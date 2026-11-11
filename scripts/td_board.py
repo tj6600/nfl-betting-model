@@ -175,17 +175,21 @@ for (home, away, book, market), bg in SN.groupby(['home_team', 'away_team', 'boo
             row = gp[(gp.game == game) & (gp.market == 'moneyline') & (gp.side == x.side)]
             if row.empty: continue
             model = float(row.model_prob.iloc[0]); lab = f'{x.side} moneyline'; lid = f'g-{gi["game_id"]}-ml-{x.side}'
+            grp, gt, sl = f'g-{gi["game_id"]}-ml', f'{game} moneyline', x.side
         elif market == 'spread':
             if 'pm' not in gi or x.point != x.point: continue
             model = 1 - norm.cdf(-x.point, gi['pm'], SDM) if x.side == home else norm.cdf(x.point, gi['pm'], SDM)
             other = other[other.point == -x.point]; lab = f'{x.side} {x.point:+g}'; lid = f'g-{gi["game_id"]}-sp-{x.side}-{x.point:g}'
+            hp = x.point if x.side == home else -x.point
+            grp, gt, sl = f'g-{gi["game_id"]}-sp-{hp:g}', f'{game} spread {abs(x.point):g}', f'{x.side} {x.point:+g}'
         else:
             if 'pt' not in gi or x.point != x.point: continue
             po = 1 - norm.cdf(x.point, gi['pt'], SDT); model = po if x.side == 'Over' else 1 - po
             other = other[other.point == x.point]; lab = f'{x.side} {x.point:g}'; lid = f'g-{gi["game_id"]}-tot-{x.side}-{x.point:g}'
+            grp, gt, sl = f'g-{gi["game_id"]}-tot-{x.point:g}', f'{game} total {x.point:g}', x.side
         bp = _imp(x.price) / (_imp(x.price) + _imp(other.price.iloc[0])) if len(other) else np.nan
         cat = gp[(gp.game == game) & (gp.market == market) & (gp.side == x.side)].category
-        add_leg(lid, bk, x.price, game=game, kind='Game', who=game, label=lab, model=float(model), bp=bp,
+        add_leg(lid, bk, x.price, game=game, kind='Game', who=game, label=lab, grp=grp, gt=gt, sl=sl, model=float(model), bp=bp,
                 cat=_cat(cat.iloc[0]) if len(cat) else '', key=f'{game}-{market}', flag='')
 # touchdowns: one number, so only the price differs by book
 for r in A.itertuples():
@@ -194,7 +198,7 @@ for r in A.itertuples():
     bks = O[(O.home == home) & (O.away == away) & (O.k == k) & O.book.isin(['DraftKings', 'FanDuel'])]
     flag = 'Check role' if r.category == 'Check role' else ('small role' if r.h_carries + r.h_targets < 3 else '')
     for b in bks.itertuples():
-        add_leg(f't-{r.pid}', b.book, b.price, game=r.game, kind='TD', who=r.full_name, label='anytime TD', team=r.posteam, model=float(r.model_prob),
+        add_leg(f't-{r.pid}', b.book, b.price, game=r.game, kind='TD', who=r.full_name, label='anytime TD', grp=f't-{r.pid}', gt=f'{r.full_name} anytime TD', sl='Yes', team=r.posteam, model=float(r.model_prob),
                 bp=float(r.book_prob) if r.book_prob == r.book_prob else np.nan, cat=_cat(r.category), key=f'td-{r.pid}', flag=flag)
 # yards over/unders: each book's own number, with the model's chance at that number (scripts/yards_picks.py)
 yb = yf.replace('_yards.csv', '_yards_books.csv')
@@ -207,6 +211,7 @@ if os.path.exists(yb):
         flag = 'Check role' if m.category == 'Check role' else ('' if m.regular else 'small role')
         add_leg(f'y-{r.pid}-{kind}-{r.side}-{r.point:g}', r.book, r.price, game=m.game, kind=kind, who=m.player, team=m.team,
                 label=f'{r.side} {r.point:g} {kind.lower()} yds', model=float(r.model_only),
+                grp=f'y-{r.pid}-{kind}-{r.point:g}', gt=f'{m.player} {r.point:g} {kind.lower()} yds', sl=r.side,
                 bp=float(r.book_p) if r.book_p == r.book_p else float(m.market_prob), cat=_cat(m.category) if m.best_line == r.point else '',
                 key=f'{r.pid}-{kind}', flag=flag)
 # milestones: one number, only the price differs by book
@@ -221,7 +226,8 @@ if os.path.exists(mb):
         kind = 'Rush' if r.kind == 'rush' else 'Rec'
         flag = 'Check role' if m.risky else ('' if m.regular else 'small role')
         add_leg(f'm-{r.pid}-{kind}-{r.milestone}', r.book, r.price, game=m.game, kind='Milestone', who=m.player, team=m.team,
-                label=f'{r.milestone}+ {kind.lower()} yds', model=float(m.model_only), bp=float(m.book_prob), cat=_cat(m.category),
+                label=f'{r.milestone}+ {kind.lower()} yds', model=float(m.model_only),
+                grp=f'm-{r.pid}-{kind}-{r.milestone}', gt=f'{m.player} {r.milestone}+ {kind.lower()} yds', sl='Yes', bp=float(m.book_prob), cat=_cat(m.category),
                 key=f'{r.pid}-{kind}', flag=flag)
 # chance = model blended with the books' no-vig chance: 50/50 normally, leaning on the books for long shots
 # (model weight 0.5 at a 25%+ book chance, sliding to 0.2 below about 12%), since the model is least reliable in the tails.

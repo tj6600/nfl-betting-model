@@ -283,7 +283,11 @@ const amer = (d) => (d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d -
 const PK = 'props-parlay-v2';
 const PBOOKS = ['DraftKings'];
 const ABBR = { DraftKings: 'DK', FanDuel: 'FD' };
-const PS = { kind: 'all', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25, note: '' };
+const PS = { kind: 'all', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25, note: '', sel: {} };
+// one row per bet: both sides of an over/under or spread together, so either side can be picked
+const GROUPS = Object.values(LEGS.reduce((acc, l) => { (acc[l.grp] = acc[l.grp] || { grp: l.grp, title: l.gt, kind: l.kind, sides: [] }).sides.push(l); return acc; }, {}))
+  .map((g) => { g.sides.sort((a, b) => (a.sl === 'Over' ? -1 : b.sl === 'Over' ? 1 : 0)); g.flag = g.sides.map((x) => x.flag).find((f) => f) || '';
+    g.text = (g.title + ' ' + g.sides[0].game + ' ' + (g.sides[0].team || '')).toLowerCase(); return g; });
 const pts = (e) => `${e > 0 ? '+' : ''}${(e * 100).toFixed(1)} pts`;
 const pct1 = (v) => (v < 0.1 ? (v * 100).toFixed(1) : (v * 100).toFixed(0)) + '%';
 let slip = []; try { slip = (JSON.parse(localStorage.getItem(PK) || '[]')).filter((id) => LEG[id]); } catch (e) { slip = []; }
@@ -371,7 +375,7 @@ function renderWins() {
 }
 function renderParlay() {
   document.getElementById('lede').textContent = 'Build a parlay from any priced leg this week: game lines, touchdowns, yards over/unders and milestones. The slip shows the chance it hits, the payout, the EV, and a verdict on whether it is worth taking.';
-  document.getElementById('legend').replaceChildren();
+  document.getElementById('legend').innerHTML = '<span><i class="leanmark" style="margin:0 4px 0 0">★</i>Our lean on an over/under or spread</span><span>Tap either side to see its chance, edge and EV, then Add it. You can always go against our lean.</span>';
   document.querySelector('.bar').style.display = 'none';
   renderWins(); renderGames();
   const board = document.getElementById('board'); board.replaceChildren(); board.className = 'cols pl';
@@ -386,7 +390,7 @@ function renderParlay() {
     b.onclick = () => { PS.kind = k; renderParlay(); }; seg.append(b);
   }
   const tg = el('label', 'tog'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = PS.plus; cb.onchange = (e) => { PS.plus = e.target.checked; drawList(); };
-  tg.append(cb, document.createTextNode(' Positive EV only'));
+  tg.append(cb, document.createTextNode(' Positive EV side only'));
   const tg2 = el('label', 'tog'); const cb2 = el('input'); cb2.type = 'checkbox'; cb2.checked = PS.clean; cb2.onchange = (e) => { PS.clean = e.target.checked; drawList(); };
   tg2.append(cb2, document.createTextNode(' Hide flagged roles'));
   const so = el('select'); so.setAttribute('aria-label', 'Sort legs');
@@ -400,21 +404,41 @@ function renderParlay() {
   const list = el('div', 'pllist'); pick.append(list);
   function drawList() {
     const qq = PS.q.trim().toLowerCase();
-    const xs = LEGS.filter((l) => inScope(l) && (PS.kind === 'all' || l.kind === PS.kind) && (!PS.plus || l.ev > 0) && (!PS.clean || !l.flag) && l.p >= PS.minp
-      && (!qq || (l.who + ' ' + l.label + ' ' + l.game + ' ' + (l.team || '')).toLowerCase().includes(qq)))
-      .sort(PS.sort === 'ev' ? (a, b) => b.ev - a.ev : PS.sort === 'p' ? (a, b) => b.p - a.p : (a, b) => b.edge - a.edge).slice(0, 80);
-    ph.lastChild.textContent = `${xs.length >= 80 ? 'top 80' : xs.length} legs`;
+    const okSide = (l) => (!PS.plus || l.ev > 0) && l.p >= PS.minp;
+    const metric = PS.sort === 'ev' ? (l) => l.ev : PS.sort === 'p' ? (l) => l.p : (l) => l.edge;
+    const gs = GROUPS.filter((g) => inScope(g.sides[0]) && (PS.kind === 'all' || g.kind === PS.kind) && (!PS.clean || !g.flag)
+      && (!qq || g.text.includes(qq)) && g.sides.some(okSide))
+      .map((g) => ({ g, m: Math.max(...g.sides.filter(okSide).map(metric)) })).sort((a, b) => b.m - a.m).slice(0, 80).map((x) => x.g);
+    ph.lastChild.textContent = `${gs.length >= 80 ? 'top 80' : gs.length} bets`;
     list.replaceChildren();
-    if (!xs.length) list.append(el('div', 'empty', 'No legs match. Try another search or turn off Positive EV only.'));
-    for (const l of xs) {
-      const on = slip.includes(l.id);
-      const r = el('div', 'leg'); const w = el('div', 'who');
-      w.append(el('span', 'n', legName(l)), el('span', 's', `${l.kind === 'Milestone' ? 'Milestone' : l.kind === 'Game' ? 'Game line' : l.kind === 'TD' ? 'Touchdown' : l.kind + ' yards'} · ${l.game}${l.cat ? ' · ' + l.cat : ''}${l.flag ? ' · ' + l.flag : ''}`));
-      const pr = el('div', 'price'); pr.append(el('span', 'e', `${ABBR[l.book]} ${fmtOdds(l.price)} · ${pct(l.p)}`), el('span', 'e ' + (l.edge >= 0 ? 'pos' : 'neg'), `edge ${pts(l.edge)} · EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`));
-      const b = el('button', 'add' + (on ? ' on' : ''), on ? 'Added' : 'Add'); b.type = 'button'; b.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + legName(l));
-      b.onclick = () => { slip = on ? slip.filter((i) => i !== l.id) : [...slip, l.id]; saveSlip(); renderParlay(); };
-      r.append(w, pr, b); list.append(r);
+    if (!gs.length) list.append(el('div', 'empty', 'Nothing matches. Try another search or turn off Positive EV only.'));
+    for (const g of gs) list.append(groupRow(g));
+  }
+  function groupRow(g) {
+    const r = el('div', 'leg'); const w = el('div', 'who'); const l0 = g.sides[0];
+    const kindName = l0.kind === 'Milestone' ? 'Milestone' : l0.kind === 'Game' ? 'Game line' : l0.kind === 'TD' ? 'Touchdown' : l0.kind + ' yards';
+    const lean = g.sides.reduce((a, b) => (b.edge > a.edge ? b : a));
+    const cat = g.sides.map((x) => x.cat).find((c) => c) || '';
+    w.append(el('span', 'n', g.title), el('span', 's', `${kindName} · ${l0.game}${cat ? ' · ' + cat : ''}${g.flag ? ' · ' + g.flag : ''}`));
+    const inSlip = g.sides.find((x) => slip.includes(x.id));
+    const cur = g.sides.find((x) => x.id === PS.sel[g.grp]) || inSlip || lean;
+    const box = el('div', 'sidebox');
+    const seg = el('div', 'seg sides');
+    for (const x of g.sides) {
+      const b = el('button', null); b.type = 'button'; b.setAttribute('aria-pressed', x === cur);
+      b.append(el('span', null, g.sides.length > 1 ? x.sl : 'Yes'), el('small', null, ' ' + fmtOdds(x.price)));
+      if (g.sides.length > 1 && x === lean && lean.edge > 0) b.append(el('i', 'leanmark', '★'));
+      b.setAttribute('aria-label', `${x.sl} ${fmtOdds(x.price)}${x === lean ? ', our lean' : ''}`);
+      b.onclick = () => { PS.sel[g.grp] = x.id; renderParlay(); };
+      seg.append(b);
     }
+    const st = el('span', 'e ' + (cur.edge >= 0 ? 'pos' : 'neg'), `${pct(cur.p)} · edge ${pts(cur.edge)} · EV ${cur.ev > 0 ? '+' : ''}${(cur.ev * 100).toFixed(0)}%`);
+    box.append(seg, st);
+    if (g.sides.length > 1 && cur !== lean && lean.edge > 0) box.append(el('span', 'e dim', `Going against our lean (${lean.sl})`));
+    const on = slip.includes(cur.id);
+    const b = el('button', 'add' + (on ? ' on' : ''), on ? 'Added' : 'Add'); b.type = 'button'; b.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + legName(cur));
+    b.onclick = () => { slip = on ? slip.filter((i) => i !== cur.id) : [...slip.filter((i) => !g.sides.some((x) => x.id === i)), cur.id]; saveSlip(); renderParlay(); };
+    r.append(w, box, b); return r;
   }
   drawList();
   // slip
