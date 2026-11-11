@@ -101,6 +101,19 @@ if os.path.exists(yf) and yprops:
     D['yards'] = yards
     D['yardsTaken'] = yt.tz_localize('UTC').tz_convert('America/New_York').strftime('%A, %B %-d at %-I:%M %p ET')
 
+# latest blind test (scripts/props_blind_test.py), shown on its own tab
+bl = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'blind', '*_summary.csv')))
+if bl:
+    tag = os.path.basename(bl[-1]).replace('_summary.csv', '')
+    bs, bw = tag.split('_'); bweek = int(bw[2:])
+    Sm = pd.read_csv(bl[-1])
+    tdb = pd.read_csv(bl[-1].replace('_summary', '_td')); tdb = tdb[tdb.played & (tdb.p_td >= 0.35)]
+    ydb = pd.read_csv(bl[-1].replace('_summary', '_yards')); ydb = ydb[ydb.p_lean >= 0.57]
+    D['blind'] = dict(season=int(bs), week=bweek, summary=Sm.to_dict('records'),
+                      td=[dict(name=r.full_name, team=r.posteam, pos=r.position, p=round(r.p_td, 3), right=bool(r.scored)) for r in tdb.itertuples()],
+                      yards=[dict(market=r.market, name=r.full_name, team=r.posteam, pos=r.position, line=r.line, proj=round(r.projection, 1),
+                                  lean=r.lean, p=round(r.p_lean, 3), actual=r.actual, right=bool(r.right)) for r in ydb.sort_values('p_lean', ascending=False).itertuples()])
+
 B = os.path.join(ROOT, 'board')
 data = json.dumps(D, separators=(',', ':')).replace('</', '<\\/')
 html = (open(os.path.join(B, 'head.html')).read() + open(os.path.join(B, 'body.html')).read().replace('2026 · Week 10', f'{season} · Week {week}')

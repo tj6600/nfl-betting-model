@@ -2,7 +2,7 @@ const D = JSON.parse(document.getElementById('td-data').textContent);
 const TD = D.players.map((p) => ({ ...p, opps: p.carries + p.targets, edge: p.book == null ? null : p.model - p.book }));
 const YD = D.yards || [];
 const state = { tab: 'td', cat: 'all', game: 'all', pos: 'all', q: '', sort: null, small: true, open: null };
-const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']];
+const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
 const PILL = { 'TD value': 'value', 'Value': 'value', 'Most likely': 'likely', 'Check role': 'check' };
 const fmtOdds = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
@@ -195,7 +195,34 @@ function column(title, sub, list) {
   list.forEach((p) => c.append(state.tab === 'td' ? tdRow(p) : ydRow(p)));
   return c;
 }
+function renderTest() {
+  const B = D.blind;
+  document.getElementById('lede').textContent = `Blind test on week ${B.week}: both models were fit only on games before week ${B.week}, priced the players that week, and were then checked against what happened. Players who didn't play are left out, since books void those bets.`;
+  for (const id of ['cats', 'games', 'legend']) document.getElementById(id).replaceChildren();
+  document.querySelector('.bar').style.display = 'none';
+  const board = document.getElementById('board'); board.replaceChildren(); board.className = 'cols';
+  const tiles = el('div', 'tiles');
+  for (const r of B.summary) {
+    const t = el('div', 'tile');
+    t.append(el('span', 'k', `${r.test} · ${r.group}`), el('span', 'big', `${r.right}–${r.wrong}`),
+      el('span', 's', `${(r.hit * 100).toFixed(0)}% right · model expected ${r.expected} of ${r.picks}`));
+    tiles.append(t);
+  }
+  board.append(tiles);
+  const mk = (title, sub, rows, cells) => {
+    const c = el('section', 'col'); const h = el('div', 'colhead'); h.append(el('h2', null, title), el('span', null, sub)); c.append(h);
+    const wrap = el('div', 'tablewrap'); const tb = el('table', 'res'); const tbody = el('tbody');
+    for (const r of rows) { const tr = el('tr'); for (const [v, cls] of cells(r)) tr.append(el('td', cls || null, v)); tbody.append(tr); }
+    tb.append(tbody); wrap.append(tb); c.append(wrap); return c;
+  };
+  board.append(mk('Touchdowns', 'players given 35%+', B.td, (r) => [[r.name], [`${r.pos} · ${r.team}`, 'dim'], [pct(r.p), 'num'], [r.right ? 'Scored' : 'No TD', r.right ? 'pos' : 'neg']]));
+  board.append(mk('Yards leans', 'confident leans (57%+) vs stand-in line', B.yards, (r) => [[r.name], [`${r.market.split(' ')[0]} · ${r.team}`, 'dim'],
+    [`${r.lean} ${r.line}`], [`proj ${r.proj.toFixed(0)}`, 'num dim'], [`actual ${r.actual.toFixed(0)}`, 'num'], [r.right ? 'Right' : 'Wrong', r.right ? 'pos' : 'neg']]));
+  document.getElementById('foot').textContent = `There are no saved prop lines for week ${B.week}, so touchdowns are graded on whether the player scored, and yards are graded against a stand-in line: his season average before week ${B.week}, rounded to .5. Real books set yards lines a little below the average, because a few big games pull the average up, so the Under results here look better than they would against real lines. Treat this as a check that the chances are sensible. The real test is this week's picks, graded against real lines after the games.`;
+}
 function render() {
+  if (state.tab === 'test') { renderTabs(); renderTest(); return; }
+  document.querySelector('.bar').style.display = '';
   const cf = CONF[state.tab];
   document.getElementById('lede').textContent = cf.lede;
   document.getElementById('legend').innerHTML = state.tab === 'td' ? cf.legend : YARDS_LEGEND;
