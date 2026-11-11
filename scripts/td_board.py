@@ -124,6 +124,44 @@ if os.path.exists(mf):
         at = pd.Timestamp(os.path.basename(aprops[-1])[9:].split('.')[0].replace('Z', ''))
         D['altTaken'] = at.tz_localize('UTC').tz_convert('America/New_York').strftime('%A, %B %-d at %-I:%M %p ET')
 
+# every priced leg for the parlay builder; chances blend the model with the books like the yards tabs do
+def _dec(a): return 1 + a / 100 if a > 0 else 1 + 100 / -a
+legs = []
+gp = pd.read_csv(os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}.csv'))
+for r in gp.dropna(subset=['best_price']).itertuples():
+    d = _dec(r.best_price); pb = min(0.99, 0.976 / d)   # break-even with a typical margin taken out
+    pp = 0.5 * r.model_prob + 0.5 * pb
+    lab = {'spread': f"{r.side} {r.best_line:+g}", 'moneyline': f"{r.side} moneyline", 'total': f"{r.side} {r.best_line:g}"}[r.market]
+    legs.append(dict(id=f"g-{r.game_id}-{r.market}-{r.side}", game=r.game, kind='Game', who=r.game, label=lab, p=round(pp, 4), model=round(r.model_prob, 4),
+                     price=int(r.best_price), book=r.best_book, ev=round(pp * d - 1, 4), cat=r.category if isinstance(r.category, str) else '',
+                     key=f"{r.game}-{r.market}", flag=''))
+for r in A.dropna(subset=['best_price']).itertuples():
+    d = _dec(r.best_price); pp = 0.5 * r.model_prob + 0.5 * r.book_prob if r.book_prob == r.book_prob else r.model_prob
+    flag = 'Check role' if r.category == 'Check role' else ('small role' if r.h_carries + r.h_targets < 3 else '')
+    legs.append(dict(id=f"t-{r.pid}", game=r.game, kind='TD', who=r.full_name, label='anytime TD', team=r.posteam, p=round(pp, 4), model=round(r.model_prob, 4),
+                     price=int(r.best_price), book=r.best_book, ev=round(pp * d - 1, 4), cat=r.category if isinstance(r.category, str) else '',
+                     key=f"td-{r.pid}", flag=flag))
+if os.path.exists(yf):
+    for r in pd.read_csv(yf).itertuples():
+        kind = 'Rush' if r.market.startswith('Rush') else 'Rec'
+        flag = 'Check role' if r.category == 'Check role' else ('' if r.regular else 'small role')
+        legs.append(dict(id=f"y-{r.pid}-{kind}-{r.side}", game=r.game, kind=kind, who=r.player, team=r.team, label=f"{r.side} {r.best_line:g} {kind.lower()} yds",
+                         p=round(r.model_prob, 4), model=round(r.model_only, 4), price=int(r.best_price), book=r.best_book, ev=round(r.ev, 4),
+                         cat=r.category if isinstance(r.category, str) else '', key=f"{r.pid}-{kind}", flag=flag))
+if os.path.exists(mf):
+    for r in pd.read_csv(mf).itertuples():
+        if not 0.05 <= r.prob <= 0.97: continue
+        kind = 'Rush' if r.market.startswith('Rush') else 'Rec'
+        flag = 'Check role' if r.risky else ('' if r.regular else 'small role')
+        legs.append(dict(id=f"m-{r.pid}-{kind}-{r.milestone}", game=r.game, kind='Milestone', who=r.player, team=r.team, label=f"{r.milestone}+ {kind.lower()} yds",
+                         p=round(r.prob, 4), model=round(r.model_only, 4), price=int(r.best_price), book=r.best_book, ev=round(r.ev, 4),
+                         cat=r.category if isinstance(r.category, str) else '', key=f"{r.pid}-{kind}", flag=flag))
+D['legs'] = legs
+# suggested parlay: the best qualifying leg from each of the four strongest games
+LG = pd.DataFrame(legs)
+LG = LG[(LG.cat.isin(['Value', 'Optimal', 'Secure', 'TD value', 'Likely hit'])) & (LG.flag == '') & (LG.p >= 0.55) & (LG.ev > 0.03)]
+D['suggested'] = list(LG.sort_values('ev', ascending=False).groupby('game').head(1).head(4).id)
+
 # latest blind test (scripts/props_blind_test.py), shown on its own tab
 bl = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'blind', '*_summary.csv')))
 if bl:
@@ -142,4 +180,4 @@ data = json.dumps(D, separators=(',', ':')).replace('</', '<\\/')
 html = (open(os.path.join(B, 'head.html')).read() + open(os.path.join(B, 'body.html')).read().replace('2026 · Week 10', f'{season} · Week {week}')
         + f'<script type="application/json" id="td-data">{data}</script>\n<script>\n' + open(os.path.join(B, 'app.js')).read() + '</script>\n')
 open(os.path.join(B, 'touchdown-board.html'), 'w').write(html)
-print('wrote board/touchdown-board.html', len(out), 'TD players,', len(yards), 'yards props,', len(D.get('milestones', [])), 'milestone ladders')
+print('wrote board/touchdown-board.html', len(out), 'TD players,', len(yards), 'yards props,', len(D.get('milestones', [])), 'milestone ladders,', len(legs), 'parlay legs')

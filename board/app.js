@@ -8,7 +8,7 @@ const headStep = (p) => {
 };
 const MS = (D.milestones || []).map((p) => { const h = headStep(p); return { ...p, head: h, p: h.p, ev: Math.max(...p.steps.map((x) => x.ev)) }; });
 const state = { tab: 'td', cat: 'all', game: 'all', pos: 'all', q: '', sort: null, small: true, open: null };
-const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(MS.length ? [['ms', 'Milestones']] : []).concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
+const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(MS.length ? [['ms', 'Milestones']] : []).concat(D.legs ? [['parlay', 'Parlay builder']] : []).concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
 const PILL = { 'TD value': 'value', 'Value': 'value', 'Most likely': 'likely', 'Check role': 'check', 'Likely hit': 'likely' };
 const fmtOdds = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
@@ -276,8 +276,121 @@ function renderTest() {
     [`${r.lean} ${r.line}`], [`proj ${r.proj.toFixed(0)}`, 'num dim'], [`actual ${r.actual.toFixed(0)}`, 'num'], [r.right ? 'Right' : 'Wrong', r.right ? 'pos' : 'neg']]));
   document.getElementById('foot').textContent = `There are no saved prop lines for week ${B.week}, so touchdowns are graded on whether the player scored, and yards are graded against a stand-in line: his season average before week ${B.week}, rounded to .5. Real books set yards lines a little below the average, because a few big games pull the average up, so the Under results here look better than they would against real lines. Treat this as a check that the chances are sensible. The real test is this week's picks, graded against real lines after the games.`;
 }
+// ---- parlay builder ----
+const LEGS = D.legs || []; const LEG = Object.fromEntries(LEGS.map((l) => [l.id, l]));
+const dec = (a) => (a > 0 ? 1 + a / 100 : 1 + 100 / -a);
+const amer = (d) => (d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d - 1)));
+const PK = 'props-parlay-v1';
+const PS = { kind: 'all', q: '', plus: true, clean: true, price: '' };
+const pct1 = (v) => (v < 0.1 ? (v * 100).toFixed(1) : (v * 100).toFixed(0)) + '%';
+let slip = []; try { slip = (JSON.parse(localStorage.getItem(PK) || '[]')).filter((id) => LEG[id]); } catch (e) { slip = []; }
+const saveSlip = () => { try { localStorage.setItem(PK, JSON.stringify(slip)); } catch (e) { /* storage unavailable */ } };
+const legName = (l) => (l.kind === 'Game' ? `${l.label}` : `${l.who} ${l.label}`);
+function parlayMath(ids, priceOverride) {
+  const ls = ids.map((i) => LEG[i]);
+  const p = ls.reduce((a, l) => a * l.p, 1); const dBest = ls.reduce((a, l) => a * dec(l.price), 1);
+  const d = priceOverride ? dec(priceOverride) : dBest;
+  return { ls, p, d, dBest, ev: p * d - 1, be: 1 / d };
+}
+function warnings(ids) {
+  const ls = ids.map((i) => LEG[i]); const w = [];
+  const byGame = {}; ls.forEach((l) => { (byGame[l.game] = byGame[l.game] || []).push(l); });
+  for (const [g, xs] of Object.entries(byGame)) if (xs.length > 1) w.push(['warn', `${xs.length} legs from ${g}. Same-game legs move together, and this math treats them as independent. Books also price same-game parlays differently.`]);
+  const byKey = {}; ls.forEach((l) => { (byKey[l.key] = byKey[l.key] || []).push(l); });
+  for (const xs of Object.values(byKey)) if (xs.length > 1) w.push(['bad', `${xs.map(legName).join(' and ')} are the same bet market twice. Most books won't allow it, and the chances aren't independent.`]);
+  ls.filter((l) => l.ev < 0).forEach((l) => w.push(['bad', `${legName(l)} is negative EV on its own (${(l.ev * 100).toFixed(0)}%). It drags the whole parlay down.`]));
+  ls.filter((l) => l.flag).forEach((l) => w.push(['warn', `${legName(l)}: ${l.flag === 'Check role' ? 'role flag (missed time, moved down the depth chart, or the model and books disagree a lot)' : 'small role, so the chance is less reliable'}.`]));
+  const books = new Set(ls.map((l) => l.book)); if (ls.length > 1 && books.size > 1) w.push(['info', `Best prices come from ${books.size} different books, but a parlay has to sit at one. Enter your book's parlay price for the real EV.`]);
+  return w;
+}
+function verdict(m, n, ws) {
+  if (!n) return null;
+  if (m.ev >= 0 && ws.some((w) => w[0] === 'bad')) return ['bad', 'Fix the legs first', 'Positive on paper, but at least one leg is negative EV or doubles up a market. See the notes below.'];
+  if (m.ev >= 0.08 && ws.some((w) => w[0] === 'warn')) return ['warn', 'Positive, with caveats', `EV of ${(m.ev * 100).toFixed(0)}% on the model\'s numbers, but some legs are flagged or share a game, so trust it less. See the notes below.`];
+  if (m.ev < 0) return ['bad', 'Skip it', `The legs together are worth less than the payout pays. You lose about ${Math.abs(m.ev * 100).toFixed(0)} cents per dollar on average.`];
+  if (m.ev < 0.08) return ['warn', 'Thin edge', 'Slightly positive on the model\'s numbers, but small enough that model error or a worse price at your book could wipe it out.'];
+  return ['good', 'Worth taking on the model\'s numbers', `Positive EV of ${(m.ev * 100).toFixed(0)}%. Remember that the edges multiply: if each leg's true edge is half what the model thinks, so is much of this.`];
+}
+function renderParlay() {
+  document.getElementById('lede').textContent = 'Build a parlay from any priced leg this week: game lines, touchdowns, yards over/unders and milestones. The slip shows the chance it hits, the payout, the EV, and a verdict on whether it is worth taking.';
+  for (const id of ['cats', 'legend']) document.getElementById(id).replaceChildren();
+  document.querySelector('.bar').style.display = 'none';
+  renderGames();
+  const board = document.getElementById('board'); board.replaceChildren(); board.className = 'cols pl';
+  // picker
+  const pick = el('section', 'col'); const ph = el('div', 'colhead'); ph.append(el('h2', null, 'Add legs'), el('span', null, '')); pick.append(ph);
+  const ctl = el('div', 'plctl');
+  const q = el('input'); q.type = 'search'; q.placeholder = 'Search a player, team or game'; q.value = PS.q; q.setAttribute('aria-label', 'Search legs');
+  q.oninput = (e) => { PS.q = e.target.value; drawList(); };
+  const seg = el('div', 'seg');
+  for (const k of ['all', 'Game', 'TD', 'Rush', 'Rec', 'Milestone']) {
+    const b = el('button', null, k === 'all' ? 'All' : k === 'Rush' ? 'Rush yds' : k === 'Rec' ? 'Rec yds' : k); b.type = 'button'; b.setAttribute('aria-pressed', PS.kind === k);
+    b.onclick = () => { PS.kind = k; renderParlay(); }; seg.append(b);
+  }
+  const tg = el('label', 'tog'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = PS.plus; cb.onchange = (e) => { PS.plus = e.target.checked; drawList(); };
+  tg.append(cb, document.createTextNode(' Positive EV only'));
+  const tg2 = el('label', 'tog'); const cb2 = el('input'); cb2.type = 'checkbox'; cb2.checked = PS.clean; cb2.onchange = (e) => { PS.clean = e.target.checked; drawList(); };
+  tg2.append(cb2, document.createTextNode(' Hide flagged roles'));
+  ctl.append(q, seg, tg, tg2); pick.append(ctl);
+  const list = el('div', 'pllist'); pick.append(list);
+  function drawList() {
+    const qq = PS.q.trim().toLowerCase();
+    const xs = LEGS.filter((l) => (state.game === 'all' || l.game === state.game) && (PS.kind === 'all' || l.kind === PS.kind) && (!PS.plus || l.ev > 0) && (!PS.clean || !l.flag)
+      && (!qq || (l.who + ' ' + l.label + ' ' + l.game + ' ' + (l.team || '')).toLowerCase().includes(qq)))
+      .sort((a, b) => b.ev - a.ev).slice(0, 80);
+    ph.lastChild.textContent = `${xs.length >= 80 ? 'top 80' : xs.length} legs, best EV first`;
+    list.replaceChildren();
+    if (!xs.length) list.append(el('div', 'empty', 'No legs match. Try another search or turn off Positive EV only.'));
+    for (const l of xs) {
+      const on = slip.includes(l.id);
+      const r = el('div', 'leg'); const w = el('div', 'who');
+      w.append(el('span', 'n', legName(l)), el('span', 's', `${l.kind === 'Milestone' ? 'Milestone' : l.kind === 'Game' ? 'Game line' : l.kind === 'TD' ? 'Touchdown' : l.kind + ' yards'} · ${l.game}${l.cat ? ' · ' + l.cat : ''}${l.flag ? ' · ' + l.flag : ''}`));
+      const pr = el('div', 'price'); pr.append(el('span', 'e', `${fmtOdds(l.price)} · ${pct(l.p)}`), el('span', 'e ' + (l.ev >= 0 ? 'pos' : 'neg'), `EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`));
+      const b = el('button', 'add' + (on ? ' on' : ''), on ? 'Added' : 'Add'); b.type = 'button'; b.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + legName(l));
+      b.onclick = () => { slip = on ? slip.filter((i) => i !== l.id) : [...slip, l.id]; saveSlip(); renderParlay(); };
+      r.append(w, pr, b); list.append(r);
+    }
+  }
+  drawList();
+  // slip
+  const sl = el('section', 'col slip'); const sh = el('div', 'colhead'); sh.append(el('h2', null, 'Your parlay'));
+  const acts = el('span', 'acts');
+  const sug = el('button', 'lnk', 'Load suggested'); sug.type = 'button'; sug.onclick = () => { slip = [...(D.suggested || [])]; saveSlip(); renderParlay(); };
+  const clr = el('button', 'lnk', 'Clear'); clr.type = 'button'; clr.onclick = () => { slip = []; PS.price = ''; saveSlip(); renderParlay(); };
+  acts.append(sug, clr); sh.append(acts); sl.append(sh);
+  if (!slip.length) sl.append(el('div', 'empty', 'Add legs from the list, or load the suggested parlay: the best value leg from each of the four strongest games.'));
+  else {
+    const m = parlayMath(slip, PS.price && Number(PS.price) && Math.abs(Number(PS.price)) >= 100 ? Number(PS.price) : null);
+    const lsx = el('div', 'books slipl');
+    for (const l of m.ls) {
+      const r = el('div'); const left = el('span'); left.append(el('b', null, legName(l)), el('small', null, `${l.game} · ${fmtOdds(l.price)} at ${l.book}`));
+      const right = el('span', 'num ' + (l.ev >= 0 ? 'pos' : 'neg'), `${pct(l.p)} · EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`);
+      const x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Remove ' + legName(l)); x.onclick = () => { slip = slip.filter((i) => i !== l.id); saveSlip(); renderParlay(); };
+      r.append(left, right, x); lsx.append(r);
+    }
+    sl.append(lsx);
+    const pin = el('label', 'pin'); pin.append(document.createTextNode("Your book's parlay price (optional) "));
+    const ip = el('input'); ip.type = 'text'; ip.inputMode = 'numeric'; ip.placeholder = fmtOdds(amer(m.dBest)); ip.value = PS.price; ip.setAttribute('aria-label', "Your book's parlay price");
+    ip.onchange = (e) => { PS.price = e.target.value.replace(/[^0-9+-]/g, ''); renderParlay(); };
+    pin.append(ip); sl.append(pin);
+    const st = stats([[pct1(m.p), `chance it hits (about 1 in ${Math.max(1, Math.round(1 / m.p))})`], [fmtOdds(amer(m.d)), PS.price ? 'your price' : 'payout at best prices'],
+      [pct1(m.be), 'break-even chance'], [`${m.ev > 0 ? '+' : ''}${(m.ev * 100).toFixed(0)}%`, 'expected value'], [`$${(10 * (m.d - 1)).toFixed(0)}`, 'profit on a $10 win'], [`${m.ev > 0 ? '+' : '-'}$${Math.abs(10 * m.ev).toFixed(2)}`, 'average result per $10']]);
+    st.classList.add('pad'); sl.append(st);
+    const v = verdict(m, slip.length, warnings(slip));
+    const vb = el('div', 'verdict ' + v[0]); vb.append(el('b', null, v[1]), el('span', null, v[2])); sl.append(vb);
+    if (m.ls.length > 1) {
+      const drops = m.ls.map((l) => ({ l, ev: parlayMath(slip.filter((i) => i !== l.id), null).ev })).sort((a, b) => b.ev - a.ev);
+      const evBest = parlayMath(slip, null).ev;
+      if (drops[0].ev > evBest + 0.005) { const t = el('p', 'note', `Tip: dropping ${legName(drops[0].l)} raises the EV to ${(drops[0].ev * 100).toFixed(0)}% at best prices.`); t.style.padding = '0 14px'; sl.append(t); }
+    }
+    const wl = el('ul', 'warns'); for (const [k, t] of warnings(slip)) wl.append(el('li', k, t)); if (wl.children.length) sl.append(wl);
+  }
+  board.append(pick, sl);
+  document.getElementById('foot').textContent = 'Each leg\'s chance blends our model 50/50 with the books\' own chance. Game lines are blended too, because on past closing lines the spread model showed no edge by itself. The parlay chance multiplies the legs, which assumes they are independent, so legs from the same game are flagged. EV uses the best price for each leg unless you enter your book\'s parlay price. None of these leg types has been graded against real lines yet, so treat the EV as the model\'s opinion, not a promise. Tracking only, not betting advice.';
+}
 function render() {
   if (state.tab === 'test') { renderTabs(); renderTest(); return; }
+  if (state.tab === 'parlay') { renderTabs(); renderParlay(); return; }
   document.querySelector('.bar').style.display = '';
   const cf = CONF[state.tab];
   document.getElementById('lede').textContent = cf.lede;
