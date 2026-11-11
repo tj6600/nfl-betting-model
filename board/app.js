@@ -148,6 +148,54 @@ function tdRow(p) {
   pr.append(el('span', 'e ' + (p.ev == null || small ? 'dim' : p.ev >= 0 ? 'pos' : 'neg'), p.ev == null ? '' : small ? 'small role' : `EV ${p.ev > 0 ? '+' : ''}${p.ev.toFixed(0)}%`));
   return rowShell(p, [who(p), m, pr], tdDetail);
 }
+// ---- season game log (opens from any player) ----
+const LOGS = D.logs || {};
+function logButton(pid, ctx) {
+  if (!LOGS[pid]) return null;
+  const b = el('button', 'logbtn', 'Season game log'); b.type = 'button';
+  b.onclick = (e) => { e.stopPropagation(); showLog(pid, ctx); }; return b;
+}
+function showLog(pid, ctx) {
+  const L = LOGS[pid]; const prev = document.activeElement;
+  const ov = el('div', 'overlay'); const pn = el('div', 'logpanel'); pn.setAttribute('role', 'dialog'); pn.setAttribute('aria-modal', 'true'); pn.setAttribute('aria-label', `${L.name} game log`);
+  const close = () => { ov.remove(); document.removeEventListener('keydown', esc); if (prev) prev.focus(); };
+  const esc = (e) => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', esc); ov.onclick = (e) => { if (e.target === ov) close(); };
+  const hd = el('div', 'loghead'); const t = el('div'); t.append(el('h2', null, L.name), el('span', 'dim', `${L.pos} · ${L.team} · ${D.season} regular season`));
+  const x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.onclick = close; hd.append(t, x); pn.append(hd);
+  const played = L.g.filter((r) => r[3] != null); const n = played.length || 1;
+  const sum = (i) => played.reduce((a, r) => a + r[i], 0);
+  const st = stats([[String(played.length), `games played${L.g.length > played.length ? ` (${L.g.length - played.length} missed)` : ''}`], [(sum(3) / n).toFixed(1), 'carries a game'], [(sum(4) / n).toFixed(0), 'rush yds a game'],
+    [(sum(5) / n).toFixed(1), 'targets a game'], [(sum(7) / n).toFixed(0), 'rec yds a game'], [String(sum(8)), `TDs (${(sum(8) / n).toFixed(2)} a game)`]]);
+  st.classList.add('pad'); pn.append(st);
+  // how this bet would have done in each game this season
+  let hitFn = null; let hitLabel = '';
+  if (ctx && ctx.kind === 'td') { hitFn = (r) => r[8] > 0; hitLabel = 'Scored'; }
+  else if (ctx && ctx.line != null) {
+    const i = ctx.kind === 'rush' ? 4 : 7; const over = ctx.side !== 'Under';
+    hitFn = (r) => (over ? r[i] > ctx.line : r[i] < ctx.line); hitLabel = `${over ? 'Over' : 'Under'} ${ctx.line}`;
+  }
+  if (hitFn) {
+    const h = played.filter(hitFn).length;
+    pn.append(el('p', 'loghit', `${ctx.kind === 'td' ? 'Scored a TD' : `${hitLabel} ${ctx.kind === 'rush' ? 'rushing' : 'receiving'} yds hit`} in ${h} of ${played.length} games this season (${played.length ? Math.round(100 * h / played.length) : 0}%).`));
+  }
+  const wrap = el('div', 'tablewrap'); const tb = el('table', 'res');
+  const th = el('thead'); const hr = el('tr');
+  for (const [tx, c] of [['Wk'], ['Opp'], ['Car', 'num'], ['Rush yds', 'num'], ['Tgt', 'num'], ['Rec', 'num'], ['Rec yds', 'num'], ['TD', 'num']].concat(hitFn ? [[hitLabel]] : [])) hr.append(el('th', c || null, tx));
+  th.append(hr); tb.append(th); const tbody = el('tbody');
+  for (const r of L.g) {
+    const tr = el('tr'); tr.append(el('td', null, String(r[0])), el('td', null, `${r[2] ? '@' : 'vs'} ${r[1]}`));
+    if (r[3] == null) { const td = el('td', 'dim', 'Did not play'); td.colSpan = 6 + (hitFn ? 1 : 0); tr.append(td); }
+    else {
+      for (const i of [3, 4, 5, 6, 7, 8]) tr.append(el('td', 'num', String(r[i])));
+      if (hitFn) { const ok = hitFn(r); tr.append(el('td', ok ? 'pos' : 'neg', ok ? 'Hit' : 'Miss')); }
+    }
+    tbody.append(tr);
+  }
+  tb.append(tbody); wrap.append(tb); pn.append(wrap);
+  pn.append(el('p', 'note logfoot', 'From play-by-play data. Past games show his range, not a forecast: role changes, injuries and the opponent matter, and the model weighs his recent games more.'));
+  ov.append(pn); document.body.append(ov); x.focus();
+}
 function tdDetail(p) {
   const d = el('div', 'detail');
   const a = el('div'); a.append(el('h3', null, 'Recent usage'), stats([[p.carries.toFixed(1), 'carries a game'], [p.targets.toFixed(1), 'targets a game'], [p.tdpg.toFixed(2), 'TDs a game'],
@@ -164,6 +212,7 @@ function tdDetail(p) {
     const fair = p.model / 100; const need = fair >= .5 ? -Math.round(100 * fair / (1 - fair)) : Math.round(100 * (1 - fair) / fair);
     const t = el('p', 'note', `The model's fair price is ${fmtOdds(need)}. Any price longer than that is value if the model is right.`); t.style.marginTop = '8px'; c.append(t);
   }
+  const lb = logButton(p.id, { kind: 'td' }); if (lb) a.append(lb);
   d.append(a, b, c); return d;
 }
 // ---- yards ----
@@ -204,6 +253,7 @@ function ydDetail(p) {
     bk.append(r);
   }
   c.append(bk);
+  const lb = logButton(p.pid, { kind: p.market, line: p.line, side: p.lean }); if (lb) a.append(lb);
   d.append(a, b, c); return d;
 }
 // ---- milestones ----
@@ -243,7 +293,8 @@ function msDetail(p) {
   tb.append(tbody); wrap.append(tb);
   const n = el('p', 'note', `Model projects ${p.projection.toFixed(0)} yards on average and ${p.median.toFixed(0)} at the median. "Model" is the yards model alone, "Books" is their chance with the margin removed, and "Chance" is the blend used. Fair price is what the blended chance is worth; a best price longer than it is value.${p.risky ? ' Role flag: he missed his last game, moved down the depth chart, or the model and books disagree a lot, so he is kept out of Likely hit and Value.' : ''}`);
   n.style.marginTop = '8px';
-  d.append(wrap, n); return d;
+  const lb = logButton(p.pid, { kind: p.market, line: p.head.m - 0.5, side: 'Over' });
+  d.append(wrap, n); if (lb) d.append(lb); return d;
 }
 function column(title, sub, list) {
   const c = el('section', 'col'); const h = el('div', 'colhead'); h.append(el('h2', null, title), el('span', null, sub)); c.append(h);
@@ -419,7 +470,14 @@ function renderParlay() {
     const kindName = l0.kind === 'Milestone' ? 'Milestone' : l0.kind === 'Game' ? 'Game line' : l0.kind === 'TD' ? 'Touchdown' : l0.kind + ' yards';
     const lean = g.sides.reduce((a, b) => (b.edge > a.edge ? b : a));
     const cat = g.sides.map((x) => x.cat).find((c) => c) || '';
-    w.append(el('span', 'n', g.title), el('span', 's', `${kindName} · ${l0.game}${cat ? ' · ' + cat : ''}${g.flag ? ' · ' + g.flag : ''}`));
+    const nm = l0.pid && LOGS[l0.pid] ? el('button', 'n namebtn', g.title) : el('span', 'n', g.title);
+    if (nm.tagName === 'BUTTON') {
+      nm.type = 'button'; nm.title = 'Season game log';
+      nm.onclick = () => { const c = g.sides.find((x) => x.id === PS.sel[g.grp]) || g.sides.find((x) => slip.includes(x.id)) || g.sides.reduce((a, b) => (b.edge > a.edge ? b : a));
+        const num = Number((c.label.match(/[\d.]+/) || [])[0]);
+        showLog(l0.pid, l0.kind === 'TD' ? { kind: 'td' } : l0.kind === 'Game' ? null : { kind: /rush/.test(c.label) ? 'rush' : 'rec', line: l0.kind === 'Milestone' ? num - 0.5 : num, side: l0.kind === 'Milestone' ? 'Over' : c.sl }); };
+    }
+    w.append(nm, el('span', 's', `${kindName} · ${l0.game}${cat ? ' · ' + cat : ''}${g.flag ? ' · ' + g.flag : ''}`));
     const inSlip = g.sides.find((x) => slip.includes(x.id));
     const cur = g.sides.find((x) => x.id === PS.sel[g.grp]) || inSlip || lean;
     const box = el('div', 'sidebox');

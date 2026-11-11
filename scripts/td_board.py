@@ -115,7 +115,7 @@ if os.path.exists(mf):
                       cat=x.category if isinstance(x.category, str) else '') for x in grp.sort_values('milestone').itertuples()]
         cats = set(s['cat'] for s in steps)
         cat = 'Value' if 'Value' in cats else 'Likely hit' if 'Likely hit' in cats else ''
-        ms.append(dict(id=f'{pid}-{kind}-m', name=r.player, team=r.team, opp=r.opp, game=r.game, day=str(g.gameday.date()), time=str(g.gametime),
+        ms.append(dict(id=f'{pid}-{kind}-m', pid=pid, name=r.player, team=r.team, opp=r.opp, game=r.game, day=str(g.gameday.date()), time=str(g.gametime),
                        weekday=str(g.weekday), pos=r.position, market=kind, projection=float(r.projection), median=float(r['median']),
                        line=None if r.main_line != r.main_line else float(r.main_line), regular=bool(r.regular), risky=bool(r.risky),
                        cat=cat, steps=steps))
@@ -198,7 +198,7 @@ for r in A.itertuples():
     bks = O[(O.home == home) & (O.away == away) & (O.k == k) & O.book.isin(['DraftKings', 'FanDuel'])]
     flag = 'Check role' if r.category == 'Check role' else ('small role' if r.h_carries + r.h_targets < 3 else '')
     for b in bks.itertuples():
-        add_leg(f't-{r.pid}', b.book, b.price, game=r.game, kind='TD', who=r.full_name, label='anytime TD', grp=f't-{r.pid}', gt=f'{r.full_name} anytime TD', sl='Yes', team=r.posteam, model=float(r.model_prob),
+        add_leg(f't-{r.pid}', b.book, b.price, game=r.game, kind='TD', who=r.full_name, pid=r.pid, label='anytime TD', grp=f't-{r.pid}', gt=f'{r.full_name} anytime TD', sl='Yes', team=r.posteam, model=float(r.model_prob),
                 bp=float(r.book_prob) if r.book_prob == r.book_prob else np.nan, cat=_cat(r.category), key=f'td-{r.pid}', flag=flag)
 # yards over/unders: each book's own number, with the model's chance at that number (scripts/yards_picks.py)
 yb = yf.replace('_yards.csv', '_yards_books.csv')
@@ -211,7 +211,7 @@ if os.path.exists(yb):
         flag = 'Check role' if m.category == 'Check role' else ('' if m.regular else 'small role')
         add_leg(f'y-{r.pid}-{kind}-{r.side}-{r.point:g}', r.book, r.price, game=m.game, kind=kind, who=m.player, team=m.team,
                 label=f'{r.side} {r.point:g} {kind.lower()} yds', model=float(r.model_only),
-                grp=f'y-{r.pid}-{kind}-{r.point:g}', gt=f'{m.player} {r.point:g} {kind.lower()} yds', sl=r.side,
+                pid=r.pid, grp=f'y-{r.pid}-{kind}-{r.point:g}', gt=f'{m.player} {r.point:g} {kind.lower()} yds', sl=r.side,
                 bp=float(r.book_p) if r.book_p == r.book_p else float(m.market_prob), cat=_cat(m.category) if m.best_line == r.point else '',
                 key=f'{r.pid}-{kind}', flag=flag)
 # milestones: one number, only the price differs by book
@@ -227,7 +227,7 @@ if os.path.exists(mb):
         flag = 'Check role' if m.risky else ('' if m.regular else 'small role')
         add_leg(f'm-{r.pid}-{kind}-{r.milestone}', r.book, r.price, game=m.game, kind='Milestone', who=m.player, team=m.team,
                 label=f'{r.milestone}+ {kind.lower()} yds', model=float(m.model_only),
-                grp=f'm-{r.pid}-{kind}-{r.milestone}', gt=f'{m.player} {r.milestone}+ {kind.lower()} yds', sl='Yes', bp=float(m.book_prob), cat=_cat(m.category),
+                pid=r.pid, grp=f'm-{r.pid}-{kind}-{r.milestone}', gt=f'{m.player} {r.milestone}+ {kind.lower()} yds', sl='Yes', bp=float(m.book_prob), cat=_cat(m.category),
                 key=f'{r.pid}-{kind}', flag=flag)
 # chance = model blended with the books' no-vig chance: 50/50 normally, leaning on the books for long shots
 # (model weight 0.5 at a 25%+ book chance, sliding to 0.2 below about 12%), since the model is least reliable in the tails.
@@ -257,6 +257,29 @@ for b in PARLAY_BOOKS:
     print(f'suggested at {b}: EV {sug[-1][0]:+.1%}, hit {sug[-1][4]:.1%}, decimal {sug[-1][5]:.2f}:', list(X.label + ' ' + X.who.where(X.kind != 'Game', '')))
 best = max(sug)
 D['suggested'] = dict(book=best[2], ids=best[3])
+
+# season game logs for every player on the board (play-by-play derived; weeks his team played without him show as DNP)
+H = T.history(); H = H[H.season == season]
+pids = {l['pid'] for l in legs if l.get('pid')} | {p['id'] for p in out} | {y['pid'] for y in D.get('yards', [])}
+GS = G[(G.season == season) & (G.game_type == 'REG') & G.result.notna()]
+logs = {}
+for pid, hg in H[H.pid.isin(pids)].groupby('pid'):
+    hg = hg.sort_values('week'); team = hg.posteam.iloc[-1]; byw = {r.week: r for r in hg.itertuples()}
+    teamg = GS[(GS.home_team == team) | (GS.away_team == team)]
+    weeks = sorted(set(teamg.week) | set(byw))
+    rows = []
+    for w in weeks:
+        r = byw.get(w)
+        if r is not None:
+            home, away = r.game_id.split('_')[3], r.game_id.split('_')[2]
+            opp = away if r.posteam == home else home; at = r.posteam != home
+            rows.append([int(w), opp, at, int(r.carries), round(r.rush_yds), int(r.targets), int(r.receptions), round(r.rec_yds), int(r.tds)])
+        else:
+            g = teamg[teamg.week == w].iloc[0]; at = g.away_team == team
+            rows.append([int(w), g.home_team if at else g.away_team, bool(at), None, None, None, None, None, None])
+    logs[pid] = dict(name=hg.full_name.iloc[-1], pos=hg.position.iloc[-1], team=team, g=rows)
+D['logs'] = logs
+print(len(logs), 'game logs')
 
 # latest blind test (scripts/props_blind_test.py), shown on its own tab
 bl = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'blind', '*_summary.csv')))
