@@ -101,10 +101,34 @@ Points per unit learned from 2019–2026 week 8, home minus away:
 
 The roster features move predictions in the right direction (losing starters costs points), but they don't improve accuracy against the line. The market already prices injury news, and by kickoff it does so faster and better than a snap-share proxy can. Snap share also measures playing time, not how good the player is.
 
+## Player quality and scheme matchups (v4)
+
+**Player quality** (`nflmodel/players.py`): each missing, returning or arriving regular is weighted by a quality multiplier from their last 17 games. An average regular is 1.0, the range is 0.25 to 2.25, and small samples are shrunk toward average.
+- Receivers, tight ends and backs: EPA on their targets and carries.
+- Defenders: impact plays (sacks, QB hits, tackles for loss, pass breakups, interceptions, forced fumbles).
+- Offensive linemen: no individual stats exist in play-by-play, so they all stay at 1.0.
+
+**Scheme matchups** (`nflmodel/schemes.py`, in EPA per dropback):
+- **Man vs zone:** how much better or worse the offense does against man than against zone, times how often the opposing defense plays man. This uses NGS participation data, which covers 2023–25 only. 2026 isn't published yet, so 2026 games use 2023–25 tendencies.
+- **Blitz:** the offense's EPA against the blitz minus without it, times the defense's blitz rate. This uses FTN charting, 2022–26.
+- **Play action:** the defense's EPA allowed on play action minus other dropbacks, times the offense's play-action rate. Also FTN, 2022–26.
+
+### v4 results
+
+| Test | v2 EPA+QB | v3 + roster (quality-weighted) | v4 + schemes |
+|---|---|---|---|
+| 2023–25 ATS, all games | 51.1% | 49.4% | 48.2% |
+| 2023–25 ATS, edge ≥ 3 | 42.6% | 46.9% | 47.9% |
+| 2023–25 margin MAE (line 9.94) | 10.43 | 10.46 | 10.47 |
+| 2026 wk 9 ATS | 8/15 | 9/15 | 10/15 |
+| 2026 wk 9 optimal picks | 7–5, +1.46 u | 5–7, −2.38 u | 6–7, −1.51 u |
+| 2026 wk 9 secure picks | 5–0 | 5–0 | 5–0 |
+
+Scheme matchups turn out tiny. A typical matchup is worth under 0.01 EPA per dropback, about 0.2 points a game, and the fitted weights are within noise. Teams adjust their game plans to the opponent, so a season-long tendency like "plays a lot of man" says little about one game.
+
 ## Next steps
 
-1. Player quality, not just playing time (e.g. EPA per target or PFF-style grades), so losing a star counts more than losing an average starter
-2. Opening lines (`initial_lines.csv`), to bet early numbers and measure closing line value
+1. Opening lines (`initial_lines.csv`), to bet early numbers and measure closing line value
 3. Key-number-aware margin distribution (3, 7, 10) in place of the normal approximation
 4. "Optimal" and "secure" leg ranking with expected value and fractional Kelly staking
 5. Measure closing line value using opening lines

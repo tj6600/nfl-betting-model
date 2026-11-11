@@ -7,8 +7,10 @@ BASE_MARGIN_X = ['pts_margin', 'd_pass_epa', 'd_rush_epa', 'd_succ', 'd_qb', 'ho
 BASE_TOTAL_X = ['pts_total', 's_pass_epa', 's_rush_epa', 's_succ', 's_qb', 'dome', 'wind']
 ROSTER_MARGIN_X = ['d_net_OL', 'd_net_SKILL', 'd_net_FRONT', 'd_net_DB', 'd_new_hc', 'd_interim_hc']
 ROSTER_TOTAL_X = ['s_net_OL', 's_net_SKILL', 's_net_FRONT', 's_net_DB']
-MARGIN_X = BASE_MARGIN_X + ROSTER_MARGIN_X
-TOTAL_X = BASE_TOTAL_X + ROSTER_TOTAL_X
+SCHEME_MARGIN_X = ['d_m_man', 'd_m_blitz', 'd_m_pa']
+SCHEME_TOTAL_X = ['s_m_man', 's_m_blitz', 's_m_pa']
+MARGIN_X = BASE_MARGIN_X + ROSTER_MARGIN_X + SCHEME_MARGIN_X
+TOTAL_X = BASE_TOTAL_X + ROSTER_TOTAL_X + SCHEME_TOTAL_X
 
 
 def load(feat_csv):

@@ -8,7 +8,9 @@ For each team and game, using only information available before kickoff:
 * return_<grp>   - established regulars who missed recent games and are active again.
 * arrive_<grp>   - regulars from another team who are now on this team's active roster (trades, signings),
                    counted at half weight since they may not start straight away.
-* net_<grp>      - return + arrive - missing, in "full-time starters" (1.0 = one player on every snap).
+* net_<grp>      - return + arrive - missing, in "full-time starters" (1.0 = one player on every snap),
+                   each player weighted by quality (players.py): about 0.25 for a weak starter up to 2.25 for a star.
+                   Linemen have no individual stats, so they all count as 1.0.
 
 Groups: OL, SKILL (WR/TE/RB), FRONT (DL/LB), DB. QBs are handled separately in features.py.
 
@@ -17,6 +19,7 @@ Groups: OL, SKILL (WR/TE/RB), FRONT (DL/LB), DB. QBs are handled separately in f
 """
 import os, numpy as np, pandas as pd
 from .model import G
+from .players import cached as player_games
 
 REL = 'https://github.com/nflverse/nflverse-data/releases/download'
 URLS = {'inj': REL + '/injuries/injuries_{y}.csv', 'snaps': REL + '/snap_counts/snap_counts_{y}.csv',
@@ -47,6 +50,7 @@ def build(seasons=range(2018, 2027)):
     snaps['share'] = snaps[['offense_pct', 'defense_pct']].max(axis=1).clip(0, 1)
     snaps['key'] = _key(snaps.player) + '|' + snaps.grp
     snaps = snaps.merge(G[['game_id', 'gameday']], on='game_id')
+    snaps = _add_quality_stats(snaps, seasons)
 
     inj = pd.concat([_load('inj', y) for y in seasons], ignore_index=True)
     inj = inj[inj.report_status.isin(INJ_AVAIL)]
@@ -70,6 +74,35 @@ def build(seasons=range(2018, 2027)):
     return out.merge(_coaching(), on=['game_id', 'team'], how='left')
 
 
+ROSTER_GRP = {'OL': 'OL', 'WR': 'SKILL', 'TE': 'SKILL', 'RB': 'SKILL', 'FB': 'SKILL', 'DL': 'FRONT', 'LB': 'FRONT', 'DB': 'DB'}
+Q_SCALE = {}
+
+
+def _add_quality_stats(snaps, seasons):
+    """Attach each player's per-game quality stat: EPA for skill players, impact plays for defenders."""
+    ros = pd.concat([_load('roster', y)[['gsis_id', 'full_name', 'position']] for y in seasons]).dropna()
+    ros = ros.drop_duplicates('gsis_id', keep='last')
+    ros['key'] = _key(ros.full_name) + '|' + ros.position.map(ROSTER_GRP)
+    pg, _ = player_games()
+    pg = pg.merge(ros[['gsis_id', 'key']], left_on='gsis', right_on='gsis_id')
+    snaps = snaps.merge(pg[['game_id', 'key', 'epa', 'impact']], on=['game_id', 'key'], how='left').fillna({'epa': 0.0, 'impact': 0.0})
+    snaps['qstat'] = np.where(snaps.grp == 'SKILL', snaps.epa, np.where(snaps.grp.isin(['FRONT', 'DB']), snaps.impact, 0.0))
+    # league scale of a regular's per-game rate, for z-scores
+    reg = snaps[snaps.share >= REGULAR].groupby(['season', 'key', 'grp']).qstat.mean().reset_index()
+    for grp, d in reg.groupby('grp'):
+        Q_SCALE[grp] = (d.qstat.mean(), d.qstat.std() or 1.0)
+    return snaps
+
+
+def _quality(log, grp):
+    """Quality multiplier from a player's last 17 games: 1.0 = average regular, shrunk toward average."""
+    if grp == 'OL' or grp not in Q_SCALE or not len(log):
+        return 1.0
+    mu, sd = Q_SCALE[grp]
+    rate = (log.qstat.tail(17).sum() + 4 * mu) / (min(len(log), 17) + 4)
+    return float(np.clip(1 + 0.5 * (rate - mu) / sd, 0.25, 2.25))
+
+
 def _team_game(g, team, tlog, by_player, active, inj_avail):
     f = {'game_id': g.game_id, 'team': team}
     for grp in GROUPS:
@@ -90,8 +123,14 @@ def _team_game(g, team, tlog, by_player, active, inj_avail):
         return inj_avail.get((g.season, g.week, team, name), 1.0)
 
     # regulars over the last 3 games who are out now
+    def q(key):
+        log = by_player[key]
+        return _quality(log[log.gameday < g.gameday], key.split('|')[1])
+
     for key, s in recent_share[recent_share >= REGULAR].items():
-        f['missing_' + key.split('|')[1]] += s * (1 - avail(key))
+        a = avail(key)
+        if a < 1:
+            f['missing_' + key.split('|')[1]] += s * (1 - a) * q(key)
     if act is None:
         return _net(f)
     # established players who were absent recently (returning) or played elsewhere (arrivals)
@@ -104,11 +143,11 @@ def _team_game(g, team, tlog, by_player, active, inj_avail):
         log = log[(log.gameday < g.gameday) & (log.gameday > g.gameday - pd.Timedelta(days=400))].tail(6)
         if len(log) < 3 or log.share.mean() < ESTABLISHED or log.team.iloc[-1] != team:
             continue
-        f['return_' + key.split('|')[1]] += log.share.mean() * (1 - recent_share.get(key, 0)) * avail(key)
+        f['return_' + key.split('|')[1]] += log.share.mean() * (1 - recent_share.get(key, 0)) * avail(key) * _quality(log, key.split('|')[1])
     # arrivals: on this week's active roster, last game played for another team
     names_here = {k for k in act}
     for key, log in _recent_elsewhere(team, g.gameday, names_here, by_player):
-        f['arrive_' + key.split('|')[1]] += 0.5 * log.share.mean() * avail(key)
+        f['arrive_' + key.split('|')[1]] += 0.5 * log.share.mean() * avail(key) * _quality(log, key.split('|')[1])
     return _net(f)
 
 

@@ -3,6 +3,7 @@ import numpy as np, pandas as pd
 from .model import G, TEAMS, TI, N, fit as fit_points, predict as predict_points
 from .pbp import cached
 from .roster import cached as roster_cached, GROUPS
+from .schemes import cached as scheme_cached
 
 TG, QB = cached()
 GD = G[['game_id', 'gameday', 'home_team', 'away_team', 'location']]
@@ -90,7 +91,10 @@ def add_roster(feat):
     for c in cols:
         out[f'd_{c}'] = m[f'{c}_h'] - m[f'{c}_a']
         out[f's_{c}'] = m[f'{c}_h'] + m[f'{c}_a']
-    return feat.merge(out, on='game_id', how='left').fillna({f'{p}_{c}': 0.0 for p in 'ds' for c in cols})
+    feat = feat.merge(out, on='game_id', how='left').fillna({f'{p}_{c}': 0.0 for p in 'ds' for c in cols})
+    sc = scheme_cached()
+    feat = feat.merge(sc, on='game_id', how='left')
+    return feat.fillna({c: 0.0 for c in sc.columns if c != 'game_id'})
 
 
 def all_features(seasons):
