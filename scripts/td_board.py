@@ -342,11 +342,31 @@ data = json.dumps(D, separators=(',', ':')).replace('</', '<\\/')
 html = (open(os.path.join(B, 'head.html')).read() + open(os.path.join(B, 'body.html')).read().replace('2026 · Week 10', f'{season} · Week {week}')
         + f'<script type="application/json" id="td-data">{data}</script>\n<script>\n' + open(os.path.join(B, 'app.js')).read() + '</script>\n')
 open(os.path.join(B, 'touchdown-board.html'), 'w').write(html)
+# sport switch shown on the hosted site (each sport is its own page: index.html = NFL, nba.html = NBA)
+SPORT_CSS = """<style>
+.sportnav { display: flex; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; }
+.sportnav a { font: 700 15px var(--display, sans-serif); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; background: var(--panel); }
+.sportnav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+</style>"""
+def sport_nav(cur):
+    return ('<nav class="sportnav" aria-label="Sport">' + ''.join(
+        f'<a href="{href}"{" aria-current=\"page\"" if k == cur else ""}>{k.upper()}</a>' for k, href in [('nfl', 'index.html'), ('nba', 'nba.html')]) + '</nav>\n')
 # standalone copy for a static host (render.yaml publishes board/site): a full document, kept out of search engines
 head = open(os.path.join(B, 'head.html')).read()
 body = html[len(head):]
+head = head.replace('<title>Player Props Board</title>', '<title>NFL Props Board</title>')
 os.makedirs(os.path.join(B, 'site'), exist_ok=True)
 open(os.path.join(B, 'site', 'index.html'), 'w').write(
     '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-    '<meta name="robots" content="noindex, nofollow">\n' + head + '\n</head>\n<body>\n' + body + '</body>\n</html>\n')
+    '<meta name="robots" content="noindex, nofollow">\n' + head + SPORT_CSS + '\n</head>\n<body>\n' + sport_nav('nfl') + body + '</body>\n</html>\n')
 print('wrote board/touchdown-board.html', len(out), 'TD players,', len(yards), 'yards props,', len(D.get('milestones', [])), 'milestone ladders,', len(legs), 'parlay legs')
+
+# NBA page placeholder until the NBA pipeline writes board/site/nba.html (never overwrites a real NBA page)
+nba = os.path.join(B, 'site', 'nba.html')
+if not os.path.exists(nba) or 'nba-placeholder' in open(nba).read():
+    open(nba, 'w').write(
+        '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        '<meta name="robots" content="noindex, nofollow">\n' + head.replace('<title>NFL Props Board</title>', '<title>NBA Props Board</title>') + SPORT_CSS
+        + '\n</head>\n<body>\n' + sport_nav('nba')
+        + '<div class="wrap nba-placeholder"><header><span class="eyebrow">NBA</span><h1>NBA Props Board</h1>'
+        + '<p class="lede">The NBA model is being built: game picks, player points, rebounds and assists, and the same parlay builder as the NFL board, priced at DraftKings. This page fills in once it is ready.</p></header></div>\n</body>\n</html>\n')

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Player Props Board</title>
+<title>NFL Props Board</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
@@ -177,9 +177,14 @@ table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
 }
 @media (prefers-reduced-motion: no-preference) { .fill { transition: width .25s ease; } }
 </style>
-
+<style>
+.sportnav { display: flex; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; }
+.sportnav a { font: 700 15px var(--display, sans-serif); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; background: var(--panel); }
+.sportnav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+</style>
 </head>
 <body>
+<nav class="sportnav" aria-label="Sport"><a href="index.html" aria-current="page">NFL</a><a href="nba.html">NBA</a></nav>
 <div class="wrap">
   <header>
     <span class="eyebrow" id="eyebrow">2026 · Week 10 · Player props</span>
