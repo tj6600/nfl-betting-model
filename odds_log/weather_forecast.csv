@@ -1,0 +1,8 @@
+season,week,game_id,wind_mph,precip_pct,temp_f,source
+2026,10,2026_10_WAS_NYG,9,61,51,rotogrinders 2026-11-11
+2026,10,2026_10_MIN_GB,3,2,46,rotogrinders 2026-11-11
+2026,10,2026_10_HOU_CLE,10,16,46,rotogrinders 2026-11-11
+2026,10,2026_10_JAX_TEN,4,1,53,rotogrinders 2026-11-11
+2026,10,2026_10_BUF_NYJ,12,0,50,rotogrinders 2026-11-11
+2026,10,2026_10_PIT_CIN,0,2,39,rotogrinders 2026-11-11
+2026,10,2026_10_LAC_BAL,2,1,43,rotogrinders 2026-11-11

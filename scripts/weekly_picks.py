@@ -3,7 +3,8 @@
 Run after `python -m nflmodel.odds` has saved a snapshot early in the week (the "opener").
 1. Rebuilds team ratings from the latest nflverse play-by-play (cached files are refreshed).
 2. Fits the v2 model (EPA + QB) on every finished game. Injury and roster features are left out
-   because injury reports come out after openers are posted.
+   because injury reports come out after openers are posted; an injury-aware version (roster
+   availability + odds_log/injury_overrides.csv) is fit too and acts as a veto.
 3. Compares the model with the consensus opening spread and total, and with the best line on offer.
 4. Writes odds_log/picks/<season>_wk<NN>.csv.
 
@@ -16,13 +17,15 @@ for f in ['team_games.csv', 'qb_games.csv']:   # force fresh play-by-play aggreg
     if os.path.exists(os.path.join(DATA, f)): os.remove(os.path.join(DATA, f))
 
 import numpy as np, pandas as pd
-from scipy.stats import norm
+from nflmodel.stats import norm
 from nflmodel.model import G, novig
 from nflmodel.features import all_features, build
 from nflmodel.predict import fit_predict, american_to_decimal, BASE_MARGIN_X, BASE_TOTAL_X
 from nflmodel.odds import all_snapshots
 
-OPTIMAL_EV, SECURE_P, MIN_EDGE = 0.05, 0.70, 1.5
+OPTIMAL_EV, SECURE_P, MIN_EDGE = 0.05, 0.70, 2.0   # edge >= 2 with agreement: 56.2% on 2019-20 openers
+WINDY = 12      # mph; 2018-25 games at 10-20 mph went Under the closing total 56-60% of the time
+WEATHER = os.path.join(ROOT, 'odds_log', 'weather_forecast.csv')   # season,week,game_id,wind_mph,precip_pct,temp_f,source
 
 today = pd.Timestamp.now(tz='UTC').tz_localize(None).normalize()
 upcoming = G[(G.game_type == 'REG') & G.result.isna() & (G.gameday >= today - pd.Timedelta(days=1))]
@@ -73,9 +76,47 @@ for g in target.itertuples():
                       'open_home_ml': hml.iloc[0] if len(hml) else np.nan, 'open_away_ml': aml.iloc[0] if len(aml) else np.nan})
 op = pd.DataFrame(open_rows)
 
+# weather: games.csv only has wind after the game, so use the saved forecast for this week
+if os.path.exists(WEATHER):
+    wx = pd.read_csv(WEATHER)[['game_id', 'wind_mph', 'precip_pct', 'temp_f']]
+    df = df.merge(wx, on='game_id', how='left')
+    up = df.game_id.isin(target.game_id) & df.wind_mph.notna()
+    df.loc[up, 'wind'] = df.loc[up, 'wind_mph']
+else:
+    df['wind_mph'] = df['precip_pct'] = df['temp_f'] = np.nan
+    print('no weather forecast file; upcoming games are treated as calm')
+
+# injuries: roster availability features (quality-weighted missing starters, plus manual overrides
+# in odds_log/injury_overrides.csv for news that isn't in the official report yet)
+try:
+    from nflmodel import roster, features as F
+    r_all = roster.for_games(target.game_id)
+    F.roster_cached = lambda: r_all
+    rf = F.add_roster(df[['game_id']].copy())
+    df = df.merge(rf[['game_id'] + [c for c in rf.columns if c.startswith(('d_net', 's_net', 'd_new', 'd_interim'))]], on='game_id', how='left')
+    INJ = True
+except Exception as e:   # injury files missing (e.g. no network): fall back to the plain model
+    print('injury features unavailable:', e); INJ = False
+
 train = df.gameday < pd.to_datetime(target.gameday).min()
 p = fit_predict(df, train & df.result.notna(), df.game_id.isin(target.game_id), False, BASE_MARGIN_X, BASE_TOTAL_X)
 p = p.merge(op, on='game_id', how='left')
+# second opinion: the same features fit on top of the betting line, anchored on this week's opener
+d2 = df.merge(op, on='game_id', how='left')
+tgt = d2.game_id.isin(target.game_id)
+d2.loc[tgt, 'spread_line'] = d2.loc[tgt, 'open_spread']
+d2.loc[tgt, 'total_line'] = d2.loc[tgt, 'open_total']
+a = fit_predict(d2, train & d2.result.notna(), tgt & d2.spread_line.notna(), True, BASE_MARGIN_X, BASE_TOTAL_X)
+p = p.merge(a[['game_id', 'pred_margin', 'pred_total']].rename(columns={'pred_margin': 'anch_margin', 'pred_total': 'anch_total'}),
+            on='game_id', how='left')
+if INJ:   # third opinion: the same plain model plus who is missing
+    from nflmodel.predict import ROSTER_MARGIN_X, ROSTER_TOTAL_X
+    i = fit_predict(df, train & df.result.notna(), df.game_id.isin(target.game_id), False,
+                    BASE_MARGIN_X + ROSTER_MARGIN_X, BASE_TOTAL_X + ROSTER_TOTAL_X)
+    p = p.merge(i[['game_id', 'pred_margin', 'pred_total']].rename(columns={'pred_margin': 'inj_margin', 'pred_total': 'inj_total'}),
+                on='game_id', how='left')
+else:
+    p['inj_margin'], p['inj_total'] = p.pred_margin, p.pred_total
 
 out = []
 for g in p.itertuples():
@@ -94,6 +135,10 @@ for g in p.itertuples():
                             open_line=(-g.open_spread if side == g.home_team else g.open_spread),
                             model_line=(-g.pred_margin if side == g.home_team else g.pred_margin),
                             edge_pts=sign * (g.pred_margin - g.open_spread), model_prob=prob,
+                            agree=bool(sign * (g.anch_margin - g.open_spread) > 0),
+                            inj_line=(-g.inj_margin if side == g.home_team else g.inj_margin),
+                            inj_ok=bool(sign * (g.inj_margin - g.open_spread) > 0),
+                            wind_mph=g.wind_mph, precip_pct=g.precip_pct, temp_f=g.temp_f,
                             best_line=bpt, best_price=bpr, best_book=bk,
                             ev=prob_b * float(american_to_decimal(bpr)) - 1))
     if g.open_total == g.open_total:
@@ -103,18 +148,29 @@ for g in p.itertuples():
             prob_b = ((1 - norm.cdf(bpt, g.pred_total, g.sd_total)) if side == 'Over' else norm.cdf(bpt, g.pred_total, g.sd_total)) if bpt == bpt else prob
             out.append(dict(game_id=g.game_id, game=game, kickoff=g.gameday, market='total', side=side,
                             open_line=g.open_total, model_line=g.pred_total, edge_pts=sign * (g.pred_total - g.open_total),
+                            agree=bool(sign * (g.anch_total - g.open_total) > 0),
+                            inj_line=g.inj_total, inj_ok=bool(sign * (g.inj_total - g.open_total) > 0),
+                            wind_mph=g.wind_mph, precip_pct=g.precip_pct, temp_f=g.temp_f,
                             model_prob=prob, best_line=bpt, best_price=bpr if bpr == bpr else -110, best_book=bk,
                             ev=prob_b * float(american_to_decimal(bpr if bpr == bpr else -110)) - 1))
-    for side, prob in [(g.home_team, g.p_home_win), (g.away_team, 1 - g.p_home_win)]:
+    inj_home = 1 - norm.cdf(0, g.inj_margin, g.sd_margin)
+    for side, prob, iprob in [(g.home_team, g.p_home_win, inj_home), (g.away_team, 1 - g.p_home_win, 1 - inj_home)]:
         bpt, bpr, bk = best(g.home_team, g.away_team, 'moneyline', side)
         if bpr == bpr:
             out.append(dict(game_id=g.game_id, game=game, kickoff=g.gameday, market='moneyline', side=side,
                             open_line=np.nan, model_line=np.nan, edge_pts=np.nan, model_prob=prob,
+                            inj_prob=iprob, inj_ok=bool(iprob >= SECURE_P),
+                            wind_mph=g.wind_mph, precip_pct=g.precip_pct, temp_f=g.temp_f,
                             best_line=np.nan, best_price=bpr, best_book=bk, ev=prob * float(american_to_decimal(bpr)) - 1))
 L = pd.DataFrame(out)
 # Only spreads were backtested against openers, so value totals are logged as "Watch" and graded separately.
-value = (L.ev >= OPTIMAL_EV) & (L.edge_pts >= MIN_EDGE)
-L['category'] = np.select([(L.market == 'moneyline') & (L.model_prob >= SECURE_P),
+# A value pick needs the plain and the line-anchored model on the same side (backtest on 2019-20 openers:
+# 55.6% with agreement vs 53.8% without).
+# It must also survive the injury-aware model (same side of the line), and no Overs in strong wind.
+ok = lambda c: L[c].astype('boolean').fillna(False)
+windy_over = (L.market == 'total') & (L.side == 'Over') & (L.wind_mph.fillna(0) >= WINDY)
+value = (L.ev >= OPTIMAL_EV) & (L.edge_pts >= MIN_EDGE) & ok('agree') & ok('inj_ok') & ~windy_over
+L['category'] = np.select([(L.market == 'moneyline') & (L.model_prob >= SECURE_P) & ok('inj_ok'),
                            (L.market == 'spread') & value, (L.market == 'total') & value],
                           ['Secure', 'Optimal', 'Watch'], '')
 L.insert(0, 'season', season); L.insert(1, 'week', week)
@@ -124,5 +180,5 @@ path = os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}.csv')
 L.round(4).to_csv(path, index=False)
 picks = L[L.category != ''].sort_values('ev', ascending=False)
 pd.set_option('display.width', 200)
-print(picks[['game', 'market', 'side', 'open_line', 'model_line', 'edge_pts', 'model_prob', 'best_line', 'best_price', 'best_book', 'ev', 'category']].round(3).to_string(index=False))
+print(picks[['game', 'market', 'side', 'open_line', 'model_line', 'inj_line', 'edge_pts', 'agree', 'inj_ok', 'wind_mph', 'model_prob', 'best_line', 'best_price', 'best_book', 'ev', 'category']].round(3).to_string(index=False))
 print(f'\nsaved {len(L)} legs ({len(picks)} picks) to {path}')

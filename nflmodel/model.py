@@ -1,5 +1,5 @@
 import numpy as np, pandas as pd
-from scipy.stats import norm
+from .stats import norm
 import os
 GAMES_URL = 'https://github.com/nflverse/nfldata/raw/master/data/games.csv'
 G = pd.read_csv(os.environ.get('NFL_GAMES_CSV', GAMES_URL), parse_dates=['gameday'])

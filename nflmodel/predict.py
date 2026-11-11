@@ -1,6 +1,6 @@
 """Turn features into predicted margins/totals with a walk-forward linear model."""
 import numpy as np, pandas as pd
-from scipy.stats import norm
+from .stats import norm
 from .model import G, novig
 
 BASE_MARGIN_X = ['pts_margin', 'd_pass_epa', 'd_rush_epa', 'd_succ', 'd_qb', 'home', 'rest']

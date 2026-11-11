@@ -42,7 +42,10 @@ def _key(name):
     return name.str.lower().str.replace(r'[^a-z]', '', regex=True)
 
 
-def build(seasons=range(2018, 2027)):
+OVERRIDES = os.path.join(os.path.dirname(__file__), '..', 'odds_log', 'injury_overrides.csv')
+
+
+def build(seasons=range(2018, 2027), game_ids=None):
     snaps = pd.concat([_load('snaps', y) for y in seasons], ignore_index=True)
     snaps = snaps[snaps.game_type == 'REG'] if 'game_type' in snaps else snaps
     snaps['grp'] = snaps.position.map(SNAP_POS)
@@ -56,6 +59,11 @@ def build(seasons=range(2018, 2027)):
     inj = inj[inj.report_status.isin(INJ_AVAIL)]
     inj['name'] = _key(inj.full_name)
     inj_avail = {(r.season, r.week, r.team, r.name): INJ_AVAIL[r.report_status] for r in inj.itertuples()}
+    # manual overrides for news that isn't in the injury report yet (season,week,team,player,status)
+    if os.path.exists(OVERRIDES):
+        ov = pd.read_csv(OVERRIDES)
+        for r in ov.itertuples():
+            inj_avail[(int(r.season), int(r.week), r.team, _key(pd.Series([r.player])).iloc[0])] = INJ_AVAIL.get(r.status, 0.0)
 
     ros = pd.concat([_load('roster', y)[['season', 'week', 'team', 'status', 'full_name', 'position']] for y in seasons])
     ros['name'] = _key(ros.full_name)
@@ -67,11 +75,20 @@ def build(seasons=range(2018, 2027)):
 
     rows = []
     reg = G[G.game_type == 'REG']
+    if game_ids is not None:
+        reg = reg[reg.game_id.isin(list(game_ids))]
     for g in reg.itertuples():
         for team in (g.home_team, g.away_team):
             rows.append(_team_game(g, team, by_team.get(team), by_player, active, inj_avail))
     out = pd.DataFrame(rows)
     return out.merge(_coaching(), on=['game_id', 'team'], how='left')
+
+
+def for_games(game_ids):
+    """Roster features for specific (usually upcoming) games, merged into the cached history."""
+    hist = cached()
+    new = build(game_ids=game_ids)
+    return pd.concat([hist[~hist.game_id.isin(new.game_id)], new], ignore_index=True)
 
 
 ROSTER_GRP = {'OL': 'OL', 'WR': 'SKILL', 'TE': 'SKILL', 'RB': 'SKILL', 'FB': 'SKILL', 'DL': 'FRONT', 'LB': 'FRONT', 'DB': 'DB'}
