@@ -3,8 +3,12 @@ import numpy as np, pandas as pd
 from scipy.stats import norm
 from .model import G, novig
 
-MARGIN_X = ['pts_margin', 'd_pass_epa', 'd_rush_epa', 'd_succ', 'd_qb', 'home', 'rest']
-TOTAL_X = ['pts_total', 's_pass_epa', 's_rush_epa', 's_succ', 's_qb', 'dome', 'wind']
+BASE_MARGIN_X = ['pts_margin', 'd_pass_epa', 'd_rush_epa', 'd_succ', 'd_qb', 'home', 'rest']
+BASE_TOTAL_X = ['pts_total', 's_pass_epa', 's_rush_epa', 's_succ', 's_qb', 'dome', 'wind']
+ROSTER_MARGIN_X = ['d_net_OL', 'd_net_SKILL', 'd_net_FRONT', 'd_net_DB', 'd_new_hc', 'd_interim_hc']
+ROSTER_TOTAL_X = ['s_net_OL', 's_net_SKILL', 's_net_FRONT', 's_net_DB']
+MARGIN_X = BASE_MARGIN_X + ROSTER_MARGIN_X
+TOTAL_X = BASE_TOTAL_X + ROSTER_TOTAL_X
 
 
 def load(feat_csv):
@@ -25,7 +29,8 @@ def _apply(b, X):
     return np.column_stack([X, np.ones(len(X))]) @ b
 
 
-def fit_predict(df, train_mask, test_mask, market_anchor=False):
+def fit_predict(df, train_mask, test_mask, market_anchor=False, margin_x=None, total_x=None):
+    MARGIN_X, TOTAL_X = margin_x or globals()['MARGIN_X'], total_x or globals()['TOTAL_X']
     tr, te = df[train_mask & df.result.notna()], df[test_mask].copy()
     sd = tr[MARGIN_X].std().replace(0, 1); st = tr[TOTAL_X].std().replace(0, 1)
     if market_anchor:

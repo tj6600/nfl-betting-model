@@ -1,0 +1,91 @@
+leg_id,gameday,game,market,pick,odds,book_prob,fair_prob,model_prob,edge_pts,ev_pct,category,result,units
+JAX-BAL-spread-0,2026-11-05,JAX @ BAL,spread,BAL +8.5,102,0.495,0.474,0.529,5.5,6.84,Optimal,Lost,-1.0
+JAX-BAL-spread-1,2026-11-05,JAX @ BAL,spread,JAX -8.5,-122,0.55,0.526,0.471,-5.5,-14.28,,Won,
+JAX-BAL-total-0,2026-11-05,JAX @ BAL,total,Over 40.5,-105,0.512,0.489,0.643,15.36,25.5,Optimal,Won,0.95
+JAX-BAL-total-1,2026-11-05,JAX @ BAL,total,Under 40.5,-115,0.535,0.511,0.357,-15.36,-33.22,,Lost,
+JAX-BAL-moneyline-0,2026-11-05,JAX @ BAL,moneyline,BAL,350,0.222,0.213,0.28,6.72,26.2,,Lost,
+JAX-BAL-moneyline-1,2026-11-05,JAX @ BAL,moneyline,JAX,-455,0.82,0.787,0.72,-6.72,-12.23,Secure,Won,0.22
+CIN-ATL-spread-0,2026-11-08,CIN @ ATL,spread,ATL +3,100,0.5,0.478,0.486,0.81,-2.72,,Lost,
+CIN-ATL-spread-1,2026-11-08,CIN @ ATL,spread,CIN -3,-120,0.545,0.522,0.514,-0.81,-5.84,,Won,
+CIN-ATL-total-0,2026-11-08,CIN @ ATL,total,Over 52.5,-105,0.512,0.489,0.438,-5.07,-14.39,,Lost,
+CIN-ATL-total-1,2026-11-08,CIN @ ATL,total,Under 52.5,-115,0.535,0.511,0.562,5.07,4.98,,Won,
+CIN-ATL-moneyline-0,2026-11-08,CIN @ ATL,moneyline,ATL,150,0.4,0.384,0.395,1.19,-1.13,,Lost,
+CIN-ATL-moneyline-1,2026-11-08,CIN @ ATL,moneyline,CIN,-180,0.643,0.616,0.605,-1.19,-5.97,,Won,
+DEN-CAR-spread-0,2026-11-08,DEN @ CAR,spread,CAR +3,-115,0.535,0.511,0.513,0.25,-4.02,,Lost,
+DEN-CAR-spread-1,2026-11-08,DEN @ CAR,spread,DEN -3,-105,0.512,0.489,0.487,-0.25,-4.99,,Won,
+DEN-CAR-total-0,2026-11-08,DEN @ CAR,total,Over 44.5,-115,0.535,0.511,0.523,1.2,-2.24,,Won,
+DEN-CAR-total-1,2026-11-08,DEN @ CAR,total,Under 44.5,-105,0.512,0.489,0.477,-1.2,-6.85,,Lost,
+DEN-CAR-moneyline-0,2026-11-08,DEN @ CAR,moneyline,CAR,130,0.435,0.417,0.422,0.48,-2.99,,Lost,
+DEN-CAR-moneyline-1,2026-11-08,DEN @ CAR,moneyline,DEN,-155,0.608,0.583,0.578,-0.48,-4.87,,Won,
+DAL-IND-spread-0,2026-11-08,DAL @ IND,spread,IND +4.5,-115,0.535,0.511,0.603,9.19,12.68,Optimal,Won,0.87
+DAL-IND-spread-1,2026-11-08,DAL @ IND,spread,DAL -4.5,-105,0.512,0.489,0.397,-9.19,-22.43,,Lost,
+DAL-IND-total-0,2026-11-08,DAL @ IND,total,Over 51.5,-105,0.512,0.489,0.524,3.5,2.34,,Lost,
+DAL-IND-total-1,2026-11-08,DAL @ IND,total,Under 51.5,-115,0.535,0.511,0.476,-3.5,-11.04,,Won,
+DAL-IND-moneyline-0,2026-11-08,DAL @ IND,moneyline,IND,180,0.357,0.343,0.466,12.32,30.41,,Lost,
+DAL-IND-moneyline-1,2026-11-08,DAL @ IND,moneyline,DAL,-218,0.686,0.657,0.534,-12.32,-22.07,,Won,
+NYJ-KC-spread-0,2026-11-08,NYJ @ KC,spread,KC -9.5,-110,0.524,0.5,0.451,-4.94,-13.97,,Won,
+NYJ-KC-spread-1,2026-11-08,NYJ @ KC,spread,NYJ +9.5,-110,0.524,0.5,0.549,4.94,4.88,,Lost,
+NYJ-KC-total-0,2026-11-08,NYJ @ KC,total,Over 47.5,-110,0.524,0.5,0.477,-2.25,-8.85,,Lost,
+NYJ-KC-total-1,2026-11-08,NYJ @ KC,total,Under 47.5,-110,0.524,0.5,0.523,2.25,-0.24,,Won,
+NYJ-KC-moneyline-0,2026-11-08,NYJ @ KC,moneyline,KC,-520,0.839,0.804,0.728,-7.62,-13.19,Secure,Won,0.19
+NYJ-KC-moneyline-1,2026-11-08,NYJ @ KC,moneyline,NYJ,390,0.204,0.196,0.272,7.62,33.25,,Lost,
+DET-MIA-spread-0,2026-11-08,DET @ MIA,spread,MIA +6.5,-108,0.519,0.496,0.469,-2.68,-9.7,,Lost,
+DET-MIA-spread-1,2026-11-08,DET @ MIA,spread,DET -6.5,-112,0.528,0.504,0.531,2.68,0.54,,Won,
+DET-MIA-total-0,2026-11-08,DET @ MIA,total,Over 49.5,-122,0.55,0.526,0.524,-0.23,-4.68,,Lost,
+DET-MIA-total-1,2026-11-08,DET @ MIA,total,Under 49.5,102,0.495,0.474,0.476,0.23,-3.81,,Won,
+DET-MIA-moneyline-0,2026-11-08,DET @ MIA,moneyline,MIA,245,0.29,0.278,0.282,0.36,-2.88,,Lost,
+DET-MIA-moneyline-1,2026-11-08,DET @ MIA,moneyline,DET,-305,0.753,0.722,0.718,-0.36,-4.59,Secure,Won,0.33
+CLE-NO-spread-0,2026-11-08,CLE @ NO,spread,NO -4.5,-115,0.535,0.511,0.483,-2.76,-9.65,,Lost,
+CLE-NO-spread-1,2026-11-08,CLE @ NO,spread,CLE +4.5,-105,0.512,0.489,0.517,2.76,0.88,,Won,
+CLE-NO-total-0,2026-11-08,CLE @ NO,total,Over 43.5,-105,0.512,0.489,0.49,0.08,-4.34,,Won,
+CLE-NO-total-1,2026-11-08,CLE @ NO,total,Under 43.5,-115,0.535,0.511,0.51,-0.08,-4.64,,Lost,
+CLE-NO-moneyline-0,2026-11-08,CLE @ NO,moneyline,NO,-225,0.692,0.664,0.62,-4.41,-10.51,,Won,
+CLE-NO-moneyline-1,2026-11-08,CLE @ NO,moneyline,CLE,185,0.351,0.336,0.38,4.41,8.42,,Lost,
+NYG-PHI-spread-0,2026-11-08,NYG @ PHI,spread,PHI +3,-110,0.524,0.5,0.525,2.55,0.32,,Lost,
+NYG-PHI-spread-1,2026-11-08,NYG @ PHI,spread,NYG -3,-110,0.524,0.5,0.475,-2.55,-9.41,,Won,
+NYG-PHI-total-0,2026-11-08,NYG @ PHI,total,Over 38.5,-102,0.505,0.483,0.636,15.39,26.05,Optimal,Lost,-1.0
+NYG-PHI-total-1,2026-11-08,NYG @ PHI,total,Under 38.5,-118,0.541,0.517,0.364,-15.39,-32.84,,Won,
+NYG-PHI-moneyline-0,2026-11-08,NYG @ PHI,moneyline,PHI,136,0.424,0.407,0.434,2.71,2.36,,Lost,
+NYG-PHI-moneyline-1,2026-11-08,NYG @ PHI,moneyline,NYG,-162,0.618,0.593,0.566,-2.71,-8.42,,Won,
+LA-WAS-spread-0,2026-11-08,LA @ WAS,spread,WAS +4.5,-118,0.541,0.517,0.431,-8.63,-20.36,,Lost,
+LA-WAS-spread-1,2026-11-08,LA @ WAS,spread,LA -4.5,-102,0.505,0.483,0.569,8.63,12.67,Optimal,Won,0.98
+LA-WAS-total-0,2026-11-08,LA @ WAS,total,Over 48.5,-102,0.505,0.483,0.514,3.11,1.75,,Lost,
+LA-WAS-total-1,2026-11-08,LA @ WAS,total,Under 48.5,-118,0.541,0.517,0.486,-3.11,-10.17,,Won,
+LA-WAS-moneyline-0,2026-11-08,LA @ WAS,moneyline,WAS,185,0.351,0.336,0.302,-3.48,-14.06,,Lost,
+LA-WAS-moneyline-1,2026-11-08,LA @ WAS,moneyline,LA,-225,0.692,0.664,0.698,3.48,0.89,,Won,
+HOU-LAC-spread-0,2026-11-08,HOU @ LAC,spread,LAC +5.5,-112,0.528,0.504,0.44,-6.41,-16.67,,Lost,
+HOU-LAC-spread-1,2026-11-08,HOU @ LAC,spread,HOU -5.5,-108,0.519,0.496,0.56,6.41,7.81,Optimal,Won,0.93
+HOU-LAC-total-0,2026-11-08,HOU @ LAC,total,Over 40.5,-110,0.524,0.5,0.561,6.15,7.19,Optimal,Won,0.91
+HOU-LAC-total-1,2026-11-08,HOU @ LAC,total,Under 40.5,-110,0.524,0.5,0.439,-6.15,-16.29,,Lost,
+HOU-LAC-moneyline-0,2026-11-08,HOU @ LAC,moneyline,LAC,190,0.345,0.331,0.283,-4.79,-17.9,,Lost,
+HOU-LAC-moneyline-1,2026-11-08,HOU @ LAC,moneyline,HOU,-230,0.697,0.669,0.717,4.79,2.86,Secure,Won,0.43
+GB-NE-spread-0,2026-11-08,GB @ NE,spread,NE -3,-120,0.545,0.522,0.504,-1.76,-7.57,,Lost,
+GB-NE-spread-1,2026-11-08,GB @ NE,spread,GB +3,100,0.5,0.478,0.496,1.76,-0.83,,Won,
+GB-NE-total-0,2026-11-08,GB @ NE,total,Over 44.5,-112,0.528,0.504,0.501,-0.34,-5.18,,Won,
+GB-NE-total-1,2026-11-08,GB @ NE,total,Under 44.5,-108,0.519,0.496,0.499,0.34,-3.88,,Lost,
+GB-NE-moneyline-0,2026-11-08,GB @ NE,moneyline,NE,-185,0.649,0.622,0.595,-2.71,-8.29,,Lost,
+GB-NE-moneyline-1,2026-11-08,GB @ NE,moneyline,GB,154,0.394,0.378,0.405,2.71,2.79,,Won,
+ARI-SEA-spread-0,2026-11-08,ARI @ SEA,spread,SEA -8.5,-110,0.524,0.5,0.439,-6.09,-16.17,,Won,
+ARI-SEA-spread-1,2026-11-08,ARI @ SEA,spread,ARI +8.5,-110,0.524,0.5,0.561,6.09,7.08,Optimal,Lost,-1.0
+ARI-SEA-total-0,2026-11-08,ARI @ SEA,total,Over 39.5,-118,0.541,0.517,0.653,13.56,20.63,Optimal,Lost,-1.0
+ARI-SEA-total-1,2026-11-08,ARI @ SEA,total,Under 39.5,-102,0.505,0.483,0.347,-13.56,-31.27,,Won,
+ARI-SEA-moneyline-0,2026-11-08,ARI @ SEA,moneyline,SEA,-455,0.82,0.787,0.692,-9.5,-15.62,,Won,
+ARI-SEA-moneyline-1,2026-11-08,ARI @ SEA,moneyline,ARI,350,0.222,0.213,0.308,9.5,38.71,,Lost,
+LV-SF-spread-0,2026-11-08,LV @ SF,spread,SF -8.5,-112,0.528,0.504,0.63,12.54,19.2,Optimal,Won,0.89
+LV-SF-spread-1,2026-11-08,LV @ SF,spread,LV +8.5,-108,0.519,0.496,0.37,-12.54,-28.69,,Lost,
+LV-SF-total-0,2026-11-08,LV @ SF,total,Over 51.5,-118,0.541,0.517,0.542,2.5,0.2,,Won,
+LV-SF-total-1,2026-11-08,LV @ SF,total,Under 51.5,-102,0.505,0.483,0.458,-2.5,-9.37,,Lost,
+LV-SF-moneyline-0,2026-11-08,LV @ SF,moneyline,SF,-410,0.804,0.772,0.838,6.62,4.21,Secure,Won,0.24
+LV-SF-moneyline-1,2026-11-08,LV @ SF,moneyline,LV,320,0.238,0.228,0.162,-6.62,-31.85,,Lost,
+TB-CHI-spread-0,2026-11-08,TB @ CHI,spread,CHI -6.5,-112,0.528,0.504,0.396,-10.87,-25.12,,Lost,
+TB-CHI-spread-1,2026-11-08,TB @ CHI,spread,TB +6.5,-108,0.519,0.496,0.604,10.87,16.41,Optimal,Won,0.93
+TB-CHI-total-0,2026-11-08,TB @ CHI,total,Over 47.5,-102,0.505,0.483,0.478,-0.47,-5.35,,Won,
+TB-CHI-total-1,2026-11-08,TB @ CHI,total,Under 47.5,-118,0.541,0.517,0.522,0.47,-3.55,,Lost,
+TB-CHI-moneyline-0,2026-11-08,TB @ CHI,moneyline,CHI,-290,0.744,0.714,0.593,-12.05,-20.24,,Won,
+TB-CHI-moneyline-1,2026-11-08,TB @ CHI,moneyline,TB,235,0.299,0.286,0.407,12.05,36.33,,Lost,
+BUF-MIN-spread-0,2026-11-09,BUF @ MIN,spread,MIN +3,102,0.495,0.474,0.524,5.03,5.9,Optimal,Lost,-1.0
+BUF-MIN-spread-1,2026-11-09,BUF @ MIN,spread,BUF -3,-122,0.55,0.526,0.476,-5.03,-13.43,,Won,
+BUF-MIN-total-0,2026-11-09,BUF @ MIN,total,Over 45.5,-112,0.528,0.504,0.51,0.59,-3.42,,Lost,
+BUF-MIN-total-1,2026-11-09,BUF @ MIN,total,Under 45.5,-108,0.519,0.496,0.49,-0.59,-5.67,,Won,
+BUF-MIN-moneyline-0,2026-11-09,BUF @ MIN,moneyline,MIN,154,0.394,0.378,0.432,5.49,9.85,,Lost,
+BUF-MIN-moneyline-1,2026-11-09,BUF @ MIN,moneyline,BUF,-185,0.649,0.622,0.568,-5.49,-12.57,,Won,

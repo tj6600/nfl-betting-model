@@ -1,6 +1,6 @@
 import sys, os; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np, pandas as pd
-from nflmodel.predict import load, fit_predict, legs
+from nflmodel.predict import load, fit_predict, legs, BASE_MARGIN_X, BASE_TOTAL_X, MARGIN_X, TOTAL_X, _ridge
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 df = load(os.path.join(ROOT, 'data', 'features.csv'))
 df['gameday'] = pd.to_datetime(df.gameday)
@@ -24,13 +24,21 @@ def report(name, d):
     sec = L[(L.market == 'moneyline') & (L.model_prob >= 0.75)]
     print(f'  secure ML (p>=75%): n={len(sec)} won {sec.won.mean():.3f} ROI {np.where(sec.won, 1/sec.implied-1, -1).mean():+.3f}')
 
-for anchor in [False, True]:
-    out = []
-    for s in [2023, 2024, 2025]:
-        out.append(fit_predict(df, df.gameday < df[df.season == s].gameday.min(), (df.season == s) & (df.week >= 3), anchor))
-    report(f'2023-25 walk-forward, market_anchor={anchor}', pd.concat(out))
-    wk = df[(df.season == 2026) & (df.week == 9)]
-    p9 = fit_predict(df, df.gameday < wk.gameday.min(), (df.season == 2026) & (df.week == 9), anchor)
-    report(f'2026 week 9, market_anchor={anchor}', p9)
-    if not anchor: p9.to_csv(os.path.join(ROOT, 'output', '2026_week9_epa_predictions.csv'), index=False)
-    else: p9.to_csv(os.path.join(ROOT, 'output', '2026_week9_epa_anchored.csv'), index=False)
+VERSIONS = {'v2 EPA+QB': (BASE_MARGIN_X, BASE_TOTAL_X), 'v3 +injuries/roster/coaching': (MARGIN_X, TOTAL_X)}
+for name, (mx, tx) in VERSIONS.items():
+    for anchor in [False, True]:
+        out = []
+        for s in [2023, 2024, 2025]:
+            out.append(fit_predict(df, df.gameday < df[df.season == s].gameday.min(), (df.season == s) & (df.week >= 3), anchor, mx, tx))
+        report(f'{name} | 2023-25 walk-forward, market_anchor={anchor}', pd.concat(out))
+        wk = df[(df.season == 2026) & (df.week == 9)]
+        p9 = fit_predict(df, df.gameday < wk.gameday.min(), (df.season == 2026) & (df.week == 9), anchor, mx, tx)
+        report(f'{name} | 2026 week 9, market_anchor={anchor}', p9)
+        tag = 'epa' if name.startswith('v2') else 'v3'
+        p9.to_csv(os.path.join(ROOT, 'output', f'2026_week9_{tag}_{"anchored" if anchor else "predictions"}.csv'), index=False)
+
+# how many points each roster feature is worth (fit on everything before 2026 week 9)
+tr = df[(df.gameday < df[(df.season == 2026) & (df.week == 9)].gameday.min()) & df.result.notna()]
+b = _ridge(tr[MARGIN_X].values, tr.result.values, 1.0)
+print('\nMargin points per unit (home minus away):')
+for c, v in zip(MARGIN_X, b): print(f'  {c:14s} {v:+.2f}')

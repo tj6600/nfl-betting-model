@@ -2,6 +2,7 @@
 import numpy as np, pandas as pd
 from .model import G, TEAMS, TI, N, fit as fit_points, predict as predict_points
 from .pbp import cached
+from .roster import cached as roster_cached, GROUPS
 
 TG, QB = cached()
 GD = G[['game_id', 'gameday', 'home_team', 'away_team', 'location']]
@@ -77,10 +78,25 @@ def build(target):
     return pd.DataFrame(rows)
 
 
+def add_roster(feat):
+    """Home-minus-away and home-plus-away roster availability and coaching features."""
+    r = roster_cached()
+    g = G[['game_id', 'home_team', 'away_team']]
+    cols = [f'net_{grp}' for grp in GROUPS] + ['new_hc', 'interim_hc']
+    h = g.merge(r, left_on=['game_id', 'home_team'], right_on=['game_id', 'team'])[['game_id'] + cols]
+    a = g.merge(r, left_on=['game_id', 'away_team'], right_on=['game_id', 'team'])[['game_id'] + cols]
+    m = h.merge(a, on='game_id', suffixes=('_h', '_a'))
+    out = pd.DataFrame({'game_id': m.game_id})
+    for c in cols:
+        out[f'd_{c}'] = m[f'{c}_h'] - m[f'{c}_a']
+        out[f's_{c}'] = m[f'{c}_h'] + m[f'{c}_a']
+    return feat.merge(out, on='game_id', how='left').fillna({f'{p}_{c}': 0.0 for p in 'ds' for c in cols})
+
+
 def all_features(seasons):
     out = []
     for s in seasons:
         for wk in sorted(G[G.season == s].week.unique()):
             t = G[(G.season == s) & (G.week == wk)]
             if len(t): out.append(build(t))
-    return pd.concat(out, ignore_index=True)
+    return add_roster(pd.concat(out, ignore_index=True))

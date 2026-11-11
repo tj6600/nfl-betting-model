@@ -49,7 +49,7 @@ The scores-only model is less accurate than the market line (margin MAE 10.2 vs 
 
 ```
 python scripts/build_features.py   # downloads ~150 MB of play-by-play on first run
-python scripts/evaluate_epa.py
+python scripts/evaluate.py         # v2 and v3, plain and market-anchored
 ```
 
 ### Results
@@ -68,9 +68,42 @@ The 2023–25 backtest covers weeks 3–18. Break-even at -110 is 52.4%.
 
 **Takeaway:** EPA and QB features beat the line in week 9, but over three seasons they don't, and the anchored fit shows they add almost nothing the market hasn't already priced. One week of 15 games is noise. Don't bet real money on this yet.
 
+## Injuries, roster moves and coaching (v3)
+
+`nflmodel/roster.py` uses nflverse injury reports, snap counts and weekly rosters, and head coaches from `games.csv`. It works per position group (OL, WR/TE/RB, DL/LB, DB), counting players in "full-time starters", where 1.0 is a player on every snap:
+
+- **Missing:** recent regulars (≥50% of snaps over the team's last 3 games) who are out this week. That means ruled Out (100%), Doubtful (90%) or Questionable (20%), off the active roster (IR, cut), or traded away.
+- **Returning:** established regulars who missed recent games and are active again.
+- **Arrivals:** regulars from another team who are now on this team's active roster (trades and signings), counted at half weight.
+- **Coaching:** a first-season head coach, and a mid-season (interim) coaching change.
+
+Points per unit learned from 2019–2026 week 8, home minus away:
+
+| Feature | Points |
+|---|---|
+| Net WR/TE/RB starters | +1.03 |
+| Net DL/LB starters | +0.64 |
+| Net OL starters | +0.48 |
+| Net DB starters | +0.48 |
+| First-year head coach | −1.10 |
+| Interim head coach | −0.50 |
+
+### v3 results
+
+| Test | v2 EPA+QB | v3 + roster |
+|---|---|---|
+| 2023–25 ATS, all games | 51.1% | 49.5% |
+| 2023–25 ATS, edge ≥ 3 | 42.6% | 47.1% |
+| 2023–25 margin MAE (line 9.94) | 10.43 | 10.46 |
+| 2026 wk 9 ATS | 8/15 | 8/15 |
+| 2026 wk 9 optimal picks | 7–5, +1.46 u | 5–7, −2.38 u |
+| 2026 wk 9 secure picks | 5–0, +1.42 u | 5–0, +1.43 u |
+
+The roster features move predictions in the right direction (losing starters costs points), but they don't improve accuracy against the line. The market already prices injury news, and by kickoff it does so faster and better than a snap-share proxy can. Snap share also measures playing time, not how good the player is.
+
 ## Next steps
 
-1. Injury reports beyond the QB (nflverse `injuries`), and offensive-line and pass-rush grades
+1. Player quality, not just playing time (e.g. EPA per target or PFF-style grades), so losing a star counts more than losing an average starter
 2. Opening lines (`initial_lines.csv`), to bet early numbers and measure closing line value
 3. Key-number-aware margin distribution (3, 7, 10) in place of the normal approximation
 4. "Optimal" and "secure" leg ranking with expected value and fractional Kelly staking
