@@ -78,8 +78,8 @@ def consensus_spread(snaps):
     return s.assign(spread_line=-s.point)[['taken_at', 'kickoff', 'home_team', 'away_team', 'spread_line']]
 
 
-def props_snapshot(days=8):
-    """Anytime-TD odds for every game in the next `days` days (1 credit per game) -> odds_log/props/."""
+def props_snapshot(days=8, markets='player_anytime_td', prefix='anytime_td'):
+    """Player prop odds for every game in the next `days` days (1 credit per market per game) -> odds_log/props/."""
     key = os.environ.get('ODDS_API_KEY')
     if not key:
         raise SystemExit('ODDS_API_KEY is not set.')
@@ -90,16 +90,21 @@ def props_snapshot(days=8):
     soon = [e for e in events if dt.datetime.fromisoformat(e['commence_time'].replace('Z', '+00:00')) < now + dt.timedelta(days=days)]
     out, remaining = [], None
     for e in soon:
-        q = urllib.parse.urlencode({'apiKey': key, 'regions': 'us', 'markets': 'player_anytime_td', 'oddsFormat': 'american'})
+        q = urllib.parse.urlencode({'apiKey': key, 'regions': 'us', 'markets': markets, 'oddsFormat': 'american'})
         with urllib.request.urlopen(f"{base}/events/{e['id']}/odds?{q}", timeout=60) as r:
             remaining = r.headers.get('x-requests-remaining'); out.append(json.loads(r.read()))
     d = os.path.join(os.path.dirname(SNAP_DIR), 'props'); os.makedirs(d, exist_ok=True)
-    path = os.path.join(d, f"anytime_td_{now.strftime('%Y-%m-%dT%H%MZ')}.json")
+    path = os.path.join(d, f"{prefix}_{now.strftime('%Y-%m-%dT%H%MZ')}.json")
     json.dump(out, open(path, 'w'))
-    print(f'saved anytime TD odds for {len(out)} games to {path}; API credits left: {remaining}')
+    print(f'saved {markets} odds for {len(out)} games to {path}; API credits left: {remaining}')
     return path
 
 
 if __name__ == '__main__':
     import sys
-    props_snapshot() if 'props' in sys.argv[1:] else snapshot()
+    if 'props' in sys.argv[1:]:
+        props_snapshot()
+    elif 'yards' in sys.argv[1:]:
+        props_snapshot(markets='player_rush_yds,player_reception_yds', prefix='yards')
+    else:
+        snapshot()

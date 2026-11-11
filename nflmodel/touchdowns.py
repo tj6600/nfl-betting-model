@@ -20,7 +20,7 @@ HALF = 6.0
 POS = ['QB', 'RB', 'WR', 'TE']
 COLS = ['game_id', 'season', 'week', 'season_type', 'posteam', 'defteam', 'yardline_100', 'play_type',
         'rusher_player_id', 'receiver_player_id', 'td_player_id', 'td_team', 'rush_touchdown', 'pass_touchdown',
-        'two_point_attempt', 'rush_attempt', 'pass_attempt']
+        'two_point_attempt', 'rush_attempt', 'pass_attempt', 'rushing_yards', 'receiving_yards', 'complete_pass']
 
 
 def _player_games(seasons):
@@ -38,8 +38,12 @@ def _player_games(seasons):
         opp['td'] = ((opp.td_player_id == opp.pid) & (opp.td_team == opp.posteam)
                      & ((opp.rush_touchdown == 1) | (opp.pass_touchdown == 1))).astype(int)
         opp['carry'] = (opp.kind == 'rush').astype(int); opp['target'] = (opp.kind == 'tgt').astype(int)
+        opp['rush_yds'] = np.where(opp.kind == 'rush', opp.rushing_yards.fillna(0), 0.0)
+        opp['rec_yds'] = np.where(opp.kind == 'tgt', opp.receiving_yards.fillna(0), 0.0)
+        opp['rec'] = np.where(opp.kind == 'tgt', opp.complete_pass.fillna(0), 0)
         pg = opp.groupby(['game_id', 'season', 'week', 'posteam', 'pid']).agg(
-            carries=('carry', 'sum'), targets=('target', 'sum'), rz=('rz', 'sum'), gl=('gl', 'sum'), tds=('td', 'sum')).reset_index()
+            carries=('carry', 'sum'), targets=('target', 'sum'), rz=('rz', 'sum'), gl=('gl', 'sum'), tds=('td', 'sum'),
+            rush_yds=('rush_yds', 'sum'), rec_yds=('rec_yds', 'sum'), receptions=('rec', 'sum')).reset_index()
         team = opp.groupby(['game_id', 'posteam']).agg(team_rz=('rz', 'sum'), team_gl=('gl', 'sum'),
                                                        team_opps=('rz', 'size')).reset_index()
         out.append(pg.merge(team, on=['game_id', 'posteam']))
@@ -64,7 +68,7 @@ def implied_points(g):
                       pd.DataFrame({'game_id': g.game_id, 'posteam': g.away_team, 'imp_pts': g.total_line - h})])
 
 
-ROLL = ['rz_share', 'gl_share', 'opp_share', 'carries', 'targets', 'tds', 'rz', 'gl']
+ROLL = ['rz_share', 'gl_share', 'opp_share', 'carries', 'targets', 'tds', 'rz', 'gl', 'rush_yds', 'rec_yds', 'receptions']
 
 
 def history(seasons=range(2021, 2027)):

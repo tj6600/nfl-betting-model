@@ -1,4 +1,4 @@
-<title>Touchdown Board</title>
+<title>Player Props Board</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
@@ -27,6 +27,14 @@ header { display: flex; flex-direction: column; gap: 6px; }
 .eyebrow { font-family: var(--display); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: 13px; color: var(--turf); }
 h1 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 6vw, 52px); line-height: 1; margin: 0; letter-spacing: .01em; text-wrap: balance; }
 .lede { color: var(--muted); max-width: 68ch; margin: 0; }
+.tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--line); overflow-x: auto; }
+.tab { font: 700 18px var(--display); letter-spacing: .03em; text-transform: uppercase; border: 0; background: transparent; color: var(--muted); padding: 8px 14px 10px; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--turf); }
+.range { position: absolute; top: 2px; bottom: 2px; background: var(--bar); border-radius: 3px; }
+.mark { position: absolute; top: -4px; bottom: -4px; width: 3px; border-radius: 2px; background: var(--turf); }
+.line { position: absolute; top: -6px; bottom: -6px; width: 2px; background: var(--tick); }
+.side { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: .03em; text-transform: uppercase; }
+.side.over { color: var(--pos); } .side.under { color: var(--gold); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { font: 600 14px var(--body); border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 12px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline; }
 .chip b { font-family: var(--display); font-size: 16px; }

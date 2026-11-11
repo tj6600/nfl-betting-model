@@ -58,9 +58,52 @@ for r in A.itertuples():
                     books=[dict(b=b.book, p=int(b.price)) for b in bks.itertuples()]))
 taken = pd.Timestamp(os.path.basename(props)[11:26].replace('T', ' ')[:-1] if False else os.path.basename(props)[11:].split('.')[0].replace('Z', ''))
 D = dict(season=season, week=week, taken=taken.tz_localize('UTC').tz_convert('America/New_York').strftime('%A, %B %-d at %-I:%M %p ET'), players=out)
+# rushing / receiving yards
+yf = os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}_yards.csv')
+yprops = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'props', 'yards_*.json')))
+yards = []
+if os.path.exists(yf) and yprops:
+    Yd = pd.read_csv(yf)
+    yrows = []
+    for e in json.load(open(yprops[-1])):
+        for bk in e.get('bookmakers', []):
+            for m in bk['markets']:
+                for o in m['outcomes']:
+                    if o.get('description') and o.get('point') is not None:
+                        yrows.append((TEAMS.get(e['home_team']), TEAMS.get(e['away_team']), 'rush' if m['key'] == 'player_rush_yds' else 'rec',
+                                      o['description'], bk['title'], o['name'], o['point'], o['price']))
+    YO = pd.DataFrame(yrows, columns=['home', 'away', 'kind', 'player', 'book', 'side', 'pt', 'pr']); YO['k'] = T._key(YO.player)
+    gl = {r.game: r for r in GW.assign(game=GW.away_team + ' @ ' + GW.home_team).itertuples()}
+    for (pid, market), grp in Yd.groupby(['pid', 'market']):
+        kind = 'rush' if market.startswith('Rush') else 'rec'
+        r = grp.iloc[0]; away, home = r.game.split(' @ '); g = gl[r.game]
+        sides = {x.side: dict(line=float(x.best_line), price=int(x.best_price), book=x.best_book, p=round(float(x.model_prob), 4),
+                              model=round(float(x.model_only), 4), mkt=round(float(x.market_prob), 4), ev=round(float(x.ev), 4)) for x in grp.itertuples()}
+        lean = grp.sort_values('ev', ascending=False).iloc[0]
+        cat = grp.category.dropna(); cat = cat.iloc[0] if len(cat) else ''
+        note = grp.note.dropna(); note = note.iloc[0] if len(note) else ''
+        k = T._key(pd.Series([r.player])).iloc[0]
+        bl = YO[(YO.home == home) & (YO.away == away) & (YO.kind == kind) & (YO.k == k)]
+        books = []
+        for b, bg in bl.groupby('book'):
+            o = bg[bg.side == 'Over']; u = bg[bg.side == 'Under']
+            books.append(dict(b=b, o=dict(pt=float(o.pt.iloc[0]), pr=int(o.pr.iloc[0])) if len(o) else None,
+                              u=dict(pt=float(u.pt.iloc[0]), pr=int(u.pr.iloc[0])) if len(u) else None))
+        yards.append(dict(id=f'{pid}-{kind}', pid=pid, name=r.player, team=r.team, opp=r.opp, game=r.game, home=home, away=away,
+                          day=str(g.gameday.date()), time=str(g.gametime), weekday=str(g.weekday), pos=r.position, market=kind,
+                          line=float(r.line), lean=lean.side, sides=sides, projection=float(r.projection), median=float(r['median']),
+                          q25=float(r.q25), q75=float(r.q75), recent=float(r.recent_yds), carries=float(r.carries), targets=float(r.targets),
+                          imp=float(r.imp_pts), margin=float(r.exp_margin), defyds=float(r.def_yds) if r.def_yds == r.def_yds else 0.0,
+                          missed=int(r.missed_n), depth=num(r.dc_rank, int), depthPrev=num(r.dc_prev, int), regular=bool(r.regular),
+                          gap=float(r.gap), ev=float(lean.ev), p=float(lean.model_prob), cat=cat, note=note,
+                          books=sorted(books, key=lambda x: x['b'])))
+    yt = pd.Timestamp(os.path.basename(yprops[-1])[6:].split('.')[0].replace('Z', ''))
+    D['yards'] = yards
+    D['yardsTaken'] = yt.tz_localize('UTC').tz_convert('America/New_York').strftime('%A, %B %-d at %-I:%M %p ET')
+
 B = os.path.join(ROOT, 'board')
 data = json.dumps(D, separators=(',', ':')).replace('</', '<\\/')
 html = (open(os.path.join(B, 'head.html')).read() + open(os.path.join(B, 'body.html')).read().replace('2026 · Week 10', f'{season} · Week {week}')
         + f'<script type="application/json" id="td-data">{data}</script>\n<script>\n' + open(os.path.join(B, 'app.js')).read() + '</script>\n')
 open(os.path.join(B, 'touchdown-board.html'), 'w').write(html)
-print('wrote board/touchdown-board.html', len(out), 'players')
+print('wrote board/touchdown-board.html', len(out), 'TD players,', len(yards), 'yards props')
