@@ -7,7 +7,7 @@ const headStep = (p) => {
   return p.steps.reduce((a, b) => (Math.abs(b.p - 0.5) < Math.abs(a.p - 0.5) ? b : a));
 };
 const MS = (D.milestones || []).map((p) => { const h = headStep(p); return { ...p, head: h, p: h.p, ev: Math.max(...p.steps.map((x) => x.ev)) }; });
-const state = { tab: 'td', cat: 'all', game: 'all', pos: 'all', q: '', sort: null, small: true, open: null };
+const state = { tab: 'td', cat: 'all', game: 'all', win: 'all', pos: 'all', q: '', sort: null, small: true, open: null };
 const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(MS.length ? [['ms', 'Milestones']] : []).concat(D.legs ? [['parlay', 'Parlay builder']] : []).concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
 const PILL = { 'TD value': 'value', 'Value': 'value', 'Most likely': 'likely', 'Check role': 'check', 'Likely hit': 'likely' };
 const fmtOdds = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
@@ -63,13 +63,13 @@ function renderTabs() {
 function renderGames() {
   const box = document.getElementById('games'); box.replaceChildren();
   const all = el('button', 'game'); all.type = 'button'; all.append(el('span', 'm', 'All games'), el('span', 't', `${games.length} games`));
-  all.setAttribute('aria-pressed', state.game === 'all'); all.onclick = () => { state.game = 'all'; state.open = null; render(); };
+  all.setAttribute('aria-pressed', state.game === 'all'); all.onclick = () => { state.game = 'all'; state.win = 'all'; state.open = null; render(); };
   box.append(all);
   for (const g of games) {
     const b = el('button', 'game'); b.type = 'button';
     b.append(el('span', 'm', `${g.away} @ ${g.home}`), el('span', 't', `${DAY[g.weekday] || g.weekday} ${clock(g.time)} ET`));
     b.setAttribute('aria-pressed', state.game === g.game);
-    b.onclick = () => { state.game = state.game === g.game ? 'all' : g.game; state.open = null; render(); };
+    b.onclick = () => { state.game = state.game === g.game ? 'all' : g.game; state.win = 'all'; state.open = null; render(); };
     box.append(b);
   }
 }
@@ -283,7 +283,7 @@ const amer = (d) => (d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d -
 const PK = 'props-parlay-v2';
 const PBOOKS = ['DraftKings'];
 const ABBR = { DraftKings: 'DK', FanDuel: 'FD' };
-const PS = { kind: 'all', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25 };
+const PS = { kind: 'all', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25, note: '' };
 const pts = (e) => `${e > 0 ? '+' : ''}${(e * 100).toFixed(1)} pts`;
 const pct1 = (v) => (v < 0.1 ? (v * 100).toFixed(1) : (v * 100).toFixed(0)) + '%';
 let slip = []; try { slip = (JSON.parse(localStorage.getItem(PK) || '[]')).filter((id) => LEG[id]); } catch (e) { slip = []; }
@@ -324,11 +324,56 @@ function verdict(m, n, ws) {
   if (m.ev < 0.08) return ['warn', 'Thin edge', 'Slightly positive on the model\'s numbers, but small enough that model error or a worse price at your book could wipe it out.'];
   return ['good', 'Worth taking on the model\'s numbers', `Positive EV of ${(m.ev * 100).toFixed(0)}%. Remember that the edges multiply: if each leg's true edge is half what the model thinks, so is much of this.`];
 }
+// game windows (Thursday night, Sunday 1 PM, ...) for the parlay builder
+const winOf = (g) => {
+  const h = Number(g.time.split(':')[0]);
+  if (g.weekday === 'Sunday') return h < 12 ? 'Sunday morning' : h < 15 ? 'Sunday 1 PM' : h < 19 ? 'Sunday 4 PM' : 'Sunday night';
+  return `${g.weekday} night`;
+};
+const GWIN = Object.fromEntries(games.map((g) => [g.game, winOf(g)]));
+const WINS = [...new Set(games.map(winOf))];
+const inScope = (l) => (state.game === 'all' || l.game === state.game) && (state.win === 'all' || GWIN[l.game] === state.win);
+const scopeName = () => (state.game !== 'all' ? state.game : state.win !== 'all' ? state.win : 'the whole week');
+// suggested parlay for the chosen game or window: clean, likely (55%+), underpriced (edge 3+ pts) legs at DraftKings.
+// One game: up to 3 legs, one per player or market, at most 2 per team and 1 game line.
+// Several games: the best leg from each game, up to 4.
+function suggest() {
+  if (state.game === 'all' && state.win === 'all') return { ids: [...((D.suggested || {}).ids || [])], note: '' };
+  const pool = LEGS.filter((l) => inScope(l) && !l.flag && l.p >= 0.55 && l.edge >= 0.03 && l.offers.DraftKings != null).sort((a, b) => b.edge - a.edge);
+  const pick = [];
+  if (state.game !== 'all') {
+    const team = {}; let gl = 0;
+    for (const l of pool) {
+      if (pick.length >= 3) break;
+      if (pick.some((x) => x.key === l.key || (x.kind !== 'Game' && x.who === l.who))) continue;
+      if (l.kind === 'Game') { if (gl) continue; gl++; } else { const t = l.team || ''; if ((team[t] || 0) >= 2) continue; team[t] = (team[t] || 0) + 1; }
+      pick.push(l);
+    }
+  } else {
+    const seen = new Set();
+    for (const l of pool) { if (pick.length >= 4) break; if (seen.has(l.game)) continue; seen.add(l.game); pick.push(l); }
+  }
+  let note = '';
+  if (!pick.length) note = `Nothing in ${scopeName()} is likely enough (55%+) and underpriced enough (3+ points of edge) to suggest. Skipping is the better bet here.`;
+  else if (pick.length === 1) note = `Only one leg in ${scopeName()} qualifies, so this is a straight bet rather than a parlay.`;
+  else if (state.game !== 'all') note = 'Same-game legs: DraftKings prices same-game parlays itself and usually pays less than the math here. Enter its price to check.';
+  return { ids: pick.map((l) => l.id), note };
+}
+function renderWins() {
+  const box = document.getElementById('cats'); box.replaceChildren();
+  for (const k of ['all', ...WINS]) {
+    const n = k === 'all' ? games.length : games.filter((g) => winOf(g) === k).length;
+    const b = el('button', 'chip'); b.type = 'button'; b.append(el('span', null, k === 'all' ? 'Whole week' : k), el('b', null, String(n)));
+    b.setAttribute('aria-pressed', state.game === 'all' && state.win === k);
+    b.onclick = () => { state.win = k; state.game = 'all'; PS.note = ''; render(); };
+    box.append(b);
+  }
+}
 function renderParlay() {
   document.getElementById('lede').textContent = 'Build a parlay from any priced leg this week: game lines, touchdowns, yards over/unders and milestones. The slip shows the chance it hits, the payout, the EV, and a verdict on whether it is worth taking.';
-  for (const id of ['cats', 'legend']) document.getElementById(id).replaceChildren();
+  document.getElementById('legend').replaceChildren();
   document.querySelector('.bar').style.display = 'none';
-  renderGames();
+  renderWins(); renderGames();
   const board = document.getElementById('board'); board.replaceChildren(); board.className = 'cols pl';
   // picker
   const pick = el('section', 'col'); const ph = el('div', 'colhead'); ph.append(el('h2', null, 'Add legs'), el('span', null, '')); pick.append(ph);
@@ -355,7 +400,7 @@ function renderParlay() {
   const list = el('div', 'pllist'); pick.append(list);
   function drawList() {
     const qq = PS.q.trim().toLowerCase();
-    const xs = LEGS.filter((l) => (state.game === 'all' || l.game === state.game) && (PS.kind === 'all' || l.kind === PS.kind) && (!PS.plus || l.ev > 0) && (!PS.clean || !l.flag) && l.p >= PS.minp
+    const xs = LEGS.filter((l) => inScope(l) && (PS.kind === 'all' || l.kind === PS.kind) && (!PS.plus || l.ev > 0) && (!PS.clean || !l.flag) && l.p >= PS.minp
       && (!qq || (l.who + ' ' + l.label + ' ' + l.game + ' ' + (l.team || '')).toLowerCase().includes(qq)))
       .sort(PS.sort === 'ev' ? (a, b) => b.ev - a.ev : PS.sort === 'p' ? (a, b) => b.p - a.p : (a, b) => b.edge - a.edge).slice(0, 80);
     ph.lastChild.textContent = `${xs.length >= 80 ? 'top 80' : xs.length} legs`;
@@ -375,10 +420,11 @@ function renderParlay() {
   // slip
   const sl = el('section', 'col slip'); const sh = el('div', 'colhead'); sh.append(el('h2', null, 'Your parlay'));
   const acts = el('span', 'acts');
-  const sug = el('button', 'lnk', 'Load suggested'); sug.type = 'button'; sug.onclick = () => { slip = [...((D.suggested || {}).ids || [])]; PS.price = ''; saveSlip(); renderParlay(); };
-  const clr = el('button', 'lnk', 'Clear'); clr.type = 'button'; clr.onclick = () => { slip = []; PS.price = ''; saveSlip(); renderParlay(); };
+  const sug = el('button', 'lnk sugb', `Suggest for ${scopeName()}`); sug.type = 'button'; sug.onclick = () => { const r = suggest(); slip = r.ids; PS.note = r.note; PS.price = ''; saveSlip(); renderParlay(); };
+  const clr = el('button', 'lnk', 'Clear'); clr.type = 'button'; clr.onclick = () => { slip = []; PS.price = ''; PS.note = ''; saveSlip(); renderParlay(); };
   acts.append(sug, clr); sh.append(acts); sl.append(sh);
-  if (!slip.length) sl.append(el('div', 'empty', `Add legs from the list, or load the suggested parlay: the best value leg from each of the four strongest games, all at ${(D.suggested || {}).book || 'one book'}.`));
+  if (PS.note) { const n = el('p', 'note sugnote', PS.note); sl.append(n); }
+  if (!slip.length) sl.append(el('div', 'empty', 'Add legs from the list, or pick a game or game window above and press Suggest. One game gets up to 3 legs; a window or the whole week gets the best leg from each game, up to 4. Every suggested leg is 55%+ likely, 3+ points better than its DraftKings price implies, and has no role flag.'));
   else {
     const m = parlayMath(slip, PS.price && Number(PS.price) && Math.abs(Number(PS.price)) >= 100 ? Number(PS.price) : null);
     const lsx = el('div', 'books slipl');
