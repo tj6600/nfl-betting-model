@@ -139,10 +139,25 @@ Scheme matchups turn out tiny. A typical matchup is worth under 0.01 EPA per dro
 
 This is the first test where the model shows **positive closing line value**: the market tends to move toward the model's side after the open. That's the standard sign of a real edge. Two seasons is still a small sample, though, and later seasons need their own opening-line data to confirm it.
 
+## Live opening-line tracking
+
+These scripts need `ODDS_API_KEY` (free key from the-odds-api.com, 500 credits a month; each snapshot costs 3).
+
+| Step | Command | When |
+|---|---|---|
+| Snapshot odds | `python -m nflmodel.odds` | Early in the week (opener), then just before kickoffs (close) |
+| Price the week vs openers | `python scripts/weekly_picks.py` | After the opener snapshot |
+| Grade picks (CLV and results) | `python scripts/clv_report.py` | Any time; writes `odds_log/clv_report.md` |
+
+- Snapshots go to `odds_log/snapshots/` (every book plus a median "consensus" line).
+- Picks go to `odds_log/picks/<season>_wk<NN>.csv`. **Optimal** means a spread with an edge of 1.5+ points over the opener and EV of 5%+ at the best available line. **Secure** means a moneyline with model win probability of 70%+. **Watch** means a total that would qualify, tracked separately because totals weren't backtested against openers.
+- The closing line is the last consensus snapshot before each game's kickoff.
+
+Set `NFL_GAMES_CSV` to a local copy of nflverse `games.csv` (clone `nflverse/nfldata`).
+
 ## Next steps
 
-1. Record opening lines live each week (e.g. The Odds API) and track closing line value going forward
-2. Opening lines (`initial_lines.csv`), to bet early numbers and measure closing line value
+1. Opening lines (`initial_lines.csv`), to bet early numbers and measure closing line value
 3. Key-number-aware margin distribution (3, 7, 10) in place of the normal approximation
 4. "Optimal" and "secure" leg ranking with expected value and fractional Kelly staking
 5. Measure closing line value using opening lines

@@ -97,10 +97,11 @@ def add_roster(feat):
     return feat.fillna({c: 0.0 for c in sc.columns if c != 'game_id'})
 
 
-def all_features(seasons):
+def all_features(seasons, with_roster=True):
     out = []
     for s in seasons:
         for wk in sorted(G[G.season == s].week.unique()):
             t = G[(G.season == s) & (G.week == wk)]
             if len(t): out.append(build(t))
-    return add_roster(pd.concat(out, ignore_index=True))
+    out = pd.concat(out, ignore_index=True)
+    return add_roster(out) if with_roster else out
