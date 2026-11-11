@@ -78,5 +78,28 @@ def consensus_spread(snaps):
     return s.assign(spread_line=-s.point)[['taken_at', 'kickoff', 'home_team', 'away_team', 'spread_line']]
 
 
+def props_snapshot(days=8):
+    """Anytime-TD odds for every game in the next `days` days (1 credit per game) -> odds_log/props/."""
+    key = os.environ.get('ODDS_API_KEY')
+    if not key:
+        raise SystemExit('ODDS_API_KEY is not set.')
+    base = API.rsplit('/odds', 1)[0]
+    with urllib.request.urlopen(f'{base}/events?apiKey={key}', timeout=60) as r:
+        events = json.loads(r.read())
+    now = dt.datetime.now(dt.timezone.utc)
+    soon = [e for e in events if dt.datetime.fromisoformat(e['commence_time'].replace('Z', '+00:00')) < now + dt.timedelta(days=days)]
+    out, remaining = [], None
+    for e in soon:
+        q = urllib.parse.urlencode({'apiKey': key, 'regions': 'us', 'markets': 'player_anytime_td', 'oddsFormat': 'american'})
+        with urllib.request.urlopen(f"{base}/events/{e['id']}/odds?{q}", timeout=60) as r:
+            remaining = r.headers.get('x-requests-remaining'); out.append(json.loads(r.read()))
+    d = os.path.join(os.path.dirname(SNAP_DIR), 'props'); os.makedirs(d, exist_ok=True)
+    path = os.path.join(d, f"anytime_td_{now.strftime('%Y-%m-%dT%H%MZ')}.json")
+    json.dump(out, open(path, 'w'))
+    print(f'saved anytime TD odds for {len(out)} games to {path}; API credits left: {remaining}')
+    return path
+
+
 if __name__ == '__main__':
-    snapshot()
+    import sys
+    props_snapshot() if 'props' in sys.argv[1:] else snapshot()

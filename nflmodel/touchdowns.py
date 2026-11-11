@@ -11,9 +11,10 @@ A logistic regression turns these into P(scores at least one TD).
 import os
 import numpy as np, pandas as pd
 from .model import G
+from .pbp import PBP_URL
+from .roster import _load as _load_extra
 
-PBP_DIR = os.environ.get('NFL_PBP_DIR', '/home/user/pbp')
-EXTRA = os.environ.get('NFL_EXTRA_DIR', os.path.join(PBP_DIR, 'extra'))
+PBP_DIR = os.environ.get('NFL_PBP_DIR', os.path.join(os.path.dirname(__file__), '..', 'data'))
 CACHE = os.path.join(os.path.dirname(__file__), '..', 'data', 'td_player_games.csv')
 HALF = 6.0
 POS = ['QB', 'RB', 'WR', 'TE']
@@ -25,7 +26,8 @@ COLS = ['game_id', 'season', 'week', 'season_type', 'posteam', 'defteam', 'yardl
 def _player_games(seasons):
     out = []
     for y in seasons:
-        p = pd.read_csv(os.path.join(PBP_DIR, f'pbp_{y}.csv.gz'), usecols=lambda c: c in COLS, low_memory=False)
+        local = os.path.join(PBP_DIR, f'pbp_{y}.csv.gz')
+        p = pd.read_csv(local if os.path.exists(local) else PBP_URL.format(y=y), usecols=lambda c: c in COLS, low_memory=False)
         p = p[(p.season_type == 'REG') & (p.two_point_attempt != 1) & p.posteam.notna()]
         ru = p[p.rush_attempt == 1].assign(pid=lambda d: d.rusher_player_id, kind='rush')
         rc = p[(p.pass_attempt == 1) & p.receiver_player_id.notna()].assign(pid=lambda d: d.receiver_player_id, kind='tgt')
@@ -49,8 +51,7 @@ def _player_games(seasons):
 
 
 def _positions(seasons):
-    r = pd.concat([pd.read_csv(os.path.join(EXTRA, f'roster_{y}.csv'), usecols=['season', 'gsis_id', 'position', 'full_name'],
-                               low_memory=False) for y in seasons])
+    r = pd.concat([_load_extra('roster', y)[['season', 'gsis_id', 'position', 'full_name']] for y in seasons])
     r = r.dropna(subset=['gsis_id']).drop_duplicates(['gsis_id'], keep='last')
     r['position'] = r.position.replace({'FB': 'RB', 'HB': 'RB'})
     return r.rename(columns={'gsis_id': 'pid'})[['pid', 'position', 'full_name']]
@@ -88,7 +89,7 @@ def _ewm_prior(pg):
     return prior
 
 
-def design(df):
+def design(df, extended=True):
     X = pd.DataFrame({
         'rz_share': df.h_rz_share, 'gl_share': df.h_gl_share, 'opp_share': df.h_opp_share,
         'carries': df.h_carries / 10, 'targets': df.h_targets / 5, 'tds': df.h_tds, 'gl': df.h_gl,
@@ -97,6 +98,11 @@ def design(df):
     for p in ['QB', 'TE', 'WR']:          # RB is the baseline
         X[f'pos_{p}'] = (df.position == p).astype(float)
     X['gl_x_pts'] = X.gl_share * X.imp_pts
+    if extended:
+        X['room_share'] = df.room_share          # his share of the touches among teammates at his position who play
+        X['last_share'] = df.last_share          # share of team touches in his most recent game
+        X['missed_last'] = df.missed_last        # missed the team's previous game (injury, benching)
+        X['def_td'] = df.def_td                  # opponent's TDs allowed per game to this position, vs league average
     return X.fillna(0.0)
 
 
@@ -113,9 +119,54 @@ def predict(b, X):
     return 1 / (1 + np.exp(-np.column_stack([X.values, np.ones(len(X))]) @ b))
 
 
+def _with_def(pg):
+    """Attach defteam and gameday to player-games."""
+    g = G[['game_id', 'home_team', 'away_team', 'gameday']]
+    pg = pg.drop(columns=[c for c in ['gameday'] if c in pg]).merge(g, on='game_id')
+    pg['defteam'] = np.where(pg.posteam == pg.home_team, pg.away_team, pg.home_team)
+    return pg.drop(columns=['home_team', 'away_team'])
+
+
+DEF_HALF = 8.0
+
+
+def defense_table(pg):
+    """Per defense, game and position: TDs allowed, and the recency-weighted average before that game."""
+    pg = _with_def(pg)
+    games = pg[['game_id', 'defteam', 'gameday']].drop_duplicates()
+    full = games.assign(k=1).merge(pd.DataFrame({'position': POS, 'k': 1}), on='k').drop(columns='k')
+    tda = pg.groupby(['game_id', 'defteam', 'position']).tds.sum().reset_index()
+    d = full.merge(tda, on=['game_id', 'defteam', 'position'], how='left').fillna({'tds': 0})
+    d = d.sort_values('gameday')
+    a = 1 - 0.5 ** (1 / DEF_HALF)
+    grp = d.groupby(['defteam', 'position']).tds
+    d['def_prior'] = grp.transform(lambda x: x.shift(1).ewm(alpha=a).mean())
+    d['def_now'] = grp.transform(lambda x: x.ewm(alpha=a).mean())
+    mean = d.groupby('position').tds.mean()
+    d['def_prior'] -= d.position.map(mean); d['def_now'] -= d.position.map(mean)
+    return d
+
+
+def _room(df):
+    tot = df.groupby(['game_id', 'posteam', 'position']).h_opp_share.transform('sum')
+    df['room_share'] = df.h_opp_share / tot.where(tot > 0, 1)
+    return df
+
+
 def training_frame():
     pg = history()
     pg = pd.concat([pg, _ewm_prior(pg)], axis=1)
+    pg['last_share'] = pg.groupby('pid').opp_share.shift(1)
+    # did he miss his team's previous game? (compare with the team's game sequence)
+    tseq = pg[['game_id', 'posteam', 'gameday']].drop_duplicates().sort_values('gameday')
+    tseq['team_prev'] = tseq.groupby('posteam').game_id.shift(1)
+    pg = pg.merge(tseq[['game_id', 'posteam', 'team_prev']], on=['game_id', 'posteam'], how='left')
+    pg['prev_game'] = pg.groupby('pid').game_id.shift(1)
+    pg['missed_last'] = ((pg.prev_game != pg.team_prev) & pg.prev_game.notna()).astype(float)
+    pg = _room(pg)
+    d = defense_table(pg)
+    pg = _with_def(pg).merge(d[['game_id', 'defteam', 'position', 'def_prior']], on=['game_id', 'defteam', 'position'], how='left')
+    pg = pg.rename(columns={'def_prior': 'def_td'})
     pg = pg.merge(implied_points(G), on=['game_id', 'posteam'], how='left')
     pg = pg[(pg.h_games >= 1) & pg.imp_pts.notna()]
     pg['scored'] = (pg.tds > 0).astype(float)
@@ -131,8 +182,8 @@ def upcoming(season, week, implied, overrides=None):
     """Rows for players expected to play in `week`, with their prior history as features.
 
     implied: DataFrame game_id, posteam, imp_pts for this week's games.
-    A player is included when he is ACT on his team's roster for this week and had a touch in one of
-    the team's last 3 games. Players named in the injury overrides with status Out are dropped.
+    A player is included when he is ACT on his team's roster for this week and has a touch this season
+    (missed_last flags players who sat out the team's latest game). Players named in the injury overrides with status Out are dropped.
     """
     pg = history()
     pg = pd.concat([pg, _ewm_prior(pg)], axis=1)
@@ -142,16 +193,33 @@ def upcoming(season, week, implied, overrides=None):
     for c in ROLL:
         last[f'h_{c}'] = pg.groupby('pid')[c].apply(lambda s: s.ewm(alpha=a, adjust=True).mean().iloc[-1]).reindex(last.pid).values
     last['h_games'] = last.h_games + 1
-    ros = pd.read_csv(os.path.join(EXTRA, f'roster_{season}.csv'), low_memory=False)
+    ros = _load_extra('roster', season)
     ros = ros[(ros.week == week) & (ros.status == 'ACT')][['gsis_id', 'team']].rename(columns={'gsis_id': 'pid'})
     last = last.merge(ros, on='pid')
-    tg = pg[pg.season == season].groupby('posteam').game_id.unique()
-    recent = {t: set(sorted(g)[-3:]) for t, g in tg.items()}
+    last['last_share'] = last.opp_share
+    tseq = pg[pg.season == season][['game_id', 'posteam', 'gameday']].drop_duplicates().sort_values('gameday')
+    team_last = tseq.groupby('posteam').game_id.last()
     played = pg[pg.season == season].groupby('pid').game_id.apply(set)
-    last = last[[bool(played.get(r.pid, set()) & recent.get(r.team, set())) for r in last.itertuples()]]
+    # anyone ACT with a touch this season; a starter back from injury competes for touches again
+    last = last[[len(played.get(r.pid, set())) > 0 for r in last.itertuples()]]
+    last['missed_last'] = [float(team_last.get(r.team) not in played.get(r.pid, set())) for r in last.itertuples()]
+    tgames = tseq.groupby('posteam').game_id.apply(list)
+    def streak(r):
+        n = 0
+        for gid in reversed(tgames.get(r.team, [])):
+            if gid in played.get(r.pid, set()): break
+            n += 1
+        return n
+    last['missed_n'] = [streak(r) for r in last.itertuples()]
     last = last.drop(columns=['posteam', 'game_id']).rename(columns={'team': 'posteam'})
     last = last.merge(implied, on='posteam')
     if overrides is not None and len(overrides):
         out = overrides[(overrides.season == season) & (overrides.week == week) & overrides.status.isin(['Out', 'Doubtful'])]
         last = last[~_key(last.full_name).isin(set(_key(out.player)))]
+    last = _room(last)
+    d = defense_table(pg)
+    dn = d.sort_values('gameday').groupby(['defteam', 'position']).def_now.last().rename('def_td').reset_index()
+    opp = implied.merge(implied[['game_id', 'posteam']].rename(columns={'posteam': 'defteam'}), on='game_id')
+    opp = opp[opp.posteam != opp.defteam][['posteam', 'defteam']]
+    last = last.merge(opp, on='posteam', how='left').merge(dn, on=['defteam', 'position'], how='left')
     return last

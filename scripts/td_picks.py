@@ -7,6 +7,8 @@
 """
 import sys, os, glob, json; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 ROOT = os.path.join(os.path.dirname(__file__), '..')
+_c = os.path.join(ROOT, 'data', 'td_player_games.csv')
+if os.path.exists(_c): os.remove(_c)          # rebuild player history with the latest games
 import numpy as np, pandas as pd
 from nflmodel.model import G
 from nflmodel import touchdowns as T
@@ -61,8 +63,9 @@ M['ev'] = M.model_prob * dec(M.best_price.fillna(-1e9)) - 1
 M.loc[M.best_price.isna(), 'ev'] = np.nan
 M['edge_pct'] = (M.model_prob - M.book_prob) * 100
 M['game'] = M.away_team + ' @ ' + M.home_team
-keep = ['game', 'posteam', 'full_name', 'position', 'model_prob', 'book_prob', 'edge_pct', 'median_price', 'best_price', 'best_book',
-        'books', 'ev', 'imp_pts', 'h_rz_share', 'h_gl_share', 'h_carries', 'h_targets', 'h_tds']
+keep = ['game', 'pid', 'posteam', 'full_name', 'position', 'model_prob', 'book_prob', 'edge_pct', 'median_price', 'best_price', 'best_book',
+        'books', 'ev', 'imp_pts', 'h_rz_share', 'h_gl_share', 'h_carries', 'h_targets', 'h_tds',
+        'room_share', 'last_share', 'missed_n', 'def_td', 'defteam']
 M = M[keep].sort_values('ev', ascending=False)
 os.makedirs(os.path.join(ROOT, 'odds_log', 'picks'), exist_ok=True)
 out = os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}_td.csv')
@@ -80,5 +83,25 @@ value = (M.opps >= 5) & (M.model_prob >= 0.15) & (M.ev >= 0.05) & (ratio <= 1.6)
 check = (M.opps >= 5) & (ratio > 1.6) & (M.model_prob >= 0.12)   # model far above books: recent role may not carry over
 top = M.model_prob.rank(ascending=False) <= 12
 M['category'] = np.select([value, check, top], ['TD value', 'Check role', 'Most likely'], '')
-M[M.category != ''].round(4).to_csv(out.replace('_td.csv', '_td_picks.csv'), index=False)
+
+POSN = {'RB': 'running backs', 'WR': 'receivers', 'TE': 'tight ends', 'QB': 'quarterbacks'}
+def why(r):
+    bits = [f"{r.h_carries:.1f} carries and {r.h_targets:.1f} targets a game", f"{r.h_gl_share * 100:.0f}% of the team's goal-line chances",
+            f"team expected to score {r.imp_pts:.1f}"]
+    if abs(r.def_td) >= 0.15:
+        bits.append(f"{r.defteam} allows {'more' if r.def_td > 0 else 'fewer'} TDs than average to {POSN[r.position]}")
+    s = ', '.join(bits)
+    if r.missed_n >= 1:
+        s = f"Missed the last {int(r.missed_n)} game{'s' if r.missed_n > 1 else ''}, so his usage is from before that. " + s
+    if r.category == 'Check role':
+        s = "The books are far lower than the model, so his role has probably changed or he may not be healthy. " + s
+    return s
+M['why'] = M.apply(why, axis=1)
+C = M[M.category != ''].copy()
+C.round(4).to_csv(out.replace('_td.csv', '_td_picks.csv'), index=False)
+page = pd.DataFrame({'pick_id': (C.full_name + '-' + C.posteam).str.replace(' ', '_'), 'game': C.game, 'team': C.posteam,
+                     'player': C.full_name, 'position': C.position, 'model_pct': (C.model_prob * 100).round(1),
+                     'book_pct': (C.book_prob * 100).round(1), 'edge_pct': C.edge_pct.round(1), 'best_price': C.best_price.astype(int),
+                     'best_book': C.best_book, 'ev_pct': (C.ev * 100).round(1), 'category': C.category, 'why': C.why})
+page.to_csv(out.replace('_td.csv', '_td_page.csv'), index=False)
 print(M[M.category != ''][['game', 'full_name', 'model_prob', 'book_prob', 'best_price', 'ev', 'category']].round(3).to_string(index=False))
