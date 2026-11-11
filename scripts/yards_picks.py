@@ -63,7 +63,8 @@ for e in json.load(open(f)):
 O = pd.DataFrame(rows); O['k'] = T._key(O.player)
 P['k'] = T._key(P.full_name)
 dec = lambda o: np.where(o < 0, 1 + 100 / -o, 1 + o / 100)
-out = []
+out = []; per_book = []
+PARLAY_BOOKS = ['DraftKings', 'FanDuel']   # the books Thomas uses; per-book prices feed the parlay builder
 for (home, away, k, kind), grp in O.groupby(['home_team', 'away_team', 'k', 'kind']):
     pl = P[(P.home_team == home) & (P.away_team == away) & (P.k == k)]
     if pl.empty or pl.iloc[0].position not in Y.STATS[kind]['pos']:
@@ -78,6 +79,17 @@ for (home, away, k, kind), grp in O.groupby(['home_team', 'away_team', 'k', 'kin
     po = float(imp(grp[grp.side == 'Over'].price.median())) if (grp.side == 'Over').any() else np.nan
     pu = float(imp(grp[grp.side == 'Under'].price.median())) if (grp.side == 'Under').any() else np.nan
     mkt_over = po / (po + pu) if po == po and pu == pu else np.nan
+    for (bkn, pt), bg in grp[grp.book.isin(PARLAY_BOOKS)].groupby(['book', 'point']):
+        o = bg[bg.side == 'Over']; u = bg[bg.side == 'Under']
+        pov = float(models[kind][1].p_over([mu], [pt])[0])
+        nv = None
+        if len(o) and len(u):
+            io, iu = float(imp(o.price.iloc[0])), float(imp(u.price.iloc[0])); nv = io / (io + iu)
+        for side, sg in [('Over', o), ('Under', u)]:
+            if not len(sg): continue
+            mp = pov if side == 'Over' else 1 - pov
+            per_book.append(dict(pid=r.pid, kind=kind, book=bkn, side=side, point=pt, price=int(sg.price.iloc[0]), model_only=mp,
+                                 book_p=(nv if side == 'Over' else 1 - nv) if nv is not None else np.nan))
     for side in ['Over', 'Under']:
         g2 = grp[grp.side == side]
         if g2.empty: continue
@@ -108,6 +120,7 @@ M['note'] = np.select([M.missed_n >= 1, M.dc_demoted == 1, M.gap.abs() > MAX_GAP
 M = M.sort_values('ev', ascending=False)
 path = os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}_yards.csv')
 M.round(4).to_csv(path, index=False)
+pd.DataFrame(per_book).round(4).to_csv(path.replace('_yards.csv', '_yards_books.csv'), index=False)
 pd.set_option('display.width', 250)
 print(f'{M.player.nunique()} players, {len(M)} sides priced; {(M.category == "Value").sum()} value picks')
 print(M[M.category != ''][['game', 'player', 'market', 'side', 'line', 'best_line', 'best_price', 'best_book', 'projection', 'median', 'model_prob', 'ev', 'category']].round(3).to_string(index=False))
@@ -131,7 +144,7 @@ if af:
     base_rows['kind'] = np.where(base_rows.market.str.startswith('Rush'), 'rush', 'rec')
     base_rows['k'] = T._key(base_rows.player)
     imp = lambda o: np.where(o < 0, -o / (-o + 100.0), 100.0 / (o + 100.0))
-    out = []
+    out = []; ms_books = []
     for (home, away, k, kind, pt), g in A.groupby(['home_team', 'away_team', 'k', 'kind', 'point']):
         br = base_rows[(base_rows.game == f'{away} @ {home}') & (base_rows.k == k) & (base_rows.kind == kind)]
         if br.empty:
@@ -141,6 +154,8 @@ if af:
         book_p = float(np.median(imp(g.price.values))) / ALT_MARGIN
         p = W_MODEL * model_p + (1 - W_MODEL) * min(book_p, 0.995)
         best = g.sort_values('price', ascending=False).iloc[0]
+        for x in g[g.book.isin(PARLAY_BOOKS)].itertuples():
+            ms_books.append(dict(pid=r.pid, kind=kind, milestone=int(pt + 0.5), book=x.book, price=int(x.price)))
         out.append(dict(game=r.game, pid=r.pid, team=r.team, opp=r.opp, player=r.player, position=r.position, market=r.market,
                         milestone=int(pt + 0.5), point=pt, model_only=model_p, book_prob=book_p, prob=p,
                         best_price=int(best.price), best_book=best.book, books=g.book.nunique(),
@@ -152,6 +167,7 @@ if af:
                                ['Likely hit', 'Value'], '')
     mpath = os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}_milestones.csv')
     MS.round(4).to_csv(mpath, index=False)
+    pd.DataFrame(ms_books).to_csv(mpath.replace('_milestones.csv', '_milestones_books.csv'), index=False)
     print(f'\n{len(MS)} milestones priced; {(MS.category == "Likely hit").sum()} likely hits, {(MS.category == "Value").sum()} value')
     print(MS[MS.category != ''].sort_values(['category', 'ev'], ascending=[True, False]).head(40)[
         ['player', 'market', 'milestone', 'model_only', 'book_prob', 'prob', 'best_price', 'best_book', 'ev', 'category']].round(3).to_string(index=False))

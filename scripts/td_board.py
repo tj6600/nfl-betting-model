@@ -124,50 +124,131 @@ if os.path.exists(mf):
         at = pd.Timestamp(os.path.basename(aprops[-1])[9:].split('.')[0].replace('Z', ''))
         D['altTaken'] = at.tz_localize('UTC').tz_convert('America/New_York').strftime('%A, %B %-d at %-I:%M %p ET')
 
-# every priced leg for the parlay builder; chances blend the model with the books like the yards tabs do
+# every priced leg for the parlay builder, at the two books Thomas uses (DraftKings and FanDuel).
+# A leg is a market + side + number; it lists its price at each book that offers that exact number.
+from nflmodel.stats import norm
+BOOKS = {'draftkings': 'DraftKings', 'fanduel': 'FanDuel', 'DraftKings': 'DraftKings', 'FanDuel': 'FanDuel'}
 def _dec(a): return 1 + a / 100 if a > 0 else 1 + 100 / -a
-legs = []
+def _imp(a): return -a / (-a + 100.0) if a < 0 else 100.0 / (a + 100.0)
+def _cat(x): return x if isinstance(x, str) else ''
+def _inv(q):   # standard normal quantile by bisection
+    lo, hi = -8.0, 8.0
+    for _ in range(60):
+        mid = (lo + hi) / 2
+        if norm.cdf(mid) < q: lo = mid
+        else: hi = mid
+    return (lo + hi) / 2
+LEGS = {}
+def add_leg(lid, book, price, **kw):
+    l = LEGS.setdefault(lid, dict(id=lid, offers={}, bps=[], **kw))
+    if book in l['offers']: return
+    l['offers'][book] = int(price)
+    if kw.get('bp') == kw.get('bp') and kw.get('bp') is not None: l['bps'].append(kw['bp'])
+
+# game lines: rebuild the model's margin and total from the picks file, then price every DraftKings/FanDuel number
 gp = pd.read_csv(os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}.csv'))
-for r in gp.dropna(subset=['best_price']).itertuples():
-    d = _dec(r.best_price); pb = min(0.99, 0.976 / d)   # break-even with a typical margin taken out
-    pp = 0.5 * r.model_prob + 0.5 * pb
-    lab = {'spread': f"{r.side} {r.best_line:+g}", 'moneyline': f"{r.side} moneyline", 'total': f"{r.side} {r.best_line:g}"}[r.market]
-    legs.append(dict(id=f"g-{r.game_id}-{r.market}-{r.side}", game=r.game, kind='Game', who=r.game, label=lab, p=round(pp, 4), model=round(r.model_prob, 4),
-                     price=int(r.best_price), book=r.best_book, ev=round(pp * d - 1, 4), cat=r.category if isinstance(r.category, str) else '',
-                     key=f"{r.game}-{r.market}", flag=''))
-for r in A.dropna(subset=['best_price']).itertuples():
-    d = _dec(r.best_price); pp = 0.5 * r.model_prob + 0.5 * r.book_prob if r.book_prob == r.book_prob else r.model_prob
+snapf = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'snapshots', '*.csv')))[-1]
+SN = pd.read_csv(snapf); SN = SN[SN.book.isin(['draftkings', 'fanduel'])]
+sdm, sdt, GM = [], [], {}
+for game, gg in gp.groupby('game'):
+    away, home = game.split(' @ ')
+    hs = gg[(gg.market == 'spread') & (gg.side == home)]; ov = gg[(gg.market == 'total') & (gg.side == 'Over')]
+    info = dict(game_id=gg.game_id.iloc[0])
+    if len(hs):
+        h = hs.iloc[0]; pred = -h.model_line; S = -h.open_line; info['pm'] = pred
+        if abs(S - pred) > 1: sdm.append((S - pred) / _inv(1 - h.model_prob))
+    if len(ov):
+        o = ov.iloc[0]; info['pt'] = o.model_line
+        if abs(o.open_line - o.model_line) > 1: sdt.append((o.open_line - o.model_line) / _inv(1 - o.model_prob))
+    GM[game] = info
+SDM, SDT = float(np.median(sdm)), float(np.median(sdt))
+print(f'game model spread sd {SDM:.1f}, total sd {SDT:.1f}')
+for (home, away, book, market), bg in SN.groupby(['home_team', 'away_team', 'book', 'market']):
+    game = f'{away} @ {home}'
+    if game not in GM: continue
+    gi = GM[game]; bk = BOOKS[book]
+    for x in bg.itertuples():
+        other = bg[(bg.side != x.side)]
+        if market == 'moneyline':
+            row = gp[(gp.game == game) & (gp.market == 'moneyline') & (gp.side == x.side)]
+            if row.empty: continue
+            model = float(row.model_prob.iloc[0]); lab = f'{x.side} moneyline'; lid = f'g-{gi["game_id"]}-ml-{x.side}'
+        elif market == 'spread':
+            if 'pm' not in gi or x.point != x.point: continue
+            model = 1 - norm.cdf(-x.point, gi['pm'], SDM) if x.side == home else norm.cdf(x.point, gi['pm'], SDM)
+            other = other[other.point == -x.point]; lab = f'{x.side} {x.point:+g}'; lid = f'g-{gi["game_id"]}-sp-{x.side}-{x.point:g}'
+        else:
+            if 'pt' not in gi or x.point != x.point: continue
+            po = 1 - norm.cdf(x.point, gi['pt'], SDT); model = po if x.side == 'Over' else 1 - po
+            other = other[other.point == x.point]; lab = f'{x.side} {x.point:g}'; lid = f'g-{gi["game_id"]}-tot-{x.side}-{x.point:g}'
+        bp = _imp(x.price) / (_imp(x.price) + _imp(other.price.iloc[0])) if len(other) else np.nan
+        cat = gp[(gp.game == game) & (gp.market == market) & (gp.side == x.side)].category
+        add_leg(lid, bk, x.price, game=game, kind='Game', who=game, label=lab, model=float(model), bp=bp,
+                cat=_cat(cat.iloc[0]) if len(cat) else '', key=f'{game}-{market}', flag='')
+# touchdowns: one number, so only the price differs by book
+for r in A.itertuples():
+    away, home = r.game.split(' @ ')
+    k = T._key(pd.Series([r.full_name])).iloc[0]
+    bks = O[(O.home == home) & (O.away == away) & (O.k == k) & O.book.isin(['DraftKings', 'FanDuel'])]
     flag = 'Check role' if r.category == 'Check role' else ('small role' if r.h_carries + r.h_targets < 3 else '')
-    legs.append(dict(id=f"t-{r.pid}", game=r.game, kind='TD', who=r.full_name, label='anytime TD', team=r.posteam, p=round(pp, 4), model=round(r.model_prob, 4),
-                     price=int(r.best_price), book=r.best_book, ev=round(pp * d - 1, 4), cat=r.category if isinstance(r.category, str) else '',
-                     key=f"td-{r.pid}", flag=flag))
-if os.path.exists(yf):
-    for r in pd.read_csv(yf).itertuples():
-        kind = 'Rush' if r.market.startswith('Rush') else 'Rec'
-        flag = 'Check role' if r.category == 'Check role' else ('' if r.regular else 'small role')
-        legs.append(dict(id=f"y-{r.pid}-{kind}-{r.side}", game=r.game, kind=kind, who=r.player, team=r.team, label=f"{r.side} {r.best_line:g} {kind.lower()} yds",
-                         p=round(r.model_prob, 4), model=round(r.model_only, 4), price=int(r.best_price), book=r.best_book, ev=round(r.ev, 4),
-                         cat=r.category if isinstance(r.category, str) else '', key=f"{r.pid}-{kind}", flag=flag))
-if os.path.exists(mf):
-    for r in pd.read_csv(mf).itertuples():
-        if not 0.05 <= r.prob <= 0.97: continue
-        kind = 'Rush' if r.market.startswith('Rush') else 'Rec'
-        flag = 'Check role' if r.risky else ('' if r.regular else 'small role')
-        legs.append(dict(id=f"m-{r.pid}-{kind}-{r.milestone}", game=r.game, kind='Milestone', who=r.player, team=r.team, label=f"{r.milestone}+ {kind.lower()} yds",
-                         p=round(r.prob, 4), model=round(r.model_only, 4), price=int(r.best_price), book=r.best_book, ev=round(r.ev, 4),
-                         cat=r.category if isinstance(r.category, str) else '', key=f"{r.pid}-{kind}", flag=flag))
-# long shots: the model is least reliable in the tails, so trust the books more as the book chance falls
-# (model weight 0.5 at a 25%+ book chance, sliding to 0.2 below about 12%); edge = chance minus break-even
-for l in legs:
-    d = _dec(l['price']); bk = min(0.99, max(0.005, 2 * l['p'] - l['model']))
+    for b in bks.itertuples():
+        add_leg(f't-{r.pid}', b.book, b.price, game=r.game, kind='TD', who=r.full_name, label='anytime TD', team=r.posteam, model=float(r.model_prob),
+                bp=float(r.book_prob) if r.book_prob == r.book_prob else np.nan, cat=_cat(r.category), key=f'td-{r.pid}', flag=flag)
+# yards over/unders: each book's own number, with the model's chance at that number (scripts/yards_picks.py)
+yb = yf.replace('_yards.csv', '_yards_books.csv')
+if os.path.exists(yb):
+    Yd = pd.read_csv(yf)
+    for r in pd.read_csv(yb).itertuples():
+        base = Yd[(Yd.pid == r.pid) & (Yd.market.str.startswith('Rush' if r.kind == 'rush' else 'Rec')) & (Yd.side == r.side)]
+        if base.empty: continue
+        m = base.iloc[0]; kind = 'Rush' if r.kind == 'rush' else 'Rec'
+        flag = 'Check role' if m.category == 'Check role' else ('' if m.regular else 'small role')
+        add_leg(f'y-{r.pid}-{kind}-{r.side}-{r.point:g}', r.book, r.price, game=m.game, kind=kind, who=m.player, team=m.team,
+                label=f'{r.side} {r.point:g} {kind.lower()} yds', model=float(r.model_only),
+                bp=float(r.book_p) if r.book_p == r.book_p else float(m.market_prob), cat=_cat(m.category) if m.best_line == r.point else '',
+                key=f'{r.pid}-{kind}', flag=flag)
+# milestones: one number, only the price differs by book
+mb = mf.replace('_milestones.csv', '_milestones_books.csv')
+if os.path.exists(mb):
+    Ms = pd.read_csv(mf); Ms['kind'] = np.where(Ms.market.str.startswith('Rush'), 'rush', 'rec')
+    Ms = Ms.set_index(['pid', 'kind', 'milestone'])
+    for r in pd.read_csv(mb).itertuples():
+        if (r.pid, r.kind, r.milestone) not in Ms.index: continue
+        m = Ms.loc[(r.pid, r.kind, r.milestone)]
+        if not 0.05 <= m.prob <= 0.97: continue
+        kind = 'Rush' if r.kind == 'rush' else 'Rec'
+        flag = 'Check role' if m.risky else ('' if m.regular else 'small role')
+        add_leg(f'm-{r.pid}-{kind}-{r.milestone}', r.book, r.price, game=m.game, kind='Milestone', who=m.player, team=m.team,
+                label=f'{r.milestone}+ {kind.lower()} yds', model=float(m.model_only), bp=float(m.book_prob), cat=_cat(m.category),
+                key=f'{r.pid}-{kind}', flag=flag)
+# chance = model blended with the books' no-vig chance: 50/50 normally, leaning on the books for long shots
+# (model weight 0.5 at a 25%+ book chance, sliding to 0.2 below about 12%), since the model is least reliable in the tails.
+# Each leg's headline price is the better of DraftKings and FanDuel, DraftKings on a tie.
+legs = []
+for l in LEGS.values():
+    bps = l.pop('bps'); l.pop('bp', None)
+    bk = float(np.mean(bps)) if bps else l['model']
+    bk = min(0.99, max(0.005, bk))
     w = 0.5 * min(1.0, max(0.4, (bk - 0.03) / 0.22))
     pp = w * l['model'] + (1 - w) * bk
-    l.update(book_p=round(bk, 4), p=round(pp, 4), ev=round(pp * d - 1, 4), edge=round(pp - 1 / d, 4))
+    book = max(l['offers'], key=lambda b: (_dec(l['offers'][b]), b == 'DraftKings'))
+    d = _dec(l['offers'][book])
+    l.update(model=round(l['model'], 4), book_p=round(bk, 4), p=round(pp, 4), price=l['offers'][book], book=book,
+             ev=round(pp * d - 1, 4), edge=round(pp - 1 / d, 4))
+    legs.append(l)
 D['legs'] = legs
-# suggested parlay: the best qualifying leg from each of the four strongest games
+# suggested parlay: at each book, the best-edge qualifying leg from each of the four strongest games; keep the book with the higher EV
 LG = pd.DataFrame(legs)
-LG = LG[(LG.cat.isin(['Value', 'Optimal', 'Secure', 'TD value', 'Likely hit'])) & (LG.flag == '') & (LG.p >= 0.55) & (LG.ev > 0.03)]
-D['suggested'] = list(LG.sort_values('edge', ascending=False).groupby('game').head(1).head(4).id)
+LG = LG[(LG.cat.isin(['Value', 'Optimal', 'Secure', 'TD value', 'Likely hit'])) & (LG.flag == '') & (LG.p >= 0.55)]
+sug = []
+for b in ['DraftKings', 'FanDuel']:
+    X = LG[LG.offers.map(lambda o: b in o)].copy()
+    X['d'] = X.offers.map(lambda o: _dec(o[b])); X['evb'] = X.p * X.d - 1; X['edgeb'] = X.p - 1 / X.d
+    X = X[X.evb > 0.03].sort_values('edgeb', ascending=False).groupby('game').head(1).head(4)
+    sug.append((X.p.prod() * X.d.prod() - 1, b == 'DraftKings', b, list(X.id), X.p.prod(), X.d.prod()))
+    print(f'suggested at {b}: EV {sug[-1][0]:+.1%}, hit {sug[-1][4]:.1%}, decimal {sug[-1][5]:.2f}:', list(X.label + ' ' + X.who.where(X.kind != 'Game', '')))
+best = max(sug)
+D['suggested'] = dict(book=best[2], ids=best[3])
 
 # latest blind test (scripts/props_blind_test.py), shown on its own tab
 bl = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'blind', '*_summary.csv')))
