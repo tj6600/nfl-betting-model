@@ -84,6 +84,36 @@ def history(seasons=range(2021, 2027)):
 
 TEAM_PEN = 1.0   # weight multiplier for games a player played for a different team than the one being predicted
 SEASON_PEN = 1.0  # weight multiplier for games from earlier seasons
+# Offensive context: when a player changes teams, his old-team games are rescaled by how much volume the new
+# offense gives his position vs the old one (e.g. a TE moving to a team that throws to TEs 30% more).
+CONTEXT = False
+CTX_STATS = ['targets', 'carries', 'rec_yds', 'rush_yds', 'receptions', 'tds', 'rz', 'gl']
+CTX_HALF = 8.0     # team games
+CTX_SHRINK = 0.25  # pull each team's position volume this far toward the league average
+
+
+def team_context(pg):
+    """Per team and position: recency-weighted volume per game, before each game (ctx_prior) and including it (ctx_at)."""
+    g = pg.groupby(['game_id', 'posteam', 'position'])[CTX_STATS].sum().reset_index()
+    games = pg[['game_id', 'posteam', 'gameday']].drop_duplicates()
+    full = games.merge(pd.DataFrame({'position': POS}), how='cross').merge(g, on=['game_id', 'posteam', 'position'], how='left').fillna({c: 0 for c in CTX_STATS})
+    full = full.sort_values('gameday')
+    a = 1 - 0.5 ** (1 / CTX_HALF); grp = full.groupby(['posteam', 'position'])
+    lg = full.groupby('position')[CTX_STATS].mean()
+    out = full[['game_id', 'posteam', 'position', 'gameday']].copy()
+    for c in CTX_STATS:
+        m = full.position.map(lg[c])
+        at = grp[c].transform(lambda x: x.ewm(alpha=a).mean())
+        pr = grp[c].transform(lambda x: x.shift(1).ewm(alpha=a).mean()).fillna(m)
+        out[f'at_{c}'] = (1 - CTX_SHRINK) * at + CTX_SHRINK * m
+        out[f'pr_{c}'] = (1 - CTX_SHRINK) * pr + CTX_SHRINK * m
+    return out
+
+
+def team_context_now(pg):
+    """Latest volume per game for each team and position (for upcoming games)."""
+    c = team_context(pg)
+    return c.sort_values('gameday').groupby(['posteam', 'position']).tail(1).set_index(['posteam', 'position'])[[f'at_{x}' for x in CTX_STATS]]
 
 
 def _team_weights(n, teams, ref, r, include_last):
@@ -100,10 +130,13 @@ def _ewm_prior(pg):
     a = 1 - 0.5 ** (1 / HALF)
     g = pg.groupby('pid')
     prior = pd.DataFrame(index=pg.index)
-    if TEAM_PEN == 1.0 and SEASON_PEN == 1.0:
+    if TEAM_PEN == 1.0 and SEASON_PEN == 1.0 and not CONTEXT:
         for c in ROLL:
             prior[f'h_{c}'] = g[c].transform(lambda s: s.shift(1).ewm(alpha=a, adjust=True).mean())
     else:
+        if CONTEXT:
+            cx = pg[['game_id', 'posteam', 'position']].merge(team_context(pg), on=['game_id', 'posteam', 'position'], how='left')
+            CI = {c: cx[f'pr_{c}'].to_numpy(float) for c in CTX_STATS}; CJ = {c: cx[f'at_{c}'].to_numpy(float) for c in CTX_STATS}
         r = 1 - a; V = pg[ROLL].to_numpy(float); out = np.full(V.shape, np.nan); team = pg.posteam.to_numpy(); sea = pg.season.to_numpy()
         for idx in g.indices.values():
             idx = np.sort(idx); n = len(idx)
@@ -112,6 +145,16 @@ def _ewm_prior(pg):
             ii, jj = np.meshgrid(np.arange(n), np.arange(n), indexing='ij')
             W = np.where(jj < ii, r ** (ii - 1 - jj).astype(float), 0.0) * np.where(t[None, :] != t[:, None], TEAM_PEN, 1.0) * np.where(se[None, :] != se[:, None], SEASON_PEN, 1.0)
             ok = ~np.isnan(v); num = W @ np.nan_to_num(v); den = W @ ok
+            if CONTEXT:
+                diff = t[None, :] != t[:, None]
+                if diff.any():
+                    Wd = np.where(diff, W, 0.0)
+                    for k, c in enumerate(ROLL):
+                        if c not in CTX_STATS: continue
+                        ci, cj = CI[c][idx], CJ[c][idx]
+                        # old-team games: replace v_j by v_j * C_i / C_j
+                        adj = Wd @ (np.nan_to_num(v[:, k]) / np.maximum(cj, 1e-6)) * ci - Wd @ np.nan_to_num(v[:, k])
+                        num[:, k] += adj
             with np.errstate(invalid='ignore', divide='ignore'):
                 out[idx] = num / den
         for k, c in enumerate(ROLL):
@@ -120,12 +163,25 @@ def _ewm_prior(pg):
     return prior
 
 
-def _ewm_now(pg):
-    """Recency-weighted averages over every game played so far, relative to each player's latest team."""
+def _ewm_now(pg, cur_team=None):
+    """Recency-weighted averages over every game played so far, relative to each player's current team
+    (cur_team: pid -> team, e.g. from this week's roster; default his latest game's team)."""
     a = 1 - 0.5 ** (1 / HALF); r = 1 - a; rows = {}
+    if CONTEXT:
+        cx = pg[['game_id', 'posteam', 'position']].merge(team_context(pg), on=['game_id', 'posteam', 'position'], how='left')
+        cxj = cx[[f'at_{c}' for c in CTX_STATS]].to_numpy(float); cnow = team_context_now(pg)
+        pos_ix = {c: k for k, c in enumerate(CTX_STATS)}
     for pid, x in pg.groupby('pid'):
-        t = x.posteam.to_numpy(); se = x.season.to_numpy(); w = _team_weights(len(x), t, t[-1], r, True) * np.where(se != se[-1], SEASON_PEN, 1.0)
-        v = x[ROLL].to_numpy(float); ok = ~np.isnan(v)
+        t = x.posteam.to_numpy(); se = x.season.to_numpy()
+        ref = (cur_team or {}).get(pid, t[-1])
+        w = _team_weights(len(x), t, ref, r, True) * np.where(se != se[-1], SEASON_PEN, 1.0)
+        v = x[ROLL].to_numpy(float).copy(); ok = ~np.isnan(v)
+        if CONTEXT and (t != ref).any() and (ref, x.position.iloc[-1]) in cnow.index:
+            ci = cnow.loc[(ref, x.position.iloc[-1])].to_numpy(float); cj = cxj[pg.index.get_indexer(x.index)]
+            for k, c in enumerate(ROLL):
+                if c in pos_ix:
+                    m = t != ref; q = pos_ix[c]
+                    v[m, k] = v[m, k] * ci[q] / np.maximum(cj[m, q], 1e-6)
         rows[pid] = (w @ np.nan_to_num(v)) / np.maximum(w @ ok, 1e-12)
     return pd.DataFrame.from_dict(rows, orient='index', columns=[f'h_{c}' for c in ROLL])
 
@@ -229,14 +285,15 @@ def upcoming(season, week, implied, overrides=None):
     pg = history()
     pg = pd.concat([pg, _ewm_prior(pg)], axis=1)
     last = pg.groupby('pid').tail(1).copy()
-    # fold the latest game into the averages so the features cover every game played so far
-    now = _ewm_now(pg).reindex(last.pid)
-    for c in ROLL:
-        last[f'h_{c}'] = now[f'h_{c}'].values
     last['h_games'] = last.h_games + 1
     ros = _load_extra('roster', season)
     ros = ros[(ros.week == week) & (ros.status == 'ACT')][['gsis_id', 'team']].rename(columns={'gsis_id': 'pid'})
     last = last.merge(ros, on='pid')
+    # fold the latest game into the averages so the features cover every game played so far,
+    # relative to the team he's on this week (matters for a player traded since his last game)
+    now = _ewm_now(pg, dict(zip(last.pid, last.team))).reindex(last.pid)
+    for c in ROLL:
+        last[f'h_{c}'] = now[f'h_{c}'].values
     last['last_share'] = last.opp_share
     tseq = pg[pg.season == season][['game_id', 'posteam', 'gameday']].drop_duplicates().sort_values('gameday')
     team_last = tseq.groupby('posteam').game_id.last()

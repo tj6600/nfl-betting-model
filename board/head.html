@@ -145,6 +145,9 @@ table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
 .loghead { display: flex; justify-content: space-between; align-items: flex-start; padding: 14px 14px 6px; }
 .loghead h2 { font-family: var(--display); font-size: 26px; margin: 0; }
 .loghead .dim { font-size: 13px; }
+.move { margin: 0 14px 10px; padding: 10px 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; border-left: 4px solid var(--line); background: var(--bg); }
+.move b { font-family: var(--display); font-size: 18px; letter-spacing: .02em; }
+.move.up { border-left-color: var(--pos); } .move.down { border-left-color: var(--neg); } .move.flat { border-left-color: var(--gold); }
 .loghit { margin: 0 14px 10px; padding: 8px 12px; background: var(--turf-soft); border-radius: 8px; font-weight: 600; }
 .logfoot { padding: 10px 14px 14px; }
 .pin { display: flex; gap: 8px; align-items: center; padding: 0 14px 10px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }

@@ -265,7 +265,35 @@ for pid, hg in H[H.pid.isin(pids)].groupby('pid'):
             g = teamg[teamg.week == w].iloc[0]; at = g.away_team == team
             rows.append([int(w), g.home_team if at else g.away_team, bool(at), None, None, None, None, None, None])
     logs[pid] = dict(name=hg.full_name.iloc[-1], pos=hg.position.iloc[-1], team=team, g=rows)
+# team changes: compare what the old and new offenses give his position (volume per game, recency-weighted),
+# and his own production before and after. Display only: as a model input it did not improve 2024-25 backtests.
+HA = T.history().sort_values(['pid', 'gameday'])
+CTX = T.team_context(HA).set_index(['game_id', 'posteam', 'position'])
+CNOW = T.team_context_now(HA)
+MAIN = {'WR': ['targets', 'rec_yds'], 'TE': ['targets', 'rec_yds'], 'RB': ['carries', 'targets', 'rush_yds', 'rec_yds'], 'QB': ['carries', 'rush_yds']}
+for pid, L in logs.items():
+    x = HA[HA.pid == pid].tail(25); team = L['team']
+    if (x.posteam == team).all() or x.posteam.iloc[-1] != team: continue
+    old = x[x.posteam != team]; old_team = old.posteam.iloc[-1]; old = old[old.posteam == old_team].tail(17)
+    new = x[(x.posteam == team) & (x.gameday > old.gameday.max())]
+    if new.empty: continue
+    pos = x.position.iloc[-1]; first = new.iloc[0]
+    if pos == 'QB': continue
+    try:
+        co = CTX.loc[(old.game_id.iloc[-1], old_team, pos)]; cn = CNOW.loc[(team, pos)]
+    except KeyError:
+        continue
+    stats_ = MAIN.get(pos, ['targets'])
+    ctx = {c: [round(float(co[f'at_{c}']), 1), round(float(cn[f'at_{c}']), 1)] for c in ['targets', 'carries', 'rec_yds', 'rush_yds']}
+    his = {c: [round(float(old[c].mean()), 1), round(float(new[c].mean()), 1)] for c in ['targets', 'carries', 'rec_yds', 'rush_yds']}
+    k = stats_[0] if pos != 'RB' else None
+    vo = sum(ctx[c][0] for c in (['carries', 'targets'] if pos == 'RB' else [stats_[0]])); vn = sum(ctx[c][1] for c in (['carries', 'targets'] if pos == 'RB' else [stats_[0]]))
+    chg = (vn - vo) / vo if vo else 0.0
+    L['move'] = dict(frm=old_team, to=team, season=int(first.season), week=int(first.week), pos=pos, ctx=ctx, his=his,
+                     n_old=len(old), n_new=len(new), chg=round(chg, 3),
+                     verdict='benefits' if chg >= 0.10 else 'falls' if chg <= -0.10 else 'similar')
 D['logs'] = logs
+print(sum('move' in v for v in logs.values()), 'players on new teams')
 print(len(logs), 'game logs')
 
 # season check: flag a likely-looking yards side that has lost most of the time this season (4+ games played).

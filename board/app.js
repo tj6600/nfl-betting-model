@@ -155,6 +155,20 @@ function logButton(pid, ctx) {
   const b = el('button', 'logbtn', 'Season game log'); b.type = 'button';
   b.onclick = (e) => { e.stopPropagation(); showLog(pid, ctx); }; return b;
 }
+function movePanel(L) {
+  const m = L.move; const box = el('div', 'move ' + (m.verdict === 'benefits' ? 'up' : m.verdict === 'falls' ? 'down' : 'flat'));
+  const posName = { WR: 'receivers', TE: 'tight ends', RB: 'running backs' }[m.pos] || m.pos;
+  const pc = (o, n) => (o > 0 ? `${n >= o ? '+' : ''}${Math.round((n / o - 1) * 100)}%` : '');
+  box.append(el('b', null, `New team: ${m.frm} → ${m.to} (${m.season} week ${m.week})`));
+  const main = m.pos === 'RB' ? `${m.ctx.carries[1] + m.ctx.targets[1] > 0 ? (m.ctx.carries[1] + m.ctx.targets[1]).toFixed(1) : '0'} carries + targets a game to ${posName} vs ${(m.ctx.carries[0] + m.ctx.targets[0]).toFixed(1)} in ${m.frm}`
+    : `${m.ctx.targets[1].toFixed(1)} targets a game to ${posName} vs ${m.ctx.targets[0].toFixed(1)} in ${m.frm}`;
+  box.append(el('span', null, `Scheme fit: ${m.verdict === 'benefits' ? 'the new offense feeds his position more' : m.verdict === 'falls' ? 'the new offense feeds his position less' : 'the new offense uses his position about the same'} (${main}, ${m.chg >= 0 ? '+' : ''}${Math.round(m.chg * 100)}%).`));
+  const k = m.pos === 'RB' ? 'carries' : 'targets'; const yk = m.pos === 'RB' ? 'rush_yds' : 'rec_yds';
+  const own = (m.his[k][0] > 0 ? m.his[k][1] / m.his[k][0] - 1 : 0);
+  box.append(el('span', null, `His own ${k}: ${m.his[k][0]} a game in his last ${m.n_old} with ${m.frm} → ${m.his[k][1]} in ${m.n_new} with ${m.to} (${m.his[yk][0]} → ${m.his[yk][1]} ${m.pos === 'RB' ? 'rush' : 'rec'} yds).`));
+  if (Math.abs(own - m.chg) > 0.3) box.append(el('span', 'dim', own > m.chg ? 'He is getting far more than the offense change explains, so his role in it has grown. The model still counts his old games, so it may underrate him.' : 'He is getting far less than the offense change explains, so his role in it has shrunk. The model still counts his old games, so it may overrate him.'));
+  return box;
+}
 function showLog(pid, ctx) {
   const L = LOGS[pid]; const prev = document.activeElement;
   const ov = el('div', 'overlay'); const pn = el('div', 'logpanel'); pn.setAttribute('role', 'dialog'); pn.setAttribute('aria-modal', 'true'); pn.setAttribute('aria-label', `${L.name} game log`);
@@ -163,6 +177,7 @@ function showLog(pid, ctx) {
   document.addEventListener('keydown', esc); ov.onclick = (e) => { if (e.target === ov) close(); };
   const hd = el('div', 'loghead'); const t = el('div'); t.append(el('h2', null, L.name), el('span', 'dim', `${L.pos} · ${L.team} · ${D.season} regular season`));
   const x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.onclick = close; hd.append(t, x); pn.append(hd);
+  if (L.move) pn.append(movePanel(L));
   const played = L.g.filter((r) => r[3] != null); const n = played.length || 1;
   const sum = (i) => played.reduce((a, r) => a + r[i], 0);
   const st = stats([[String(played.length), `games played${L.g.length > played.length ? ` (${L.g.length - played.length} missed)` : ''}`], [(sum(3) / n).toFixed(1), 'carries a game'], [(sum(4) / n).toFixed(0), 'rush yds a game'],
@@ -193,7 +208,7 @@ function showLog(pid, ctx) {
     tbody.append(tr);
   }
   tb.append(tbody); wrap.append(tb); pn.append(wrap);
-  pn.append(el('p', 'note logfoot', 'From play-by-play data. Past games show his range, not a forecast: role changes, injuries and the opponent matter, and the model weighs his recent games more.'));
+  pn.append(el('p', 'note logfoot', `${L.move ? 'Scheme fit compares how many targets and carries each offense has given his position lately (recency-weighted, nudged toward league average). As a model input it did not improve 2024-25 backtests, so it is shown for judgment only. ' : ''}From play-by-play data. Past games show his range, not a forecast: role changes, injuries and the opponent matter, and the model weighs his recent games more.`));
   ov.append(pn); document.body.append(ov); x.focus();
 }
 function tdDetail(p) {
@@ -477,7 +492,8 @@ function renderParlay() {
         const num = Number((c.label.match(/[\d.]+/) || [])[0]);
         showLog(l0.pid, l0.kind === 'TD' ? { kind: 'td' } : l0.kind === 'Game' ? null : { kind: /rush/.test(c.label) ? 'rush' : 'rec', line: l0.kind === 'Milestone' ? num - 0.5 : num, side: l0.kind === 'Milestone' ? 'Over' : c.sl }); };
     }
-    w.append(nm, el('span', 's', `${kindName} · ${l0.game}${cat ? ' · ' + cat : ''}${g.flag ? ' · ' + g.flag : ''}`));
+    const mv = l0.pid && LOGS[l0.pid] && LOGS[l0.pid].move;
+    w.append(nm, el('span', 's', `${kindName} · ${l0.game}${cat ? ' · ' + cat : ''}${g.flag ? ' · ' + g.flag : ''}${mv ? ` · new team (from ${mv.frm})` : ''}`));
     const inSlip = g.sides.find((x) => slip.includes(x.id));
     const cur = g.sides.find((x) => x.id === PS.sel[g.grp]) || inSlip || lean;
     const box = el('div', 'sidebox');
