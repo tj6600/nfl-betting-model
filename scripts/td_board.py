@@ -124,7 +124,7 @@ if os.path.exists(mf):
         at = pd.Timestamp(os.path.basename(aprops[-1])[9:].split('.')[0].replace('Z', ''))
         D['altTaken'] = at.tz_localize('UTC').tz_convert('America/New_York').strftime('%A, %B %-d at %-I:%M %p ET')
 
-# every priced leg for the parlay builder, at the two books Thomas uses (DraftKings and FanDuel).
+# every priced leg for the parlay builder, at the book Thomas uses (DraftKings only since 2026-11-11).
 # A leg is a market + side + number; it lists its price at each book that offers that exact number.
 from nflmodel.stats import norm
 BOOKS = {'draftkings': 'DraftKings', 'fanduel': 'FanDuel', 'DraftKings': 'DraftKings', 'FanDuel': 'FanDuel'}
@@ -139,7 +139,9 @@ def _inv(q):   # standard normal quantile by bisection
         else: hi = mid
     return (lo + hi) / 2
 LEGS = {}
+PARLAY_BOOKS = ['DraftKings']
 def add_leg(lid, book, price, **kw):
+    if book not in PARLAY_BOOKS: return
     l = LEGS.setdefault(lid, dict(id=lid, offers={}, bps=[], **kw))
     if book in l['offers']: return
     l['offers'][book] = int(price)
@@ -241,7 +243,7 @@ D['legs'] = legs
 LG = pd.DataFrame(legs)
 LG = LG[(LG.cat.isin(['Value', 'Optimal', 'Secure', 'TD value', 'Likely hit'])) & (LG.flag == '') & (LG.p >= 0.55)]
 sug = []
-for b in ['DraftKings', 'FanDuel']:
+for b in PARLAY_BOOKS:
     X = LG[LG.offers.map(lambda o: b in o)].copy()
     X['d'] = X.offers.map(lambda o: _dec(o[b])); X['evb'] = X.p * X.d - 1; X['edgeb'] = X.p - 1 / X.d
     X = X[X.evb > 0.03].sort_values('edgeb', ascending=False).groupby('game').head(1).head(4)

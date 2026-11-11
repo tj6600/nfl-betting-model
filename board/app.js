@@ -281,7 +281,7 @@ const LEGS = D.legs || []; const LEG = Object.fromEntries(LEGS.map((l) => [l.id,
 const dec = (a) => (a > 0 ? 1 + a / 100 : 1 + 100 / -a);
 const amer = (d) => (d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d - 1)));
 const PK = 'props-parlay-v2';
-const PBOOKS = ['DraftKings', 'FanDuel'];
+const PBOOKS = ['DraftKings'];
 const ABBR = { DraftKings: 'DK', FanDuel: 'FD' };
 const PS = { kind: 'all', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25 };
 const pts = (e) => `${e > 0 ? '+' : ''}${(e * 100).toFixed(1)} pts`;
@@ -311,13 +311,13 @@ function warnings(ids) {
   ls.filter((l) => l.p < 0.25).forEach((l) => w.push(['warn', `${legName(l)} is a long shot (${pct1(l.p)}). Most of its EV rests on the model being right about a rare event, and it cuts the parlay's hit chance a lot.`]));
   if (!PBOOKS.some((b) => ls.every((l) => l.offers[b] != null))) {
     const only = ls.filter((l) => Object.keys(l.offers).length === 1).map((l) => `${legName(l)} (${Object.keys(l.offers)[0]} only)`);
-    w.push(['bad', `No single book offers every leg${only.length ? ': ' + only.join(', ') : ''}. Swap a leg for the same bet at the other book's number.`]);
+    w.push(['bad', `No single book offers every leg${only.length ? ': ' + only.join(', ') : ''}. Remove it or pick DraftKings' own number for that bet.`]);
   }
   return w;
 }
 function verdict(m, n, ws) {
   if (!n) return null;
-  if (!m.book) return ['bad', 'Can\'t place as one parlay', 'These legs aren\'t all offered at DraftKings or all at FanDuel. See the notes below.'];
+  if (!m.book) return ['bad', 'Can\'t place as one parlay', 'Not every leg is offered at DraftKings. See the notes below.'];
   if (m.ev >= 0 && ws.some((w) => w[0] === 'bad')) return ['bad', 'Fix the legs first', 'Positive on paper, but at least one leg is negative EV or doubles up a market. See the notes below.'];
   if (m.ev >= 0.08 && ws.some((w) => w[0] === 'warn')) return ['warn', 'Positive, with caveats', `EV of ${(m.ev * 100).toFixed(0)}% on the model\'s numbers, but some legs are flagged or share a game, so trust it less. See the notes below.`];
   if (m.ev < 0) return ['bad', 'Skip it', `The legs together are worth less than the payout pays. You lose about ${Math.abs(m.ev * 100).toFixed(0)} cents per dollar on average.`];
@@ -391,7 +391,7 @@ function renderParlay() {
     sl.append(lsx);
     if (m.book) {
       const pl = el('div', 'placeat'); pl.append(el('b', null, `Place at ${m.book}: ${fmtOdds(amer(m.dBook))}`),
-        el('span', null, m.other ? (Math.abs(m.other.d - m.dBook) < 1e-9 ? `${m.other.b} pays the same, so DraftKings.` : `${m.other.b} pays ${fmtOdds(amer(m.other.d))} for the same legs.`) : `Not every leg is offered at ${m.book === 'DraftKings' ? 'FanDuel' : 'DraftKings'} at these numbers.`));
+        el('span', null, 'Every leg priced at DraftKings\' current number. DraftKings may boost or trim the payout on its slip; if so, enter what it shows below.'));
       sl.append(pl);
     }
     const pin = el('label', 'pin'); pin.append(document.createTextNode("Your book's parlay price (optional) "));
@@ -411,7 +411,7 @@ function renderParlay() {
     const wl = el('ul', 'warns'); for (const [k, t] of warnings(slip)) wl.append(el('li', k, t)); if (wl.children.length) sl.append(wl);
   }
   board.append(pick, sl);
-  document.getElementById('foot').textContent = 'Legs are ranked by edge: our chance minus the break-even chance the price implies. EV alone favors long shots, because a small overestimate of a 5% chance turns into a huge EV at +2500; edge in percentage points does not, so it rewards legs that are both likely and underpriced. Each leg\'s chance blends our model with the books\' own chance, 50/50 for normal prices and leaning more on the books for long shots (down to 20% model below about a 12% book chance), since the model is least reliable in the tails. Game lines are blended too, because on past closing lines the spread model showed no edge by itself. Only DraftKings and FanDuel are used. Each leg is one exact number, and its price is the better of the two books (DraftKings on a tie); a parlay is priced at whichever single book pays more for all of its legs, DraftKings on a tie. The parlay chance multiplies the legs, which assumes they are independent, so legs from the same game are flagged. EV uses that book\'s price unless you enter the parlay price your app shows (books sometimes boost or trim parlay payouts). None of these leg types has been graded against real lines yet, so treat the EV as the model\'s opinion, not a promise. Tracking only, not betting advice.';
+  document.getElementById('foot').textContent = 'Legs are ranked by edge: our chance minus the break-even chance the price implies. EV alone favors long shots, because a small overestimate of a 5% chance turns into a huge EV at +2500; edge in percentage points does not, so it rewards legs that are both likely and underpriced. Each leg\'s chance blends our model with the books\' own chance, 50/50 for normal prices and leaning more on the books for long shots (down to 20% model below about a 12% book chance), since the model is least reliable in the tails. Game lines are blended too, because on past closing lines the spread model showed no edge by itself. Only DraftKings is used: each leg is DraftKings\' own number and price, and the parlay is priced at DraftKings. The parlay chance multiplies the legs, which assumes they are independent, so legs from the same game are flagged. EV uses that book\'s price unless you enter the parlay price your app shows (books sometimes boost or trim parlay payouts). None of these leg types has been graded against real lines yet, so treat the EV as the model\'s opinion, not a promise. Tracking only, not betting advice.';
 }
 function render() {
   if (state.tab === 'test') { renderTabs(); renderTest(); return; }
