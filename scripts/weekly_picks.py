@@ -24,6 +24,12 @@ from nflmodel.predict import fit_predict, american_to_decimal, BASE_MARGIN_X, BA
 from nflmodel.odds import all_snapshots
 
 OPTIMAL_EV, SECURE_P, MIN_EDGE = 0.05, 0.70, 2.0   # edge >= 2 with agreement: 56.2% on 2019-20 openers
+# Win probabilities are recalibrated (Platt scaling fit on 2021-25 walk-forward games): the raw model
+# was overconfident, e.g. games it called 84% were won 78% of the time.
+CALIB_A, CALIB_B = 0.872, 0.041
+def calib(ph):
+    ph = np.clip(np.asarray(ph, float), 1e-6, 1 - 1e-6)
+    return 1 / (1 + np.exp(-(CALIB_A * np.log(ph / (1 - ph)) + CALIB_B)))
 WINDY = 12      # mph; 2018-25 games at 10-20 mph went Under the closing total 56-60% of the time
 WEATHER = os.path.join(ROOT, 'odds_log', 'weather_forecast.csv')   # season,week,game_id,wind_mph,precip_pct,temp_f,source
 
@@ -153,8 +159,9 @@ for g in p.itertuples():
                             wind_mph=g.wind_mph, precip_pct=g.precip_pct, temp_f=g.temp_f,
                             model_prob=prob, best_line=bpt, best_price=bpr if bpr == bpr else -110, best_book=bk,
                             ev=prob_b * float(american_to_decimal(bpr if bpr == bpr else -110)) - 1))
-    inj_home = 1 - norm.cdf(0, g.inj_margin, g.sd_margin)
-    for side, prob, iprob in [(g.home_team, g.p_home_win, inj_home), (g.away_team, 1 - g.p_home_win, 1 - inj_home)]:
+    inj_home = float(calib(1 - norm.cdf(0, g.inj_margin, g.sd_margin)))
+    ph = float(calib(g.p_home_win))
+    for side, prob, iprob in [(g.home_team, ph, inj_home), (g.away_team, 1 - ph, 1 - inj_home)]:
         bpt, bpr, bk = best(g.home_team, g.away_team, 'moneyline', side)
         if bpr == bpr:
             out.append(dict(game_id=g.game_id, game=game, kickoff=g.gameday, market='moneyline', side=side,
