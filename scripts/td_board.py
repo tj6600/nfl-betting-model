@@ -342,4 +342,11 @@ data = json.dumps(D, separators=(',', ':')).replace('</', '<\\/')
 html = (open(os.path.join(B, 'head.html')).read() + open(os.path.join(B, 'body.html')).read().replace('2026 · Week 10', f'{season} · Week {week}')
         + f'<script type="application/json" id="td-data">{data}</script>\n<script>\n' + open(os.path.join(B, 'app.js')).read() + '</script>\n')
 open(os.path.join(B, 'touchdown-board.html'), 'w').write(html)
+# standalone copy for a static host (render.yaml publishes board/site): a full document, kept out of search engines
+head = open(os.path.join(B, 'head.html')).read()
+body = html[len(head):]
+os.makedirs(os.path.join(B, 'site'), exist_ok=True)
+open(os.path.join(B, 'site', 'index.html'), 'w').write(
+    '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+    '<meta name="robots" content="noindex, nofollow">\n' + head + '\n</head>\n<body>\n' + body + '</body>\n</html>\n')
 print('wrote board/touchdown-board.html', len(out), 'TD players,', len(yards), 'yards props,', len(D.get('milestones', [])), 'milestone ladders,', len(legs), 'parlay legs')

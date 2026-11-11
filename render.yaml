@@ -1,0 +1,10 @@
+# Render Blueprint: hosts the Player Props Board as a static site.
+# The weekly run rebuilds board/site/index.html (scripts/td_board.py) and pushes it; Render redeploys on each push.
+services:
+  - type: web
+    name: nfl-props-board
+    runtime: static
+    branch: epa-model
+    buildCommand: echo "Board is prebuilt by scripts/td_board.py"
+    staticPublishPath: ./board/site
+    autoDeploy: true
