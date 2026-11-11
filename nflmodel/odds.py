@@ -104,6 +104,8 @@ if __name__ == '__main__':
     import sys
     if 'props' in sys.argv[1:]:
         props_snapshot()
+    elif 'alt' in sys.argv[1:]:
+        props_snapshot(markets='player_rush_yds_alternate,player_reception_yds_alternate', prefix='altyards')
     elif 'yards' in sys.argv[1:]:
         props_snapshot(markets='player_rush_yds,player_reception_yds', prefix='yards')
     else:

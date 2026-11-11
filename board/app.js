@@ -1,9 +1,15 @@
 const D = JSON.parse(document.getElementById('td-data').textContent);
 const TD = D.players.map((p) => ({ ...p, opps: p.carries + p.targets, edge: p.book == null ? null : p.model - p.book }));
 const YD = D.yards || [];
+const headStep = (p) => {
+  const v = p.steps.filter((x) => x.cat === 'Value'); if (v.length) return v.reduce((a, b) => (b.ev > a.ev ? b : a));
+  const l = p.steps.filter((x) => x.cat === 'Likely hit'); if (l.length) return l[l.length - 1];
+  return p.steps.reduce((a, b) => (Math.abs(b.p - 0.5) < Math.abs(a.p - 0.5) ? b : a));
+};
+const MS = (D.milestones || []).map((p) => { const h = headStep(p); return { ...p, head: h, p: h.p, ev: Math.max(...p.steps.map((x) => x.ev)) }; });
 const state = { tab: 'td', cat: 'all', game: 'all', pos: 'all', q: '', sort: null, small: true, open: null };
-const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
-const PILL = { 'TD value': 'value', 'Value': 'value', 'Most likely': 'likely', 'Check role': 'check' };
+const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(MS.length ? [['ms', 'Milestones']] : []).concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
+const PILL = { 'TD value': 'value', 'Value': 'value', 'Most likely': 'likely', 'Check role': 'check', 'Likely hit': 'likely' };
 const fmtOdds = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
 const DAY = { Thursday: 'Thu', Sunday: 'Sun', Monday: 'Mon', Saturday: 'Sat', Friday: 'Fri' };
@@ -33,7 +39,16 @@ const CONF = {
     pos: ['all', 'WR', 'TE', 'RB'],
     sorts: [['ev', 'Sort: expected value'], ['chance', 'Sort: chance of lean'], ['gap', 'Sort: projection vs line'], ['line', 'Sort: line']],
   },
+  ms: {
+    lede: 'Chances to reach yardage milestones, like 40+ receiving or 50+ rushing, priced against the books\' alternate lines. Each chip is one milestone and its chance. Open a player for every milestone with its best price.',
+    cats: [['all', 'All players'], ['Likely hit', 'Likely hit'], ['Value', 'Value']],
+    pos: ['all', 'rush', 'rec'],
+    sorts: [['sure', 'Sort: surest hit'], ['ev', 'Sort: best EV'], ['median', 'Sort: projected yards']],
+  },
 };
+const SEG = { all: 'All', rush: 'Rushing', rec: 'Receiving' };
+const MS_LEGEND = '<span><i style="width:22px;height:12px;border-radius:4px;background:color-mix(in srgb, var(--turf) 70%, transparent)"></i>Darker chip = likelier</span><span><span class="pill likely">Likely hit</span> 80%+ chance</span><span><span class="pill value">Value</span> 5%+ EV at the best price</span>';
+const MS_FOOT = 'Each chance blends the yards model 50/50 with the books\' own chance (their alternate-line price with an estimated 6% margin taken out). Likely hit means 80%+ for a regular with no role flags. Expect most likely hits to show a small negative EV: books price heavy favorites like -400 to -1800 with extra margin, so a likely hit is safe for a parlay leg but rarely value on its own. Value needs 5%+ EV and at least two books offering the milestone.';
 const YARDS_LEGEND = '<span><i style="width:26px;height:8px;border-radius:3px;background:var(--bar)"></i>Middle half of outcomes</span><span><i style="width:3px;height:14px;background:var(--turf)"></i>Model median</span><span><i style="width:2px;height:14px;background:var(--tick)"></i>Book line</span><span><span class="pill value">Value</span></span><span><span class="pill check">Check role</span></span>';
 const YARDS_FOOT = 'The yards model projects each player from his recent yards and usage, his recent role, his team\'s expected points and margin (teams that lead run more), and the opponent\'s yards allowed to his position. It beat each player\'s recent average on 2024 and 2025 games, and its over/under chances were well calibrated there. Yards are lopsided: a few big games pull the average up, so the median is usually below the average and unders win a bit more often than averages suggest. There are no past prop lines to test against, so the chance shown blends the model 50/50 with the books\' no-vig chance. Value needs 57%+ and 5%+ EV at the best line. Check role means he missed his last game, the depth chart moved him down, or the model and line are more than 25% apart (the books likely know something). "Small roles" means under 8 carries or 3 targets a game.';
 
@@ -70,7 +85,7 @@ function renderCats(base) {
 function renderPos() {
   const box = document.getElementById('pos'); box.replaceChildren();
   for (const k of CONF[state.tab].pos) {
-    const b = el('button', null, k === 'all' ? 'All' : k); b.type = 'button';
+    const b = el('button', null, SEG[k] && (state.tab === 'ms' || k === 'all') ? SEG[k] : k); b.type = 'button';
     b.setAttribute('aria-pressed', state.pos === k); b.onclick = () => { state.pos = k; state.open = null; render(); };
     box.append(b);
   }
@@ -89,12 +104,14 @@ const SORTS = {
   chance: (a, b) => b.p - a.p,
   gap: (a, b) => Math.abs(b.gap) - Math.abs(a.gap),
   line: (a, b) => b.line - a.line,
+  sure: (a, b) => (b.cat === 'Likely hit') - (a.cat === 'Likely hit') || b.head.m * (b.cat ? 1 : 0) - a.head.m * (a.cat ? 1 : 0) || b.p - a.p,
+  median: (a, b) => b.median - a.median,
 };
 function filtered() {
   const q = state.q.trim().toLowerCase();
-  const src = state.tab === 'td' ? TD : YD.filter((p) => p.market === state.tab);
+  const src = state.tab === 'td' ? TD : state.tab === 'ms' ? MS : YD.filter((p) => p.market === state.tab);
   const base = src.filter((p) => (state.game === 'all' || p.game === state.game)
-    && (state.pos === 'all' || p.pos === state.pos)
+    && (state.pos === 'all' || (state.tab === 'ms' ? p.market : p.pos) === state.pos)
     && (!state.small || p.cat || (state.tab === 'td' ? p.opps >= 3 : p.regular))
     && (!q || p.name.toLowerCase().includes(q) || p.team.toLowerCase() === q || p.opp.toLowerCase() === q));
   return { base, list: base.filter((p) => state.cat === 'all' || p.cat === state.cat).sort(SORTS[state.sort] || SORTS.ev) };
@@ -189,10 +206,49 @@ function ydDetail(p) {
   c.append(bk);
   d.append(a, b, c); return d;
 }
+// ---- milestones ----
+const mlabel = (p, x) => `${x.m}+ ${p.market === 'rush' ? 'rush' : 'rec'}`;
+function chip(x, hot) {
+  const c = el('span', 'step' + (hot ? ' hot' : '')); c.style.setProperty('--a', Math.round(12 + x.p * 70) + '%');
+  c.append(el('b', null, `${x.m}+`), document.createTextNode(' ' + pct(x.p))); return c;
+}
+function msRow(p) {
+  const lad = el('div', 'ladder');
+  let pts = p.steps.filter((x) => x.p >= 0.08 && x.p <= 0.97);
+  if (pts.length > 7) { const k = (pts.length - 1) / 6; pts = [...new Set([0, 1, 2, 3, 4, 5, 6].map((i) => Math.round(i * k)))].map((i) => pts[i]); }
+  if (!pts.includes(p.head)) pts = [...pts, p.head].sort((a, b) => a.m - b.m);
+  pts.forEach((x) => lad.append(chip(x, x === p.head)));
+  const m = el('div', 'meter'); m.append(lad, el('div', 'l', `median ${p.median.toFixed(0)} yds${p.line != null ? ` · main line ${p.line}` : ''}`));
+  const pr = el('div', 'price'); const h = p.head;
+  pr.append(el('span', 'side over', mlabel(p, h)), el('span', 'e', `${fmtOdds(h.price)} · ${pct(h.p)}`),
+    el('span', 'e ' + (h.ev >= 0 ? 'pos' : 'neg'), `EV ${h.ev > 0 ? '+' : ''}${(h.ev * 100).toFixed(0)}%`));
+  return rowShell(p, [who(p), m, pr], msDetail);
+}
+function msDetail(p) {
+  const d = el('div', 'detail one');
+  const wrap = el('div', 'tablewrap'); const tb = el('table', 'res');
+  const th = el('thead'); const hr = el('tr');
+  for (const [t, c] of [['Milestone'], ['Chance', 'num'], ['Model', 'num'], ['Books', 'num'], ['Fair price', 'num'], ['Best price', 'num'], ['Book'], ['EV', 'num'], ['']]) hr.append(el('th', c || null, t));
+  th.append(hr); tb.append(th);
+  const tbody = el('tbody');
+  for (const x of p.steps) {
+    const tr = el('tr', x === p.head ? 'hl' : null);
+    const fair = x.p >= .5 ? -Math.round(100 * x.p / (1 - x.p)) : Math.round(100 * (1 - x.p) / x.p);
+    const cells = [[mlabel(p, x)], [pct(x.p), 'num'], [pct(x.model), 'num dim'], [pct(x.book), 'num dim'], [fmtOdds(fair), 'num dim'], [fmtOdds(x.price), 'num'], [`${x.bk}${x.n > 1 ? ` +${x.n - 1}` : ''}`, 'dim'],
+      [`${x.ev > 0 ? '+' : ''}${(x.ev * 100).toFixed(0)}%`, 'num ' + (x.ev >= 0 ? 'pos' : 'neg')]];
+    for (const [v, c] of cells) tr.append(el('td', c || null, v));
+    const td = el('td'); if (x.cat) td.append(el('span', `pill ${PILL[x.cat]}`, x.cat)); tr.append(td);
+    tbody.append(tr);
+  }
+  tb.append(tbody); wrap.append(tb);
+  const n = el('p', 'note', `Model projects ${p.projection.toFixed(0)} yards on average and ${p.median.toFixed(0)} at the median. "Model" is the yards model alone, "Books" is their chance with the margin removed, and "Chance" is the blend used. Fair price is what the blended chance is worth; a best price longer than it is value.${p.risky ? ' Role flag: he missed his last game, moved down the depth chart, or the model and books disagree a lot, so he is kept out of Likely hit and Value.' : ''}`);
+  n.style.marginTop = '8px';
+  d.append(wrap, n); return d;
+}
 function column(title, sub, list) {
   const c = el('section', 'col'); const h = el('div', 'colhead'); h.append(el('h2', null, title), el('span', null, sub)); c.append(h);
   if (!list.length) c.append(el('div', 'empty', 'No players match these filters. Try All players or turn off Hide small roles.'));
-  list.forEach((p) => c.append(state.tab === 'td' ? tdRow(p) : ydRow(p)));
+  list.forEach((p) => c.append(state.tab === 'td' ? tdRow(p) : state.tab === 'ms' ? msRow(p) : ydRow(p)));
   return c;
 }
 function renderTest() {
@@ -225,8 +281,8 @@ function render() {
   document.querySelector('.bar').style.display = '';
   const cf = CONF[state.tab];
   document.getElementById('lede').textContent = cf.lede;
-  document.getElementById('legend').innerHTML = state.tab === 'td' ? cf.legend : YARDS_LEGEND;
-  document.getElementById('foot').textContent = (state.tab === 'td' ? cf.foot : YARDS_FOOT) + ` Odds are from The Odds API, taken ${state.tab === 'td' ? D.taken : D.yardsTaken}. Check injury news and current prices before using any of this. These are tracking picks, not betting advice.`;
+  document.getElementById('legend').innerHTML = state.tab === 'td' ? cf.legend : state.tab === 'ms' ? MS_LEGEND : YARDS_LEGEND;
+  document.getElementById('foot').textContent = (state.tab === 'td' ? cf.foot : state.tab === 'ms' ? MS_FOOT : YARDS_FOOT) + ` Odds are from The Odds API, taken ${state.tab === 'td' ? D.taken : state.tab === 'ms' ? (D.altTaken || D.yardsTaken) : D.yardsTaken}. Check injury news and current prices before using any of this. These are tracking picks, not betting advice.`;
   renderTabs(); renderGames(); renderPos(); renderSort();
   const { base, list } = filtered(); renderCats(base);
   document.getElementById('count').textContent = `${list.length} player${list.length === 1 ? '' : 's'}`;

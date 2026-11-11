@@ -101,6 +101,29 @@ if os.path.exists(yf) and yprops:
     D['yards'] = yards
     D['yardsTaken'] = yt.tz_localize('UTC').tz_convert('America/New_York').strftime('%A, %B %-d at %-I:%M %p ET')
 
+# alternate-line milestones (scripts/yards_picks.py), one entry per player and market
+mf = os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}_milestones.csv')
+aprops = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'props', 'altyards_*.json')))
+if os.path.exists(mf):
+    M = pd.read_csv(mf); ms = []
+    gl = {r.game: r for r in GW.assign(game=GW.away_team + ' @ ' + GW.home_team).itertuples()}
+    for (pid, market), grp in M.groupby(['pid', 'market'], sort=False):
+        r = grp.iloc[0]; kind = 'rush' if market.startswith('Rush') else 'rec'; g = gl.get(r.game)
+        if g is None: continue
+        steps = [dict(m=int(x.milestone), p=round(float(x.prob), 4), model=round(float(x.model_only), 4), book=round(float(x.book_prob), 4),
+                      price=int(x.best_price), bk=x.best_book, n=int(x.books), ev=round(float(x.ev), 4),
+                      cat=x.category if isinstance(x.category, str) else '') for x in grp.sort_values('milestone').itertuples()]
+        cats = set(s['cat'] for s in steps)
+        cat = 'Value' if 'Value' in cats else 'Likely hit' if 'Likely hit' in cats else ''
+        ms.append(dict(id=f'{pid}-{kind}-m', name=r.player, team=r.team, opp=r.opp, game=r.game, day=str(g.gameday.date()), time=str(g.gametime),
+                       weekday=str(g.weekday), pos=r.position, market=kind, projection=float(r.projection), median=float(r['median']),
+                       line=None if r.main_line != r.main_line else float(r.main_line), regular=bool(r.regular), risky=bool(r.risky),
+                       cat=cat, steps=steps))
+    D['milestones'] = ms
+    if aprops:
+        at = pd.Timestamp(os.path.basename(aprops[-1])[9:].split('.')[0].replace('Z', ''))
+        D['altTaken'] = at.tz_localize('UTC').tz_convert('America/New_York').strftime('%A, %B %-d at %-I:%M %p ET')
+
 # latest blind test (scripts/props_blind_test.py), shown on its own tab
 bl = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'blind', '*_summary.csv')))
 if bl:
@@ -119,4 +142,4 @@ data = json.dumps(D, separators=(',', ':')).replace('</', '<\\/')
 html = (open(os.path.join(B, 'head.html')).read() + open(os.path.join(B, 'body.html')).read().replace('2026 · Week 10', f'{season} · Week {week}')
         + f'<script type="application/json" id="td-data">{data}</script>\n<script>\n' + open(os.path.join(B, 'app.js')).read() + '</script>\n')
 open(os.path.join(B, 'touchdown-board.html'), 'w').write(html)
-print('wrote board/touchdown-board.html', len(out), 'TD players,', len(yards), 'yards props')
+print('wrote board/touchdown-board.html', len(out), 'TD players,', len(yards), 'yards props,', len(D.get('milestones', [])), 'milestone ladders')

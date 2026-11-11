@@ -102,6 +102,14 @@ label.tog { display: inline-flex; gap: 6px; align-items: center; color: var(--mu
 .note { color: var(--muted); font-size: 13px; max-width: 72ch; margin: 0; }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); align-items: center; }
 .legend i { display: inline-block; vertical-align: middle; margin-right: 5px; }
+.ladder { display: flex; flex-wrap: wrap; gap: 4px; }
+.step { font-size: 12px; font-variant-numeric: tabular-nums; padding: 2px 7px; border-radius: 6px; border: 1px solid var(--line); background: color-mix(in srgb, var(--turf) var(--a), var(--panel)); color: var(--ink); white-space: nowrap; }
+.step b { font-family: var(--display); font-size: 14px; }
+.step.hot { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.detail.one { grid-template-columns: 1fr; }
+table.res th { padding: 6px 14px; text-align: left; font: 600 12px var(--body); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.res th.num { text-align: right; }
+table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
 .empty { padding: 24px 14px; color: var(--muted); }
 @media (max-width: 560px) {
   .row { grid-template-columns: minmax(0, 1fr) auto; }

@@ -111,3 +111,47 @@ M.round(4).to_csv(path, index=False)
 pd.set_option('display.width', 250)
 print(f'{M.player.nunique()} players, {len(M)} sides priced; {(M.category == "Value").sum()} value picks')
 print(M[M.category != ''][['game', 'player', 'market', 'side', 'line', 'best_line', 'best_price', 'best_book', 'projection', 'median', 'model_prob', 'ev', 'category']].round(3).to_string(index=False))
+
+# ---- milestones (alternate lines: "40+ receiving yards" = Over 39.5) ----
+ALT_MARGIN = 1.06    # alternate lines have no Under side; book chances are divided by an estimated 6% margin
+af = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'props', 'altyards_*.json')))
+if af:
+    rows = []
+    for e in json.load(open(af[-1])):
+        for bk in e.get('bookmakers', []):
+            for m in bk['markets']:
+                kind = 'rush' if m['key'].startswith('player_rush') else 'rec'
+                for o in m['outcomes']:
+                    pt = o.get('point')
+                    if o.get('name') == 'Over' and o.get('description') and pt is not None and (pt + 0.5) % 5 == 0 and 9.5 <= pt <= 199.5:
+                        rows.append({'home_team': TEAMS.get(e['home_team']), 'away_team': TEAMS.get(e['away_team']), 'kind': kind,
+                                     'player': o['description'], 'point': pt, 'price': o['price'], 'book': bk['title']})
+    A = pd.DataFrame(rows); A['k'] = T._key(A.player)
+    base_rows = M.drop_duplicates(['pid', 'market']).copy()
+    base_rows['kind'] = np.where(base_rows.market.str.startswith('Rush'), 'rush', 'rec')
+    base_rows['k'] = T._key(base_rows.player)
+    imp = lambda o: np.where(o < 0, -o / (-o + 100.0), 100.0 / (o + 100.0))
+    out = []
+    for (home, away, k, kind, pt), g in A.groupby(['home_team', 'away_team', 'k', 'kind', 'point']):
+        br = base_rows[(base_rows.game == f'{away} @ {home}') & (base_rows.k == k) & (base_rows.kind == kind)]
+        if br.empty:
+            continue
+        r = br.iloc[0]; spread = models[kind][1]
+        model_p = float(spread.p_over([r.projection], [pt])[0])
+        book_p = float(np.median(imp(g.price.values))) / ALT_MARGIN
+        p = W_MODEL * model_p + (1 - W_MODEL) * min(book_p, 0.995)
+        best = g.sort_values('price', ascending=False).iloc[0]
+        out.append(dict(game=r.game, pid=r.pid, team=r.team, opp=r.opp, player=r.player, position=r.position, market=r.market,
+                        milestone=int(pt + 0.5), point=pt, model_only=model_p, book_prob=book_p, prob=p,
+                        best_price=int(best.price), best_book=best.book, books=g.book.nunique(),
+                        ev=p * float(dec(best.price)) - 1, projection=r.projection, median=r['median'], main_line=r.line,
+                        regular=r.regular, risky=bool((r.missed_n >= 1) or (r.dc_demoted == 1) or (abs(r.gap) > MAX_GAP))))
+    MS = pd.DataFrame(out)
+    MS['category'] = np.select([(MS.prob >= 0.80) & ~MS.risky & MS.regular,
+                                (MS.ev >= 0.05) & (MS.prob >= 0.25) & (MS.books >= 2) & ~MS.risky & MS.regular],
+                               ['Likely hit', 'Value'], '')
+    mpath = os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}_milestones.csv')
+    MS.round(4).to_csv(mpath, index=False)
+    print(f'\n{len(MS)} milestones priced; {(MS.category == "Likely hit").sum()} likely hits, {(MS.category == "Value").sum()} value')
+    print(MS[MS.category != ''].sort_values(['category', 'ev'], ascending=[True, False]).head(40)[
+        ['player', 'market', 'milestone', 'model_only', 'book_prob', 'prob', 'best_price', 'best_book', 'ev', 'category']].round(3).to_string(index=False))
