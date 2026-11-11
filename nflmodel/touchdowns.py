@@ -82,15 +82,52 @@ def history(seasons=range(2021, 2027)):
     return pg
 
 
+TEAM_PEN = 1.0   # weight multiplier for games a player played for a different team than the one being predicted
+SEASON_PEN = 1.0  # weight multiplier for games from earlier seasons
+
+
+def _team_weights(n, teams, ref, r, include_last):
+    """Recency weights over a player's games, scaled by TEAM_PEN for games with another team than `ref`."""
+    age = np.arange(n)[::-1] if include_last else np.arange(n)[::-1] - 1
+    w = r ** age.astype(float)
+    return w * np.where(teams != ref, TEAM_PEN, 1.0)
+
+
 def _ewm_prior(pg):
-    """Recency-weighted averages of each stat over the player's earlier games (excludes the current game)."""
+    """Recency-weighted averages of each stat over the player's earlier games (excludes the current game).
+
+    Games played for another team count TEAM_PEN times as much (a new team usually means a new role)."""
     a = 1 - 0.5 ** (1 / HALF)
     g = pg.groupby('pid')
     prior = pd.DataFrame(index=pg.index)
-    for c in ROLL:
-        prior[f'h_{c}'] = g[c].transform(lambda s: s.shift(1).ewm(alpha=a, adjust=True).mean())
+    if TEAM_PEN == 1.0 and SEASON_PEN == 1.0:
+        for c in ROLL:
+            prior[f'h_{c}'] = g[c].transform(lambda s: s.shift(1).ewm(alpha=a, adjust=True).mean())
+    else:
+        r = 1 - a; V = pg[ROLL].to_numpy(float); out = np.full(V.shape, np.nan); team = pg.posteam.to_numpy(); sea = pg.season.to_numpy()
+        for idx in g.indices.values():
+            idx = np.sort(idx); n = len(idx)
+            if n < 2: continue
+            v = V[idx]; t = team[idx]; se = sea[idx]
+            ii, jj = np.meshgrid(np.arange(n), np.arange(n), indexing='ij')
+            W = np.where(jj < ii, r ** (ii - 1 - jj).astype(float), 0.0) * np.where(t[None, :] != t[:, None], TEAM_PEN, 1.0) * np.where(se[None, :] != se[:, None], SEASON_PEN, 1.0)
+            ok = ~np.isnan(v); num = W @ np.nan_to_num(v); den = W @ ok
+            with np.errstate(invalid='ignore', divide='ignore'):
+                out[idx] = num / den
+        for k, c in enumerate(ROLL):
+            prior[f'h_{c}'] = out[:, k]
     prior['h_games'] = g.cumcount()
     return prior
+
+
+def _ewm_now(pg):
+    """Recency-weighted averages over every game played so far, relative to each player's latest team."""
+    a = 1 - 0.5 ** (1 / HALF); r = 1 - a; rows = {}
+    for pid, x in pg.groupby('pid'):
+        t = x.posteam.to_numpy(); se = x.season.to_numpy(); w = _team_weights(len(x), t, t[-1], r, True) * np.where(se != se[-1], SEASON_PEN, 1.0)
+        v = x[ROLL].to_numpy(float); ok = ~np.isnan(v)
+        rows[pid] = (w @ np.nan_to_num(v)) / np.maximum(w @ ok, 1e-12)
+    return pd.DataFrame.from_dict(rows, orient='index', columns=[f'h_{c}' for c in ROLL])
 
 
 def design(df, extended=True):
@@ -191,11 +228,11 @@ def upcoming(season, week, implied, overrides=None):
     """
     pg = history()
     pg = pd.concat([pg, _ewm_prior(pg)], axis=1)
-    a = 1 - 0.5 ** (1 / HALF)
     last = pg.groupby('pid').tail(1).copy()
     # fold the latest game into the averages so the features cover every game played so far
+    now = _ewm_now(pg).reindex(last.pid)
     for c in ROLL:
-        last[f'h_{c}'] = pg.groupby('pid')[c].apply(lambda s: s.ewm(alpha=a, adjust=True).mean().iloc[-1]).reindex(last.pid).values
+        last[f'h_{c}'] = now[f'h_{c}'].values
     last['h_games'] = last.h_games + 1
     ros = _load_extra('roster', season)
     ros = ros[(ros.week == week) & (ros.status == 'ACT')][['gsis_id', 'team']].rename(columns={'gsis_id': 'pid'})

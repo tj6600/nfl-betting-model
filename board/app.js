@@ -337,7 +337,7 @@ const ABBR = { DraftKings: 'DK', FanDuel: 'FD' };
 const PS = { kind: 'all', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25, note: '', sel: {} };
 // one row per bet: both sides of an over/under or spread together, so either side can be picked
 const GROUPS = Object.values(LEGS.reduce((acc, l) => { (acc[l.grp] = acc[l.grp] || { grp: l.grp, title: l.gt, kind: l.kind, sides: [] }).sides.push(l); return acc; }, {}))
-  .map((g) => { g.sides.sort((a, b) => (a.sl === 'Over' ? -1 : b.sl === 'Over' ? 1 : 0)); g.flag = g.sides.map((x) => x.flag).find((f) => f) || '';
+  .map((g) => { g.sides.sort((a, b) => (a.sl === 'Over' ? -1 : b.sl === 'Over' ? 1 : 0)); g.flag = g.sides.map((x) => x.flag).find((f) => f && f !== 'season disagrees') || '';
     g.text = (g.title + ' ' + g.sides[0].game + ' ' + (g.sides[0].team || '')).toLowerCase(); return g; });
 const pts = (e) => `${e > 0 ? '+' : ''}${(e * 100).toFixed(1)} pts`;
 const pct1 = (v) => (v < 0.1 ? (v * 100).toFixed(1) : (v * 100).toFixed(0)) + '%';
@@ -362,7 +362,7 @@ function warnings(ids) {
   const byKey = {}; ls.forEach((l) => { (byKey[l.key] = byKey[l.key] || []).push(l); });
   for (const xs of Object.values(byKey)) if (xs.length > 1) w.push(['bad', `${xs.map(legName).join(' and ')} are the same bet market twice. Most books won't allow it, and the chances aren't independent.`]);
   ls.filter((l) => l.ev < 0).forEach((l) => w.push(['bad', `${legName(l)} is negative EV on its own (${(l.ev * 100).toFixed(0)}%). It drags the whole parlay down.`]));
-  ls.filter((l) => l.flag).forEach((l) => w.push(['warn', `${legName(l)}: ${l.flag === 'Check role' ? 'role flag (missed time, moved down the depth chart, or the model and books disagree a lot)' : 'small role, so the chance is less reliable'}.`]));
+  ls.filter((l) => l.flag).forEach((l) => w.push(['warn', `${legName(l)}: ${l.flag === 'Check role' ? 'role flag (missed time, moved down the depth chart, or the model and books disagree a lot)' : l.flag === 'season disagrees' ? `this side has hit only ${l.season} games this season, so the model may be leaning on an old role` : 'small role, so the chance is less reliable'}.`]));
   ls.filter((l) => l.p < 0.25).forEach((l) => w.push(['warn', `${legName(l)} is a long shot (${pct1(l.p)}). Most of its EV rests on the model being right about a rare event, and it cuts the parlay's hit chance a lot.`]));
   if (!PBOOKS.some((b) => ls.every((l) => l.offers[b] != null))) {
     const only = ls.filter((l) => Object.keys(l.offers).length === 1).map((l) => `${legName(l)} (${Object.keys(l.offers)[0]} only)`);
@@ -490,9 +490,10 @@ function renderParlay() {
       b.onclick = () => { PS.sel[g.grp] = x.id; renderParlay(); };
       seg.append(b);
     }
-    const st = el('span', 'e ' + (cur.edge >= 0 ? 'pos' : 'neg'), `${pct(cur.p)} · edge ${pts(cur.edge)} · EV ${cur.ev > 0 ? '+' : ''}${(cur.ev * 100).toFixed(0)}%`);
+    const st = el('span', 'e ' + (cur.edge >= 0 ? 'pos' : 'neg'), `${pct(cur.p)} · edge ${pts(cur.edge)} · EV ${cur.ev > 0 ? '+' : ''}${(cur.ev * 100).toFixed(0)}%${cur.season ? ` · hit ${cur.season} this season` : ''}`);
     box.append(seg, st);
     if (g.sides.length > 1 && cur !== lean && lean.edge > 0) box.append(el('span', 'e dim', `Going against our lean (${lean.sl})`));
+    if (cur.flag === 'season disagrees') box.append(el('span', 'e warnc', `Caution: hit only ${cur.season} this season`));
     const on = slip.includes(cur.id);
     const b = el('button', 'add' + (on ? ' on' : ''), on ? 'Added' : 'Add'); b.type = 'button'; b.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + legName(cur));
     b.onclick = () => { slip = on ? slip.filter((i) => i !== cur.id) : [...slip.filter((i) => !g.sides.some((x) => x.id === i)), cur.id]; saveSlip(); renderParlay(); };

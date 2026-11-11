@@ -2,7 +2,7 @@
 
 Run after scripts/td_picks.py. Publish the output as the Touchdown Board artifact.
 """
-import sys, os, glob, json; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import sys, os, glob, json, re; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 import numpy as np, pandas as pd
 from nflmodel.model import G
@@ -245,19 +245,6 @@ for l in LEGS.values():
              ev=round(pp * d - 1, 4), edge=round(pp - 1 / d, 4))
     legs.append(l)
 D['legs'] = legs
-# suggested parlay: at each book, the best-edge qualifying leg from each of the four strongest games; keep the book with the higher EV
-LG = pd.DataFrame(legs)
-LG = LG[(LG.cat.isin(['Value', 'Optimal', 'Secure', 'TD value', 'Likely hit'])) & (LG.flag == '') & (LG.p >= 0.55)]
-sug = []
-for b in PARLAY_BOOKS:
-    X = LG[LG.offers.map(lambda o: b in o)].copy()
-    X['d'] = X.offers.map(lambda o: _dec(o[b])); X['evb'] = X.p * X.d - 1; X['edgeb'] = X.p - 1 / X.d
-    X = X[X.evb > 0.03].sort_values('edgeb', ascending=False).groupby('game').head(1).head(4)
-    sug.append((X.p.prod() * X.d.prod() - 1, b == 'DraftKings', b, list(X.id), X.p.prod(), X.d.prod()))
-    print(f'suggested at {b}: EV {sug[-1][0]:+.1%}, hit {sug[-1][4]:.1%}, decimal {sug[-1][5]:.2f}:', list(X.label + ' ' + X.who.where(X.kind != 'Game', '')))
-best = max(sug)
-D['suggested'] = dict(book=best[2], ids=best[3])
-
 # season game logs for every player on the board (play-by-play derived; weeks his team played without him show as DNP)
 H = T.history(); H = H[H.season == season]
 pids = {l['pid'] for l in legs if l.get('pid')} | {p['id'] for p in out} | {y['pid'] for y in D.get('yards', [])}
@@ -280,6 +267,34 @@ for pid, hg in H[H.pid.isin(pids)].groupby('pid'):
     logs[pid] = dict(name=hg.full_name.iloc[-1], pos=hg.position.iloc[-1], team=team, g=rows)
 D['logs'] = logs
 print(len(logs), 'game logs')
+
+# season check: flag a likely-looking yards side that has lost most of the time this season (4+ games played).
+# The recency weights reach back into earlier seasons and old teams, so a player in a new role can be
+# projected off his old usage (e.g. a backup turned starter); his own season is the warning sign.
+for l in legs:
+    if l['kind'] not in ('Rush', 'Rec', 'Milestone') or l.get('pid') not in logs: continue
+    rows = [r for r in logs[l['pid']]['g'] if r[3] is not None]
+    num = float(re.search(r'[\d.]+', l['label']).group())
+    line = num - 0.5 if l['kind'] == 'Milestone' else num
+    i = 4 if 'rush' in l['label'] else 7
+    over = l['kind'] == 'Milestone' or l['sl'] == 'Over'
+    hits = sum((r[i] > line) if over else (r[i] < line) for r in rows)
+    l['season'] = f'{hits}/{len(rows)}'
+    if len(rows) >= 4 and l['p'] >= 0.55 and hits / len(rows) < 0.4 and not l['flag']:
+        l['flag'] = 'season disagrees'
+
+# suggested parlay: at each book, the best-edge qualifying leg from each of the four strongest games; keep the book with the higher EV
+LG = pd.DataFrame(legs)
+LG = LG[(LG.cat.isin(['Value', 'Optimal', 'Secure', 'TD value', 'Likely hit'])) & (LG.flag == '') & (LG.p >= 0.55)]
+sug = []
+for b in PARLAY_BOOKS:
+    X = LG[LG.offers.map(lambda o: b in o)].copy()
+    X['d'] = X.offers.map(lambda o: _dec(o[b])); X['evb'] = X.p * X.d - 1; X['edgeb'] = X.p - 1 / X.d
+    X = X[X.evb > 0.03].sort_values('edgeb', ascending=False).groupby('game').head(1).head(4)
+    sug.append((X.p.prod() * X.d.prod() - 1, b == 'DraftKings', b, list(X.id), X.p.prod(), X.d.prod()))
+    print(f'suggested at {b}: EV {sug[-1][0]:+.1%}, hit {sug[-1][4]:.1%}, decimal {sug[-1][5]:.2f}:', list(X.label + ' ' + X.who.where(X.kind != 'Game', '')))
+best = max(sug)
+D['suggested'] = dict(book=best[2], ids=best[3])
 
 # latest blind test (scripts/props_blind_test.py), shown on its own tab
 bl = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'blind', '*_summary.csv')))
