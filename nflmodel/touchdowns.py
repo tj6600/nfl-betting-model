@@ -223,3 +223,84 @@ def upcoming(season, week, implied, overrides=None):
     opp = opp[opp.posteam != opp.defteam][['posteam', 'defteam']]
     last = last.merge(opp, on='posteam', how='left').merge(dn, on=['defteam', 'position'], how='left')
     return last
+
+
+# ---- depth charts (nflverse, ESPN snapshots; daily format from 2025) ----
+DC_URL = 'https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_{y}.csv'
+DC_DIR = os.environ.get('NFL_DC_DIR', os.path.join(os.path.dirname(__file__), '..', 'data'))
+DEPTH_SEASONS = [2025, 2026]
+
+
+def depth_snapshots(seasons=DEPTH_SEASONS):
+    out = []
+    for y in seasons:
+        local = os.path.join(DC_DIR, f'depth_charts_{y}.csv')
+        d = pd.read_csv(local if os.path.exists(local) else DC_URL.format(y=y),
+                        usecols=['dt', 'team', 'gsis_id', 'pos_abb', 'pos_rank'], low_memory=False)
+        d = d[d.pos_abb.isin(POS) & d.gsis_id.notna()]
+        out.append(d)
+    d = pd.concat(out, ignore_index=True)
+    d['dt'] = pd.to_datetime(d.dt, utc=True).dt.tz_localize(None)
+    d = d.sort_values('pos_rank').drop_duplicates(['dt', 'team', 'gsis_id'])   # a player listed twice keeps his best rank
+    return d.rename(columns={'gsis_id': 'pid'})
+
+
+def _tier(pos, rank):
+    """1 = starter, 2 = first backup, 3 = deeper; WRs count the top two as starters. 0 = not on the chart."""
+    r = np.asarray(rank, float); wr = np.asarray(pos) == 'WR'
+    adj = np.where(wr, r - 1, r)
+    t = np.where(np.isnan(r), 0, np.where(adj <= 1, 1, np.where(adj <= 2, 2, 3)))
+    return t.astype(int)
+
+
+def rank_at(rows, snaps, when_col):
+    """Player's depth rank in his team's latest snapshot before `when_col` (NaN if not listed)."""
+    team_dt = snaps[['team', 'dt']].drop_duplicates().sort_values('dt')
+    q = rows[['team', when_col]].drop_duplicates().sort_values(when_col)
+    q = pd.merge_asof(q, team_dt.rename(columns={'dt': 'snap'}), left_on=when_col, right_on='snap', by='team', direction='backward')
+    out = rows.merge(q, on=['team', when_col], how='left')
+    return out.merge(snaps.rename(columns={'dt': 'snap'})[['snap', 'team', 'pid', 'pos_rank']], on=['snap', 'team', 'pid'], how='left').pos_rank.values
+
+
+def add_depth(df, snaps, now=None):
+    """Adds depth tier now and at his previous game, plus promoted/demoted flags.
+
+    Training rows: rank before each game's kickoff. Upcoming rows (now given): rank in the latest snapshot.
+    """
+    df = df.copy()
+    ko = pd.to_datetime(df.gameday) + pd.Timedelta(hours=12)
+    df['_ko'] = ko if now is None else pd.Timestamp(now)
+    df['team'] = df.posteam
+    df['dc_rank'] = rank_at(df, snaps, '_ko')
+    if now is None:
+        df = df.sort_values(['pid', 'gameday'])
+        df['dc_prev'] = df.groupby('pid').dc_rank.shift(1)
+    else:   # rank before his most recent game
+        df['_last'] = pd.to_datetime(df.gameday) + pd.Timedelta(hours=12)
+        df['dc_prev'] = rank_at(df, snaps, '_last')
+    df['dc_tier'] = _tier(df.position, df.dc_rank)
+    prev = _tier(df.position, df.dc_prev)
+    has = (df.dc_tier > 0) & (prev > 0)
+    df['dc_demoted'] = (has & (df.dc_tier > prev)).astype(float)
+    df['dc_promoted'] = (has & (df.dc_tier < prev)).astype(float)
+    return df.drop(columns=['_ko', 'team'] + (['_last'] if '_last' in df else []))
+
+
+def depth_design(df):
+    X = pd.DataFrame({'tier2': (df.dc_tier == 2).astype(float), 'tier3': (df.dc_tier == 3).astype(float),
+                      'off_chart': (df.dc_tier == 0).astype(float), 'demoted': df.dc_demoted, 'promoted': df.dc_promoted})
+    return X
+
+
+def fit_offset(X, y, offset, lam=1.0):
+    """Logistic regression on top of a fixed base logit (offset)."""
+    X1 = np.column_stack([X.values, np.ones(len(X))]); b = np.zeros(X1.shape[1])
+    P = np.eye(X1.shape[1]) * lam; P[-1, -1] = 0
+    for _ in range(30):
+        q = 1 / (1 + np.exp(-(X1 @ b + offset))); W = q * (1 - q)
+        b -= np.linalg.solve(X1.T @ (X1 * W[:, None]) + P, X1.T @ (q - y) + P @ b)
+    return b
+
+
+def logit(p):
+    p = np.clip(p, 1e-6, 1 - 1e-6); return np.log(p / (1 - p))

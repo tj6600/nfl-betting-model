@@ -1,0 +1,36 @@
+<div class="wrap">
+  <header>
+    <span class="eyebrow" id="eyebrow">2026 · Week 10 · Anytime touchdown</span>
+    <h1>Touchdown Board</h1>
+    <p class="lede" id="lede">Every player the model priced this week, and his chance to score a rushing or receiving touchdown, set against sportsbook odds. Pick a game, filter by position, or open a player to see why the model likes him.</p>
+  </header>
+
+  <div class="chips" id="cats" role="group" aria-label="Pick type"></div>
+
+  <div class="strip" id="games" role="group" aria-label="Games"></div>
+
+  <div class="bar">
+    <input type="search" id="q" placeholder="Search a player or team" aria-label="Search a player or team">
+    <div class="seg" id="pos" role="group" aria-label="Position"></div>
+    <select id="sort" aria-label="Sort players">
+      <option value="model">Sort: chance to score</option>
+      <option value="edge">Sort: model minus book</option>
+      <option value="ev">Sort: expected value</option>
+      <option value="odds">Sort: longest odds</option>
+    </select>
+    <label class="tog"><input type="checkbox" id="small" checked> Hide small roles</label>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="legend">
+    <span><i style="width:22px;height:8px;border-radius:4px;background:var(--turf)"></i>Model chance</span>
+    <span><i style="width:2px;height:14px;background:var(--tick)"></i>Book chance (includes their margin)</span>
+    <span><span class="pill value">TD value</span></span>
+    <span><span class="pill likely">Most likely</span></span>
+    <span><span class="pill check">Check role</span></span>
+  </div>
+
+  <div class="cols" id="board"></div>
+
+  <p class="note">The model learns from each player's recent red-zone and goal-line work, his carries and targets, his share among teammates at his position, games he missed, the opponent's touchdowns allowed to his position, and his team's expected points. It was well calibrated on 2024 and 2025 games. There are no past touchdown odds to test it against, so an edge over the books is unproven. "Small roles" means fewer than 3 carries plus targets a game. The model is least reliable there, and their long odds produce big but unrealistic EV numbers. Odds are from The Odds API, taken <span id="taken"></span>. The ESPN depth chart (via nflverse) is shown for each player and moves players into Check role when it has dropped them, but it isn't a model input: on 2026 games it didn't improve the predictions, because recent usage already shows who is playing. Check injury news and current prices before using any of this. These are tracking picks, not betting advice.</p>
+</div>

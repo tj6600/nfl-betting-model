@@ -36,6 +36,13 @@ ov_path = os.path.join(ROOT, 'odds_log', 'injury_overrides.csv')
 ov = pd.read_csv(ov_path) if os.path.exists(ov_path) else None
 P = T.upcoming(season, week, T.implied_points(lines), ov)
 P['model_prob'] = T.predict(b, T.design(P))
+# depth chart (shown and used as a flag, not in the model: on 2026 games it did not improve the predictions
+# because recent usage already carries the same information)
+try:
+    snaps = T.depth_snapshots([season])
+    P = T.add_depth(P, snaps, now=snaps.dt.max() + pd.Timedelta(minutes=1))
+except Exception as e:
+    print('depth charts unavailable:', e); P['dc_rank'] = P['dc_prev'] = np.nan; P['dc_tier'] = 0; P['dc_demoted'] = P['dc_promoted'] = 0.0
 P = P.merge(lines[['game_id', 'home_team', 'away_team']], on='game_id')
 
 # sportsbook anytime TD prices
@@ -65,7 +72,7 @@ M['edge_pct'] = (M.model_prob - M.book_prob) * 100
 M['game'] = M.away_team + ' @ ' + M.home_team
 keep = ['game', 'pid', 'posteam', 'full_name', 'position', 'model_prob', 'book_prob', 'edge_pct', 'median_price', 'best_price', 'best_book',
         'books', 'ev', 'imp_pts', 'h_rz_share', 'h_gl_share', 'h_carries', 'h_targets', 'h_tds',
-        'room_share', 'last_share', 'missed_n', 'def_td', 'defteam']
+        'room_share', 'last_share', 'missed_n', 'def_td', 'defteam', 'dc_rank', 'dc_prev', 'dc_tier', 'dc_demoted']
 M = M[keep].sort_values('ev', ascending=False)
 os.makedirs(os.path.join(ROOT, 'odds_log', 'picks'), exist_ok=True)
 out = os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}_td.csv')
@@ -81,6 +88,7 @@ M['opps'] = M.h_carries + M.h_targets
 ratio = M.model_prob / M.book_prob
 value = (M.opps >= 5) & (M.model_prob >= 0.15) & (M.ev >= 0.05) & (ratio <= 1.6)
 check = (M.opps >= 5) & (ratio > 1.6) & (M.model_prob >= 0.12)   # model far above books: recent role may not carry over
+check |= (M.model_prob >= 0.15) & (ratio > 1.3) & ((M.dc_demoted == 1) | (M.dc_tier == 3))   # depth chart says he's moved down
 top = M.model_prob.rank(ascending=False) <= 12
 M['category'] = np.select([value, check, top], ['TD value', 'Check role', 'Most likely'], '')
 
@@ -90,11 +98,22 @@ def why(r):
             f"team expected to score {r.imp_pts:.1f}"]
     if abs(r.def_td) >= 0.15:
         bits.append(f"{r.defteam} allows {'more' if r.def_td > 0 else 'fewer'} TDs than average to {POSN[r.position]}")
+    if r.dc_rank == r.dc_rank:
+        dc = f"depth chart {r.position}{int(r.dc_rank)}"
+        if r.dc_prev == r.dc_prev and int(r.dc_prev) != int(r.dc_rank):
+            dc += f" (was {r.position}{int(r.dc_prev)} at his last game)"
+        bits.append(dc)
     s = ', '.join(bits)
     if r.missed_n >= 1:
         s = f"Missed the last {int(r.missed_n)} game{'s' if r.missed_n > 1 else ''}, so his usage is from before that. " + s
     if r.category == 'Check role':
-        s = "The books are far lower than the model, so his role has probably changed or he may not be healthy. " + s
+        if r.dc_demoted == 1:
+            lead = "The depth chart has moved him down, so his recent usage may not carry over. "
+        elif r.dc_tier == 3:
+            lead = f"He is a backup on the depth chart ({r.position}{int(r.dc_rank)}), and the books price him well below the model. "
+        else:
+            lead = "The books are far lower than the model, so his role has probably changed or he may not be healthy. "
+        s = lead + s
     return s
 M['why'] = M.apply(why, axis=1)
 C = M[M.category != ''].copy()
