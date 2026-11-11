@@ -126,9 +126,23 @@ The roster features move predictions in the right direction (losing starters cos
 
 Scheme matchups turn out tiny. A typical matchup is worth under 0.01 EPA per dropback, about 0.2 points a game, and the fitted weights are within noise. Teams adjust their game plans to the opponent, so a season-long tendency like "plays a lot of man" says little about one game.
 
+## Betting opening lines
+
+`scripts/opening_lines.py` tests v2 picks (EPA + QB) against nflverse's early lines (`sc_lines.csv`). These are spreads only, 2019–2020, and the source is undocumented. They sit about 1 point from the close on average and predict results a bit worse, as opening lines do. The weights are fit leave-one-season-out. Use `--no-qb` to drop the starting-QB feature, since a QB change is often only known after openers are posted.
+
+| Opener bets, 2019–20 (n≈430) | with QB feature | without (`--no-qb`) |
+|---|---|---|
+| Hit rate, all games | 54.1% | 53.8% |
+| Hit rate, edge ≥ 1.5 | 55.9% | 55.2% |
+| Line moved toward our side by kickoff (edge ≥ 1.5) | 65% | 59% |
+| Avg closing line value, edge ≥ 3 | +0.98 pts | +0.75 pts |
+
+This is the first test where the model shows **positive closing line value**: the market tends to move toward the model's side after the open. That's the standard sign of a real edge. Two seasons is still a small sample, though, and later seasons need their own opening-line data to confirm it.
+
 ## Next steps
 
-1. Opening lines (`initial_lines.csv`), to bet early numbers and measure closing line value
+1. Record opening lines live each week (e.g. The Odds API) and track closing line value going forward
+2. Opening lines (`initial_lines.csv`), to bet early numbers and measure closing line value
 3. Key-number-aware margin distribution (3, 7, 10) in place of the normal approximation
 4. "Optimal" and "secure" leg ranking with expected value and fractional Kelly staking
 5. Measure closing line value using opening lines
