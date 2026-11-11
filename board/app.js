@@ -281,11 +281,12 @@ const LEGS = D.legs || []; const LEG = Object.fromEntries(LEGS.map((l) => [l.id,
 const dec = (a) => (a > 0 ? 1 + a / 100 : 1 + 100 / -a);
 const amer = (d) => (d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d - 1)));
 const PK = 'props-parlay-v1';
-const PS = { kind: 'all', q: '', plus: true, clean: true, price: '' };
+const PS = { kind: 'all', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25 };
+const pts = (e) => `${e > 0 ? '+' : ''}${(e * 100).toFixed(1)} pts`;
 const pct1 = (v) => (v < 0.1 ? (v * 100).toFixed(1) : (v * 100).toFixed(0)) + '%';
 let slip = []; try { slip = (JSON.parse(localStorage.getItem(PK) || '[]')).filter((id) => LEG[id]); } catch (e) { slip = []; }
 const saveSlip = () => { try { localStorage.setItem(PK, JSON.stringify(slip)); } catch (e) { /* storage unavailable */ } };
-const legName = (l) => (l.kind === 'Game' ? `${l.label}` : `${l.who} ${l.label}`);
+const legName = (l) => (l.kind === 'Game' ? (/^(Over|Under)/.test(l.label) ? `${l.game} ${l.label}` : l.label) : `${l.who} ${l.label}`);
 function parlayMath(ids, priceOverride) {
   const ls = ids.map((i) => LEG[i]);
   const p = ls.reduce((a, l) => a * l.p, 1); const dBest = ls.reduce((a, l) => a * dec(l.price), 1);
@@ -300,6 +301,7 @@ function warnings(ids) {
   for (const xs of Object.values(byKey)) if (xs.length > 1) w.push(['bad', `${xs.map(legName).join(' and ')} are the same bet market twice. Most books won't allow it, and the chances aren't independent.`]);
   ls.filter((l) => l.ev < 0).forEach((l) => w.push(['bad', `${legName(l)} is negative EV on its own (${(l.ev * 100).toFixed(0)}%). It drags the whole parlay down.`]));
   ls.filter((l) => l.flag).forEach((l) => w.push(['warn', `${legName(l)}: ${l.flag === 'Check role' ? 'role flag (missed time, moved down the depth chart, or the model and books disagree a lot)' : 'small role, so the chance is less reliable'}.`]));
+  ls.filter((l) => l.p < 0.25).forEach((l) => w.push(['warn', `${legName(l)} is a long shot (${pct1(l.p)}). Most of its EV rests on the model being right about a rare event, and it cuts the parlay's hit chance a lot.`]));
   const books = new Set(ls.map((l) => l.book)); if (ls.length > 1 && books.size > 1) w.push(['info', `Best prices come from ${books.size} different books, but a parlay has to sit at one. Enter your book's parlay price for the real EV.`]);
   return w;
 }
@@ -331,21 +333,28 @@ function renderParlay() {
   tg.append(cb, document.createTextNode(' Positive EV only'));
   const tg2 = el('label', 'tog'); const cb2 = el('input'); cb2.type = 'checkbox'; cb2.checked = PS.clean; cb2.onchange = (e) => { PS.clean = e.target.checked; drawList(); };
   tg2.append(cb2, document.createTextNode(' Hide flagged roles'));
-  ctl.append(q, seg, tg, tg2); pick.append(ctl);
+  const so = el('select'); so.setAttribute('aria-label', 'Sort legs');
+  for (const [v, t] of [['edge', 'Sort: best balance (edge)'], ['ev', 'Sort: highest EV'], ['p', 'Sort: most likely']]) { const o = el('option', null, t); o.value = v; so.append(o); }
+  so.value = PS.sort; so.onchange = (e) => { PS.sort = e.target.value; drawList(); };
+  const mp = el('div', 'seg'); mp.setAttribute('aria-label', 'Minimum chance');
+  for (const [v, t] of [[0, 'Any chance'], [0.25, '25%+'], [0.4, '40%+'], [0.55, '55%+'], [0.7, '70%+']]) {
+    const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', PS.minp === v); b.onclick = () => { PS.minp = v; renderParlay(); }; mp.append(b);
+  }
+  ctl.append(q, seg, so, mp, tg, tg2); pick.append(ctl);
   const list = el('div', 'pllist'); pick.append(list);
   function drawList() {
     const qq = PS.q.trim().toLowerCase();
-    const xs = LEGS.filter((l) => (state.game === 'all' || l.game === state.game) && (PS.kind === 'all' || l.kind === PS.kind) && (!PS.plus || l.ev > 0) && (!PS.clean || !l.flag)
+    const xs = LEGS.filter((l) => (state.game === 'all' || l.game === state.game) && (PS.kind === 'all' || l.kind === PS.kind) && (!PS.plus || l.ev > 0) && (!PS.clean || !l.flag) && l.p >= PS.minp
       && (!qq || (l.who + ' ' + l.label + ' ' + l.game + ' ' + (l.team || '')).toLowerCase().includes(qq)))
-      .sort((a, b) => b.ev - a.ev).slice(0, 80);
-    ph.lastChild.textContent = `${xs.length >= 80 ? 'top 80' : xs.length} legs, best EV first`;
+      .sort(PS.sort === 'ev' ? (a, b) => b.ev - a.ev : PS.sort === 'p' ? (a, b) => b.p - a.p : (a, b) => b.edge - a.edge).slice(0, 80);
+    ph.lastChild.textContent = `${xs.length >= 80 ? 'top 80' : xs.length} legs`;
     list.replaceChildren();
     if (!xs.length) list.append(el('div', 'empty', 'No legs match. Try another search or turn off Positive EV only.'));
     for (const l of xs) {
       const on = slip.includes(l.id);
       const r = el('div', 'leg'); const w = el('div', 'who');
       w.append(el('span', 'n', legName(l)), el('span', 's', `${l.kind === 'Milestone' ? 'Milestone' : l.kind === 'Game' ? 'Game line' : l.kind === 'TD' ? 'Touchdown' : l.kind + ' yards'} · ${l.game}${l.cat ? ' · ' + l.cat : ''}${l.flag ? ' · ' + l.flag : ''}`));
-      const pr = el('div', 'price'); pr.append(el('span', 'e', `${fmtOdds(l.price)} · ${pct(l.p)}`), el('span', 'e ' + (l.ev >= 0 ? 'pos' : 'neg'), `EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`));
+      const pr = el('div', 'price'); pr.append(el('span', 'e', `${fmtOdds(l.price)} · ${pct(l.p)}`), el('span', 'e ' + (l.edge >= 0 ? 'pos' : 'neg'), `edge ${pts(l.edge)} · EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`));
       const b = el('button', 'add' + (on ? ' on' : ''), on ? 'Added' : 'Add'); b.type = 'button'; b.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + legName(l));
       b.onclick = () => { slip = on ? slip.filter((i) => i !== l.id) : [...slip, l.id]; saveSlip(); renderParlay(); };
       r.append(w, pr, b); list.append(r);
@@ -364,7 +373,7 @@ function renderParlay() {
     const lsx = el('div', 'books slipl');
     for (const l of m.ls) {
       const r = el('div'); const left = el('span'); left.append(el('b', null, legName(l)), el('small', null, `${l.game} · ${fmtOdds(l.price)} at ${l.book}`));
-      const right = el('span', 'num ' + (l.ev >= 0 ? 'pos' : 'neg'), `${pct(l.p)} · EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`);
+      const right = el('span', 'num ' + (l.ev >= 0 ? 'pos' : 'neg'), `${pct(l.p)} · ${pts(l.edge)} · EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`);
       const x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Remove ' + legName(l)); x.onclick = () => { slip = slip.filter((i) => i !== l.id); saveSlip(); renderParlay(); };
       r.append(left, right, x); lsx.append(r);
     }
@@ -386,7 +395,7 @@ function renderParlay() {
     const wl = el('ul', 'warns'); for (const [k, t] of warnings(slip)) wl.append(el('li', k, t)); if (wl.children.length) sl.append(wl);
   }
   board.append(pick, sl);
-  document.getElementById('foot').textContent = 'Each leg\'s chance blends our model 50/50 with the books\' own chance. Game lines are blended too, because on past closing lines the spread model showed no edge by itself. The parlay chance multiplies the legs, which assumes they are independent, so legs from the same game are flagged. EV uses the best price for each leg unless you enter your book\'s parlay price. None of these leg types has been graded against real lines yet, so treat the EV as the model\'s opinion, not a promise. Tracking only, not betting advice.';
+  document.getElementById('foot').textContent = 'Legs are ranked by edge: our chance minus the break-even chance the price implies. EV alone favors long shots, because a small overestimate of a 5% chance turns into a huge EV at +2500; edge in percentage points does not, so it rewards legs that are both likely and underpriced. Each leg\'s chance blends our model with the books\' own chance, 50/50 for normal prices and leaning more on the books for long shots (down to 20% model below about a 12% book chance), since the model is least reliable in the tails. Game lines are blended too, because on past closing lines the spread model showed no edge by itself. The parlay chance multiplies the legs, which assumes they are independent, so legs from the same game are flagged. EV uses the best price for each leg unless you enter your book\'s parlay price. None of these leg types has been graded against real lines yet, so treat the EV as the model\'s opinion, not a promise. Tracking only, not betting advice.';
 }
 function render() {
   if (state.tab === 'test') { renderTabs(); renderTest(); return; }

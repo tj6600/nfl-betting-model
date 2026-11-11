@@ -156,11 +156,18 @@ if os.path.exists(mf):
         legs.append(dict(id=f"m-{r.pid}-{kind}-{r.milestone}", game=r.game, kind='Milestone', who=r.player, team=r.team, label=f"{r.milestone}+ {kind.lower()} yds",
                          p=round(r.prob, 4), model=round(r.model_only, 4), price=int(r.best_price), book=r.best_book, ev=round(r.ev, 4),
                          cat=r.category if isinstance(r.category, str) else '', key=f"{r.pid}-{kind}", flag=flag))
+# long shots: the model is least reliable in the tails, so trust the books more as the book chance falls
+# (model weight 0.5 at a 25%+ book chance, sliding to 0.2 below about 12%); edge = chance minus break-even
+for l in legs:
+    d = _dec(l['price']); bk = min(0.99, max(0.005, 2 * l['p'] - l['model']))
+    w = 0.5 * min(1.0, max(0.4, (bk - 0.03) / 0.22))
+    pp = w * l['model'] + (1 - w) * bk
+    l.update(book_p=round(bk, 4), p=round(pp, 4), ev=round(pp * d - 1, 4), edge=round(pp - 1 / d, 4))
 D['legs'] = legs
 # suggested parlay: the best qualifying leg from each of the four strongest games
 LG = pd.DataFrame(legs)
 LG = LG[(LG.cat.isin(['Value', 'Optimal', 'Secure', 'TD value', 'Likely hit'])) & (LG.flag == '') & (LG.p >= 0.55) & (LG.ev > 0.03)]
-D['suggested'] = list(LG.sort_values('ev', ascending=False).groupby('game').head(1).head(4).id)
+D['suggested'] = list(LG.sort_values('edge', ascending=False).groupby('game').head(1).head(4).id)
 
 # latest blind test (scripts/props_blind_test.py), shown on its own tab
 bl = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'blind', '*_summary.csv')))
