@@ -43,13 +43,18 @@ def _mins(s):
 
 
 def build(seasons=SEASONS):
-    gi = _read('game_info', seasons)
+    frames = {f: _read(f, seasons) for f in ('game_info', 'pbp', 'skater_box', 'goalie_box')}
+    games, sk, go, tg = assemble(frames['game_info'], frames['pbp'], frames['skater_box'], frames['goalie_box'])
+    save(games, sk, go, tg, seasons)
+
+
+def assemble(gi, pbp, sk, go):
+    """Turn raw game info, play-by-play and box scores (any set of games) into the cached tables."""
     gi = gi[(gi.game_type == 'R') & (gi.game_state.isin(['OFF', 'FINAL']))].copy()
     games = gi.rename(columns={'home_team_abbr': 'home', 'away_team_abbr': 'away'})[
         ['game_id', 'season', 'game_date', 'home', 'away', 'home_score', 'away_score']].copy()
 
     # play-by-play aggregates
-    pbp = _read('pbp', seasons)
     pbp = pbp[pbp.game_id.isin(games.game_id)]
     per = pbp.groupby('game_id').period.max()
     so = pbp[pbp.event_type == 'SHOOTOUT_COMPLETE'].game_id.unique()
@@ -85,7 +90,6 @@ def build(seasons=SEASONS):
                                                     pp_cf=('pp', 'sum')).reset_index().rename(columns={'shoot_team': 'team'})
 
     # skaters
-    sk = _read('skater_box', seasons)
     sk = sk[sk.game_id.isin(games.game_id)].copy()
     sk['toi'] = _mins(sk.toi)
     sk = sk.merge(games[['game_id', 'game_date', 'home', 'away']], on=['game_id', 'game_date'], how='left')
@@ -105,7 +109,6 @@ def build(seasons=SEASONS):
     sk['full_name'] = sk.player_id.map(nm.set_index('player_id').name).fillna(sk.player_name)
 
     # goalies
-    go = _read('goalie_box', seasons)
     go = go[go.game_id.isin(games.game_id)].copy()
     go['toi'] = _mins(go.toi)
     go = go.merge(games[['game_id', 'home', 'away']], on='game_id', how='left')
@@ -130,6 +133,10 @@ def build(seasons=SEASONS):
     tg = tg.merge(tm.rename(columns={'team': 'opp', 'cf': 'ca', 'sf': 'sa', 'xgf': 'xga', 'pp_cf': 'pk_ca'}),
                   on=['game_id', 'opp'], how='left')
 
+    return games, sk, go, tg
+
+
+def save(games, sk, go, tg, seasons):
     # one folder per season (nhl_data/<end year>/), so a daily run only rebuilds the current season
     for y in seasons:
         code = int(f'{y - 1}{y}')
@@ -137,6 +144,55 @@ def build(seasons=SEASONS):
         for name, df in [('games', games), ('skaters', sk), ('goalies', go), ('team_games', tg)]:
             df[df.season == code].to_csv(os.path.join(out, f'{name}.csv.gz'), index=False)
     print(f'{len(games)} games, {len(sk)} skater rows, {len(go)} goalie rows through {games.game_date.max()}')
+
+
+RAW_JSON = 'https://raw.githubusercontent.com/sportsdataverse/fastRhockey-nhl-raw/main/nhl/json/final'
+
+
+def _game_json(gid):
+    import json
+    try:
+        with urllib.request.urlopen(f'{RAW_JSON}/{gid}.json', timeout=120) as r:
+            return json.loads(r.read())
+    except Exception:
+        return None
+
+
+def update(season=CURRENT, lookahead=40):
+    """Daily path with no pyarrow: add newly finished games from the mirror's per-game JSON files to nhl_data/<season>/."""
+    out = os.path.join(CACHE, str(season))
+    have = pd.read_csv(os.path.join(out, 'games.csv.gz')) if os.path.exists(os.path.join(out, 'games.csv.gz')) else pd.DataFrame(columns=['game_id'])
+    done = set(have.game_id.astype(int))
+    base = (season - 1) * 1000000 + 20000          # regular season ids: 2026020001, ...
+    top = max(done) if done else base
+    todo = [g for g in range(max(base + 1, top - 60), top + lookahead) if g not in done]
+    gi, pbp, sk, go, misses = [], [], [], [], 0
+    for gid in todo:
+        d = _game_json(gid)
+        if not d or not d.get('game_info'):
+            if gid > top:
+                misses += 1
+                if misses >= 4: break
+            continue
+        info = pd.DataFrame(d['game_info'])
+        if info.game_state.iloc[0] not in ('OFF', 'FINAL'):
+            continue
+        meta = dict(game_id=gid, season=int(info.season.iloc[0]), game_date=info.game_date.iloc[0])
+        gi.append(info)
+        pbp.append(pd.DataFrame(d['all_plays']).assign(**meta))
+        sk.append(pd.DataFrame(d['skater_stats']).assign(**meta))
+        go.append(pd.DataFrame(d['goalie_stats']).assign(**meta))
+    if not gi:
+        print('no new NHL games'); return 0
+    g2, s2, k2, t2 = assemble(pd.concat(gi, ignore_index=True), pd.concat(pbp, ignore_index=True),
+                              pd.concat(sk, ignore_index=True), pd.concat(go, ignore_index=True))
+    for name, df in [('games', g2), ('skaters', s2), ('goalies', k2), ('team_games', t2)]:
+        f = os.path.join(out, f'{name}.csv.gz')
+        old = pd.read_csv(f) if os.path.exists(f) else pd.DataFrame()
+        pd.concat([old, df], ignore_index=True).drop_duplicates([c for c in ('game_id', 'player_id', 'team') if c in df.columns], keep='last') \
+            .to_csv(f, index=False)
+    print(f'added {len(g2)} NHL games through {g2.game_date.max()}')
+    return len(g2)
 
 
 def load():
@@ -147,8 +203,11 @@ def load():
 
 
 if __name__ == '__main__':
-    # daily: refresh and rebuild only the current season (needs pyarrow to read the mirror's parquet files);
-    # --all rebuilds every season from nhl_data/raw
-    if '--no-fetch' not in sys.argv:
-        fetch(CURRENT)
-    build(SEASONS if '--all' in sys.argv else [CURRENT])
+    # default (daily): add new games from per-game JSON, no pyarrow needed.
+    # --parquet: re-download and rebuild the current season from parquet (needs pyarrow); --all: rebuild every season.
+    if '--parquet' in sys.argv or '--all' in sys.argv:
+        if '--no-fetch' not in sys.argv:
+            fetch(CURRENT)
+        build(SEASONS if '--all' in sys.argv else [CURRENT])
+    else:
+        update()

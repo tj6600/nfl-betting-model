@@ -243,6 +243,6 @@ picks (the model picked 54-61% correctly, DraftKings' favorite 56-62%). Shots-on
 Model weights against the DraftKings no-vig price: moneyline 50%, shots on goal 50%, saves 50%, puck line 25%, total 25%.
 Winner picks also join the "Most likely to hit" parlay pool, priced no shorter than -200.
 
-A daily run would be: `pip install pyarrow` (to read the mirror's parquet files), `python -m nhlmodel.data` (rebuilds
-the current season only, since past seasons are committed in `nhl_data/<year>/`), `python scripts/nhl_grade.py`,
-optionally `python -m nhlmodel.odds props` (costs credits), then `python scripts/nhl_board.py`.
+Daily run: `python -m nhlmodel.data` adds newly finished games from the mirror's per-game JSON files to
+`nhl_data/<year>/`. It needs no pyarrow; `--parquet` / `--all` rebuild from parquet instead. Then run
+`python scripts/nhl_grade.py`, `python -m nhlmodel.odds props` (about 2 credits per game), and `python scripts/nhl_board.py`.
