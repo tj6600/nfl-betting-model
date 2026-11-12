@@ -20,7 +20,8 @@ const POOL = (D.pool || []).map((id) => LEG[id]).filter(Boolean);
 function buildSlips(size, n = 6) {
   const out = [], used = new Set();
   for (let s = 0; s < n; s++) {
-    const slip = [], g = {}, pl = new Set(), perGame = size > 6 ? 3 : 1;   // big slips need several legs per game
+    const nG = new Set(POOL.map((L) => L.game)).size;
+    const slip = [], g = {}, pl = new Set(), perGame = Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / Math.max(1, nG))));   // more per game only when the slate is too small
     for (const L of POOL) {
       if (used.has(L.id) || (g[L.game] || 0) >= perGame || (L.pid && pl.has(L.pid))) continue;
       slip.push(L.id); g[L.game] = (g[L.game] || 0) + 1; if (L.pid) pl.add(L.pid);
