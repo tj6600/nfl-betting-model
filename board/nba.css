@@ -1,0 +1,18 @@
+.gcards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+@media (max-width: 400px) { .gcards { grid-template-columns: 1fr; } }
+.gcard .colhead h2 { font-size: 24px; }
+.gcard table.res td, .gcard table.res th { padding: 6px 8px; font-size: 14px; }
+.gcard table.res td:first-child, .gcard table.res th:first-child { padding-left: 14px; white-space: normal; }
+.gcard .add { min-width: 0; padding: 4px 8px; }
+.gcard .outs { padding: 8px 14px 12px; font-size: 13px; color: var(--muted); }
+.gcard .proj { padding: 10px 14px 4px; display: flex; gap: 18px; flex-wrap: wrap; }
+.gcard .proj div { display: flex; flex-direction: column; }
+.gcard .proj b { font-family: var(--display); font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.gcard .proj span { font-size: 12px; color: var(--muted); }
+.track .range { position: absolute; top: 1px; bottom: 1px; background: var(--bar); border-radius: 4px; }
+.track .mark { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1px; border-radius: 2px; background: var(--turf); }
+.track .line { position: absolute; top: -6px; bottom: -6px; width: 2px; margin-left: -1px; background: var(--tick); }
+table.log td, table.log th { padding: 5px 10px; }
+table.log td.hit { color: var(--pos); font-weight: 600; }
+.logpanel .tablewrap { padding: 0 6px 6px; }
+.lchips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 10px; }

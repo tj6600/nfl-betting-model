@@ -161,3 +161,18 @@ Set `NFL_GAMES_CSV` to a local copy of nflverse `games.csv` (clone `nflverse/nfl
 3. Key-number-aware margin distribution (3, 7, 10) in place of the normal approximation
 4. "Optimal" and "secure" leg ranking with expected value and fractional Kelly staking
 5. Measure closing line value using opening lines
+
+## NBA board (`nbamodel/`, `board/site/nba.html`)
+
+Data comes from [sportsdataverse hoopR](https://github.com/sportsdataverse/hoopR-nba-data) on raw.githubusercontent.com (stats.nba.com and ESPN are blocked from the cloud environment): ESPN box scores for every player-game since 2021-22, plus ESPN's listed lines (DraftKings from 2025-26, consensus before). It is cached in `nba_data/`; `--update` adds new games from hoopR's per-game JSON, so scheduled runs need only numpy and pandas.
+
+| Step | Command |
+|---|---|
+| Rebuild history (one-off, needs pyarrow) | `python scripts/nba_build_history.py` |
+| DraftKings game lines (3 credits) | `python -m nbamodel.odds games` |
+| Player props for a slate (~5 credits a game) | `python -m nbamodel.odds props [YYYY-MM-DD]` |
+| Build the page | `python scripts/nba_board.py --update` |
+| Backtests | `python scripts/nba_backtest.py`, `python scripts/nba_props_backtest.py` |
+
+- **Game model** (`nbamodel/games.py`): recency-weighted ridge ratings on points scored, with home court, back-to-backs and the value of regulars who sat the team's previous game. Walk-forward against the listed spread, 2023-24 to 2025-26: **50.1% ATS over 3,742 games** (break-even 52.4%), totals 49.0%. Margin error 11.3 vs the line's 10.8. A regression of results on line and model gives the model a weight of about 0.07, so the board shows game chances as 25% model, 75% DraftKings no-vig.
+- **Props** (`nbamodel/props.py`): minutes x per-minute rate (shrunk to position) x opponent-by-position factor x game-total factor. Average miss beats season-to-date and last-10 averages (points 4.88 vs 5.02). Over/under chances come from the empirical spread of actual vs projected and are calibrated against a stand-in line (season average rounded to the half point). There are no historical prop lines, so the board blends 50/50 with DraftKings, as on the NFL board.
