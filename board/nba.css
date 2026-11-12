@@ -23,3 +23,5 @@ table.log td.hit { color: var(--pos); font-weight: 600; }
 .savedrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px 0; }
 .savedchip { display: inline-flex; align-items: center; gap: 2px; }
 .savedchip .chip { padding: 4px 10px; font-size: 13px; }
+.sugnav .seg button { padding: 6px 10px; }
+.sugbest { font-size: 12px; }
