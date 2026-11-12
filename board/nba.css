@@ -16,3 +16,10 @@ table.log td, table.log th { padding: 5px 10px; }
 table.log td.hit { color: var(--pos); font-weight: 600; }
 .logpanel .tablewrap { padding: 0 6px 6px; }
 .lchips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 10px; }
+.sugnav { display: flex; align-items: center; gap: 10px; padding: 10px 14px 0; flex-wrap: wrap; }
+.sugnav .lnk:not(.sugb) { font-size: 22px; line-height: 1; padding: 0 6px; }
+.suglab { font: 600 14px var(--body); min-width: 130px; text-align: center; }
+.sugnav .sugb { margin-left: auto; }
+.savedrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px 0; }
+.savedchip { display: inline-flex; align-items: center; gap: 2px; }
+.savedchip .chip { padding: 4px 10px; font-size: 13px; }
