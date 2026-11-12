@@ -635,8 +635,10 @@ function sugPool() {
   return v.concat(nv);
 }
 function buildSlips(size, n = 6) {
-  const pool = sugPool(), one = state.game !== 'all', out = [], used = new Set();
-  const perGame = one ? size : size > 6 ? 3 : 1;
+  const pool = sugPool(), out = [], used = new Set();
+  const nG = new Set(pool.map((l) => l.game)).size, one = state.game !== 'all' || nG === 1;   // a window can hold just one game
+  // across games: 1 leg per game, more only when the scope has too few games to fill the slip (max 3 per game)
+  const perGame = one ? size : Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / nG)));
   for (let s = 0; s < n; s++) {
     const pick = [], g = {}, gl = {}, team = {};
     for (const l of pool) {
