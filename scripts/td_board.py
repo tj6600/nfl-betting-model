@@ -45,6 +45,10 @@ for r in A.itertuples():
         why = ', '.join(bits)
         if r.missed_n >= 1:
             why = f"Missed the last {int(r.missed_n)} game{'s' if r.missed_n > 1 else ''}, so his usage is from before that. " + why
+    no_role = r.h_carries + r.h_targets < 0.05
+    if no_role:
+        why = (f"No carries or targets yet this season{f' (depth chart {r.position}{int(r.dc_rank)})' if r.dc_rank == r.dc_rank else ''}, "
+               f"so this is the model's baseline for a player without a role; team expected to score {r.imp_pts:.1f}.")
     out.append(dict(id=r.pid, name=r.full_name, team=r.posteam, opp=r.defteam, home=home, away=away, game=r.game,
                     day=str(g.gameday.date()), time=str(g.gametime), weekday=str(g.weekday), pos=r.position,
                     model=round(r.model_prob * 100, 1), book=num(r.book_prob, lambda v: round(v * 100, 1)),
@@ -52,7 +56,7 @@ for r in A.itertuples():
                     median=num(r.median_price, round), ev=num(r.ev, lambda v: round(v * 100, 1)),
                     cat=r.category if isinstance(r.category, str) else '',
                     carries=round(r.h_carries, 1), targets=round(r.h_targets, 1), gl=round(r.h_gl_share * 100), rz=round(r.h_rz_share * 100),
-                    tdpg=round(r.h_tds, 2), room=round(r.room_share * 100), last=round(r.last_share * 100), missed=int(r.missed_n),
+                    tdpg=round(r.h_tds, 2), room=round(r.room_share * 100), last=round(r.last_share * 100), missed=0 if no_role else int(r.missed_n),
                     imp=round(r.imp_pts, 1), deftd=round(r.def_td, 2), why=why,
                     depth=num(r.dc_rank, int), depthPrev=num(r.dc_prev, int),
                     books=[dict(b=b.book, p=int(b.price)) for b in bks.itertuples()]))
