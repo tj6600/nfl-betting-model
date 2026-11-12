@@ -8,7 +8,7 @@ const headStep = (p) => {
 };
 const MS = (D.milestones || []).map((p) => { const h = headStep(p); return { ...p, head: h, p: h.p, ev: Math.max(...p.steps.map((x) => x.ev)) }; });
 const state = { tab: 'td', cat: 'all', game: 'all', win: 'all', pos: 'all', q: '', sort: null, small: true, open: null };
-const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(MS.length ? [['ms', 'Milestones']] : []).concat(D.legs ? [['parlay', 'Parlay builder']] : []).concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
+const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(YD.some((p) => p.market === 'pass') ? [['pass', 'Passing yards']] : []).concat(MS.length ? [['ms', 'Milestones']] : []).concat(D.legs ? [['parlay', 'Parlay builder']] : []).concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
 const PILL = { 'TD value': 'value', 'Value': 'value', 'Most likely': 'likely', 'Check role': 'check', 'Likely hit': 'likely' };
 const fmtOdds = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
@@ -39,6 +39,12 @@ const CONF = {
     pos: ['all', 'WR', 'TE', 'RB'],
     sorts: [['ev', 'Sort: expected value'], ['chance', 'Sort: chance of lean'], ['gap', 'Sort: projection vs line'], ['line', 'Sort: line']],
   },
+  pass: {
+    lede: 'Each starting quarterback\'s projected passing yards against the over/under lines. The bar shows the model\'s likely range, its median and the line. Open a player to see every book\'s line.',
+    cats: [['all', 'All players'], ['Value', 'Value'], ['Check role', 'Check role']],
+    pos: ['all'],
+    sorts: [['ev', 'Sort: expected value'], ['chance', 'Sort: chance of lean'], ['gap', 'Sort: projection vs line'], ['line', 'Sort: line']],
+  },
   ms: {
     lede: 'Chances to reach yardage milestones, like 40+ receiving or 50+ rushing, priced against the books\' alternate lines. Each chip is one milestone and its chance. Open a player for every milestone with its best price.',
     cats: [['all', 'All players'], ['Likely hit', 'Likely hit'], ['Value', 'Value']],
@@ -50,6 +56,7 @@ const SEG = { all: 'All', rush: 'Rushing', rec: 'Receiving' };
 const MS_LEGEND = '<span><i style="width:22px;height:12px;border-radius:4px;background:color-mix(in srgb, var(--turf) 70%, transparent)"></i>Darker chip = likelier</span><span><span class="pill likely">Likely hit</span> 80%+ chance</span><span><span class="pill value">Value</span> 5%+ EV at the best price</span>';
 const MS_FOOT = 'Each chance blends the yards model 50/50 with the books\' own chance (their alternate-line price with an estimated 6% margin taken out). Likely hit means 80%+ for a regular with no role flags. Expect most likely hits to show a small negative EV: books price heavy favorites like -400 to -1800 with extra margin, so a likely hit is safe for a parlay leg but rarely value on its own. Value needs 5%+ EV and at least two books offering the milestone.';
 const YARDS_LEGEND = '<span><i style="width:26px;height:8px;border-radius:3px;background:var(--bar)"></i>Middle half of outcomes</span><span><i style="width:3px;height:14px;background:var(--turf)"></i>Model median</span><span><i style="width:2px;height:14px;background:var(--tick)"></i>Book line</span><span><span class="pill value">Value</span></span><span><span class="pill check">Check role</span></span>';
+const PASS_FOOT = 'The passing model projects each expected starter from his recent passing yards and attempts, his team\'s expected points and margin (teams that trail throw more), and the passing yards the defense has allowed lately. Fit on earlier seasons and tested on the next, it missed by 53 to 57 yards a game in 2024, 2025 and 2026, against 56 to 60 for the QB\'s season average. There are no past prop lines to test against, so the chance shown blends the model 50/50 with the books\' no-vig chance. Value needs 57%+ and 5%+ EV at the best line. The starter is whoever started the team\'s latest game and is on the active roster; check the news for late QB changes.';
 const YARDS_FOOT = 'The yards model projects each player from his recent yards and usage, his recent role, his team\'s expected points and margin (teams that lead run more), and the opponent\'s yards allowed to his position. It beat each player\'s recent average on 2024 and 2025 games, and its over/under chances were well calibrated there. Yards are lopsided: a few big games pull the average up, so the median is usually below the average and unders win a bit more often than averages suggest. There are no past prop lines to test against, so the chance shown blends the model 50/50 with the books\' no-vig chance. Value needs 57%+ and 5%+ EV at the best line. Check role means he missed his last game, the depth chart moved him down, or the model and line are more than 25% apart (the books likely know something). "Small roles" means under 8 carries or 3 targets a game.';
 
 function renderTabs() {
@@ -247,9 +254,9 @@ function ydRow(p) {
   return rowShell(p, [who(p), m, pr], ydDetail);
 }
 function ydDetail(p) {
-  const d = el('div', 'detail'); const rush = p.market === 'rush';
-  const a = el('div'); a.append(el('h3', null, 'Recent form'), stats([[p.recent.toFixed(0), `${rush ? 'rushing' : 'receiving'} yds a game`],
-    [(rush ? p.carries : p.targets).toFixed(1), rush ? 'carries a game' : 'targets a game'], [`${p.q25.toFixed(0)}–${p.q75.toFixed(0)}`, 'likely range'],
+  const d = el('div', 'detail'); const rush = p.market === 'rush', pass = p.market === 'pass';
+  const a = el('div'); a.append(el('h3', null, 'Recent form'), stats([[p.recent.toFixed(0), `${rush ? 'rushing' : pass ? 'passing' : 'receiving'} yds a game`],
+    [(rush || pass ? p.carries : p.targets).toFixed(1), rush ? 'carries a game' : pass ? 'attempts a game' : 'targets a game'], [`${p.q25.toFixed(0)}–${p.q75.toFixed(0)}`, 'likely range'],
     [p.imp.toFixed(1), 'team expected pts'], [(p.margin > 0 ? '+' : '') + p.margin.toFixed(1), 'expected margin'], [(p.defyds > 0 ? '+' : '') + p.defyds.toFixed(0), `yds vs avg allowed to ${p.pos}s`]]));
   const b = el('div'); b.append(el('h3', null, 'Chances'));
   const ch = el('div', 'books');
@@ -268,7 +275,7 @@ function ydDetail(p) {
     bk.append(r);
   }
   c.append(bk);
-  const lb = logButton(p.pid, { kind: p.market, line: p.line, side: p.lean }); if (lb) a.append(lb);
+  const lb = pass ? null : logButton(p.pid, { kind: p.market, line: p.line, side: p.lean }); if (lb) a.append(lb);
   d.append(a, b, c); return d;
 }
 // ---- milestones ----
@@ -353,7 +360,7 @@ const PS = { kind: 'all', mode: 'value', q: '', plus: true, clean: true, price: 
 try { PS.mode = localStorage.getItem('props-mode') === 'likely' ? 'likely' : 'value'; } catch (e) {}
 // market of a leg, for the filter: game lines split into moneyline / spread / total
 const mkt = (l) => (l.kind !== 'Game' ? l.kind : /moneyline/i.test(l.label) ? 'ML' : /^(Over|Under)/.test(l.label) ? 'Total' : 'Spread');
-const MKTS = [['all', 'All'], ['ML', 'Moneyline'], ['Spread', 'Spread'], ['Total', 'Game total'], ['TD', 'TDs'], ['Rush', 'Rush yds'], ['Rec', 'Rec yds'], ['Milestone', 'Milestones']];
+const MKTS = [['all', 'All'], ['ML', 'Moneyline'], ['Spread', 'Spread'], ['Total', 'Game total'], ['TD', 'TDs'], ['Pass', 'Pass yds'], ['Rush', 'Rush yds'], ['Rec', 'Rec yds'], ['Milestone', 'Milestones']];
 // one row per bet: both sides of an over/under or spread together, so either side can be picked
 const GROUPS = Object.values(LEGS.reduce((acc, l) => { (acc[l.grp] = acc[l.grp] || { grp: l.grp, title: l.gt, kind: l.kind, sides: [] }).sides.push(l); return acc; }, {}))
   .map((g) => { g.sides.sort((a, b) => (a.sl === 'Over' ? -1 : b.sl === 'Over' ? 1 : 0)); g.flag = g.sides.map((x) => x.flag).find((f) => f && f !== 'season disagrees') || '';
@@ -527,7 +534,7 @@ function renderParlay() {
       nm.type = 'button'; nm.title = 'Season game log';
       nm.onclick = () => { const c = g.sides.find((x) => x.id === PS.sel[g.grp]) || g.sides.find((x) => slip.includes(x.id)) || g.sides.reduce((a, b) => (b.edge > a.edge ? b : a));
         const num = Number((c.label.match(/[\d.]+/) || [])[0]);
-        showLog(l0.pid, l0.kind === 'TD' ? { kind: 'td' } : l0.kind === 'Game' ? null : { kind: /rush/.test(c.label) ? 'rush' : 'rec', line: l0.kind === 'Milestone' ? num - 0.5 : num, side: l0.kind === 'Milestone' ? 'Over' : c.sl }); };
+        showLog(l0.pid, l0.kind === 'TD' ? { kind: 'td' } : l0.kind === 'Game' || l0.kind === 'Pass' ? null : { kind: /rush/.test(c.label) ? 'rush' : 'rec', line: l0.kind === 'Milestone' ? num - 0.5 : num, side: l0.kind === 'Milestone' ? 'Over' : c.sl }); };
     }
     const mv = l0.pid && LOGS[l0.pid] && LOGS[l0.pid].move;
     w.append(nm, el('span', 's', `${kindName} · ${l0.game}${cat ? ' · ' + cat : ''}${g.flag ? ' · ' + g.flag : ''}${mv ? ` · new team (from ${mv.frm})` : ''}`));
@@ -640,7 +647,7 @@ function render() {
   const cf = CONF[state.tab];
   document.getElementById('lede').textContent = cf.lede;
   document.getElementById('legend').innerHTML = state.tab === 'td' ? cf.legend : state.tab === 'ms' ? MS_LEGEND : YARDS_LEGEND;
-  document.getElementById('foot').textContent = (state.tab === 'td' ? cf.foot : state.tab === 'ms' ? MS_FOOT : YARDS_FOOT) + ` Odds are from The Odds API, taken ${state.tab === 'td' ? D.taken : state.tab === 'ms' ? (D.altTaken || D.yardsTaken) : D.yardsTaken}. Check injury news and current prices before using any of this. These are tracking picks, not betting advice.`;
+  document.getElementById('foot').textContent = (state.tab === 'td' ? cf.foot : state.tab === 'ms' ? MS_FOOT : state.tab === 'pass' ? PASS_FOOT : YARDS_FOOT) + ` Odds are from The Odds API, taken ${state.tab === 'td' ? D.taken : state.tab === 'ms' ? (D.altTaken || D.yardsTaken) : D.yardsTaken}. Check injury news and current prices before using any of this. These are tracking picks, not betting advice.`;
   renderTabs(); renderGames(); renderPos(); renderSort();
   const { base, list } = filtered(); renderCats(base);
   document.getElementById('count').textContent = `${list.length} player${list.length === 1 ? '' : 's'}`;

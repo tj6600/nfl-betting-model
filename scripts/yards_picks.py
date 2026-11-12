@@ -10,7 +10,7 @@ ROOT = os.path.join(os.path.dirname(__file__), '..')
 import numpy as np, pandas as pd
 from nflmodel.model import G
 from nflmodel.odds import all_snapshots, TEAMS
-from nflmodel import touchdowns as T, yards as Y
+from nflmodel import touchdowns as T, yards as Y, passing as PY
 
 VALUE_EV, VALUE_P, MIN_BOOKS = 0.05, 0.57, 3
 W_MODEL = 0.5           # untested against real prop lines, so the model's chance is blended 50/50 with the books' no-vig chance
@@ -55,7 +55,8 @@ rows = []
 for e in json.load(open(f)):
     for bk in e.get('bookmakers', []):
         for m in bk['markets']:
-            kind = 'rush' if m['key'] == 'player_rush_yds' else 'rec'
+            kind = {'player_rush_yds': 'rush', 'player_reception_yds': 'rec', 'player_pass_yds': 'pass'}.get(m['key'])
+            if kind is None: continue
             for o in m['outcomes']:
                 if o.get('description') and o.get('point') is not None:
                     rows.append({'home_team': TEAMS.get(e['home_team']), 'away_team': TEAMS.get(e['away_team']), 'kind': kind,
@@ -65,7 +66,58 @@ P['k'] = T._key(P.full_name)
 dec = lambda o: np.where(o < 0, 1 + 100 / -o, 1 + o / 100)
 out = []; per_book = []
 PARLAY_BOOKS = ['DraftKings', 'FanDuel']   # the books Thomas uses; per-book prices feed the parlay builder
+# ---- passing yards (nflmodel/passing.py): this week's expected starter for each team ----
+QS = PY.load(range(2021, season + 1))
+pb, pspread = PY.fit(PY.features(QS))
+out_names = set()
+if os.path.exists(ov_path):
+    ov = pd.read_csv(ov_path); out_names = set(ov[(ov.season == season) & (ov.week == week) & (ov.status == 'Out')].player)
+teams = list(lines.home_team) + list(lines.away_team)
+QB = PY.current(QS, season, week, teams, out_names)
+ctx = T.implied_points(lines).merge(Y.team_margin(lines), on=['game_id', 'posteam'])
+opp = pd.concat([lines[['game_id', 'home_team', 'away_team']].rename(columns={'home_team': 'posteam', 'away_team': 'defteam'}),
+                 lines[['game_id', 'home_team', 'away_team']].rename(columns={'away_team': 'posteam', 'home_team': 'defteam'})])
+dn = PY.defense(QS).sort_values('gameday').groupby('defteam').def_now.last().rename('def_prior').reset_index()
+QB = QB.merge(ctx, on='posteam').merge(opp, on=['game_id', 'posteam']).merge(dn, on='defteam', how='left')
+QB = QB.merge(lines[['game_id', 'home_team', 'away_team']], on='game_id')
+QB['k'] = T._key(QB.name)
+QB['mu'] = PY.predict(pb, QB) if len(QB) else []
+print(f'{len(QB)} expected starting QBs priced for passing yards')
 for (home, away, k, kind), grp in O.groupby(['home_team', 'away_team', 'k', 'kind']):
+    if kind == 'pass':
+        pl = QB[(QB.home_team == home) & (QB.away_team == away) & (QB.k == k)]
+        if pl.empty: continue
+        r = pl.iloc[0]; mu = float(r.mu)
+        imp = lambda o: np.where(o < 0, -o / (-o + 100.0), 100.0 / (o + 100.0))
+        po = float(imp(grp[grp.side == 'Over'].price.median())) if (grp.side == 'Over').any() else np.nan
+        pu = float(imp(grp[grp.side == 'Under'].price.median())) if (grp.side == 'Under').any() else np.nan
+        mkt_over = po / (po + pu) if po == po and pu == pu else np.nan
+        for (bkn, pt), bg in grp[grp.book.isin(PARLAY_BOOKS)].groupby(['book', 'point']):
+            o = bg[bg.side == 'Over']; u = bg[bg.side == 'Under']
+            pov = float(pspread.p_over([mu], [pt])[0]); nv = None
+            if len(o) and len(u):
+                io, iu = float(imp(o.price.iloc[0])), float(imp(u.price.iloc[0])); nv = io / (io + iu)
+            for side, sg in [('Over', o), ('Under', u)]:
+                if not len(sg): continue
+                per_book.append(dict(pid=r.pid, kind='pass', book=bkn, side=side, point=pt, price=int(sg.price.iloc[0]), model_only=pov if side == 'Over' else 1 - pov,
+                                     book_p=(nv if side == 'Over' else 1 - nv) if nv is not None else np.nan))
+        cons = grp.point.median()
+        for side in ['Over', 'Under']:
+            g2 = grp[grp.side == side]
+            if g2.empty: continue
+            x = g2.sort_values(['point', 'price'], ascending=[side == 'Over', False]).iloc[0]
+            p_over = float(pspread.p_over([mu], [x.point])[0]); model_p = p_over if side == 'Over' else 1 - p_over
+            mkt = (mkt_over if side == 'Over' else 1 - mkt_over) if mkt_over == mkt_over else model_p
+            p = W_MODEL * model_p + (1 - W_MODEL) * mkt
+            out.append(dict(game=f'{away} @ {home}', pid=r.pid, team=r.posteam, opp=r.defteam, player=r['name'], position='QB',
+                            market='Passing yards', side=side, line=cons, best_line=x.point, best_price=int(x.price), best_book=x.book,
+                            books=g2.book.nunique(), projection=round(mu, 1), median=round(float(pspread.quantile([mu], .5)[0]), 1),
+                            q25=round(float(pspread.quantile([mu], .25)[0]), 1), q75=round(float(pspread.quantile([mu], .75)[0]), 1),
+                            model_only=model_p, market_prob=mkt, model_prob=p, ev=p * float(dec(x.price)) - 1,
+                            carries=r.h_attempts, targets=0.0, recent_yds=r.h_passing_yards, imp_pts=r.imp_pts, exp_margin=r.exp_margin,
+                            def_yds=r.def_prior, missed_n=r.missed_last, dc_rank=np.nan, dc_prev=np.nan, dc_demoted=0.0,
+                            volume=r.h_starts, regular=bool(r.h_starts >= 3)))
+        continue
     pl = P[(P.home_team == home) & (P.away_team == away) & (P.k == k)]
     if pl.empty or pl.iloc[0].position not in Y.STATS[kind]['pos']:
         continue
@@ -140,7 +192,7 @@ if af:
                         rows.append({'home_team': TEAMS.get(e['home_team']), 'away_team': TEAMS.get(e['away_team']), 'kind': kind,
                                      'player': o['description'], 'point': pt, 'price': o['price'], 'book': bk['title']})
     A = pd.DataFrame(rows); A['k'] = T._key(A.player)
-    base_rows = M.drop_duplicates(['pid', 'market']).copy()
+    base_rows = M[M.market != 'Passing yards'].drop_duplicates(['pid', 'market']).copy()
     base_rows['kind'] = np.where(base_rows.market.str.startswith('Rush'), 'rush', 'rec')
     base_rows['k'] = T._key(base_rows.player)
     imp = lambda o: np.where(o < 0, -o / (-o + 100.0), 100.0 / (o + 100.0))
