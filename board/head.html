@@ -162,7 +162,10 @@ table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
 .warns .bad { color: var(--risk); } .warns .warn { color: var(--gold); } .warns .info { color: var(--muted); }
 .leg .who .n { white-space: normal; }
 @media (max-width: 520px) { .leg { grid-template-columns: minmax(0, 1fr) auto; } .leg .who { grid-column: 1 / -1; } .leg .price, .leg .sidebox { align-items: flex-start; } }
-@media (max-width: 720px) { .slip { position: static; } .pllist { max-height: 60vh; } }
+@media (max-width: 720px) { .slip { position: static; } }
+/* the leg list scrolls inside its box only on wide screens; on phones and tablets the page itself scrolls */
+@media (max-width: 1024px) { .pllist { max-height: none; overflow: visible; } }
+.lnk.more { display: block; width: 100%; padding: 14px; text-align: center; font-size: 14px; }
 .empty { padding: 24px 14px; color: var(--muted); }
 @media (max-width: 560px) {
   .row { grid-template-columns: minmax(0, 1fr) auto; }
@@ -179,6 +182,7 @@ table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
 .savedrow .lnk { font-size: 13px; }
 .savedchip { display: inline-flex; align-items: center; gap: 2px; }
 .savedchip .chip { padding: 4px 10px; font-size: 13px; }
+.lnk.althint { font-size: 12px; font-weight: 600; text-align: right; white-space: normal; }
 .seglab { flex-basis: 100%; font-size: 12px; margin-bottom: -4px; }
 /* Phones: nothing should need a sideways swipe except a wide table. Tabs, game buttons and button groups wrap
    onto extra lines instead of scrolling (clipped .seg groups used to hide filters past the screen edge). */
