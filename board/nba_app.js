@@ -280,7 +280,21 @@ function boardParlay() {
 
 function boardRecord() {
   const B = $('board'); B.innerHTML = '';
-  const bt = D.backtest; if (!bt.rows) { B.append(el('div', 'empty', 'No backtest yet.')); return; }
+  const bt = D.backtest;
+  const lv = D.live;
+  const fmtp = (x) => x == null ? '—' : (x * 100).toFixed(1) + '%';
+  const liveRows = lv ? lv.groups.concat(lv.by_kind || []).filter((g) => g.bets || g.clv_n) : [];
+  if (liveRows.length) {
+    const c = el('div', 'col'); const h = el('div', 'colhead'); h.append(el('h2', null, 'Live record at DraftKings'), el('span', null, `${lv.days.length} slate${lv.days.length > 1 ? 's' : ''} logged`)); c.append(h);
+    const tw = el('div', 'tablewrap'); const t = el('table', 'res'); const hr = el('tr');
+    ['Group', 'Bets', 'W-L', 'Hit', 'Expected', 'Units', 'ROI', 'Beat close', 'Lost to close'].forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr);
+    liveRows.forEach((g) => { const tr = el('tr'); [g.group, g.bets, `${g.won}-${g.lost}`, g.bets ? fmtp(g.hit) : '—', fmtp(g.exp_hit), g.bets ? sgn(g.units) : '—', g.bets ? sgn(Math.round(g.roi * 1000) / 10) + '%' : '—',
+      g.clv_n ? fmtp(g.beat) : '—', g.clv_n ? fmtp(g.lost_clv) : '—'].forEach((x, i) => tr.append(el('td', i ? 'num' : null, String(x)))); t.append(tr); });
+    tw.append(t); c.append(tw);
+    c.append(el('p', 'note logfoot', 'Every priced leg is logged when the board is built (about 2:47 PM ET) and graded at that DraftKings price, 1 unit per leg; players who sit are void. Beat close = DraftKings moved its line toward our side by tip-off, or kept the line and raised our side\'s chance by half a point or more. Beating the close more often than losing to it is the earliest sign of a real edge; results take hundreds of bets to mean much.'));
+    c.style.marginBottom = '16px'; B.append(c);
+  }
+  if (!bt.rows) { B.append(el('div', 'empty', 'No backtest yet.')); return; }
   const tiles = el('div', 'tiles');
   const r0 = bt.rows[0];
   [[`${(r0.ats * 100).toFixed(1)}%`, 'Against the spread', `${r0.ats_n} games, ${bt.seasons}. Break-even is 52.4%.`],
