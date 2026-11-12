@@ -224,3 +224,9 @@ moneylines and puck lines.
 
 The shots-on-goal blend is the only lead, and it's concentrated in March and April (153 of the 231 bets).
 November to January was flat or negative. Treat it as unproven until it's tested on another season.
+
+**2026-27 retest (shots on goal only, 495 credits, 5 nights, 822 lines).** Fit on 2024-26 and run with
+`python scripts/nhl_props_backtest.py --season 2026-27`. Log loss: model 0.6772, DK 0.6792, blend **0.6765**. Every
+blend pick with positive EV: 139 bets, 59.0% hit, +9.3% ROI. At EV 3%+: 40 bets, 60.0% hit, +13.0% ROI, all but
+one unders. Betting every under blindly lost 4.6%, so the gain comes from which unders the model picks. Three of
+the five nights were profitable. That's encouraging, but the sample is still small.
