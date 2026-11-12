@@ -28,6 +28,7 @@ try { mode = localStorage.getItem('nhl-mode') === 'likely' ? 'likely' : 'value';
 let POOL = mode === 'likely' ? LIKELY_POOL : VALUE_POOL;
 // market filter: pick any mix of markets (e.g. Points + Assists); none picked = every market. Suggestions follow it.
 let KINDS = new Set();
+const OPEN = new Set(), GLIM = {};
 try { KINDS = new Set(JSON.parse(localStorage.getItem('nhl-kinds') || '[]')); } catch (e) {}
 const kindOk = (L) => !KINDS.size || KINDS.has(L.kind);
 const MKTS = [...new Set(D.legs.map((L) => L.kind))];
@@ -245,12 +246,27 @@ function boardParlay() {
     if (state.pq) ls = ls.filter((l) => (l.label + ' ' + l.game).toLowerCase().includes(state.pq));
     ls.sort(mode === 'likely' ? (a, b) => (b.edge >= 1) - (a.edge >= 1) || b.p - a.p : (a, b) => b.edge - a.edge);
     if (!ls.length) pl.append(el('div', 'empty', 'No legs match.'));
-    ls.slice(0, 200).forEach((L) => {
+    const row = (L) => {
       const r = el('div', 'leg'); const who = el('div', 'who');
       who.append(legLabel(L, 'n'), el('span', 's', `${L.kind} · ${L.game}${L.flags.length ? ' · ' + L.flags.join('; ') : ''}`));
       const sb = el('div', 'sidebox'); sb.append(el('span', 'o', fmt(L.price)), el('span', 'e ' + (L.edge > 0 ? 'pos' : 'neg'), `${pct(L.p)} · ${sgn(L.edge)}`));
-      r.append(who, sb, addBtn(L.id)); pl.append(r);
-    });
+      r.append(who, sb, addBtn(L.id)); return r;
+    };
+    // phones and tablets: one tap-to-open section per market, so you can jump between markets without scrolling past every leg
+    if (matchMedia('(max-width: 1024px)').matches) {
+      const ks = MKTS.filter((k) => ls.some((L) => L.kind === k));
+      ks.forEach((k) => {
+        const gl = ls.filter((L) => L.kind === k), lim = GLIM[k] || 25;
+        const d = el('details', 'mgrp'); d.open = OPEN.has(k) || ks.length === 1 || !!state.pq;
+        const sm = el('summary'); sm.append(el('span', 'mname', k), el('span', 'dim', `${gl.length} leg${gl.length > 1 ? 's' : ''} · best ${mode === 'likely' ? pct(gl[0].p) : sgn(gl[0].edge)}`));
+        d.append(sm); d.ontoggle = () => { if (d.open) OPEN.add(k); else OPEN.delete(k); };
+        gl.slice(0, lim).forEach((L) => d.append(row(L)));
+        if (gl.length > lim) { const m = el('button', 'lnk more', `Show more ${k} (${gl.length - lim} left)`); m.type = 'button'; m.onclick = () => { GLIM[k] = lim + 25; OPEN.add(k); drawList(); }; d.append(m); }
+        pl.append(d);
+      });
+      return;
+    }
+    ls.slice(0, 200).forEach((L) => pl.append(row(L)));
   }
   drawList();
   const sl = el('div', 'col slip');
