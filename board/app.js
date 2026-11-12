@@ -82,6 +82,8 @@ function renderGames() {
   for (const g of games) {
     const b = el('button', 'game'); b.type = 'button';
     b.append(el('span', 'm', `${g.away} @ ${g.home}`), el('span', 't', `${DAY[g.weekday] || g.weekday} ${clock(g.time)} ET`));
+    const wx = (D.weather || {})[g.game];
+    if (wx && wx.desc !== 'Indoors' && wx.desc !== 'No forecast yet') { const t = el('span', 't' + (wx.note ? ' wxbad' : ''), wx.desc); t.title = wx.note ? `Projections adjusted: ${wx.note}` : 'No weather adjustment'; b.append(t); }
     b.setAttribute('aria-pressed', state.game === g.game);
     b.onclick = () => { state.game = state.game === g.game ? 'all' : g.game; state.win = 'all'; state.open = null; render(); };
     box.append(b);
@@ -277,6 +279,8 @@ function ydDetail(p) {
   }
   b.append(ch);
   if (p.note) { const n = el('p', 'note', p.note); n.style.marginTop = '8px'; b.append(n); }
+  const wx = (D.weather || {})[p.game];
+  if (wx && wx.note) { const n = el('p', 'note', `Weather (${wx.desc}): projection adjusted for ${wx.note.split(', ').filter((x) => x.startsWith({ rush: 'rush', rec: 'rec', recs: 'catches', pass: 'pass' }[p.market])).join(', ') || 'none for this stat'}.`); n.style.marginTop = '8px'; b.append(n); }
   const c = el('div'); c.append(el('h3', null, 'Lines by book'));
   const bk = el('div', 'books');
   for (const x of p.books) {

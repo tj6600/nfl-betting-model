@@ -36,6 +36,12 @@ ov_path = os.path.join(ROOT, 'odds_log', 'injury_overrides.csv')
 ov = pd.read_csv(ov_path) if os.path.exists(ov_path) else None
 P = T.upcoming(season, week, T.implied_points(lines), ov)
 P['model_prob'] = T.predict(b, T.design(P))
+# weather: rain cut TD rates in backtests (odds_log/weather_props.json); scale the expected scoring rate
+from nflmodel import weather as W
+WX = W.prop_weather(target)
+P = P.merge(WX[['game_id', 'm_td']], on='game_id', how='left')
+P['m_td'] = P.m_td.fillna(1.0)
+P['model_prob'] = 1 - (1 - P.model_prob) ** P.m_td
 # depth chart (shown and used as a flag, not in the model: on 2026 games it did not improve the predictions
 # because recent usage already carries the same information)
 try:
