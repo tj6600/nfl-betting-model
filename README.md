@@ -155,6 +155,21 @@ These scripts need `ODDS_API_KEY` (free key from the-odds-api.com, 500 credits a
 
 Set `NFL_GAMES_CSV` to a local copy of nflverse `games.csv` (clone `nflverse/nfldata`).
 
+## Passing yards props (`nflmodel/passing.py`)
+
+QB passing yards over/unders. The data is nflverse weekly player stats (`stats_player_week_<year>.csv`, downloaded from the github.com releases; set `NFL_STATS_DIR` to use a local copy). The model uses gross passing yards, which is what books use.
+- **Projection:** a ridge regression on the QB's recency-weighted yards and attempts in his previous starts (15+ attempts), his team's implied points and expected margin, and the passing yards the defense has allowed lately. The chance of the Over comes from the empirical actual/expected spread.
+- **Backtest** (`scripts/pass_backtest.py`, fit on earlier seasons and tested on the next). Average miss in yards per game:
+
+| Season | Model | QB's season average |
+|---|---|---|
+| 2024 | 55.5 | 59.9 |
+| 2025 | 52.8 | 56.3 |
+| 2026 so far | 56.7 | 60.3 |
+
+- **Pricing:** `python -m nflmodel.odds yards` now also pulls `player_pass_yds`. `scripts/yards_picks.py` prices each team's expected starter: whoever started the latest game and is on this week's active roster, unless he's listed Out in `odds_log/injury_overrides.csv`.
+- **Board:** passing yards get their own tab, and the parlay builder has a "Pass yds" filter.
+
 ## Next steps
 
 1. Opening lines (`initial_lines.csv`), to bet early numbers and measure closing line value
