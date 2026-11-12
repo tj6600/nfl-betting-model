@@ -818,9 +818,9 @@ function renderParlay() {
     b.onclick = () => { toggleKind(k); SS.idx = -1; renderParlay(); }; seg.append(b);
   }
   const tg = el('label', 'tog'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = PS.plus; cb.onchange = (e) => { PS.plus = e.target.checked; drawList(); };
-  tg.append(cb, document.createTextNode(' Positive EV side only'));
+  tg.append(cb, document.createTextNode(' Positive EV side only (not alt lines)'));
   const tg2 = el('label', 'tog'); const cb2 = el('input'); cb2.type = 'checkbox'; cb2.checked = PS.clean; cb2.onchange = (e) => { PS.clean = e.target.checked; drawList(); };
-  tg2.append(cb2, document.createTextNode(' Hide flagged roles'));
+  tg2.append(cb2, document.createTextNode(' Hide flagged roles (not alt lines)'));
   const so = el('select'); so.setAttribute('aria-label', 'Sort legs');
   for (const [v, t] of [['edge', 'Sort: best balance (edge)'], ['ev', 'Sort: highest EV'], ['p', 'Sort: most likely']]) { const o = el('option', null, t); o.value = v; so.append(o); }
   so.value = PS.sort; so.onchange = (e) => { PS.sort = e.target.value; drawList(); };
@@ -832,11 +832,13 @@ function renderParlay() {
   const list = el('div', 'pllist'); pick.append(list);
   function drawList() {
     const qq = PS.q.trim().toLowerCase();
-    const okSide = (l) => (!PS.plus || l.ev > 0) && l.p >= PS.minp;
+    // alt ladders: show every player with alt lines, flagged or not (most alt lines carry extra juice, so 'Positive EV only' would hide nearly all);
+    // the ★ and ✓ marks point to the best lines in each row
+    const okSide = (l) => (!PS.plus || l.ev > 0 || l.alt) && l.p >= PS.minp;
     const metric = PS.sort === 'ev' ? (l) => l.ev : PS.sort === 'p' ? (l) => l.p : (l) => l.edge;
-    const all = GROUPS.filter((g) => inScope(g.sides[0]) && listOk(g.sides[0]) && (!PS.clean || !g.flag)
+    const all = GROUPS.filter((g) => inScope(g.sides[0]) && listOk(g.sides[0]) && (!PS.clean || !g.flag || g.sides[0].alt)
       && (!qq || g.text.includes(qq)) && g.sides.some(okSide))
-      .map((g) => ({ g, m: Math.max(...g.sides.filter(okSide).map(metric)) })).sort((a, b) => b.m - a.m);
+      .map((g) => ({ g, m: Math.max(...g.sides.filter(okSide).map(metric)) - (g.flag ? 10 : 0) })).sort((a, b) => b.m - a.m);   // flagged rows after the rest
     // with several markets picked, give each market its share of the list so one market (e.g. TDs) can't crowd out the rest
     let top = all.slice(0, PS.lim);
     if (PS.kinds.size > 1) {
@@ -853,7 +855,7 @@ function renderParlay() {
       for (const k of keys) {
         const gl = by[k], lim = PS.glim[k] || 25;
         const d = el('details', 'mgrp'); d.open = PS.open.has(k) || keys.length === 1 || !!qq;
-        const best = Math.max(...gl[0].sides.map(metric));
+        const best = Math.max(...(gl.find((g) => !g.flag) || gl[0]).sides.map(metric));
         const sm = el('summary'); sm.append(el('span', 'mname', MKTS.find((m) => m[0] === k)[1]),
           el('span', 'dim', `${gl.length} bet${gl.length > 1 ? 's' : ''} · best ${PS.sort === 'p' ? pct(best) : PS.sort === 'ev' ? `EV ${best > 0 ? '+' : ''}${(best * 100).toFixed(0)}%` : `edge ${pts(best)}`}`));
         d.append(sm);
