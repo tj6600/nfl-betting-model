@@ -93,6 +93,36 @@ def main():
     rep['calibration_fav_-1.5'] = [{'bucket': str(k), 'n': int(len(v)), 'model': float(v.p.mean()), 'actual': float(v.y.mean())}
                                     for k, v in pd.DataFrame({'p': p_fav, 'y': fav_cover}).groupby(pd.cut(p_fav, [0, .25, .3, .35, .4, .45, .5, 1]), observed=True)]
     print(pd.DataFrame(rep['calibration_fav_-1.5']))
+    # ESPN's free DraftKings closing lines (2025-26 and this season): totals, and how often the pick wins
+    ef = os.path.join(os.path.dirname(__file__), '..', 'odds_log', 'nhl', 'espn_lines.csv')
+    if os.path.exists(ef):
+        e = pd.read_csv(ef).merge(games[['game_id', 'game_date', 'home', 'away', 'home_score', 'away_score', 'season']],
+                                  on=['game_date', 'home', 'away']).merge(h, on='game_id')
+        e = e.dropna(subset=['total', 'over', 'under'])
+        e['goals'] = e.home_score + e.away_score
+        e = e[e.goals != e.total]
+        rep['totals_close'] = {}
+        for se, x in e.groupby('season'):
+            p_over = np.array([gm.p_over_total(a, b, t) for a, b, t in zip(x.lam_h, x.lam_a, x.total)])
+            rep['totals_close'][str(se)] = bet_report(p_over, x.over.values, x.under.values, (x.goals > x.total).values, f'Totals at close {se}')
+            rep['totals_close'][str(se)]['over_rate'] = float((x.goals > x.total).mean())
+            rep['totals_close'][str(se)]['model_mean_total'] = float((x.lam_h + x.lam_a).mean())
+        # picking winners: model's favorite vs DraftKings' favorite
+        w = e.dropna(subset=['ml_home', 'ml_away'])
+        pm = novig(am_to_prob(w.ml_home), am_to_prob(w.ml_away))[0]
+        hw = (w.home_score > w.away_score).values
+        acc = {}
+        for se in sorted(w.season.unique()):
+            s_ = (w.season == se).values
+            row = {'games': int(s_.sum())}
+            for name, p in [('model', w.home_win.values), ('draftkings', pm), ('blend', .5 * w.home_win.values + .5 * pm)]:
+                pick = p >= .5; conf = np.maximum(p, 1 - p)
+                row[name] = {'all': float((pick == hw)[s_].mean()),
+                             **{f'conf{int(c*100)}': [int((s_ & (conf >= c)).sum()), float((pick == hw)[s_ & (conf >= c)].mean()) if (s_ & (conf >= c)).any() else None]
+                                for c in (.55, .6, .65)}}
+            acc[str(se)] = row
+            print(se, 'winner accuracy', {k: (round(v['all'], 3) if isinstance(v, dict) else v) for k, v in row.items()})
+        rep['winner_accuracy'] = acc
     json.dump(rep, open(OUT, 'w'), indent=1)
     m.to_csv(OUT.replace('.json', '.csv'), index=False)
 

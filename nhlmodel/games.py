@@ -69,7 +69,7 @@ class GameModel:
     def fit(self, games, go, tg, mask_season):
         self.d, self.lm = frame(games, go, tg)
         X = design(self.d, self.lm)
-        ok = self.d.season.isin(mask_season) & (self.d.n_team >= 10) & X.notna().all(axis=1)
+        ok = self.d.season.isin(mask_season) & (self.d.n_team >= 10) & self.d.gf_reg.notna() & X.notna().all(axis=1)
         # offset: the league's current non-empty-net regulation scoring rate
         self.reg_share = float(tg.gf_reg.sum() / tg.gf.sum())
         off = np.log(self.d.lg_gf_now * self.reg_share)
@@ -172,6 +172,42 @@ class GameModel:
             else:
                 final[m] = final.get(m, 0) + p
         return final
+
+    def total_pmf(self, lh, la):
+        """Final total goals: bivariate-Poisson regulation scores, plus empty-net goals from the margin table,
+        plus one goal for overtime or a shootout (DraftKings counts the shootout winner as a goal)."""
+        from math import lgamma
+        sh = self.shared * min(lh, la)
+        a, b, c = lh - sh, la - sh, sh
+        k = np.arange(MAXG + 1)
+        lf = np.array([lgamma(i + 1) for i in k])
+        pois = lambda l: np.exp(k * np.log(max(l, 1e-9)) - l - lf)
+        pa, pb, pc = pois(a), pois(b), pois(c)
+        out = {}
+        for z in range(MAXG + 1):
+            if pc[z] < 1e-7:
+                continue
+            for i in range(MAXG + 1 - z):
+                for j in range(MAXG + 1 - z):
+                    p = pc[z] * pa[i] * pb[j]
+                    if p < 1e-9:
+                        continue
+                    hg, ag = i + z, j + z
+                    m = hg - ag
+                    if m == 0:
+                        out[hg + ag + 1] = out.get(hg + ag + 1, 0) + p
+                    elif abs(m) <= 4:
+                        for mf, q in self.T[m].items():
+                            t = hg + ag + abs(mf - m)
+                            out[t] = out.get(t, 0) + p * q
+                    else:
+                        out[hg + ag] = out.get(hg + ag, 0) + p
+        s = sum(out.values())
+        return {t: v / s for t, v in out.items()}
+
+    def p_over_total(self, lh, la, line):
+        f = self.total_pmf(lh, la)
+        return sum(p for t, p in f.items() if t > line)
 
     def probs(self, lh, la):
         f = self.margin_pmf(lh, la)

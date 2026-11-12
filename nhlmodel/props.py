@@ -36,7 +36,7 @@ class SavesModel:
     """Expected saves = expected shots against x projected save rate, then a pull-risk haircut."""
     def fit(self, st, lm, mask):
         X = saves_design(st, lm)
-        ok = mask & (st.n_starts >= 3) & X.notna().all(axis=1)
+        ok = mask & (st.n_starts >= 3) & st.saves.notna() & X.notna().all(axis=1)
         # shots against for full games only, so pulls don't bias the shot model
         full = ok & (st.toi >= 55)
         self.b = poisson_glm(X[full].values, st.shots_against[full].values)

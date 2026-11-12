@@ -230,3 +230,19 @@ November to January was flat or negative. Treat it as unproven until it's tested
 blend pick with positive EV: 139 bets, 59.0% hit, +9.3% ROI. At EV 3%+: 40 bets, 60.0% hit, +13.0% ROI, all but
 one unders. Betting every under blindly lost 4.6%, so the gain comes from which unders the model picks. Three of
 the five nights were profitable. That's encouraging, but the sample is still small.
+
+### NHL board (`board/site/nhl.html`, `scripts/nhl_board.py`)
+
+The board has these tabs: Games (a pick to win, model goals, goalies, and moneyline, puck line and total legs), Shots on goal,
+Goalie saves, Parlay builder and Model record. Game lines and probable goalies come from ESPN's scoreboard, which
+carries DraftKings prices and costs no Odds API credits. ESPN's summaries also give DraftKings closing lines from 2025-26
+on (`python -m nhlmodel.espn history ...`, free). Those lines were used to test totals (DraftKings was better) and winner
+picks (the model picked 54-61% correctly, DraftKings' favorite 56-62%). Shots-on-goal and saves lines need
+`python -m nhlmodel.odds props` (about 2 credits per game). Without them, the prop tabs show projections only.
+
+Model weights against the DraftKings no-vig price: moneyline 50%, shots on goal 50%, saves 50%, puck line 25%, total 25%.
+Winner picks also join the "Most likely to hit" parlay pool, priced no shorter than -200.
+
+A daily run would be: `pip install pyarrow` (to read the mirror's parquet files), `python -m nhlmodel.data` (rebuilds
+the current season only, since past seasons are committed in `nhl_data/<year>/`), `python scripts/nhl_grade.py`,
+optionally `python -m nhlmodel.odds props` (costs credits), then `python scripts/nhl_board.py`.

@@ -130,20 +130,25 @@ def build(seasons=SEASONS):
     tg = tg.merge(tm.rename(columns={'team': 'opp', 'cf': 'ca', 'sf': 'sa', 'xgf': 'xga', 'pp_cf': 'pk_ca'}),
                   on=['game_id', 'opp'], how='left')
 
-    os.makedirs(CACHE, exist_ok=True)
-    games.to_csv(os.path.join(CACHE, 'games.csv'), index=False)
-    sk.to_csv(os.path.join(CACHE, 'skaters.csv.gz'), index=False)
-    go.to_csv(os.path.join(CACHE, 'goalies.csv'), index=False)
-    tg.to_csv(os.path.join(CACHE, 'team_games.csv'), index=False)
+    # one folder per season (nhl_data/<end year>/), so a daily run only rebuilds the current season
+    for y in seasons:
+        code = int(f'{y - 1}{y}')
+        out = os.path.join(CACHE, str(y)); os.makedirs(out, exist_ok=True)
+        for name, df in [('games', games), ('skaters', sk), ('goalies', go), ('team_games', tg)]:
+            df[df.season == code].to_csv(os.path.join(out, f'{name}.csv.gz'), index=False)
     print(f'{len(games)} games, {len(sk)} skater rows, {len(go)} goalie rows through {games.game_date.max()}')
 
 
 def load():
-    r = lambda f: pd.read_csv(os.path.join(CACHE, f))
-    return r('games.csv'), r('skaters.csv.gz'), r('goalies.csv'), r('team_games.csv')
+    import glob
+    dirs = sorted(d for d in glob.glob(os.path.join(CACHE, '[0-9]' * 4)) if os.path.isdir(d))
+    r = lambda f: pd.concat([pd.read_csv(os.path.join(d, f)) for d in dirs], ignore_index=True)
+    return r('games.csv.gz'), r('skaters.csv.gz'), r('goalies.csv.gz'), r('team_games.csv.gz')
 
 
 if __name__ == '__main__':
+    # daily: refresh and rebuild only the current season (needs pyarrow to read the mirror's parquet files);
+    # --all rebuilds every season from nhl_data/raw
     if '--no-fetch' not in sys.argv:
         fetch(CURRENT)
-    build()
+    build(SEASONS if '--all' in sys.argv else [CURRENT])

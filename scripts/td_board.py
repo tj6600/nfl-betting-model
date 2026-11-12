@@ -351,7 +351,7 @@ SPORT_CSS = """<style>
 </style>"""
 def sport_nav(cur):
     return ('<nav class="sportnav" aria-label="Sport">' + ''.join(
-        f'<a href="{href}"{" aria-current=\"page\"" if k == cur else ""}>{k.upper()}</a>' for k, href in [('nfl', 'index.html'), ('nba', 'nba.html')]) + '</nav>\n')
+        f'<a href="{href}"{" aria-current=\"page\"" if k == cur else ""}>{k.upper()}</a>' for k, href in [('nfl', 'index.html'), ('nba', 'nba.html'), ('nhl', 'nhl.html')]) + '</nav>\n')
 # standalone copy for a static host (render.yaml publishes board/site): a full document, kept out of search engines
 head = open(os.path.join(B, 'head.html')).read()
 body = html[len(head):]
