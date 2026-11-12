@@ -13,6 +13,8 @@ from . import touchdowns as T
 STATS = {
     'rush': dict(y='rush_yds', vol='h_carries', min_vol=2.0, pos=['RB', 'WR']),   # QB runs (scrambles, sneaks) need their own model
     'rec': dict(y='rec_yds', vol='h_targets', min_vol=1.5, pos=['WR', 'TE', 'RB']),
+    # receptions (catches): same features on the catch count; spread buckets are in catches, not yards
+    'recs': dict(y='receptions', vol='h_targets', min_vol=1.5, pos=['WR', 'TE', 'RB'], edges=[0, 2, 3, 4, 5, 6, 1e9]),
 }
 DEF_HALF = 8.0
 
@@ -78,7 +80,9 @@ class Spread:
     """Empirical distribution of actual/expected, by bucket of expected yards."""
     EDGES = [0, 15, 30, 45, 60, 80, 1e9]
 
-    def __init__(self, mu, y):
+    def __init__(self, mu, y, edges=None):
+        if edges is not None:
+            self.EDGES = edges
         b = np.digitize(mu, self.EDGES) - 1
         self.r = {i: np.sort(y[b == i] / mu[b == i]) for i in range(len(self.EDGES) - 1) if (b == i).sum() >= 50}
 
@@ -101,4 +105,4 @@ class Spread:
 def fit(kind, tr):
     y = tr[STATS[kind]['y']].values
     X = design(tr, kind); b = ridge(X, y)
-    return b, Spread(apply(b, X), y)
+    return b, Spread(apply(b, X), y, STATS[kind].get('edges'))

@@ -59,24 +59,26 @@ for r in A.itertuples():
 taken = pd.Timestamp(os.path.basename(props)[11:26].replace('T', ' ')[:-1] if False else os.path.basename(props)[11:].split('.')[0].replace('Z', ''))
 D = dict(season=season, week=week, taken=taken.tz_localize('UTC').tz_convert('America/New_York').strftime('%A, %B %-d at %-I:%M %p ET'), players=out)
 # rushing / receiving / passing yards
-MK = {'Rush': 'rush', 'Rece': 'rec', 'Pass': 'pass'}
+MK = {'Rushing yards': 'rush', 'Receiving yards': 'rec', 'Passing yards': 'pass', 'Receptions': 'recs'}
+YKEYS = {'player_rush_yds': 'rush', 'player_reception_yds': 'rec', 'player_pass_yds': 'pass', 'player_receptions': 'recs'}
 yf = os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}_yards.csv')
 yprops = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'props', 'yards_*.json')))
 yards = []
 if os.path.exists(yf) and yprops:
     Yd = pd.read_csv(yf)
     yrows = []
-    for e in json.load(open(yprops[-1])):
+    rprops = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'props', 'recs_*.json')))
+    for e in json.load(open(yprops[-1])) + (json.load(open(rprops[-1])) if rprops else []):
         for bk in e.get('bookmakers', []):
             for m in bk['markets']:
                 for o in m['outcomes']:
                     if o.get('description') and o.get('point') is not None:
-                        yrows.append((TEAMS.get(e['home_team']), TEAMS.get(e['away_team']), {'player_rush_yds': 'rush', 'player_pass_yds': 'pass'}.get(m['key'], 'rec'),
+                        yrows.append((TEAMS.get(e['home_team']), TEAMS.get(e['away_team']), YKEYS.get(m['key'], 'rec'),
                                       o['description'], bk['title'], o['name'], o['point'], o['price']))
     YO = pd.DataFrame(yrows, columns=['home', 'away', 'kind', 'player', 'book', 'side', 'pt', 'pr']); YO['k'] = T._key(YO.player)
     gl = {r.game: r for r in GW.assign(game=GW.away_team + ' @ ' + GW.home_team).itertuples()}
     for (pid, market), grp in Yd.groupby(['pid', 'market']):
-        kind = MK[market[:4]]
+        kind = MK[market]
         r = grp.iloc[0]; away, home = r.game.split(' @ '); g = gl[r.game]
         sides = {x.side: dict(line=float(x.best_line), price=int(x.best_price), book=x.best_book, p=round(float(x.model_prob), 4),
                               model=round(float(x.model_only), 4), mkt=round(float(x.market_prob), 4), ev=round(float(x.ev), 4)) for x in grp.itertuples()}
@@ -206,13 +208,14 @@ yb = yf.replace('_yards.csv', '_yards_books.csv')
 if os.path.exists(yb):
     Yd = pd.read_csv(yf)
     for r in pd.read_csv(yb).itertuples():
-        base = Yd[(Yd.pid == r.pid) & (Yd.market.str[:4].map(MK) == r.kind) & (Yd.side == r.side)]
+        base = Yd[(Yd.pid == r.pid) & (Yd.market.map(MK) == r.kind) & (Yd.side == r.side)]
         if base.empty: continue
-        m = base.iloc[0]; kind = r.kind.title()
+        m = base.iloc[0]; kind = r.kind.title()   # Rush, Rec, Pass, Recs (receptions)
+        unit = 'receptions' if r.kind == 'recs' else f'{kind.lower()} yds'
         flag = 'Check role' if m.category == 'Check role' else ('' if m.regular else 'small role')
         add_leg(f'y-{r.pid}-{kind}-{r.side}-{r.point:g}', r.book, r.price, game=m.game, kind=kind, who=m.player, team=m.team,
-                label=f'{r.side} {r.point:g} {kind.lower()} yds', model=float(r.model_only),
-                pid=r.pid, grp=f'y-{r.pid}-{kind}-{r.point:g}', gt=f'{m.player} {r.point:g} {kind.lower()} yds', sl=r.side,
+                label=f'{r.side} {r.point:g} {unit}', model=float(r.model_only),
+                pid=r.pid, grp=f'y-{r.pid}-{kind}-{r.point:g}', gt=f'{m.player} {r.point:g} {unit}', sl=r.side,
                 bp=float(r.book_p) if r.book_p == r.book_p else float(m.market_prob), cat=_cat(m.category) if m.best_line == r.point else '',
                 key=f'{r.pid}-{kind}', flag=flag)
 # milestones: one number, only the price differs by book
@@ -301,11 +304,11 @@ print(len(logs), 'game logs')
 # The recency weights reach back into earlier seasons and old teams, so a player in a new role can be
 # projected off his old usage (e.g. a backup turned starter); his own season is the warning sign.
 for l in legs:
-    if l['kind'] not in ('Rush', 'Rec', 'Milestone') or l.get('pid') not in logs: continue
+    if l['kind'] not in ('Rush', 'Rec', 'Recs', 'Milestone') or l.get('pid') not in logs: continue
     rows = [r for r in logs[l['pid']]['g'] if r[3] is not None]
     num = float(re.search(r'[\d.]+', l['label']).group())
     line = num - 0.5 if l['kind'] == 'Milestone' else num
-    i = 4 if 'rush' in l['label'] else 7
+    i = 4 if 'rush' in l['label'] else 6 if l['kind'] == 'Recs' else 7
     over = l['kind'] == 'Milestone' or l['sl'] == 'Over'
     hits = sum((r[i] > line) if over else (r[i] < line) for r in rows)
     l['season'] = f'{hits}/{len(rows)}'
