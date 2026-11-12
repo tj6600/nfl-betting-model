@@ -185,6 +185,7 @@ table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
 .savedrow .lnk { font-size: 13px; }
 .savedchip { display: inline-flex; align-items: center; gap: 2px; }
 .savedchip .chip { padding: 4px 10px; font-size: 13px; }
+.seglab { flex-basis: 100%; font-size: 12px; margin-bottom: -4px; }
 /* Phones: nothing should need a sideways swipe except a wide table. Tabs, game buttons and button groups wrap
    onto extra lines instead of scrolling (clipped .seg groups used to hide filters past the screen edge). */
 .tablewrap { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
@@ -284,7 +285,7 @@ const STATS = [['sog', 'Shots on goal'], ['saves', 'Goalie saves']];
 const SRC = (k) => (k === 'saves' ? D.goalies : D.players);
 const SL = Object.fromEntries(STATS);
 const TABS = [['games', 'Games']].concat(STATS).concat([['parlay', 'Parlay builder'], ['record', 'Model record']]);
-const state = { tab: 'games', game: 'all', pos: 'all', q: '', sort: 'edge', pmin: 0.25, pkind: 'all', pq: '' };
+const state = { tab: 'games', game: 'all', pos: 'all', q: '', sort: 'edge', pmin: 0.25, pq: '' };
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
 const fmt = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
 const pct = (p) => p == null ? '—' : p < 0.01 ? (p * 100).toFixed(2) + '%' : Math.round(p * 100) + '%';
@@ -306,12 +307,18 @@ const LIKELY_POOL = D.legs.filter((l) => (l.edge >= 1 || l.pick) && l.p >= 0.55 
 let mode = 'value';
 try { mode = localStorage.getItem('nhl-mode') === 'likely' ? 'likely' : 'value'; } catch (e) {}
 let POOL = mode === 'likely' ? LIKELY_POOL : VALUE_POOL;
+// market filter: pick any mix of markets (e.g. Points + Assists); none picked = every market. Suggestions follow it.
+let KINDS = new Set();
+try { KINDS = new Set(JSON.parse(localStorage.getItem('nhl-kinds') || '[]')); } catch (e) {}
+const kindOk = (L) => !KINDS.size || KINDS.has(L.kind);
+const MKTS = [...new Set(D.legs.map((L) => L.kind))];
 function buildSlips(size, n = 6) {
   const out = [], used = new Set();
+  const pool = POOL.filter(kindOk);
   for (let s = 0; s < n; s++) {
-    const nG = new Set(POOL.map((L) => L.game)).size;
+    const nG = new Set(pool.map((L) => L.game)).size;
     const slip = [], g = {}, pl = new Set(), perGame = Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / Math.max(1, nG))));   // more per game only when the slate is too small
-    for (const L of POOL) {
+    for (const L of pool) {
       if (used.has(L.id) || (g[L.game] || 0) >= perGame || (L.pid && pl.has(L.pid))) continue;
       slip.push(L.id); g[L.game] = (g[L.game] || 0) + 1; if (L.pid) pl.add(L.pid);
       if (slip.length >= size) break;
@@ -344,7 +351,7 @@ const setMode = (m) => {
   mode = m; POOL = m === 'likely' ? LIKELY_POOL : VALUE_POOL; try { localStorage.setItem('nhl-mode', m); } catch (e) {}
   sizesFor(); if (!SIZES.includes(legCount)) legCount = BEST;
 };
-const setSize = (k) => { legCount = k; try { localStorage.setItem('nhl-legs', k); } catch (e) {} SLIPS = POOL.length ? buildSlips(k) : (D.slips || []); };
+const setSize = (k) => { legCount = k; try { localStorage.setItem('nhl-legs', k); } catch (e) {} SLIPS = !k ? [] : POOL.length ? buildSlips(k) : (D.slips || []); };
 setSize(legCount);
 let sugIdx = -1;   // which suggestion is loaded (-1 = own slip)
 let saved = [];
@@ -498,14 +505,24 @@ function boardParlay() {
   const h = el('div', 'colhead'); h.append(el('h2', null, 'Legs'), el('span', null, mode === 'likely' ? 'Ranked by chance to hit, DraftKings prices' : 'Ranked by edge, DraftKings prices')); list.append(h);
   const ctl = el('div', 'plctl');
   const q = el('input'); q.type = 'search'; q.placeholder = 'Search legs'; q.value = state.pq; q.oninput = (e) => { state.pq = e.target.value.toLowerCase(); drawList(); };
-  const kinds = el('div', 'seg'); [['all', 'All'], ['game', 'Game lines'], ['prop', 'Props']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', state.pkind === k); b.onclick = () => { state.pkind = k; render(); }; kinds.append(b); });
+  const kl = el('span', 'dim seglab', 'Markets: tap one or more');
+  const kinds = el('div', 'seg'); kinds.setAttribute('aria-label', 'Markets (pick one or more)');
+  [['all', 'All']].concat(MKTS.map((k) => [k, k])).forEach(([k, l]) => {
+    const b = el('button', null, l); b.setAttribute('aria-pressed', k === 'all' ? !KINDS.size : KINDS.has(k));
+    b.onclick = () => {
+      if (k === 'all') KINDS.clear(); else if (KINDS.has(k)) KINDS.delete(k); else KINDS.add(k);
+      try { localStorage.setItem('nhl-kinds', JSON.stringify([...KINDS])); } catch (e) {}
+      sizesFor(); if (!SIZES.includes(legCount)) legCount = BEST; setSize(legCount); sugIdx = -1; render();
+    };
+    kinds.append(b);
+  });
   const mins = el('div', 'seg'); [[0.25, '25%+'], [0.4, '40%+'], [0.55, '55%+']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', state.pmin === k); b.onclick = () => { state.pmin = k; render(); }; mins.append(b); });
-  ctl.append(q, kinds, mins); list.append(ctl);
+  ctl.append(q, kl, kinds, mins); list.append(ctl);
   const pl = el('div', 'pllist'); list.append(pl);
   function drawList() {
     pl.innerHTML = '';
     let ls = D.legs.filter((l) => l.p >= state.pmin);
-    if (state.pkind === 'game') ls = ls.filter((l) => !l.pid); if (state.pkind === 'prop') ls = ls.filter((l) => l.pid);
+    ls = ls.filter(kindOk);
     if (state.pq) ls = ls.filter((l) => (l.label + ' ' + l.game).toLowerCase().includes(state.pq));
     ls.sort(mode === 'likely' ? (a, b) => (b.edge >= 1) - (a.edge >= 1) || b.p - a.p : (a, b) => b.edge - a.edge);
     if (!ls.length) pl.append(el('div', 'empty', 'No legs match.'));
@@ -528,7 +545,7 @@ function boardParlay() {
     const seg = el('div', 'seg');
     [['value', 'Best value'], ['likely', 'Most likely to hit']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', mode === k); b.onclick = () => { setMode(k); setSize(legCount); if (SLIPS.length) loadSug(0); else { sugIdx = -1; render(); } }; seg.append(b); });
     md.append(seg);
-    md.append(el('span', 'dim sugbest', mode === 'likely' ? 'Highest-chance legs: board winner picks plus legs with edge 1+, 55%+ chance, nothing shorter than -200' : 'Biggest edge first (edge 3+, 55%+ chance)'));
+    md.append(el('span', 'dim sugbest', (mode === 'likely' ? 'Highest-chance legs: board winner picks plus legs with edge 1+, 55%+ chance, nothing shorter than -200' : 'Biggest edge first (edge 3+, 55%+ chance)') + (KINDS.size ? `. Only ${[...KINDS].join(' + ')} legs (market filter).` : '')));
     sl.append(md);
   }
   if (SIZES.length) {
