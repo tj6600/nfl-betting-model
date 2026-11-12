@@ -365,7 +365,7 @@ const amer = (d) => (d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d -
 const PK = 'props-parlay-v2';
 const PBOOKS = ['DraftKings'];
 const ABBR = { DraftKings: 'DK', FanDuel: 'FD' };
-const PS = { kinds: new Set(), mode: 'value', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25, note: '', sel: {} };
+const PS = { lim: 80, kinds: new Set(), mode: 'value', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25, note: '', sel: {} };
 try { PS.mode = localStorage.getItem('props-mode') === 'likely' ? 'likely' : 'value'; } catch (e) {}
 // market filter: pick any mix of markets (e.g. TDs + Receptions); none picked = every market
 try { PS.kinds = new Set(JSON.parse(localStorage.getItem('props-kinds') || '[]')); } catch (e) {}
@@ -392,6 +392,13 @@ const pts = (e) => `${e > 0 ? '+' : ''}${(e * 100).toFixed(1)} pts`;
 const pct1 = (v) => (v < 0.1 ? (v * 100).toFixed(1) : (v * 100).toFixed(0)) + '%';
 let slip = []; try { slip = (JSON.parse(localStorage.getItem(PK) || '[]')).filter((id) => LEG[id]); } catch (e) { slip = []; }
 const saveSlip = () => { try { localStorage.setItem(PK, JSON.stringify(slip)); } catch (e) { /* storage unavailable */ } };
+// game-log context for a leg (which stat and line to check each game against)
+const logCtx = (l) => {
+  if (l.kind === 'TD') return { kind: 'td' };
+  if (l.kind === 'Game' || l.kind === 'Pass') return null;
+  const num = Number((l.label.match(/[\d.]+/) || [])[0]);
+  return { kind: /rush/.test(l.label) ? 'rush' : /receptions/.test(l.label) ? 'recs' : 'rec', line: l.alt ? num - 0.5 : num, side: l.alt ? 'Over' : l.sl };
+};
 const legName = (l) => (l.kind === 'Game' ? (/^(Over|Under)/.test(l.label) ? `${l.game} ${l.label}` : l.label) : `${l.who} ${l.label}`);
 // a parlay sits at one book: price it at DraftKings and at FanDuel, keep the better payout (DraftKings on a tie)
 function parlayMath(ids, priceOverride) {
@@ -542,13 +549,24 @@ function renderParlay() {
     const qq = PS.q.trim().toLowerCase();
     const okSide = (l) => (!PS.plus || l.ev > 0) && l.p >= PS.minp;
     const metric = PS.sort === 'ev' ? (l) => l.ev : PS.sort === 'p' ? (l) => l.p : (l) => l.edge;
-    const gs = GROUPS.filter((g) => inScope(g.sides[0]) && kindOk(g.sides[0]) && (!PS.clean || !g.flag)
+    const all = GROUPS.filter((g) => inScope(g.sides[0]) && kindOk(g.sides[0]) && (!PS.clean || !g.flag)
       && (!qq || g.text.includes(qq)) && g.sides.some(okSide))
-      .map((g) => ({ g, m: Math.max(...g.sides.filter(okSide).map(metric)) })).sort((a, b) => b.m - a.m).slice(0, 80).map((x) => x.g);
-    ph.lastChild.textContent = `${gs.length >= 80 ? 'top 80' : gs.length} bets`;
+      .map((g) => ({ g, m: Math.max(...g.sides.filter(okSide).map(metric)) })).sort((a, b) => b.m - a.m);
+    // with several markets picked, give each market its share of the list so one market (e.g. TDs) can't crowd out the rest
+    let top = all.slice(0, PS.lim);
+    if (PS.kinds.size > 1) {
+      const per = Math.ceil(PS.lim / PS.kinds.size), seen = {};
+      top = all.filter((x) => { const k = x.g.sides[0].alt && !PS.kinds.has(mkt(x.g.sides[0])) ? 'Milestone' : mkt(x.g.sides[0]); seen[k] = (seen[k] || 0) + 1; return seen[k] <= per; });
+    }
+    const gs = top.map((x) => x.g);
+    ph.lastChild.textContent = `${gs.length < all.length ? `top ${gs.length} of ${all.length}` : gs.length} bets`;
     list.replaceChildren();
     if (!gs.length) list.append(el('div', 'empty', 'Nothing matches. Try another search or turn off Positive EV only.'));
     for (const g of gs) list.append(groupRow(g));
+    if (gs.length < all.length) {
+      const more = el('button', 'lnk more', `Show more (${all.length - gs.length} left)`); more.type = 'button';
+      more.onclick = () => { PS.lim += 80; drawList(); }; list.append(more);
+    }
   }
   function groupRow(g) {
     const r = el('div', 'leg'); const w = el('div', 'who'); const l0 = g.sides[0];
@@ -643,7 +661,10 @@ function renderParlay() {
     const m = parlayMath(slip, PS.price && Number(PS.price) && Math.abs(Number(PS.price)) >= 100 ? Number(PS.price) : null);
     const lsx = el('div', 'books slipl');
     for (const l of m.ls) {
-      const r = el('div'); const left = el('span'); left.append(el('b', null, legName(l)), el('small', null, `${l.game} · ${PBOOKS.filter((b) => l.offers[b] != null).map((b) => `${ABBR[b]} ${fmtOdds(l.offers[b])}`).join(' · ')}`));
+      const r = el('div'); const left = el('span');
+      const nm = l.pid && LOGS[l.pid] ? el('button', 'namebtn', legName(l)) : el('b', null, legName(l));
+      if (nm.tagName === 'BUTTON') { nm.type = 'button'; nm.title = 'Season game log'; nm.onclick = () => showLog(l.pid, logCtx(l)); }
+      left.append(nm, el('small', null, `${l.game} · ${PBOOKS.filter((b) => l.offers[b] != null).map((b) => `${ABBR[b]} ${fmtOdds(l.offers[b])}`).join(' · ')}`));
       const right = el('span', 'num ' + (l.ev >= 0 ? 'pos' : 'neg'), `${pct(l.p)} · ${pts(l.edge)} · EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`);
       const x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Remove ' + legName(l)); x.onclick = () => { slip = slip.filter((i) => i !== l.id); SS.idx = -1; saveSlip(); renderParlay(); };
       r.append(left, right, x); lsx.append(r);

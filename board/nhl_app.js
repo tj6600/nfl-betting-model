@@ -247,7 +247,7 @@ function boardParlay() {
     if (!ls.length) pl.append(el('div', 'empty', 'No legs match.'));
     ls.slice(0, 200).forEach((L) => {
       const r = el('div', 'leg'); const who = el('div', 'who');
-      who.append(el('span', 'n', L.label), el('span', 's', `${L.kind} · ${L.game}${L.flags.length ? ' · ' + L.flags.join('; ') : ''}`));
+      who.append(legLabel(L, 'n'), el('span', 's', `${L.kind} · ${L.game}${L.flags.length ? ' · ' + L.flags.join('; ') : ''}`));
       const sb = el('div', 'sidebox'); sb.append(el('span', 'o', fmt(L.price)), el('span', 'e ' + (L.edge > 0 ? 'pos' : 'neg'), `${pct(L.p)} · ${sgn(L.edge)}`));
       r.append(who, sb, addBtn(L.id)); pl.append(r);
     });
@@ -303,7 +303,7 @@ function boardParlay() {
   const legs = slip.map((id) => LEG[id]).filter(Boolean);
   if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : mode === 'likely' ? 'Add legs from the list. No leg is 55%+ to hit at -200 or longer on this slate.' : 'Add legs from the list. No leg meets the value rule (edge 3+, chance 55%+) on this slate.'));
   const box = el('div', 'slipl');
-  legs.forEach((L) => { const d = el('div'); const n = el('span', null, L.label); n.append(el('small', null, `${L.game} · ${pct(L.p)}`)); const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
+  legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
   if (legs.length) {
     sl.append(box);
     const p = legs.reduce((a, l) => a * l.p, 1), d = legs.reduce((a, l) => a * dec(l.price), 1), ev = p * d - 1;
@@ -353,6 +353,13 @@ function boardRecord() {
   $('foot').textContent = 'Backtests: scripts/nhl_props_backtest.py and scripts/nhl_game_backtest.py.';
 }
 
+// a leg's label, tappable to open the player's game log when the leg is a player prop
+function legLabel(L, cls) {
+  const pl = L.pid ? SRC(L.market).find((x) => x.id === L.pid) : null;
+  if (!pl) return el('span', cls, L.label);
+  const b = el('button', (cls ? cls + ' ' : '') + 'namebtn', L.label); b.type = 'button'; b.title = 'Game log';
+  b.onclick = (e) => { e.stopPropagation(); openLog(pl, L.market); }; return b;
+}
 function openLog(p, k) {
   const ov = el('div', 'overlay'); ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
   const pn = el('div', 'logpanel'); pn.setAttribute('role', 'dialog'); pn.setAttribute('aria-label', p.name + ' game log');
