@@ -93,7 +93,7 @@ function boardProps(k) {
     const pr = p.props[k]; const best = bestSide(pr);
     const row = el('div', 'row');
     const who = el('div', 'who'); const nb = el('button', 'namebtn', p.name); nb.onclick = () => openLog(p, k);
-    who.append(nb, el('span', 's', `${p.team} ${p.pos} vs ${p.opp} · ${p.mpg} min${p.flags.length ? ' · ' + p.flags.join('; ') : ''}`));
+    who.append(nb, el('span', 's', `${p.team} ${p.pos} vs ${p.opp} · ${p.mpg} min${p.boost ? ' · bigger role with ' + p.boost + ' out' : ''}${p.flags.length ? ' · ' + p.flags.join('; ') : ''}`));
     const price = el('div', 'price');
     if (best) {
       const side = best === pr.over ? 'Over' : 'Under';
@@ -134,7 +134,7 @@ function boardGames() {
       tw.append(t); c.append(tw);
     } else c.append(el('div', 'outs', 'DraftKings lines not posted yet.'));
     const outs = [...g.out_away.map((o) => `${g.away}: ${o.name}`), ...g.out_home.map((o) => `${g.home}: ${o.name}`)];
-    c.append(el('div', 'outs', outs.length ? `Sat out their last game: ${outs.join(', ')}. Check the injury report.` : 'No regulars sat out either team\'s last game.'));
+    c.append(el('div', 'outs', D.injuries ? (outs.length ? `Out tonight (ESPN injury report): ${outs.join(', ')}.` : 'No regulars listed out.') : (outs.length ? `Sat out their last game: ${outs.join(', ')}. Check the injury report.` : 'No regulars sat out either team\'s last game.')));
     wrap.append(c);
   });
   B.append(wrap);

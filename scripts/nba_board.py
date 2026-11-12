@@ -7,7 +7,7 @@ Prices come from the latest odds_log/nba snapshots (python -m nbamodel.odds game
 """
 import sys, os, json, glob, argparse, datetime as dt; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np, pandas as pd
-from nbamodel import data as D, games as M, props as PR, odds as O
+from nbamodel import data as D, games as M, props as PR, odds as O, injuries as INJ
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 ap = argparse.ArgumentParser(); ap.add_argument('--update', action='store_true'); ap.add_argument('--date')
@@ -46,12 +46,27 @@ r = M.Ratings().fit(G, MS, day, rest=M.rest_days(rest_src))
 # who sat each team's last game (the only availability signal we have)
 last_gid = P.sort_values('date').groupby('team').game_id.last()
 miss = {t: MS['val'].get((g, t), 0.0) for t, g in last_gid.items()}
-pred = r.predict(slate, miss=miss)
 pf = M.player_form(P)
+INJURY = INJ.latest()   # ESPN injury report; None if unreachable (then the last-game proxy is used)
+if INJURY is not None:
+    form = pf[~pf.dnp & (pf['min'] > 0)].sort_values('date').groupby('pid').tail(1).set_index('pid')
+    form = form[form.date >= str(pd.Timestamp(day) - pd.Timedelta(days=60))[:10]]
+    miss = {t: 0.0 for t in M.TEAMS}
+    for pid, v in INJURY.items():
+        if v['status'] == 'Out' and pid in form.index and v['team']:
+            f = form.loc[pid]
+            if f.mpg >= 15: miss[v['team']] += float(f.mpg * (f.gsm - M.REP))
+pred = r.predict(slate, miss=miss)
 outs = {}
 for t, g in last_gid.items():
     q = pf[(pf.game_id == g) & (pf.team == t) & pf.dnp & ~pf.reason.fillna('').str.contains('COACH', case=False) & (pf.mpg >= 15)]
     outs[t] = [dict(name=x.name, reason=str(x.reason).title(), mpg=round(x.mpg, 1)) for x in q.itertuples()]
+if INJURY is not None:   # replace the proxy with today's report: regulars listed Out
+    recent_m = pf[~pf.dnp & (pf['min'] > 0)].sort_values('date').groupby('pid').tail(1).set_index('pid')
+    outs = {t: [] for t in M.TEAMS}
+    for pid, v in INJURY.items():
+        if v['status'] == 'Out' and v['team'] and pid in recent_m.index and recent_m.loc[pid].mpg >= 15:
+            outs[v['team']].append(dict(name=v['name'], reason=v['comment'], mpg=round(float(recent_m.loc[pid].mpg), 1)))
 
 teams = r.team_table()
 games, legs = [], []
@@ -124,7 +139,21 @@ F = PR.features(pd.concat([P, U], ignore_index=True), G, totals=tot)
 hist = F[F.date < day]
 SP = PR.Spread().fit(hist[hist.season >= D.SEASON - 2])
 FU = F[(F.date == day) & F.game_id.isin(slate.game_id)]
-FU = FU[(FU.n_prev >= 3) & (FU.m_ewm >= 10)]
+FU = FU[(FU.n_prev >= 3) & (FU.m_ewm >= 10)].copy()
+# injuries: drop players listed Out and hand part of their production to healthy teammates
+# (USAGE_SHARE of the vacated projection, split by each teammate's own projection; not backtested)
+USAGE_SHARE = 0.6
+if INJURY is not None:
+    st = FU.pid.map(lambda i: (INJURY.get(int(i)) or {}).get('status'))
+    out_rows = FU[st == 'Out']
+    FU = FU[st != 'Out'].copy()
+    for (gid, t), o in out_rows.groupby(['game_id', 'team']):
+        mates = (FU.game_id == gid) & (FU.team == t)
+        for k in PR.STATS:
+            vac = o[f'{k}_proj'].sum(); have = FU.loc[mates, f'{k}_proj'].sum()
+            if have > 0:
+                FU.loc[mates, f'{k}_proj'] *= 1 + USAGE_SHARE * vac / have
+        FU.loc[mates, 'boost'] = ', '.join(o['name'])
 key = lambda s: s.str.lower().str.replace(r'[^a-z]', '', regex=True).str.replace(r'(jr|sr|ii|iii|iv)$', '', regex=True)
 if len(PRW):
     PRW['k'] = key(PRW.player)
@@ -135,7 +164,9 @@ for x in FU.itertuples():
     sat = [o['name'] for o in outs.get(x.team, [])]
     flags = []
     if x.days_off > 7: flags.append(f'Returning: last played {int(x.days_off)} days ago')
-    if x.name in sat: flags.append('Sat out the last game')
+    inj = (INJURY or {}).get(int(x.pid))
+    if inj: flags.append(f"{inj['status']}: {inj['comment']}")
+    elif x.name in sat and INJURY is None: flags.append('Sat out the last game')
     lg = hist[(hist.pid == x.pid) & hist.played].sort_values('date').tail(12)
     log = [dict(d=r.date[5:], o=('vs ' if r.home else '@ ') + r.opp, m=int(getattr(r, 'min')), pts=int(r.pts), reb=int(r.reb), ast=int(r.ast),
                 fg3m=int(r.fg3m), pra=int(r.pra)) for r in lg.iloc[::-1].itertuples()]
@@ -143,7 +174,7 @@ for x in FU.itertuples():
     p = dict(id=int(x.pid), name=x.name, team=x.team, opp=x.opp, game=gl[x.game_id]['game'], pos=x.pg, mpg=round(x.m_ewm, 1),
              start=bool(x.start_prev) if x.start_prev == x.start_prev else False, flags=flags, log=log,
              avg={k: round(float(season_rows[k].mean()), 1) if len(season_rows) else None for k in PR.STATS}, gp=int(len(season_rows)),
-             props={})
+             props={}, boost=getattr(x, 'boost', None) if isinstance(getattr(x, 'boost', None), str) else None)
     for k in PR.STATS:
         proj = getattr(x, f'{k}_proj')
         if not proj == proj or proj <= 0: continue
@@ -191,7 +222,7 @@ pb = os.path.join(D.DIR, 'backtest_props.json')
 if os.path.exists(pb):
     bt['props'] = json.load(open(pb))
 
-DATA = dict(day=day, dayLabel=pd.Timestamp(day).strftime('%A, %B %-d'), taken=taken.strftime('%A %-I:%M %p ET') if taken is not None else None,
+DATA = dict(injuries=INJURY is not None, day=day, dayLabel=pd.Timestamp(day).strftime('%A, %B %-d'), taken=taken.strftime('%A %-I:%M %p ET') if taken is not None else None,
             propsTaken=os.path.basename(pfile)[17:-5] if pfile else None, through=G.date.max(), book=BOOK,
             games=games, players=players, legs=legs, suggested=sug, backtest=bt,
             teams=[dict(team=t.team, off=round(t.off, 1), deff=round(t.deff, 1), net=round(t.net, 1)) for t in teams.itertuples()])
