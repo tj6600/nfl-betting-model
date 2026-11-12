@@ -6,7 +6,7 @@ const TABS = [['games', 'Games']].concat(STATS).concat([['parlay', 'Parlay build
 const state = { tab: 'games', game: 'all', pos: 'all', q: '', sort: 'edge', pmin: 0.25, pkind: 'all', pq: '' };
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
 const fmt = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
-const pct = (p) => p == null ? '—' : Math.round(p * 100) + '%';
+const pct = (p) => p == null ? '—' : p < 0.01 ? (p * 100).toFixed(2) + '%' : Math.round(p * 100) + '%';
 const sgn = (x) => (x > 0 ? '+' : '') + x;
 const dec = (a) => a > 0 ? 1 + a / 100 : 1 + 100 / -a;
 const toAm = (d) => d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1));
@@ -20,10 +20,10 @@ const POOL = (D.pool || []).map((id) => LEG[id]).filter(Boolean);
 function buildSlips(size, n = 6) {
   const out = [], used = new Set();
   for (let s = 0; s < n; s++) {
-    const slip = [], g = new Set(), pl = new Set();
+    const slip = [], g = {}, pl = new Set(), perGame = size > 6 ? 3 : 1;   // big slips need several legs per game
     for (const L of POOL) {
-      if (used.has(L.id) || g.has(L.game) || (L.pid && pl.has(L.pid))) continue;
-      slip.push(L.id); g.add(L.game); if (L.pid) pl.add(L.pid);
+      if (used.has(L.id) || (g[L.game] || 0) >= perGame || (L.pid && pl.has(L.pid))) continue;
+      slip.push(L.id); g[L.game] = (g[L.game] || 0) + 1; if (L.pid) pl.add(L.pid);
       if (slip.length >= size) break;
     }
     if (slip.length < size) break;
@@ -37,7 +37,7 @@ function growth(ids) {
   const f = (b * p - (1 - p)) / b; if (f <= 0) return 0;
   return p * Math.log(1 + f * b) + (1 - p) * Math.log(1 - f);
 }
-const SIZES = [2, 3, 4, 5, 6].filter((k) => buildSlips(k, 1).length);
+const SIZES = [2, 3, 4, 5, 6, 11].filter((k) => buildSlips(k, 1).length);
 const BEST = SIZES.length ? SIZES.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), SIZES[0]) : null;
 let legCount = null;
 try { legCount = +localStorage.getItem('nba-legs') || null; } catch (e) {}
