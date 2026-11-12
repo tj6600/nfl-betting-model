@@ -201,11 +201,25 @@ for x in FU.itertuples():
 # picks: value = edge >= 3 pts and chance >= 55%, no flag
 for L in legs:
     L['cat'] = 'Value' if (L['edge'] >= 3 and L['p'] >= 0.55 and not L['flags']) else ''
-sug, used_games, used_p = [], {}, set()
-for L in sorted([l for l in legs if l['cat'] == 'Value'], key=lambda l: -l['edge']):
-    if used_games.get(L['game'], 0) >= 1 or L.get('pid') in used_p: continue
-    sug.append(L['id']); used_games[L['game']] = 1; used_p.add(L.get('pid'))
-    if len(sug) >= 4: break
+# suggested slips: up to 6 different parlays, each the best remaining legs (1 per game, 1 per player, 2-4 legs);
+# a leg is used in at most one slip so each suggestion is different. Value legs first, then near-value (edge 1.5+, 52%+).
+def build_slips(pool, n=6, size=4):
+    slips, used = [], set()
+    for _ in range(n):
+        slip, g_used, p_used = [], set(), set()
+        for L in pool:
+            if L['id'] in used or L['game'] in g_used or (L.get('pid') and L['pid'] in p_used): continue
+            slip.append(L['id']); g_used.add(L['game'])
+            if L.get('pid'): p_used.add(L['pid'])
+            if len(slip) >= size: break
+        if len(slip) < 2: break
+        used.update(slip); slips.append(slip)
+    return slips
+ok = lambda l: not l['flags']
+pool = sorted([l for l in legs if l['cat'] == 'Value'], key=lambda l: -l['edge'])
+pool += sorted([l for l in legs if l['cat'] != 'Value' and ok(l) and l['edge'] >= 1.5 and l['p'] >= 0.52], key=lambda l: -l['edge'])
+slips = build_slips(pool)
+sug = slips[0] if slips else []
 
 # backtest summary for the page
 bt = {}
@@ -224,7 +238,7 @@ if os.path.exists(pb):
 
 DATA = dict(injuries=INJURY is not None, day=day, dayLabel=pd.Timestamp(day).strftime('%A, %B %-d'), taken=taken.strftime('%A %-I:%M %p ET') if taken is not None else None,
             propsTaken=os.path.basename(pfile)[17:-5] if pfile else None, through=G.date.max(), book=BOOK,
-            games=games, players=players, legs=legs, suggested=sug, backtest=bt,
+            games=games, players=players, legs=legs, suggested=sug, slips=slips, backtest=bt,
             teams=[dict(team=t.team, off=round(t.off, 1), deff=round(t.deff, 1), net=round(t.net, 1)) for t in teams.itertuples()])
 B = os.path.join(ROOT, 'board')
 head = open(os.path.join(B, 'head.html')).read().replace('<title>Player Props Board</title>', '<title>NBA Props Board</title>')

@@ -14,6 +14,12 @@ const $ = (id) => document.getElementById(id);
 let slip = [];
 try { slip = JSON.parse(localStorage.getItem('nba-slip-' + D.day) || '[]').filter((id) => LEG[id]); } catch (e) { slip = []; }
 const saveSlip = () => { try { localStorage.setItem('nba-slip-' + D.day, JSON.stringify(slip)); } catch (e) {} };
+const SLIPS = (D.slips && D.slips.length ? D.slips : (D.suggested.length ? [D.suggested] : [])).map((s) => s.filter((id) => LEG[id]));
+let sugIdx = -1;   // which suggestion is loaded (-1 = own slip)
+let saved = [];
+try { saved = JSON.parse(localStorage.getItem('nba-saved-' + D.day) || '[]').map((s) => ({ ...s, legs: s.legs.filter((id) => LEG[id]) })).filter((s) => s.legs.length); } catch (e) { saved = []; }
+const saveSaved = () => { try { localStorage.setItem('nba-saved-' + D.day, JSON.stringify(saved)); } catch (e) {} };
+const loadSug = (i) => { sugIdx = (i + SLIPS.length) % SLIPS.length; slip = SLIPS[sugIdx].slice(); saveSlip(); render(); };
 const hasProps = D.players.some((p) => Object.values(p.props).some((x) => x.line != null));
 if (!hasProps) state.sort = 'proj';
 
@@ -145,7 +151,7 @@ function boardGames() {
 function addBtn(id) {
   const on = slip.includes(id);
   const b = el('button', 'add' + (on ? ' on' : ''), on ? 'Added' : 'Add');
-  b.onclick = () => { slip = on ? slip.filter((x) => x !== id) : slip.concat(id); saveSlip(); render(); };
+  b.onclick = () => { slip = on ? slip.filter((x) => x !== id) : slip.concat(id); sugIdx = -1; saveSlip(); render(); };
   return b;
 }
 
@@ -178,13 +184,36 @@ function boardParlay() {
   const sl = el('div', 'col slip');
   const sh = el('div', 'colhead'); sh.append(el('h2', null, 'Slip'));
   const acts = el('span', 'acts');
-  const sug = el('button', 'lnk sugb', 'Load suggested'); sug.onclick = () => { slip = D.suggested.slice(); saveSlip(); render(); };
-  const clr = el('button', 'lnk', 'Clear'); clr.onclick = () => { slip = []; saveSlip(); render(); };
-  acts.append(sug, clr); sh.append(acts); sl.append(sh);
+  const clr = el('button', 'lnk', 'Clear'); clr.onclick = () => { slip = []; sugIdx = -1; saveSlip(); render(); };
+  acts.append(clr); sh.append(acts); sl.append(sh);
+  if (SLIPS.length) {
+    const nav = el('div', 'sugnav');
+    const prev = el('button', 'lnk', '‹'); prev.setAttribute('aria-label', 'Previous suggestion'); prev.onclick = () => loadSug(sugIdx < 0 ? SLIPS.length - 1 : sugIdx - 1);
+    const lab = el('span', 'suglab', sugIdx >= 0 ? `Suggestion ${sugIdx + 1} of ${SLIPS.length}` : `${SLIPS.length} suggested parlays`);
+    const next = el('button', 'lnk', '›'); next.setAttribute('aria-label', 'Next suggestion'); next.onclick = () => loadSug(sugIdx + 1);
+    const shuf = el('button', 'lnk sugb', sugIdx < 0 ? 'Load suggested' : 'Shuffle');
+    shuf.onclick = () => { if (sugIdx < 0 || SLIPS.length < 2) return loadSug(0); let k = sugIdx; while (k === sugIdx) k = Math.floor(Math.random() * SLIPS.length); loadSug(k); };
+    nav.append(prev, lab, next, shuf); sl.append(nav);
+  }
+  if (saved.length || slip.length) {
+    const sv = el('div', 'savedrow');
+    if (slip.length) {
+      const sb = el('button', 'lnk', 'Save this slip');
+      sb.onclick = () => { const key = slip.slice().sort().join('|'); if (!saved.some((s) => s.legs.slice().sort().join('|') === key)) { saved.push({ name: sugIdx >= 0 ? `Suggestion ${sugIdx + 1}` : `My slip ${saved.length + 1}`, legs: slip.slice() }); saveSaved(); } render(); };
+      sv.append(sb);
+    }
+    saved.forEach((s, i) => {
+      const on = s.legs.slice().sort().join('|') === slip.slice().sort().join('|');
+      const c = el('button', 'chip', s.name); c.setAttribute('aria-pressed', on); c.onclick = () => { slip = s.legs.slice(); sugIdx = -1; saveSlip(); render(); };
+      const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Delete ' + s.name); x.onclick = () => { saved.splice(i, 1); saveSaved(); render(); };
+      const w = el('span', 'savedchip'); w.append(c, x); sv.append(w);
+    });
+    sl.append(sv);
+  }
   const legs = slip.map((id) => LEG[id]).filter(Boolean);
-  if (!legs.length) sl.append(el('div', 'empty', D.suggested.length ? 'Add legs, or load the suggested slip (best value leg from up to 4 games).' : 'Add legs from the list. No leg meets the value rule (edge 3+, chance 55%+) on this slate.'));
+  if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : 'Add legs from the list. No leg meets the value rule (edge 3+, chance 55%+) on this slate.'));
   const box = el('div', 'slipl');
-  legs.forEach((L) => { const d = el('div'); const n = el('span', null, L.label); n.append(el('small', null, `${L.game} · ${pct(L.p)}`)); const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
+  legs.forEach((L) => { const d = el('div'); const n = el('span', null, L.label); n.append(el('small', null, `${L.game} · ${pct(L.p)}`)); const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
   if (legs.length) {
     sl.append(box);
     const p = legs.reduce((a, l) => a * l.p, 1), d = legs.reduce((a, l) => a * dec(l.price), 1), ev = p * d - 1;
