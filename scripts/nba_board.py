@@ -247,7 +247,7 @@ DATA = dict(live=LIVE, injuries=INJURY is not None, day=day, dayLabel=pd.Timesta
             teams=[dict(team=t.team, off=round(t.off, 1), deff=round(t.deff, 1), net=round(t.net, 1)) for t in teams.itertuples()])
 B = os.path.join(ROOT, 'board')
 head = open(os.path.join(B, 'head.html')).read().replace('<title>Player Props Board</title>', '<title>NBA Props Board</title>')
-nav = ('<nav class="sportnav" aria-label="Sport"><a href="index.html">NFL</a><a href="nba.html" aria-current="page">NBA</a></nav>\n')
+nav = ('<nav class="sportnav" aria-label="Sport"><a href="index.html">NFL</a><a href="nba.html" aria-current="page">NBA</a><a href="nhl.html">NHL</a></nav>\n')
 SPORT_CSS = """<style>
 .sportnav { display: flex; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; }
 .sportnav a { font: 700 15px var(--display, sans-serif); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; background: var(--panel); }

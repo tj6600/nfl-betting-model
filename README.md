@@ -195,3 +195,54 @@ Data comes from [sportsdataverse hoopR](https://github.com/sportsdataverse/hoopR
 - **Parlay builder modes:** *Best value* (biggest edge first) or *Most likely to hit*, which uses the highest-chance legs that are still +EV (edge 1+ pt, 55%+ chance, no flags).
 - **Injuries** (`nbamodel/injuries.py`): ESPN's injury report (site.api.espn.com, allowed in the Default environment). Players listed Out are dropped. Teammates pick up part of their projected production in proportion to each teammate's own projection: 63% of points, 49% of rebounds, 59% of assists and 56% of threes (`props.SHARE`, fit on 2023-24 to 2025-26). Only regulars who played in the last 21 days count, so a long-term absence that teammates' recent form already reflects isn't counted twice. Their value also feeds the game model's missing-player term. If the report can't be reached, the board falls back to who sat each team's last game.
 - **Live grading** (`scripts/nba_grade.py`): each board build logs every priced leg to `odds_log/nba/picks/`. The grader takes each day's first log and grades it at the logged DraftKings price against box scores, voiding players who sit. It also compares each leg with the day's last DraftKings snapshot before tip-off (closing line value). Results go to `odds_log/nba/grade_report.md` and the board's Model record tab.
+
+## NHL model (`nhlmodel/`), backtests only so far
+
+**Data.** The NHL API is blocked from the cloud env, so box scores and play-by-play (with xG) come from the
+sportsdataverse mirror on raw.githubusercontent.com (`python -m nhlmodel.data` fetches the current season and
+rebuilds `nhl_data/`, which is gitignored). DraftKings history comes from The Odds API historical endpoints
+(`python -m nhlmodel.odds history-props ...` / `history-games ...`) and is saved in `odds_log/nhl/history/`.
+The pull cost about 8,100 credits: 20 sample nights of 2025-26 props (228 games) and every 2025-26 day of
+moneylines and puck lines.
+
+**Models.** All are fit on 2024-25 and tested on 2025-26 DraftKings lines.
+- Shots on goal: Poisson regression on recent shots, shot attempts, ice time, power-play attempts, opponent shots
+  allowed, home and back-to-back, with a negative binomial for over/under chances.
+- Goalie saves: opponent shot attempts x the goalie's shrunk save rate, with a haircut for the chance he's pulled.
+- Games: each team's non-empty-net regulation goals (xG and goals for/against vs the current league rate, opposing
+  goalie, rest), a shared-goal Skellam margin, an empirical empty-net table (a 1-goal lead became 2+ about 40% of
+  the time), overtime, then a logistic recalibration of "wins by 2+".
+
+**Results on 2025-26 DraftKings lines** (`scripts/nhl_props_backtest.py`, `scripts/nhl_game_backtest.py`):
+
+| Market | Lines | Log loss model / DK / 50-50 blend | Best bet filter |
+|---|---|---|---|
+| Shots on goal | 3,344 | 0.6843 / 0.6840 / **0.6829** | blend, EV 3%+: 231 bets, 55.0% hit, +12.2% ROI (almost all unders) |
+| Goalie saves | 375 | 0.6960 / 0.6936 / **0.6924** | blend, EV 3%+: 55 bets, 56.4% hit, +6.8% ROI (too few to trust) |
+| Moneyline | 1,215 | 0.6841 / 0.6833 / **0.6825** | roughly break-even at every filter |
+| Puck line | 1,215 | 0.6261 / **0.6236** / 0.6237 | loses 3% to 10% at every filter |
+
+The shots-on-goal blend is the only lead, and it's concentrated in March and April (153 of the 231 bets).
+November to January was flat or negative. Treat it as unproven until it's tested on another season.
+
+**2026-27 retest (shots on goal only, 495 credits, 5 nights, 822 lines).** Fit on 2024-26 and run with
+`python scripts/nhl_props_backtest.py --season 2026-27`. Log loss: model 0.6772, DK 0.6792, blend **0.6765**. Every
+blend pick with positive EV: 139 bets, 59.0% hit, +9.3% ROI. At EV 3%+: 40 bets, 60.0% hit, +13.0% ROI, all but
+one unders. Betting every under blindly lost 4.6%, so the gain comes from which unders the model picks. Three of
+the five nights were profitable. That's encouraging, but the sample is still small.
+
+### NHL board (`board/site/nhl.html`, `scripts/nhl_board.py`)
+
+The board has these tabs: Games (a pick to win, model goals, goalies, and moneyline, puck line and total legs), Shots on goal,
+Goalie saves, Parlay builder and Model record. Game lines and probable goalies come from ESPN's scoreboard, which
+carries DraftKings prices and costs no Odds API credits. ESPN's summaries also give DraftKings closing lines from 2025-26
+on (`python -m nhlmodel.espn history ...`, free). Those lines were used to test totals (DraftKings was better) and winner
+picks (the model picked 54-61% correctly, DraftKings' favorite 56-62%). Shots-on-goal and saves lines need
+`python -m nhlmodel.odds props` (about 2 credits per game). Without them, the prop tabs show projections only.
+
+Model weights against the DraftKings no-vig price: moneyline 50%, shots on goal 50%, saves 50%, puck line 25%, total 25%.
+Winner picks also join the "Most likely to hit" parlay pool, priced no shorter than -200.
+
+Daily run: `python -m nhlmodel.data` adds newly finished games from the mirror's per-game JSON files to
+`nhl_data/<year>/`. It needs no pyarrow; `--parquet` / `--all` rebuild from parquet instead. Then run
+`python scripts/nhl_grade.py`, `python -m nhlmodel.odds props` (about 2 credits per game), and `python scripts/nhl_board.py`.
