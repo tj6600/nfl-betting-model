@@ -1,0 +1,76 @@
+{
+ "mae": [
+  {
+   "stat": "Points",
+   "n": 47511,
+   "model": 4.88,
+   "season_avg": 5.02,
+   "last10": 5.02
+  },
+  {
+   "stat": "Rebounds",
+   "n": 47511,
+   "model": 2.03,
+   "season_avg": 2.03,
+   "last10": 2.04
+  },
+  {
+   "stat": "Assists",
+   "n": 47511,
+   "model": 1.44,
+   "season_avg": 1.47,
+   "last10": 1.47
+  },
+  {
+   "stat": "Threes",
+   "n": 47511,
+   "model": 0.97,
+   "season_avg": 0.98,
+   "last10": 0.98
+  },
+  {
+   "stat": "Pts+Reb+Ast",
+   "n": 47511,
+   "model": 6.33,
+   "season_avg": 6.53,
+   "last10": 6.53
+  }
+ ],
+ "cal": [
+  {
+   "stat": "Points",
+   "n": 9188,
+   "hit": 0.631,
+   "pred": 0.622,
+   "overs": 0.217
+  },
+  {
+   "stat": "Rebounds",
+   "n": 10867,
+   "hit": 0.62,
+   "pred": 0.626,
+   "overs": 0.254
+  },
+  {
+   "stat": "Assists",
+   "n": 12425,
+   "hit": 0.627,
+   "pred": 0.631,
+   "overs": 0.269
+  },
+  {
+   "stat": "Threes",
+   "n": 16472,
+   "hit": 0.672,
+   "pred": 0.682,
+   "overs": 0.064
+  },
+  {
+   "stat": "Pts+Reb+Ast",
+   "n": 9608,
+   "hit": 0.633,
+   "pred": 0.626,
+   "overs": 0.308
+  }
+ ]
+}
