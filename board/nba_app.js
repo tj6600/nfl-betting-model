@@ -14,7 +14,37 @@ const $ = (id) => document.getElementById(id);
 let slip = [];
 try { slip = JSON.parse(localStorage.getItem('nba-slip-' + D.day) || '[]').filter((id) => LEG[id]); } catch (e) { slip = []; }
 const saveSlip = () => { try { localStorage.setItem('nba-slip-' + D.day, JSON.stringify(slip)); } catch (e) {} };
-const SLIPS = (D.slips && D.slips.length ? D.slips : (D.suggested.length ? [D.suggested] : [])).map((s) => s.filter((id) => LEG[id]));
+// suggested parlays are built here so the leg count can be chosen: best remaining legs, 1 per game and 1 per player,
+// no leg reused across suggestions (same rule as scripts/nba_board.py)
+const POOL = (D.pool || []).map((id) => LEG[id]).filter(Boolean);
+function buildSlips(size, n = 6) {
+  const out = [], used = new Set();
+  for (let s = 0; s < n; s++) {
+    const slip = [], g = new Set(), pl = new Set();
+    for (const L of POOL) {
+      if (used.has(L.id) || g.has(L.game) || (L.pid && pl.has(L.pid))) continue;
+      slip.push(L.id); g.add(L.game); if (L.pid) pl.add(L.pid);
+      if (slip.length >= size) break;
+    }
+    if (slip.length < size) break;
+    slip.forEach((id) => used.add(id)); out.push(slip);
+  }
+  return out;
+}
+// growth score: Kelly bankroll growth of the slip, with each leg's chance cut 2 points for model error
+function growth(ids) {
+  const p = ids.reduce((a, id) => a * Math.max(0.01, LEG[id].p - 0.02), 1), b = ids.reduce((a, id) => a * dec(LEG[id].price), 1) - 1;
+  const f = (b * p - (1 - p)) / b; if (f <= 0) return 0;
+  return p * Math.log(1 + f * b) + (1 - p) * Math.log(1 - f);
+}
+const SIZES = [2, 3, 4, 5, 6].filter((k) => buildSlips(k, 1).length);
+const BEST = SIZES.length ? SIZES.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), SIZES[0]) : null;
+let legCount = null;
+try { legCount = +localStorage.getItem('nba-legs') || null; } catch (e) {}
+if (!SIZES.includes(legCount)) legCount = BEST;
+let SLIPS = [];
+const setSize = (k) => { legCount = k; try { localStorage.setItem('nba-legs', k); } catch (e) {} SLIPS = POOL.length ? buildSlips(k) : (D.slips || []); };
+setSize(legCount);
 let sugIdx = -1;   // which suggestion is loaded (-1 = own slip)
 let saved = [];
 try { saved = JSON.parse(localStorage.getItem('nba-saved-' + D.day) || '[]').map((s) => ({ ...s, legs: s.legs.filter((id) => LEG[id]) })).filter((s) => s.legs.length); } catch (e) { saved = []; }
@@ -186,6 +216,15 @@ function boardParlay() {
   const acts = el('span', 'acts');
   const clr = el('button', 'lnk', 'Clear'); clr.onclick = () => { slip = []; sugIdx = -1; saveSlip(); render(); };
   acts.append(clr); sh.append(acts); sl.append(sh);
+  if (SIZES.length) {
+    const lc = el('div', 'sugnav');
+    lc.append(el('b', null, 'Legs'));
+    const seg = el('div', 'seg');
+    SIZES.forEach((k) => { const b = el('button', null, k === BEST ? `${k} ★` : String(k)); b.setAttribute('aria-pressed', k === legCount); b.title = k === BEST ? 'Best number of legs tonight' : ''; b.onclick = () => { setSize(k); loadSug(0); }; seg.append(b); });
+    lc.append(seg);
+    lc.append(el('span', 'dim sugbest', `★ ${BEST} legs is best tonight`));
+    sl.append(lc);
+  }
   if (SLIPS.length) {
     const nav = el('div', 'sugnav');
     const prev = el('button', 'lnk', '‹'); prev.setAttribute('aria-label', 'Previous suggestion'); prev.onclick = () => loadSug(sugIdx < 0 ? SLIPS.length - 1 : sugIdx - 1);
@@ -232,7 +271,7 @@ function boardParlay() {
     if (warns.length) { const ul = el('ul', 'warns'); warns.forEach(([c, t]) => ul.append(el('li', c, t))); sl.append(ul); }
   }
   cols.append(list, sl); B.append(cols);
-  $('foot').textContent = 'Edge is the leg\'s chance minus the break-even of its DraftKings price, in percentage points. Ranking by edge rather than payout keeps long shots from crowding the top. Your slip is saved in this browser.';
+  $('foot').textContent = 'Edge is the leg\'s chance minus the break-even of its DraftKings price, in percentage points. Ranking by edge rather than payout keeps long shots from crowding the top. ★ marks the leg count whose top suggestion grows a bankroll fastest (Kelly growth, with each leg\'s chance cut 2 points for model error): more legs raise the payout, but every leg compounds the chance of being wrong. Your slip is saved in this browser.';
 }
 
 function boardRecord() {

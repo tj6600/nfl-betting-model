@@ -238,7 +238,7 @@ if os.path.exists(pb):
 
 DATA = dict(injuries=INJURY is not None, day=day, dayLabel=pd.Timestamp(day).strftime('%A, %B %-d'), taken=taken.strftime('%A %-I:%M %p ET') if taken is not None else None,
             propsTaken=os.path.basename(pfile)[17:-5] if pfile else None, through=G.date.max(), book=BOOK,
-            games=games, players=players, legs=legs, suggested=sug, slips=slips, backtest=bt,
+            games=games, players=players, legs=legs, suggested=sug, slips=slips, pool=[l['id'] for l in pool], backtest=bt,
             teams=[dict(team=t.team, off=round(t.off, 1), deff=round(t.deff, 1), net=round(t.net, 1)) for t in teams.itertuples()])
 B = os.path.join(ROOT, 'board')
 head = open(os.path.join(B, 'head.html')).read().replace('<title>Player Props Board</title>', '<title>NBA Props Board</title>')
