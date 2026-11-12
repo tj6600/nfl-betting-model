@@ -9,6 +9,11 @@ before the target game:
   * opponent: what the opponent allowed per minute to that position (G/F/C) vs league, EWM over its
     games, shrunk and taken to the 0.5 power.
   * game total: the market total (else the teams' recent totals) vs league average, to the 0.5 power.
+  * teammates out: regulars who sit (injury, rest; not coach's decision) leave production behind, and
+    teammates pick up SHARE[stat] of it, split by their own projection: proj x (1 + BASE + SHARE x vacated / team).
+    Fit on 2023-24 to 2025-26 (scripts/nba_props_backtest.py). Live, "sits" means Out on the injury report.
+  * drift: every projection is scaled by how the league's actual stats compared with projections over
+    the previous 21 days (shrunk), which catches early-season shifts like deeper rotations and lower scoring.
 Over/under chances come from the empirical spread of actual / projected in past games, grouped by stat
 and projection size, so they carry minutes risk, blowouts and foul trouble.
 """
@@ -25,8 +30,16 @@ def _ewm(s, hl):
     return s.shift(1).ewm(halflife=hl, ignore_na=True).mean()
 
 
-def features(P, G, totals=None):
-    """Pre-game features for every player-game row in P (rows for upcoming games may have NaN stats)."""
+# teammates-out adjustment, fit 2026-11-12 on 2023-24..2025-26: actual/proj - 1 = BASE + SHARE * vacated/team
+BASE = {'pts': -0.024, 'reb': -0.046, 'ast': -0.039, 'fg3m': -0.040, 'pra': -0.024}
+SHARE = {'pts': 0.63, 'reb': 0.49, 'ast': 0.59, 'fg3m': 0.56, 'pra': 0.60}
+DRIFT_DAYS, DRIFT_N = 21, 400
+
+
+def features(P, G, totals=None, out=None, raw=False):
+    """Pre-game features for every player-game row in P (rows for upcoming games may have NaN stats).
+    out: set of (game_id, pid) known to sit in upcoming games (injury report Out). raw=True skips the
+    teammates-out and drift adjustments (for refitting them)."""
     p = P.copy()
     p['pra'] = p.pts + p.reb + p.ast
     p['pg'] = p.pos.map(POSG).fillna('F')
@@ -88,6 +101,35 @@ def features(P, G, totals=None):
     p['tf'] = (exp_tot / p.season.map(lg_tot)).fillna(1.0) ** 0.5
     for k in STATS:
         p[f'{k}_proj'] = p.m_ewm * p[f'{k}_pm'] * p[f'{k}_of'] * p.tf
+    if raw:
+        return p
+    # teammates out
+    upcoming = p.pts.isna()
+    reg = (p.n_prev >= 3) & (p.m_ewm >= 15) & (p.days_off <= 21)
+    sat = p.dnp.astype(bool) & ~p.reason.fillna('').str.contains('COACH', case=False)
+    if out:
+        sat = sat | pd.Series([(g, i) in out for g, i in zip(p.game_id, p.pid)], index=p.index)
+    p['absent'] = reg & sat
+    mates = eligible(p) & ~sat & (p.played | upcoming)
+    key = [p.game_id, p.team]
+    for k in STATS:
+        vac = p[f'{k}_proj'].where(p.absent, 0.0).groupby(key).transform('sum')
+        have = p[f'{k}_proj'].where(mates, 0.0).groupby(key).transform('sum')
+        adj = 1 + BASE[k] + SHARE[k] * (vac / have.replace(0, np.nan)).fillna(0.0).clip(upper=0.6)
+        p[f'{k}_proj'] = p[f'{k}_proj'] * np.where(mates, adj, 1.0)
+    p['vacated'] = p.pts_proj.where(p.absent, 0.0).groupby(key).transform('sum').where(mates, 0.0)
+    # drift: league actual / projected over the previous DRIFT_DAYS days, shrunk by DRIFT_N player-games
+    base = p[eligible(p) & p.played]
+    dts = pd.to_datetime(p.date)
+    days = pd.Series(sorted(dts.unique()))
+    for k in STATS:
+        dd = base.assign(d=pd.to_datetime(base.date)).groupby('d').agg(a=(k, 'sum'), j=(f'{k}_proj', 'sum'), n=(k, 'size'))
+        dd = dd.reindex(pd.date_range(dd.index.min(), max(dd.index.max(), dts.max()), freq='D'), fill_value=0)
+        roll = dd.rolling(DRIFT_DAYS, min_periods=1).sum().shift(1)
+        r = (roll.a / roll.j.replace(0, np.nan)).fillna(1.0)
+        fac = 1 + (r - 1) * roll.n / (roll.n + DRIFT_N)
+        p[f'{k}_drift'] = dts.map(fac).fillna(1.0).values
+        p[f'{k}_proj'] = p[f'{k}_proj'] * p[f'{k}_drift']
     return p
 
 
