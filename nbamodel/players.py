@@ -14,7 +14,7 @@ or who played the team's previous game ('prev', what a stale run knows).
 import numpy as np, pandas as pd
 from nbamodel import games as M
 
-HL_DAYS, LAM, PRIOR_SEASON_W = 240.0, 25.0, 1.0
+HL_DAYS, LAM = 240.0, 10.0   # tuned 2026-11-12: lam 10 best of 10/25/60/150; hl 240 best of 120/240/500
 
 
 def form(P):
