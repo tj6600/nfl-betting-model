@@ -25,7 +25,7 @@ const CONF = {
     pos: ['all', 'RB', 'WR', 'TE', 'QB'],
     sorts: [['model', 'Sort: chance to score'], ['edge', 'Sort: model minus book'], ['ev', 'Sort: expected value'], ['odds', 'Sort: longest odds']],
     legend: '<span><i style="width:22px;height:8px;border-radius:4px;background:var(--turf)"></i>Model chance</span><span><i style="width:2px;height:14px;background:var(--tick)"></i>Book chance (includes their margin)</span><span><span class="pill value">TD value</span></span><span><span class="pill likely">Most likely</span></span><span><span class="pill check">Check role</span></span>',
-    foot: 'The touchdown model learns from each player\'s recent red-zone and goal-line work, carries and targets, his share among teammates at his position, games he missed, the opponent\'s touchdowns allowed to his position, and his team\'s expected points. It was well calibrated on 2024 and 2025 games, but there are no past touchdown odds to test it against. "Small roles" means fewer than 3 carries plus targets a game; long odds there produce big but unrealistic EV numbers. The depth chart is shown and flags Check role when it has moved a player down.',
+    foot: 'The touchdown model learns from each player\'s recent red-zone and goal-line work, carries and targets, his share among teammates at his position, games he missed, the opponent\'s touchdowns allowed to his position, and his team\'s expected points. It was well calibrated on 2024 and 2025 games, but there are no past touchdown odds to test it against. "Small roles" means fewer than 3 carries plus targets a game; long odds there produce big but unrealistic EV numbers. The depth chart is shown and flags Check role when it has moved a player down. Pick a game to see every active QB, RB, WR and TE on both teams, including depth-chart players with no touches yet (players on injured reserve are left out).',
   },
   rush: {
     lede: 'Each player\'s projected rushing yards against the over/under lines. The bar shows the model\'s likely range, its median and the line. Open a player to see every book\'s line.',
@@ -126,9 +126,12 @@ const SORTS = {
 function filtered() {
   const q = state.q.trim().toLowerCase();
   const src = state.tab === 'td' ? TD : state.tab === 'ms' ? MS : YD.filter((p) => p.market === state.tab);
+  // touchdowns for one game: list every active QB/RB/WR/TE (depth chart included), small roles too
+  const allTd = state.tab === 'td' && state.game !== 'all';
+  const sm = document.getElementById('small'); sm.disabled = allTd; sm.parentElement.title = allTd ? 'Picking a game shows every player' : '';
   const base = src.filter((p) => (state.game === 'all' || p.game === state.game)
     && (state.pos === 'all' || (state.tab === 'ms' ? p.market : p.pos) === state.pos)
-    && (!state.small || p.cat || (state.tab === 'td' ? p.opps >= 3 : p.regular))
+    && (!state.small || allTd || p.cat || (state.tab === 'td' ? p.opps >= 3 : p.regular))
     && (!q || p.name.toLowerCase().includes(q) || p.team.toLowerCase() === q || p.opp.toLowerCase() === q));
   return { base, list: base.filter((p) => state.cat === 'all' || p.cat === state.cat).sort(SORTS[state.sort] || SORTS.ev) };
 }

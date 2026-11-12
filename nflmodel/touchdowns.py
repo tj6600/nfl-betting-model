@@ -275,7 +275,7 @@ def _key(s):
             .str.replace(r'[^a-z]', '', regex=True))
 
 
-def upcoming(season, week, implied, overrides=None):
+def upcoming(season, week, implied, overrides=None, depth=None):
     """Rows for players expected to play in `week`, with their prior history as features.
 
     implied: DataFrame game_id, posteam, imp_pts for this week's games.
@@ -299,7 +299,21 @@ def upcoming(season, week, implied, overrides=None):
     team_last = tseq.groupby('posteam').game_id.last()
     played = pg[pg.season == season].groupby('pid').game_id.apply(set)
     # anyone ACT with a touch this season; a starter back from injury competes for touches again
-    last = last[[len(played.get(r.pid, set())) > 0 for r in last.itertuples()]]
+    on_chart = set() if depth is None else set(depth.pid)
+    has_touch = np.array([len(played.get(r.pid, set())) > 0 for r in last.itertuples()], bool)
+    core = set(last.pid[has_touch])
+    last = last[has_touch | last.pid.isin(on_chart).values]
+    if depth is not None:   # listed on the depth chart, ACT, but no touches in our play-by-play history at all
+        ract = _load_extra('roster', season); ract = ract[(ract.week == week) & (ract.status == 'ACT')]
+        nm = dict(zip(ract.gsis_id, ract.full_name))
+        new = depth[depth.pid.isin(set(nm)) & ~depth.pid.isin(set(last.pid))]
+        if len(new):
+            lg = pg.groupby('posteam').gameday.max()
+            add = pd.DataFrame({'pid': new.pid.values, 'team': new.team.values, 'position': new.pos_abb.values,
+                                'full_name': [nm[x] for x in new.pid], 'gameday': [lg.get(t) for t in new.team],
+                                'posteam': new.team.values, 'game_id': None, 'h_games': 0, 'last_share': 0.0})
+            for c in ROLL: add[f'h_{c}'] = 0.0
+            last = pd.concat([last, add[add.gameday.notna()]], ignore_index=True)
     last['missed_last'] = [float(team_last.get(r.team) not in played.get(r.pid, set())) for r in last.itertuples()]
     tgames = tseq.groupby('posteam').game_id.apply(list)
     def streak(r):
@@ -314,7 +328,14 @@ def upcoming(season, week, implied, overrides=None):
     if overrides is not None and len(overrides):
         out = overrides[(overrides.season == season) & (overrides.week == week) & overrides.status.isin(['Out', 'Doubtful'])]
         last = last[~_key(last.full_name).isin(set(_key(out.player)))]
-    last = _room(last)
+    tot = last[last.pid.isin(core)].groupby(['posteam', 'position']).h_opp_share.sum()
+    last = _room(last.assign(_core=last.pid.isin(core)))
+    extra = ~last._core
+    if extra.any():   # extras: share against the regulars' total, so adding them leaves everyone else unchanged
+        t = np.array([tot.get((r.posteam, r.position), 0.0) for r in last[extra].itertuples()]) + last.loc[extra, 'h_opp_share'].values
+        last.loc[extra, 'room_share'] = last.loc[extra, 'h_opp_share'].values / np.where(t > 0, t, 1)
+        core_rows = last[~extra]; last.loc[~extra, 'room_share'] = _room(core_rows.copy()).room_share
+    last = last.drop(columns='_core')
     d = defense_table(pg)
     dn = d.sort_values('gameday').groupby(['defteam', 'position']).def_now.last().rename('def_td').reset_index()
     opp = implied.merge(implied[['game_id', 'posteam']].rename(columns={'posteam': 'defteam'}), on='game_id')

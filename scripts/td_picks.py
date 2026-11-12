@@ -34,7 +34,13 @@ for g in target.itertuples():
 lines = pd.DataFrame(lines)
 ov_path = os.path.join(ROOT, 'odds_log', 'injury_overrides.csv')
 ov = pd.read_csv(ov_path) if os.path.exists(ov_path) else None
-P = T.upcoming(season, week, T.implied_points(lines), ov)
+# depth chart: every QB/RB/WR/TE listed now gets a chance on the board, even with no touches yet
+try:
+    snaps = T.depth_snapshots([season])
+    cur = snaps[snaps.dt == snaps.groupby('team').dt.transform('max')]
+except Exception as e:
+    print('depth charts unavailable:', e); snaps = cur = None
+P = T.upcoming(season, week, T.implied_points(lines), ov, depth=cur)
 P['model_prob'] = T.predict(b, T.design(P))
 # weather: rain cut TD rates in backtests (odds_log/weather_props.json); scale the expected scoring rate
 from nflmodel import weather as W
@@ -45,10 +51,9 @@ P['model_prob'] = 1 - (1 - P.model_prob) ** P.m_td
 # depth chart (shown and used as a flag, not in the model: on 2026 games it did not improve the predictions
 # because recent usage already carries the same information)
 try:
-    snaps = T.depth_snapshots([season])
     P = T.add_depth(P, snaps, now=snaps.dt.max() + pd.Timedelta(minutes=1))
 except Exception as e:
-    print('depth charts unavailable:', e); P['dc_rank'] = P['dc_prev'] = np.nan; P['dc_tier'] = 0; P['dc_demoted'] = P['dc_promoted'] = 0.0
+    print('depth charts not added:', e); P['dc_rank'] = P['dc_prev'] = np.nan; P['dc_tier'] = 0; P['dc_demoted'] = P['dc_promoted'] = 0.0
 P = P.merge(lines[['game_id', 'home_team', 'away_team']], on='game_id')
 
 # sportsbook anytime TD prices
