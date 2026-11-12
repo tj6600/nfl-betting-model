@@ -40,6 +40,16 @@ LA @ ARI,00-0037840,LA,ARI,Kyren Williams,RB,Receptions,5,4.5,0.1642,0.2449,0.20
 LA @ ARI,00-0037840,LA,ARI,Kyren Williams,RB,Receptions,6,5.5,0.0829,0.1419,0.1124,630,DraftKings,6,-0.1795,2.7,2.3,2.5,True,False,
 LA @ ARI,00-0037840,LA,ARI,Kyren Williams,RB,Receptions,7,6.5,0.0419,0.0858,0.0639,1240,DraftKings,4,-0.1444,2.7,2.3,2.5,True,False,
 LA @ ARI,00-0037840,LA,ARI,Kyren Williams,RB,Receptions,8,7.5,0.0212,0.0524,0.0368,2200,DraftKings,3,-0.1532,2.7,2.3,2.5,True,False,
+LA @ ARI,00-0026498,LA,ARI,Matthew Stafford,QB,Passing yards,125,124.5,0.9523,0.8805,0.9164,-1400,FanDuel,1,-0.0182,238.1,235.8,213.5,True,False,Likely hit
+LA @ ARI,00-0026498,LA,ARI,Matthew Stafford,QB,Passing yards,150,149.5,0.9045,0.8324,0.8685,-580,FanDuel,5,0.0182,238.1,235.8,213.5,True,False,Likely hit
+LA @ ARI,00-0026498,LA,ARI,Matthew Stafford,QB,Passing yards,175,174.5,0.8138,0.7013,0.7576,-280,FanDuel,2,0.0281,238.1,235.8,213.5,True,False,
+LA @ ARI,00-0026498,LA,ARI,Matthew Stafford,QB,Passing yards,200,199.5,0.6933,0.5833,0.6383,-145,Fanatics,6,0.0785,238.1,235.8,213.5,True,False,Value
+LA @ ARI,00-0026498,LA,ARI,Matthew Stafford,QB,Passing yards,225,224.5,0.5603,0.4138,0.487,135,Fanatics,3,0.1445,238.1,235.8,213.5,True,False,Value
+LA @ ARI,00-0026498,LA,ARI,Matthew Stafford,QB,Passing yards,250,249.5,0.4257,0.3043,0.365,250,Fanatics,5,0.2775,238.1,235.8,213.5,True,False,Value
+LA @ ARI,00-0026498,LA,ARI,Matthew Stafford,QB,Passing yards,275,274.5,0.3044,0.1805,0.2424,460,Fanatics,2,0.3577,238.1,235.8,213.5,True,False,
+LA @ ARI,00-0026498,LA,ARI,Matthew Stafford,QB,Passing yards,300,299.5,0.205,0.1258,0.1654,800,Fanatics,5,0.4886,238.1,235.8,213.5,True,False,
+LA @ ARI,00-0026498,LA,ARI,Matthew Stafford,QB,Passing yards,325,324.5,0.1275,0.0786,0.1031,1100,FanDuel,1,0.237,238.1,235.8,213.5,True,False,
+LA @ ARI,00-0026498,LA,ARI,Matthew Stafford,QB,Passing yards,350,349.5,0.072,0.0517,0.0618,1840,DraftKings,4,0.1998,238.1,235.8,213.5,True,False,
 LA @ ARI,00-0041070,ARI,LA,Reggie Virgil,WR,Receptions,2,1.5,0.4944,0.716,0.6052,-286,BetRivers,6,-0.1831,1.8,1.5,2.5,True,True,
 LA @ ARI,00-0041070,ARI,LA,Reggie Virgil,WR,Receptions,3,2.5,0.2678,0.474,0.3709,104,DraftKings,6,-0.2433,1.8,1.5,2.5,True,True,
 LA @ ARI,00-0041070,ARI,LA,Reggie Virgil,WR,Receptions,4,3.5,0.1514,0.2996,0.2255,251,DraftKings,6,-0.2085,1.8,1.5,2.5,True,True,
@@ -300,6 +310,18 @@ KC @ ATL,00-0036970,ATL,KC,Kyle Pitts,TE,Receptions,7,6.5,0.091,0.1398,0.1154,74
 KC @ ATL,00-0036970,ATL,KC,Kyle Pitts,TE,Receptions,8,7.5,0.0453,0.0822,0.0637,1420,DraftKings,6,-0.0314,3.5,3.2,3.5,True,False,
 KC @ ATL,00-0036970,ATL,KC,Kyle Pitts,TE,Receptions,9,8.5,0.0211,0.0519,0.0365,2300,DraftKings,4,-0.1234,3.5,3.2,3.5,True,False,
 KC @ ATL,00-0036970,ATL,KC,Kyle Pitts,TE,Receptions,10,9.5,0.0109,0.0325,0.0217,2800,Bovada,1,-0.3698,3.5,3.2,3.5,True,False,
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,150,149.5,0.8141,0.8509,0.8325,-700,Fanatics,6,-0.0486,214.3,210.2,218.5,True,False,Likely hit
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,175,174.5,0.6984,0.7354,0.7169,-320,Fanatics,4,-0.059,214.3,210.2,218.5,True,False,
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,200,199.5,0.568,0.6065,0.5872,-165,Fanatics,7,-0.0568,214.3,210.2,218.5,True,False,
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,225,224.5,0.4206,0.4605,0.4406,110,FanDuel,4,-0.0748,214.3,210.2,218.5,True,False,
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,250,249.5,0.2857,0.3322,0.3089,195,DraftKings,7,-0.0886,214.3,210.2,218.5,True,False,
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,275,274.5,0.1814,0.2233,0.2024,350,FanDuel,4,-0.0894,214.3,210.2,218.5,True,False,
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,300,299.5,0.1111,0.1398,0.1254,630,FanDuel,6,-0.0843,214.3,210.2,218.5,True,False,
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,325,324.5,0.0624,0.0925,0.0774,1000,Fanatics,3,-0.1483,214.3,210.2,218.5,True,False,
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,350,349.5,0.0306,0.059,0.0448,1840,DraftKings,5,-0.1311,214.3,210.2,218.5,True,False,
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,375,374.5,0.0136,0.0472,0.0304,1900,Bovada,1,-0.3922,214.3,210.2,218.5,True,False,
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,400,399.5,0.0079,0.0363,0.0221,2500,Bovada,1,-0.4251,214.3,210.2,218.5,True,False,
+KC @ ATL,00-0039917,ATL,KC,Michael Penix Jr.,QB,Passing yards,450,449.5,0.0034,0.0304,0.0169,3000,Bovada,1,-0.4756,214.3,210.2,218.5,True,False,
 KC @ ATL,00-0036637,KC,ATL,Noah Gray,TE,Receiving yards,10,9.5,0.5747,0.5568,0.5657,-134,BetRivers,3,-0.0121,17.9,12.3,10.5,False,True,
 KC @ ATL,00-0036637,KC,ATL,Noah Gray,TE,Receiving yards,15,14.5,0.4445,0.4368,0.4406,118,FanDuel,2,-0.0394,17.9,12.3,10.5,False,True,
 KC @ ATL,00-0036637,KC,ATL,Noah Gray,TE,Receiving yards,20,19.5,0.3397,0.3276,0.3336,200,BetRivers,3,0.0009,17.9,12.3,10.5,False,True,
@@ -330,6 +352,18 @@ KC @ ATL,00-0035208,ATL,KC,Olamide Zaccheaus,WR,Receptions,4,3.5,0.1662,0.091,0.
 KC @ ATL,00-0035208,ATL,KC,Olamide Zaccheaus,WR,Receptions,5,4.5,0.085,0.0604,0.0727,2600,DraftKings,2,0.9621,1.9,1.5,1.5,True,True,
 KC @ ATL,00-0035208,ATL,KC,Olamide Zaccheaus,WR,Receptions,6,5.5,0.0487,0.041,0.0449,2200,BetOnline.ag,1,0.0319,1.9,1.5,1.5,True,True,
 KC @ ATL,00-0035208,ATL,KC,Olamide Zaccheaus,WR,Receptions,7,6.5,0.0225,0.0193,0.0209,4800,BetOnline.ag,1,0.0236,1.9,1.5,1.5,True,True,
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,150,149.5,0.9124,0.8825,0.8974,-1450,FanDuel,1,-0.0407,244.8,242.5,238.5,True,False,Likely hit
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,175,174.5,0.8349,0.8176,0.8263,-650,FanDuel,3,-0.0466,244.8,242.5,238.5,True,False,Likely hit
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,200,199.5,0.7254,0.7422,0.7338,-300,Fanatics,7,-0.0216,244.8,242.5,238.5,True,False,
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,225,224.5,0.5876,0.6003,0.594,-150,Fanatics,5,-0.01,244.8,242.5,238.5,True,False,
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,250,249.5,0.4585,0.467,0.4628,120,Fanatics,7,0.0181,244.8,242.5,238.5,True,False,
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,275,274.5,0.3365,0.3209,0.3287,215,BetRivers,5,0.0353,244.8,242.5,238.5,True,False,
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,300,299.5,0.2418,0.2215,0.2316,410,BetRivers,7,0.1813,244.8,242.5,238.5,True,False,
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,325,324.5,0.1581,0.148,0.153,650,Fanatics,4,0.1477,244.8,242.5,238.5,True,False,
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,350,349.5,0.0884,0.0912,0.0898,1200,Fanatics,6,0.1673,244.8,242.5,238.5,True,False,
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,375,374.5,0.0462,0.0629,0.0545,1700,BetOnline.ag,3,-0.0185,244.8,242.5,238.5,True,False,
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,400,399.5,0.0243,0.0417,0.033,2500,DraftKings,2,-0.1422,244.8,242.5,238.5,True,False,
+KC @ ATL,00-0033873,KC,ATL,Patrick Mahomes,QB,Passing yards,450,449.5,0.007,0.0304,0.0187,3000,Bovada,1,-0.4191,244.8,242.5,238.5,True,False,
 KC @ ATL,00-0039067,KC,ATL,Rashee Rice,WR,Receiving yards,15,14.5,0.933,0.9005,0.9168,-2100,DraftKings,1,-0.0396,60.8,56.7,55.5,True,False,Likely hit
 KC @ ATL,00-0039067,KC,ATL,Rashee Rice,WR,Receiving yards,20,19.5,0.8992,0.8761,0.8877,-1180,DraftKings,2,-0.0371,60.8,56.7,55.5,True,False,Likely hit
 KC @ ATL,00-0039067,KC,ATL,Rashee Rice,WR,Receiving yards,25,24.5,0.8579,0.8389,0.8484,-760,DraftKings,2,-0.04,60.8,56.7,55.5,True,False,Likely hit
@@ -486,6 +520,16 @@ LAC @ BAL,00-0034975,BAL,LAC,Justice Hill,RB,Rushing yards,50,49.5,0.1742,0.0898
 LAC @ BAL,00-0034975,BAL,LAC,Justice Hill,RB,Rushing yards,75,74.5,0.0748,0.0539,0.0643,1650,BetMGM,1,0.1261,29.8,18.2,12.5,False,True,
 LAC @ BAL,00-0034975,BAL,LAC,Justice Hill,RB,Rushing yards,100,99.5,0.0314,0.0449,0.0382,2000,BetMGM,1,-0.1988,29.8,18.2,12.5,False,True,
 LAC @ BAL,00-0034975,BAL,LAC,Justice Hill,RB,Rushing yards,125,124.5,0.012,0.0449,0.0285,2000,BetMGM,1,-0.402,29.8,18.2,12.5,False,True,
+LAC @ BAL,00-0036355,LAC,BAL,Justin Herbert,QB,Passing yards,125,124.5,0.8639,0.8678,0.8659,-1100,FanDuel,2,-0.0554,198.8,195.0,207.0,True,False,Likely hit
+LAC @ BAL,00-0036355,LAC,BAL,Justin Herbert,QB,Passing yards,150,149.5,0.7653,0.7972,0.7812,-450,Fanatics,6,-0.0452,198.8,195.0,207.0,True,False,
+LAC @ BAL,00-0036355,LAC,BAL,Justin Herbert,QB,Passing yards,175,174.5,0.6281,0.6575,0.6428,-220,Fanatics,3,-0.065,198.8,195.0,207.0,True,False,
+LAC @ BAL,00-0036355,LAC,BAL,Justin Herbert,QB,Passing yards,200,199.5,0.4819,0.5323,0.5071,-109,BetRivers,6,-0.0277,198.8,195.0,207.0,True,False,
+LAC @ BAL,00-0036355,LAC,BAL,Justin Herbert,QB,Passing yards,225,224.5,0.3243,0.3628,0.3436,175,BetRivers,3,-0.0552,198.8,195.0,207.0,True,False,
+LAC @ BAL,00-0036355,LAC,BAL,Justin Herbert,QB,Passing yards,250,249.5,0.212,0.2695,0.2408,335,BetRivers,6,0.0474,198.8,195.0,207.0,True,False,
+LAC @ BAL,00-0036355,LAC,BAL,Justin Herbert,QB,Passing yards,275,274.5,0.1202,0.1676,0.1439,500,Fanatics,2,-0.1366,198.8,195.0,207.0,True,False,
+LAC @ BAL,00-0036355,LAC,BAL,Justin Herbert,QB,Passing yards,300,299.5,0.0624,0.111,0.0867,900,Fanatics,5,-0.1333,198.8,195.0,207.0,True,False,
+LAC @ BAL,00-0036355,LAC,BAL,Justin Herbert,QB,Passing yards,325,324.5,0.0306,0.0726,0.0516,1200,FanDuel,1,-0.3293,198.8,195.0,207.0,True,False,
+LAC @ BAL,00-0036355,LAC,BAL,Justin Herbert,QB,Passing yards,350,349.5,0.0136,0.0502,0.0319,2000,DraftKings,2,-0.33,198.8,195.0,207.0,True,False,
 LAC @ BAL,00-0038454,LAC,BAL,Keaton Mitchell,RB,Receiving yards,10,9.5,0.4329,0.563,0.4979,-148,FanDuel,1,-0.1656,9.6,7.2,11.5,False,False,
 LAC @ BAL,00-0038454,LAC,BAL,Keaton Mitchell,RB,Receiving yards,15,14.5,0.3062,0.4212,0.3637,124,FanDuel,1,-0.1853,9.6,7.2,11.5,False,False,
 LAC @ BAL,00-0038454,LAC,BAL,Keaton Mitchell,RB,Receiving yards,20,19.5,0.2197,0.3166,0.2682,198,FanDuel,1,-0.2009,9.6,7.2,11.5,False,False,
@@ -620,6 +664,18 @@ LAC @ BAL,00-0039064,BAL,LAC,Zay Flowers,WR,Receptions,12,11.5,0.0058,0.05,0.027
 LAC @ BAL,00-0039064,BAL,LAC,Zay Flowers,WR,Rushing yards,10,9.5,0.4567,0.2859,0.3713,230,FanDuel,1,0.2252,11.5,7.9,3.5,False,True,
 LAC @ BAL,00-0039064,BAL,LAC,Zay Flowers,WR,Rushing yards,15,14.5,0.3626,0.1887,0.2757,400,FanDuel,1,0.3783,11.5,7.9,3.5,False,True,
 LAC @ BAL,00-0039064,BAL,LAC,Zay Flowers,WR,Rushing yards,20,19.5,0.2796,0.1292,0.2044,630,FanDuel,1,0.4923,11.5,7.9,3.5,False,True,
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,150,149.5,0.9022,0.8985,0.9003,-1800,FanDuel,3,-0.0496,236.7,234.5,240.5,True,False,Likely hit
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,175,174.5,0.8091,0.8209,0.815,-600,Fanatics,3,-0.0492,236.7,234.5,240.5,True,False,Likely hit
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,200,199.5,0.6909,0.7314,0.7112,-275,Fanatics,7,-0.0302,236.7,234.5,240.5,True,False,
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,225,224.5,0.5524,0.5907,0.5716,-150,Fanatics,4,-0.0474,236.7,234.5,240.5,True,False,
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,250,249.5,0.4194,0.4536,0.4365,118,BetRivers,7,-0.0485,236.7,234.5,240.5,True,False,
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,275,274.5,0.2981,0.3264,0.3123,215,BetRivers,4,-0.0163,236.7,234.5,240.5,True,False,
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,300,299.5,0.1964,0.2246,0.2105,400,BetRivers,7,0.0525,236.7,234.5,240.5,True,False,
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,325,324.5,0.1197,0.1451,0.1324,550,FanDuel,3,-0.1392,236.7,234.5,240.5,True,False,
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,350,349.5,0.0673,0.0898,0.0786,1100,DraftKings,6,-0.0572,236.7,234.5,240.5,True,False,
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,375,374.5,0.0352,0.0629,0.0491,1400,FanDuel,2,-0.2642,236.7,234.5,240.5,True,False,
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,400,399.5,0.0172,0.0393,0.0283,2700,DraftKings,2,-0.2087,236.7,234.5,240.5,True,False,
+PIT @ CIN,00-0023459,PIT,CIN,Aaron Rodgers,QB,Passing yards,450,449.5,0.0047,0.0304,0.0176,3000,Bovada,1,-0.4555,236.7,234.5,240.5,True,False,
 PIT @ CIN,00-0038597,CIN,PIT,Chase Brown,RB,Receiving yards,10,9.5,0.69,0.7996,0.7448,-550,FanDuel,3,-0.1198,29.4,20.2,25.5,True,False,
 PIT @ CIN,00-0038597,CIN,PIT,Chase Brown,RB,Receiving yards,15,14.5,0.5952,0.6951,0.6452,-270,BetOnline.ag,3,-0.1159,29.4,20.2,25.5,True,False,
 PIT @ CIN,00-0038597,CIN,PIT,Chase Brown,RB,Receiving yards,20,19.5,0.5092,0.6324,0.5708,-166,FanDuel,4,-0.0853,29.4,20.2,25.5,True,False,
@@ -855,6 +911,17 @@ PIT @ CIN,00-0037228,PIT,CIN,Jaylen Warren,RB,Rushing yards,140,139.5,0.0261,0.0
 PIT @ CIN,00-0037228,PIT,CIN,Jaylen Warren,RB,Rushing yards,150,149.5,0.0171,0.0339,0.0255,2900,DraftKings,2,-0.2353,62.6,59.7,64.5,True,False,
 PIT @ CIN,00-0037228,PIT,CIN,Jaylen Warren,RB,Rushing yards,160,159.5,0.0135,0.0236,0.0185,3900,DraftKings,1,-0.258,62.6,59.7,64.5,True,False,
 PIT @ CIN,00-0037228,PIT,CIN,Jaylen Warren,RB,Rushing yards,175,174.5,0.0054,0.0277,0.0166,3300,Bovada,1,-0.4364,62.6,59.7,64.5,True,False,
+PIT @ CIN,00-0036442,CIN,PIT,Joe Burrow,QB,Passing yards,200,199.5,0.8569,0.891,0.8739,-950,Fanatics,5,-0.0341,271.2,268.5,289.5,True,False,Likely hit
+PIT @ CIN,00-0036442,CIN,PIT,Joe Burrow,QB,Passing yards,225,224.5,0.7496,0.8209,0.7852,-475,Fanatics,3,-0.0495,271.2,268.5,289.5,True,False,
+PIT @ CIN,00-0036442,CIN,PIT,Joe Burrow,QB,Passing yards,250,249.5,0.6114,0.724,0.6677,-245,Fanatics,7,-0.0598,271.2,268.5,289.5,True,False,
+PIT @ CIN,00-0036442,CIN,PIT,Joe Burrow,QB,Passing yards,275,274.5,0.4634,0.6053,0.5343,-140,Fanatics,4,-0.084,271.2,268.5,289.5,True,False,
+PIT @ CIN,00-0036442,CIN,PIT,Joe Burrow,QB,Passing yards,300,299.5,0.3187,0.4602,0.3894,120,Fanatics,8,-0.1432,271.2,268.5,289.5,True,False,
+PIT @ CIN,00-0036442,CIN,PIT,Joe Burrow,QB,Passing yards,325,324.5,0.2098,0.3276,0.2687,200,Fanatics,4,-0.194,271.2,268.5,289.5,True,False,
+PIT @ CIN,00-0036442,CIN,PIT,Joe Burrow,QB,Passing yards,350,349.5,0.1236,0.2274,0.1755,349,DraftKings,8,-0.2122,271.2,268.5,289.5,True,False,
+PIT @ CIN,00-0036442,CIN,PIT,Joe Burrow,QB,Passing yards,375,374.5,0.0699,0.1509,0.1104,580,FanDuel,3,-0.2491,271.2,268.5,289.5,True,False,
+PIT @ CIN,00-0036442,CIN,PIT,Joe Burrow,QB,Passing yards,400,399.5,0.0472,0.0993,0.0732,1060,DraftKings,7,-0.1505,271.2,268.5,289.5,True,False,
+PIT @ CIN,00-0036442,CIN,PIT,Joe Burrow,QB,Passing yards,425,424.5,0.026,0.0651,0.0456,1400,FanDuel,2,-0.3163,271.2,268.5,289.5,True,False,
+PIT @ CIN,00-0036442,CIN,PIT,Joe Burrow,QB,Passing yards,450,449.5,0.0163,0.0389,0.0276,2600,DraftKings,2,-0.2552,271.2,268.5,289.5,True,False,
 PIT @ CIN,00-0034829,CIN,PIT,Mike Gesicki,TE,Receiving yards,10,9.5,0.8018,0.7677,0.7848,-420,DraftKings,4,-0.0284,32.3,25.9,23.5,True,True,
 PIT @ CIN,00-0034829,CIN,PIT,Mike Gesicki,TE,Receiving yards,15,14.5,0.7038,0.6695,0.6866,-239,DraftKings,2,-0.0261,32.3,25.9,23.5,True,True,
 PIT @ CIN,00-0034829,CIN,PIT,Mike Gesicki,TE,Receiving yards,20,19.5,0.6059,0.5784,0.5922,-152,DraftKings,4,-0.0182,32.3,25.9,23.5,True,True,
@@ -981,6 +1048,18 @@ PIT @ CIN,00-0036410,CIN,PIT,Tee Higgins,WR,Receptions,9,8.5,0.0976,0.1641,0.130
 PIT @ CIN,00-0036410,CIN,PIT,Tee Higgins,WR,Receptions,10,9.5,0.0545,0.102,0.0783,1020,DraftKings,7,-0.1234,5.0,4.8,5.5,True,False,
 PIT @ CIN,00-0036410,CIN,PIT,Tee Higgins,WR,Receptions,11,10.5,0.0258,0.0581,0.042,1760,DraftKings,4,-0.2197,5.0,4.8,5.5,True,False,
 PIT @ CIN,00-0036410,CIN,PIT,Tee Higgins,WR,Receptions,12,11.5,0.0134,0.0337,0.0235,2700,DraftKings,1,-0.3407,5.0,4.8,5.5,True,False,
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,150,149.5,0.8709,0.8937,0.8823,-1800,FanDuel,1,-0.0687,225.7,223.6,244.5,True,False,Likely hit
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,175,174.5,0.7707,0.8255,0.7981,-700,FanDuel,3,-0.0879,225.7,223.6,244.5,True,False,
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,200,199.5,0.6377,0.7338,0.6857,-320,DraftKings,7,-0.1,225.7,223.6,244.5,True,False,
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,225,224.5,0.4945,0.6065,0.5505,-159,BetRivers,5,-0.1033,225.7,223.6,244.5,True,False,
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,250,249.5,0.3584,0.4717,0.415,123,BetRivers,7,-0.0745,225.7,223.6,244.5,True,False,
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,275,274.5,0.248,0.3394,0.2937,230,BetRivers,5,-0.0308,225.7,223.6,244.5,True,False,
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,300,299.5,0.1565,0.2301,0.1933,430,BetRivers,7,0.0245,225.7,223.6,244.5,True,False,
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,325,324.5,0.0798,0.1547,0.1173,525,Fanatics,4,-0.2672,225.7,223.6,244.5,True,False,
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,350,349.5,0.0415,0.0968,0.0691,900,Fanatics,6,-0.3088,225.7,223.6,244.5,True,False,
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,375,374.5,0.018,0.0679,0.0429,1500,Fanatics,4,-0.313,225.7,223.6,244.5,True,False,
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,400,399.5,0.011,0.043,0.027,2200,DraftKings,2,-0.3799,225.7,223.6,244.5,True,False,
+HOU @ CLE,00-0039163,HOU,CLE,C.J. Stroud,QB,Passing yards,450,449.5,0.0039,0.0304,0.0172,3000,Bovada,1,-0.4677,225.7,223.6,244.5,True,False,
 HOU @ CLE,00-0034383,HOU,CLE,Dalton Schultz,TE,Receiving yards,10,9.5,0.8284,0.8576,0.843,-740,DraftKings,3,-0.0431,37.3,29.9,30.5,True,False,Likely hit
 HOU @ CLE,00-0034383,HOU,CLE,Dalton Schultz,TE,Receiving yards,15,14.5,0.7449,0.7642,0.7545,-389,DraftKings,2,-0.0515,37.3,29.9,30.5,True,False,
 HOU @ CLE,00-0034383,HOU,CLE,Dalton Schultz,TE,Receiving yards,20,19.5,0.6593,0.6882,0.6738,-238,DraftKings,4,-0.0431,37.3,29.9,30.5,True,False,
@@ -1330,6 +1409,17 @@ HOU @ CLE,00-0038618,HOU,CLE,Xavier Hutchinson,WR,Receptions,7,6.5,0.0295,0.0629
 HOU @ CLE,00-0038618,HOU,CLE,Xavier Hutchinson,WR,Receptions,8,7.5,0.0123,0.0363,0.0243,2900,DraftKings,3,-0.2713,2.5,2.1,2.5,True,False,
 HOU @ CLE,00-0038618,HOU,CLE,Xavier Hutchinson,WR,Receptions,9,8.5,0.0059,0.0304,0.0182,3000,Bovada,1,-0.4369,2.5,2.1,2.5,True,False,
 HOU @ CLE,00-0038618,HOU,CLE,Xavier Hutchinson,WR,Receptions,10,9.5,0.002,0.0262,0.0141,3500,Bovada,1,-0.4919,2.5,2.1,2.5,True,False,
+SF @ DAL,00-0037834,SF,DAL,Brock Purdy,QB,Passing yards,175,174.5,0.9252,0.8642,0.8947,-1000,FanDuel,2,-0.0158,275.6,272.8,255.5,True,False,Likely hit
+SF @ DAL,00-0037834,SF,DAL,Brock Purdy,QB,Passing yards,200,199.5,0.8667,0.7937,0.8302,-441,DraftKings,7,0.0184,275.6,272.8,255.5,True,False,Likely hit
+SF @ DAL,00-0037834,SF,DAL,Brock Purdy,QB,Passing yards,225,224.5,0.7675,0.6776,0.7225,-235,Fanatics,4,0.03,275.6,272.8,255.5,True,False,
+SF @ DAL,00-0037834,SF,DAL,Brock Purdy,QB,Passing yards,250,249.5,0.6293,0.5437,0.5865,-125,DraftKings,7,0.0556,275.6,272.8,255.5,True,False,Value
+SF @ DAL,00-0037834,SF,DAL,Brock Purdy,QB,Passing yards,275,274.5,0.4862,0.4023,0.4442,145,Fanatics,4,0.0884,275.6,272.8,255.5,True,False,Value
+SF @ DAL,00-0037834,SF,DAL,Brock Purdy,QB,Passing yards,300,299.5,0.3512,0.2859,0.3185,265,Fanatics,7,0.1627,275.6,272.8,255.5,True,False,Value
+SF @ DAL,00-0037834,SF,DAL,Brock Purdy,QB,Passing yards,325,324.5,0.2325,0.1925,0.2125,440,Fanatics,3,0.1476,275.6,272.8,255.5,True,False,
+SF @ DAL,00-0037834,SF,DAL,Brock Purdy,QB,Passing yards,350,349.5,0.1447,0.1258,0.1353,750,Fanatics,6,0.1496,275.6,272.8,255.5,True,False,
+SF @ DAL,00-0037834,SF,DAL,Brock Purdy,QB,Passing yards,375,374.5,0.0797,0.0858,0.0827,1300,Fanatics,3,0.1581,275.6,272.8,255.5,True,False,
+SF @ DAL,00-0037834,SF,DAL,Brock Purdy,QB,Passing yards,400,399.5,0.0504,0.0526,0.0515,1880,DraftKings,4,0.0195,275.6,272.8,255.5,True,False,
+SF @ DAL,00-0037834,SF,DAL,Brock Purdy,QB,Passing yards,450,449.5,0.0179,0.0304,0.0242,3000,Bovada,1,-0.2511,275.6,272.8,255.5,True,False,
 SF @ DAL,00-0036358,DAL,SF,CeeDee Lamb,WR,Receiving yards,30,29.5,0.8838,0.9109,0.8973,-2800,DraftKings,1,-0.0706,85.1,77.9,88.5,True,False,Likely hit
 SF @ DAL,00-0036358,DAL,SF,CeeDee Lamb,WR,Receiving yards,40,39.5,0.8415,0.8782,0.8599,-1160,DraftKings,2,-0.066,85.1,77.9,88.5,True,False,Likely hit
 SF @ DAL,00-0036358,DAL,SF,CeeDee Lamb,WR,Receiving yards,50,49.5,0.7606,0.8451,0.8028,-630,DraftKings,4,-0.0697,85.1,77.9,88.5,True,False,Likely hit
@@ -1405,6 +1495,17 @@ SF @ DAL,00-0033280,SF,DAL,Christian McCaffrey,RB,Rushing yards,130,129.5,0.0505
 SF @ DAL,00-0033280,SF,DAL,Christian McCaffrey,RB,Rushing yards,140,139.5,0.0306,0.0393,0.035,2300,DraftKings,1,-0.1607,63.5,60.6,61.5,True,False,
 SF @ DAL,00-0033280,SF,DAL,Christian McCaffrey,RB,Rushing yards,150,149.5,0.018,0.0332,0.0256,3200,DraftKings,2,-0.1555,63.5,60.6,61.5,True,False,
 SF @ DAL,00-0033280,SF,DAL,Christian McCaffrey,RB,Rushing yards,175,174.5,0.0081,0.0277,0.0179,3300,Bovada,1,-0.3905,63.5,60.6,61.5,True,False,
+SF @ DAL,00-0033077,DAL,SF,Dak Prescott,QB,Passing yards,175,174.5,0.9203,0.8879,0.9041,-1600,FanDuel,1,-0.0394,270.1,267.4,266.5,True,False,Likely hit
+SF @ DAL,00-0033077,DAL,SF,Dak Prescott,QB,Passing yards,200,199.5,0.8504,0.8297,0.8401,-600,Fanatics,6,-0.0199,270.1,267.4,266.5,True,False,Likely hit
+SF @ DAL,00-0033077,DAL,SF,Dak Prescott,QB,Passing yards,225,224.5,0.7398,0.7369,0.7384,-300,Fanatics,4,-0.0155,270.1,267.4,266.5,True,False,
+SF @ DAL,00-0033077,DAL,SF,Dak Prescott,QB,Passing yards,250,249.5,0.6049,0.6028,0.6038,-165,Fanatics,7,-0.0302,270.1,267.4,266.5,True,False,
+SF @ DAL,00-0033077,DAL,SF,Dak Prescott,QB,Passing yards,275,274.5,0.4602,0.4659,0.4631,110,BetRivers,4,-0.0276,270.1,267.4,266.5,True,False,
+SF @ DAL,00-0033077,DAL,SF,Dak Prescott,QB,Passing yards,300,299.5,0.3138,0.3369,0.3254,200,BetRivers,7,-0.0239,270.1,267.4,266.5,True,False,
+SF @ DAL,00-0033077,DAL,SF,Dak Prescott,QB,Passing yards,325,324.5,0.2049,0.2315,0.2182,360,BetRivers,4,0.0037,270.1,267.4,266.5,True,False,
+SF @ DAL,00-0033077,DAL,SF,Dak Prescott,QB,Passing yards,350,349.5,0.1171,0.1572,0.1372,610,DraftKings,6,-0.0262,270.1,267.4,266.5,True,False,
+SF @ DAL,00-0033077,DAL,SF,Dak Prescott,QB,Passing yards,375,374.5,0.065,0.1048,0.0849,850,Bovada,3,-0.1932,270.1,267.4,266.5,True,False,
+SF @ DAL,00-0033077,DAL,SF,Dak Prescott,QB,Passing yards,400,399.5,0.0439,0.0656,0.0548,1700,DraftKings,4,-0.0142,270.1,267.4,266.5,True,False,
+SF @ DAL,00-0033077,DAL,SF,Dak Prescott,QB,Passing yards,450,449.5,0.0163,0.0363,0.0263,2500,Bovada,1,-0.3169,270.1,267.4,266.5,True,False,
 SF @ DAL,00-0035719,SF,DAL,Deebo Samuel Sr.,WR,Receptions,2,1.5,0.8149,0.8324,0.8237,-535,DraftKings,5,-0.0224,3.0,2.8,3.5,True,True,
 SF @ DAL,00-0035719,SF,DAL,Deebo Samuel Sr.,WR,Receptions,3,2.5,0.5647,0.6712,0.618,-201,DraftKings,6,-0.0746,3.0,2.8,3.5,True,True,
 SF @ DAL,00-0035719,SF,DAL,Deebo Samuel Sr.,WR,Receptions,4,3.5,0.3463,0.467,0.4067,108,DraftKings,6,-0.1541,3.0,2.8,3.5,True,True,
@@ -1561,6 +1662,17 @@ NE @ DET,00-0040556,NE,DET,Corey Kiner,RB,Rushing yards,130,129.5,0.0016,0.0349,
 NE @ DET,00-0040556,NE,DET,Corey Kiner,RB,Rushing yards,140,139.5,0.001,0.0248,0.0129,3700,DraftKings,1,-0.5084,21.2,13.0,51.5,False,True,
 NE @ DET,00-0040556,NE,DET,Corey Kiner,RB,Rushing yards,150,149.5,0.001,0.0304,0.0157,3000,Bovada,1,-0.5121,21.2,13.0,51.5,False,True,
 NE @ DET,00-0040556,NE,DET,Corey Kiner,RB,Rushing yards,175,174.5,0.001,0.0262,0.0136,3500,Bovada,1,-0.5095,21.2,13.0,51.5,False,True,
+NE @ DET,00-0039851,NE,DET,Drake Maye,QB,Passing yards,175,174.5,0.8894,0.8805,0.885,-1400,FanDuel,1,-0.0518,252.8,250.3,259.5,True,False,Likely hit
+NE @ DET,00-0039851,NE,DET,Drake Maye,QB,Passing yards,200,199.5,0.7902,0.8151,0.8027,-525,Fanatics,6,-0.0444,252.8,250.3,259.5,True,False,Likely hit
+NE @ DET,00-0039851,NE,DET,Drake Maye,QB,Passing yards,225,224.5,0.6618,0.7133,0.6875,-275,Fanatics,3,-0.0624,252.8,250.3,259.5,True,False,
+NE @ DET,00-0039851,NE,DET,Drake Maye,QB,Passing yards,250,249.5,0.5057,0.5833,0.5445,-150,DraftKings,7,-0.0925,252.8,250.3,259.5,True,False,
+NE @ DET,00-0039851,NE,DET,Drake Maye,QB,Passing yards,275,274.5,0.3528,0.445,0.3989,120,Fanatics,4,-0.1223,252.8,250.3,259.5,True,False,
+NE @ DET,00-0039851,NE,DET,Drake Maye,QB,Passing yards,300,299.5,0.2228,0.3198,0.2713,201,DraftKings,7,-0.1834,252.8,250.3,259.5,True,False,
+NE @ DET,00-0039851,NE,DET,Drake Maye,QB,Passing yards,325,324.5,0.1285,0.2194,0.1739,340,Fanatics,3,-0.2347,252.8,250.3,259.5,True,False,
+NE @ DET,00-0039851,NE,DET,Drake Maye,QB,Passing yards,350,349.5,0.0683,0.1451,0.1067,592,DraftKings,6,-0.2615,252.8,250.3,259.5,True,False,
+NE @ DET,00-0039851,NE,DET,Drake Maye,QB,Passing yards,375,374.5,0.0423,0.0943,0.0683,950,Fanatics,3,-0.2828,252.8,250.3,259.5,True,False,
+NE @ DET,00-0039851,NE,DET,Drake Maye,QB,Passing yards,400,399.5,0.0228,0.0609,0.0418,1640,DraftKings,4,-0.2719,252.8,250.3,259.5,True,False,
+NE @ DET,00-0039851,NE,DET,Drake Maye,QB,Passing yards,450,449.5,0.0049,0.0325,0.0187,2800,Bovada,1,-0.4576,252.8,250.3,259.5,True,False,
 NE @ DET,00-0033090,NE,DET,Hunter Henry,TE,Receptions,2,1.5,0.8149,0.8324,0.8237,-710,DraftKings,4,-0.0603,3.6,3.3,3.5,True,False,Likely hit
 NE @ DET,00-0033090,NE,DET,Hunter Henry,TE,Receptions,3,2.5,0.6313,0.6495,0.6404,-209,Caesars,5,-0.0532,3.6,3.3,3.5,True,False,
 NE @ DET,00-0033090,NE,DET,Hunter Henry,TE,Receptions,4,3.5,0.4539,0.4368,0.4453,120,BetOnline.ag,5,-0.0203,3.6,3.3,3.5,True,False,
@@ -1666,6 +1778,17 @@ NE @ DET,00-0037240,DET,NE,Jameson Williams,WR,Receptions,7,6.5,0.118,0.1398,0.1
 NE @ DET,00-0037240,DET,NE,Jameson Williams,WR,Receptions,8,7.5,0.0575,0.0786,0.068,1380,DraftKings,6,0.007,3.7,3.4,3.5,True,False,
 NE @ DET,00-0037240,DET,NE,Jameson Williams,WR,Receptions,9,8.5,0.029,0.0472,0.0381,2300,DraftKings,3,-0.0861,3.7,3.4,3.5,True,False,
 NE @ DET,00-0037240,DET,NE,Jameson Williams,WR,Receptions,10,9.5,0.015,0.0363,0.0256,2500,Bovada,1,-0.3333,3.7,3.4,3.5,True,False,
+NE @ DET,00-0033106,DET,NE,Jared Goff,QB,Passing yards,175,174.5,0.9154,0.8879,0.9017,-1600,FanDuel,1,-0.042,264.9,262.2,267.5,True,False,Likely hit
+NE @ DET,00-0033106,DET,NE,Jared Goff,QB,Passing yards,200,199.5,0.8358,0.8423,0.839,-650,Fanatics,6,-0.0319,264.9,262.2,267.5,True,False,Likely hit
+NE @ DET,00-0033106,DET,NE,Jared Goff,QB,Passing yards,225,224.5,0.7236,0.729,0.7263,-310,Fanatics,3,-0.0394,264.9,262.2,267.5,True,False,
+NE @ DET,00-0033106,DET,NE,Jared Goff,QB,Passing yards,250,249.5,0.5724,0.6181,0.5952,-165,Fanatics,7,-0.044,264.9,262.2,267.5,True,False,
+NE @ DET,00-0033106,DET,NE,Jared Goff,QB,Passing yards,275,274.5,0.4211,0.4775,0.4493,105,Fanatics,4,-0.0789,264.9,262.2,267.5,True,False,
+NE @ DET,00-0033106,DET,NE,Jared Goff,QB,Passing yards,300,299.5,0.2797,0.3431,0.3114,182,DraftKings,7,-0.122,264.9,262.2,267.5,True,False,
+NE @ DET,00-0033106,DET,NE,Jared Goff,QB,Passing yards,325,324.5,0.1837,0.2419,0.2128,300,FanDuel,3,-0.1487,264.9,262.2,267.5,True,False,
+NE @ DET,00-0033106,DET,NE,Jared Goff,QB,Passing yards,350,349.5,0.0992,0.1547,0.1269,553,DraftKings,6,-0.1711,264.9,262.2,267.5,True,False,
+NE @ DET,00-0033106,DET,NE,Jared Goff,QB,Passing yards,375,374.5,0.0602,0.0993,0.0797,900,Fanatics,3,-0.2027,264.9,262.2,267.5,True,False,
+NE @ DET,00-0033106,DET,NE,Jared Goff,QB,Passing yards,400,399.5,0.0309,0.0656,0.0483,1540,DraftKings,4,-0.2085,264.9,262.2,267.5,True,False,
+NE @ DET,00-0033106,DET,NE,Jared Goff,QB,Passing yards,450,449.5,0.0098,0.0363,0.023,2500,Bovada,1,-0.4015,264.9,262.2,267.5,True,False,
 NE @ DET,00-0039065,DET,NE,Sam LaPorta,TE,Receiving yards,10,9.5,0.917,0.8972,0.9071,-1940,DraftKings,1,-0.0462,46.2,42.4,42.5,True,False,Likely hit
 NE @ DET,00-0039065,DET,NE,Sam LaPorta,TE,Receiving yards,15,14.5,0.8651,0.8626,0.8638,-960,DraftKings,2,-0.0462,46.2,42.4,42.5,True,False,Likely hit
 NE @ DET,00-0039065,DET,NE,Sam LaPorta,TE,Receiving yards,20,19.5,0.8082,0.8086,0.8084,-558,DraftKings,3,-0.0467,46.2,42.4,42.5,True,False,Likely hit
@@ -1811,6 +1934,17 @@ MIN @ GB,00-0038994,MIN,GB,Jordan Addison,WR,Receptions,7,6.5,0.0606,0.1502,0.10
 MIN @ GB,00-0038994,MIN,GB,Jordan Addison,WR,Receptions,8,7.5,0.03,0.0886,0.0593,1150,BetOnline.ag,6,-0.2589,2.9,2.4,3.5,True,False,
 MIN @ GB,00-0038994,MIN,GB,Jordan Addison,WR,Receptions,9,8.5,0.0148,0.0524,0.0336,2400,BetOnline.ag,5,-0.1596,2.9,2.4,3.5,True,False,
 MIN @ GB,00-0038994,MIN,GB,Jordan Addison,WR,Receptions,10,9.5,0.0083,0.0356,0.0219,2600,DraftKings,2,-0.4078,2.9,2.4,3.5,True,False,
+MIN @ GB,00-0036264,GB,MIN,Jordan Love,QB,Passing yards,175,174.5,0.7856,0.8491,0.8173,-700,Fanatics,3,-0.0659,229.3,227.1,251.5,True,False,Likely hit
+MIN @ GB,00-0036264,GB,MIN,Jordan Love,QB,Passing yards,200,199.5,0.6588,0.7937,0.7262,-375,Fanatics,7,-0.0801,229.3,227.1,251.5,True,False,
+MIN @ GB,00-0036264,GB,MIN,Jordan Love,QB,Passing yards,225,224.5,0.5172,0.6595,0.5884,-205,Fanatics,4,-0.1246,229.3,227.1,251.5,True,False,
+MIN @ GB,00-0036264,GB,MIN,Jordan Love,QB,Passing yards,250,249.5,0.3803,0.5241,0.4522,-117,DraftKings,7,-0.1613,229.3,227.1,251.5,True,False,
+MIN @ GB,00-0036264,GB,MIN,Jordan Love,QB,Passing yards,275,274.5,0.2645,0.3907,0.3276,152,FanDuel,4,-0.1745,229.3,227.1,251.5,True,False,
+MIN @ GB,00-0036264,GB,MIN,Jordan Love,QB,Passing yards,300,299.5,0.169,0.2734,0.2212,273,DraftKings,7,-0.1748,229.3,227.1,251.5,True,False,
+MIN @ GB,00-0036264,GB,MIN,Jordan Love,QB,Passing yards,325,324.5,0.0923,0.1833,0.1378,450,BetRivers,4,-0.2419,229.3,227.1,251.5,True,False,
+MIN @ GB,00-0036264,GB,MIN,Jordan Love,QB,Passing yards,350,349.5,0.0469,0.1198,0.0834,880,DraftKings,6,-0.1828,229.3,227.1,251.5,True,False,
+MIN @ GB,00-0036264,GB,MIN,Jordan Love,QB,Passing yards,375,374.5,0.0235,0.0786,0.051,1200,FanDuel,3,-0.3364,229.3,227.1,251.5,True,False,
+MIN @ GB,00-0036264,GB,MIN,Jordan Love,QB,Passing yards,400,399.5,0.0125,0.0524,0.0325,2300,DraftKings,3,-0.2208,229.3,227.1,251.5,True,False,
+MIN @ GB,00-0036264,GB,MIN,Jordan Love,QB,Passing yards,450,449.5,0.0039,0.0304,0.0172,3000,Bovada,1,-0.4677,229.3,227.1,251.5,True,False,
 MIN @ GB,00-0037525,MIN,GB,Jordan Mason,RB,Receptions,1,0.5,0.763,0.5991,0.6811,-174,FanDuel,1,0.0725,1.0,0.8,0.5,False,True,
 MIN @ GB,00-0037525,MIN,GB,Jordan Mason,RB,Receptions,2,1.5,0.2466,0.2754,0.261,260,FanDuel,4,-0.0603,1.0,0.8,0.5,False,True,
 MIN @ GB,00-0037525,MIN,GB,Jordan Mason,RB,Receptions,3,2.5,0.0765,0.1145,0.0955,810,DraftKings,4,-0.1311,1.0,0.8,0.5,False,True,
@@ -2043,6 +2177,16 @@ MIA @ IND,00-0041525,MIA,IND,Chris Bell,WR,Receptions,4,3.5,0.1161,0.1559,0.136,
 MIA @ IND,00-0041525,MIA,IND,Chris Bell,WR,Receptions,5,4.5,0.0626,0.0786,0.0706,1160,DraftKings,3,-0.1103,1.7,1.4,1.5,True,False,
 MIA @ IND,00-0041525,MIA,IND,Chris Bell,WR,Receptions,6,5.5,0.0272,0.0552,0.0412,2400,DraftKings,2,0.0295,1.7,1.4,1.5,True,False,
 MIA @ IND,00-0041525,MIA,IND,Chris Bell,WR,Receptions,7,6.5,0.0145,0.0349,0.0247,2600,BetOnline.ag,1,-0.3328,1.7,1.4,1.5,True,False,
+MIA @ IND,00-0035710,IND,MIA,Daniel Jones,QB,Passing yards,100,99.5,0.9569,0.8879,0.9224,-1600,FanDuel,1,-0.0199,208.6,204.6,182.5,True,False,Likely hit
+MIA @ IND,00-0035710,IND,MIA,Daniel Jones,QB,Passing yards,125,124.5,0.881,0.8205,0.8507,-600,FanDuel,2,-0.0075,208.6,204.6,182.5,True,False,Likely hit
+MIA @ IND,00-0035710,IND,MIA,Daniel Jones,QB,Passing yards,150,149.5,0.7948,0.7214,0.7581,-280,FanDuel,5,0.0289,208.6,204.6,182.5,True,False,
+MIA @ IND,00-0035710,IND,MIA,Daniel Jones,QB,Passing yards,175,174.5,0.6712,0.5568,0.614,-140,Fanatics,3,0.0525,208.6,204.6,182.5,True,False,Value
+MIA @ IND,00-0035710,IND,MIA,Daniel Jones,QB,Passing yards,200,199.5,0.5351,0.4212,0.4782,145,Fanatics,6,0.1715,208.6,204.6,182.5,True,False,Value
+MIA @ IND,00-0035710,IND,MIA,Daniel Jones,QB,Passing yards,225,224.5,0.3912,0.2649,0.328,280,Fanatics,2,0.2466,208.6,204.6,182.5,True,False,Value
+MIA @ IND,00-0035710,IND,MIA,Daniel Jones,QB,Passing yards,250,249.5,0.2574,0.1787,0.218,525,Fanatics,5,0.3626,208.6,204.6,182.5,True,False,
+MIA @ IND,00-0035710,IND,MIA,Daniel Jones,QB,Passing yards,275,274.5,0.1599,0.0984,0.1291,1000,Fanatics,2,0.4203,208.6,204.6,182.5,True,False,
+MIA @ IND,00-0035710,IND,MIA,Daniel Jones,QB,Passing yards,300,299.5,0.0907,0.0684,0.0795,1380,DraftKings,4,0.1772,208.6,204.6,182.5,True,False,
+MIA @ IND,00-0035710,IND,MIA,Daniel Jones,QB,Passing yards,350,349.5,0.0204,0.0449,0.0327,2000,BetMGM,1,-0.314,208.6,204.6,182.5,True,False,
 MIA @ IND,00-0041132,IND,MIA,Deion Burks,WR,Receptions,2,1.5,0.2722,0.6263,0.4493,-190,Caesars,4,-0.3143,1.1,0.9,2.5,False,True,
 MIA @ IND,00-0041132,IND,MIA,Deion Burks,WR,Receptions,3,2.5,0.0916,0.3781,0.2348,152,BetOnline.ag,4,-0.4082,1.1,0.9,2.5,False,True,
 MIA @ IND,00-0041132,IND,MIA,Deion Burks,WR,Receptions,4,3.5,0.0285,0.2039,0.1162,380,Fanatics,4,-0.4421,1.1,0.9,2.5,False,True,
@@ -2217,6 +2361,19 @@ SEA @ LV,00-0033908,SEA,LV,Cooper Kupp,WR,Receptions,6,5.5,0.0654,0.0726,0.069,1
 SEA @ LV,00-0033908,SEA,LV,Cooper Kupp,WR,Receptions,7,6.5,0.0295,0.041,0.0352,2700,DraftKings,3,-0.0131,2.5,2.1,2.5,True,False,
 SEA @ LV,00-0033908,SEA,LV,Cooper Kupp,WR,Receptions,8,7.5,0.0123,0.0283,0.0203,3500,BetOnline.ag,2,-0.2689,2.5,2.1,2.5,True,False,
 SEA @ LV,00-0033908,SEA,LV,Cooper Kupp,WR,Receptions,9,8.5,0.0059,0.0262,0.0161,3500,Bovada,1,-0.4222,2.5,2.1,2.5,True,False,
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,125,124.5,0.9358,0.8708,0.9033,-1200,FanDuel,1,-0.0214,220.0,217.9,203.5,True,False,Likely hit
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,150,149.5,0.8552,0.8133,0.8343,-500,FanDuel,7,0.0011,220.0,217.9,203.5,True,False,Likely hit
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,175,174.5,0.7488,0.6756,0.7122,-235,Fanatics,4,0.0153,220.0,217.9,203.5,True,False,
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,200,199.5,0.6017,0.5332,0.5675,-120,Fanatics,7,0.0404,220.0,217.9,203.5,True,False,
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,225,224.5,0.4585,0.3752,0.4169,155,BetRivers,4,0.063,220.0,217.9,203.5,True,False,Value
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,250,249.5,0.3247,0.255,0.2898,300,BetRivers,7,0.1594,220.0,217.9,203.5,True,False,Value
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,275,274.5,0.2136,0.1655,0.1896,525,Fanatics,3,0.1848,220.0,217.9,203.5,True,False,
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,300,299.5,0.1283,0.1079,0.1181,1020,DraftKings,6,0.3229,220.0,217.9,203.5,True,False,
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,325,324.5,0.0681,0.0776,0.0728,1260,FanDuel,2,-0.0096,220.0,217.9,203.5,True,False,
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,350,349.5,0.0344,0.0555,0.045,2700,DraftKings,3,0.2589,220.0,217.9,203.5,True,False,
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,375,374.5,0.0156,0.0393,0.0275,2300,Bovada,1,-0.3405,220.0,217.9,203.5,True,False,
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,400,399.5,0.0078,0.0325,0.0202,2800,Bovada,1,-0.4148,220.0,217.9,203.5,True,False,
+SEA @ LV,00-0035704,SEA,LV,Drew Lock,QB,Passing yards,450,449.5,0.0039,0.0262,0.0151,3500,Bovada,1,-0.4579,220.0,217.9,203.5,True,False,
 SEA @ LV,00-0041512,SEA,LV,Jadarian Price,RB,Receiving yards,10,9.5,0.5306,0.5519,0.5413,-136,DraftKings,3,-0.0608,14.5,10.9,11.5,True,True,
 SEA @ LV,00-0041512,SEA,LV,Jadarian Price,RB,Receiving yards,15,14.5,0.43,0.4212,0.4256,126,DraftKings,2,-0.0382,14.5,10.9,11.5,True,True,
 SEA @ LV,00-0041512,SEA,LV,Jadarian Price,RB,Receiving yards,20,19.5,0.3449,0.3176,0.3313,210,BetRivers,3,0.027,14.5,10.9,11.5,True,True,
@@ -2406,6 +2563,18 @@ SEA @ LV,00-0039165,SEA,LV,Zach Charbonnet,RB,Rushing yards,130,129.5,0.0251,0.0
 SEA @ LV,00-0039165,SEA,LV,Zach Charbonnet,RB,Rushing yards,140,139.5,0.0182,0.0337,0.026,2700,DraftKings,1,-0.273,44.7,36.1,60.5,True,True,
 SEA @ LV,00-0039165,SEA,LV,Zach Charbonnet,RB,Rushing yards,150,149.5,0.0144,0.0309,0.0227,3600,DraftKings,2,-0.1614,44.7,36.1,60.5,True,True,
 SEA @ LV,00-0039165,SEA,LV,Zach Charbonnet,RB,Rushing yards,175,174.5,0.0068,0.0277,0.0173,3300,Bovada,1,-0.412,44.7,36.1,60.5,True,True,
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,150,149.5,0.9061,0.8937,0.8999,-1800,FanDuel,1,-0.0501,238.6,236.3,244.5,True,False,Likely hit
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,175,174.5,0.8169,0.8255,0.8212,-700,FanDuel,3,-0.0615,238.6,236.3,244.5,True,False,Likely hit
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,200,199.5,0.6972,0.7577,0.7275,-340,Fanatics,6,-0.0586,238.6,236.3,244.5,True,False,
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,225,224.5,0.5634,0.6203,0.5918,-180,Fanatics,5,-0.0793,238.6,236.3,244.5,True,False,
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,250,249.5,0.4304,0.492,0.4612,105,Fanatics,7,-0.0546,238.6,236.3,244.5,True,False,
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,275,274.5,0.3059,0.3628,0.3344,178,FanDuel,5,-0.0704,238.6,236.3,244.5,True,False,
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,300,299.5,0.205,0.2389,0.2219,340,DraftKings,6,-0.0235,238.6,236.3,244.5,True,False,
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,325,324.5,0.1291,0.1603,0.1447,525,Fanatics,4,-0.0956,238.6,236.3,244.5,True,False,
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,350,349.5,0.072,0.0968,0.0844,1060,DraftKings,6,-0.0209,238.6,236.3,244.5,True,False,
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,375,374.5,0.0391,0.0726,0.0558,1280,FanDuel,3,-0.2293,238.6,236.3,244.5,True,False,
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,400,399.5,0.0172,0.0411,0.0291,2600,DraftKings,2,-0.2134,238.6,236.3,244.5,True,False,
+CAR @ NO,00-0039150,CAR,NO,Bryce Young,QB,Passing yards,450,449.5,0.0047,0.0304,0.0176,3000,Bovada,1,-0.4555,238.6,236.3,244.5,True,False,
 CAR @ NO,00-0037239,NO,CAR,Chris Olave,WR,Receiving yards,25,24.5,0.8978,0.8985,0.8982,-2000,DraftKings,1,-0.0569,75.3,70.2,73.5,True,False,Likely hit
 CAR @ NO,00-0037239,NO,CAR,Chris Olave,WR,Receiving yards,30,29.5,0.8613,0.8839,0.8726,-1260,DraftKings,2,-0.0582,75.3,70.2,73.5,True,False,Likely hit
 CAR @ NO,00-0037239,NO,CAR,Chris Olave,WR,Receiving yards,40,39.5,0.7848,0.8255,0.8052,-600,DraftKings,3,-0.0606,75.3,70.2,73.5,True,False,Likely hit
@@ -2641,6 +2810,17 @@ CAR @ NO,00-0040124,CAR,NO,Tetairoa McMillan,WR,Receptions,8,7.5,0.1571,0.1986,0
 CAR @ NO,00-0040124,CAR,NO,Tetairoa McMillan,WR,Receptions,9,8.5,0.0898,0.1258,0.1078,770,DraftKings,7,-0.0621,4.7,4.5,5.5,True,False,
 CAR @ NO,00-0040124,CAR,NO,Tetairoa McMillan,WR,Receptions,10,9.5,0.0486,0.0786,0.0636,1340,DraftKings,7,-0.084,4.7,4.5,5.5,True,False,
 CAR @ NO,00-0040124,CAR,NO,Tetairoa McMillan,WR,Receptions,11,10.5,0.0249,0.0689,0.0469,2200,DraftKings,2,0.0784,4.7,4.5,5.5,True,False,
+CAR @ NO,00-0040743,NO,CAR,Tyler Shough,QB,Passing yards,175,174.5,0.8435,0.8491,0.8463,-800,Fanatics,3,-0.0479,248.7,246.3,252.5,True,False,Likely hit
+CAR @ NO,00-0040743,NO,CAR,Tyler Shough,QB,Passing yards,200,199.5,0.7402,0.7779,0.7591,-375,Fanatics,6,-0.0385,248.7,246.3,252.5,True,False,
+CAR @ NO,00-0040743,NO,CAR,Tyler Shough,QB,Passing yards,225,224.5,0.6127,0.6617,0.6372,-205,Fanatics,4,-0.052,248.7,246.3,252.5,True,False,
+CAR @ NO,00-0040743,NO,CAR,Tyler Shough,QB,Passing yards,250,249.5,0.4804,0.5241,0.5023,-119,DraftKings,7,-0.0756,248.7,246.3,252.5,True,False,
+CAR @ NO,00-0040743,NO,CAR,Tyler Shough,QB,Passing yards,275,274.5,0.3584,0.3915,0.3749,143,BetRivers,4,-0.089,248.7,246.3,252.5,True,False,
+CAR @ NO,00-0040743,NO,CAR,Tyler Shough,QB,Passing yards,300,299.5,0.2598,0.2755,0.2676,272,DraftKings,6,-0.0045,248.7,246.3,252.5,True,False,
+CAR @ NO,00-0040743,NO,CAR,Tyler Shough,QB,Passing yards,325,324.5,0.1698,0.1887,0.1792,410,FanDuel,3,-0.0859,248.7,246.3,252.5,True,False,
+CAR @ NO,00-0040743,NO,CAR,Tyler Shough,QB,Passing yards,350,349.5,0.0994,0.1198,0.1096,820,DraftKings,6,0.0083,248.7,246.3,252.5,True,False,
+CAR @ NO,00-0040743,NO,CAR,Tyler Shough,QB,Passing yards,375,374.5,0.0509,0.0786,0.0647,1200,FanDuel,3,-0.1584,248.7,246.3,252.5,True,False,
+CAR @ NO,00-0040743,NO,CAR,Tyler Shough,QB,Passing yards,400,399.5,0.0282,0.0467,0.0374,2200,DraftKings,2,-0.1388,248.7,246.3,252.5,True,False,
+CAR @ NO,00-0040743,NO,CAR,Tyler Shough,QB,Passing yards,450,449.5,0.0078,0.0304,0.0191,3000,Bovada,1,-0.407,248.7,246.3,252.5,True,False,
 WAS @ NYG,00-0041040,WAS,NYG,Antonio Williams,WR,Receiving yards,10,9.5,0.8083,0.8783,0.8433,-1260,DraftKings,2,-0.0898,33.4,26.7,37.0,True,False,Likely hit
 WAS @ NYG,00-0041040,WAS,NYG,Antonio Williams,WR,Receiving yards,15,14.5,0.7139,0.8232,0.7685,-670,DraftKings,2,-0.1168,33.4,26.7,37.0,True,False,
 WAS @ NYG,00-0041040,WAS,NYG,Antonio Williams,WR,Receiving yards,20,19.5,0.6203,0.7645,0.6924,-410,DraftKings,4,-0.1387,33.4,26.7,37.0,True,False,
@@ -2856,6 +3036,32 @@ WAS @ NYG,00-0037838,NYG,WAS,Isaiah Likely,TE,Receptions,8,7.5,0.0758,0.1398,0.1
 WAS @ NYG,00-0037838,NYG,WAS,Isaiah Likely,TE,Receptions,9,8.5,0.0369,0.0858,0.0613,1200,BetRivers,7,-0.2025,4.0,3.8,4.5,True,False,
 WAS @ NYG,00-0037838,NYG,WAS,Isaiah Likely,TE,Receptions,10,9.5,0.0152,0.0524,0.0338,1880,DraftKings,5,-0.331,4.0,3.8,4.5,True,False,
 WAS @ NYG,00-0037838,NYG,WAS,Isaiah Likely,TE,Receptions,11,10.5,0.0054,0.0337,0.0196,2700,DraftKings,1,-0.4521,4.0,3.8,4.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,125,124.5,0.856,0.8648,0.8604,-1100,FanDuel,1,-0.0614,191.4,187.8,200.5,True,False,Likely hit
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,150,149.5,0.7392,0.7937,0.7664,-470,FanDuel,7,-0.0705,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,175,174.5,0.593,0.6637,0.6284,-220,Fanatics,4,-0.086,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,200,199.5,0.4274,0.5241,0.4758,-106,BetRivers,7,-0.0754,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,225,224.5,0.2789,0.3652,0.322,185,BetRivers,4,-0.0822,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,250,249.5,0.1701,0.2585,0.2143,360,BetRivers,7,-0.0144,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,275,274.5,0.0941,0.1655,0.1298,500,Fanatics,3,-0.2212,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,300,299.5,0.0476,0.1042,0.0759,900,Fanatics,6,-0.2407,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,325,324.5,0.0193,0.0771,0.0482,1280,FanDuel,2,-0.3353,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,350,349.5,0.0125,0.0539,0.0332,2000,DraftKings,3,-0.303,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,375,374.5,0.0045,0.0393,0.0219,2300,Bovada,1,-0.4739,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,400,399.5,0.0034,0.0325,0.018,2800,Bovada,1,-0.479,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039910,WAS,NYG,Jayden Daniels,QB,Passing yards,450,449.5,0.0011,0.0262,0.0137,3500,Bovada,1,-0.5079,191.4,187.8,200.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,125,124.5,0.8662,0.8708,0.8685,-1200,FanDuel,1,-0.0591,199.6,195.8,210.5,True,False,Likely hit
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,150,149.5,0.7664,0.8036,0.785,-470,FanDuel,7,-0.0479,199.6,195.8,210.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,175,174.5,0.6293,0.6659,0.6476,-230,Fanatics,4,-0.0709,199.6,195.8,210.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,200,199.5,0.4875,0.5222,0.5049,-119,DraftKings,7,-0.0708,199.6,195.8,210.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,225,224.5,0.3311,0.3707,0.3509,155,BetRivers,4,-0.1053,199.6,195.8,210.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,250,249.5,0.2132,0.2585,0.2358,300,BetRivers,7,-0.0568,199.6,195.8,210.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,275,274.5,0.1247,0.1685,0.1466,470,FanDuel,3,-0.1644,199.6,195.8,210.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,300,299.5,0.0646,0.1048,0.0847,900,Fanatics,6,-0.1528,199.6,195.8,210.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,325,324.5,0.0306,0.0776,0.0541,1260,FanDuel,2,-0.2644,199.6,195.8,210.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,350,349.5,0.0136,0.0539,0.0338,2200,DraftKings,3,-0.2236,199.6,195.8,210.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,375,374.5,0.0068,0.0393,0.0231,2300,Bovada,1,-0.4467,199.6,195.8,210.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,400,399.5,0.0045,0.0325,0.0185,2800,Bovada,1,-0.4625,199.6,195.8,210.5,True,False,
+WAS @ NYG,00-0039923,NYG,WAS,J.J. McCarthy,QB,Passing yards,450,449.5,0.0023,0.0262,0.0142,3500,Bovada,1,-0.4875,199.6,195.8,210.5,True,False,
 WAS @ NYG,00-0041042,NYG,WAS,Malachi Fields,WR,Receiving yards,10,9.5,0.8145,0.7711,0.7928,-400,BetRivers,4,-0.0091,34.4,27.6,25.5,True,True,
 WAS @ NYG,00-0041042,NYG,WAS,Malachi Fields,WR,Receiving yards,15,14.5,0.7234,0.6918,0.7076,-270,FanDuel,2,-0.0304,34.4,27.6,25.5,True,True,
 WAS @ NYG,00-0041042,NYG,WAS,Malachi Fields,WR,Receiving yards,20,19.5,0.6302,0.61,0.6201,-162,BetRivers,4,0.0029,34.4,27.6,25.5,True,True,
@@ -3209,6 +3415,18 @@ BUF @ NYJ,00-0037740,NYJ,BUF,Garrett Wilson,WR,Receptions,9,8.5,0.0657,0.1348,0.
 BUF @ NYJ,00-0037740,NYJ,BUF,Garrett Wilson,WR,Receptions,10,9.5,0.0323,0.0858,0.059,1100,DraftKings,7,-0.2918,4.4,4.2,5.5,True,True,
 BUF @ NYJ,00-0037740,NYJ,BUF,Garrett Wilson,WR,Receptions,11,10.5,0.0148,0.062,0.0384,1800,DraftKings,4,-0.2705,4.4,4.2,5.5,True,True,
 BUF @ NYJ,00-0037740,NYJ,BUF,Garrett Wilson,WR,Receptions,12,11.5,0.0058,0.0349,0.0204,2600,DraftKings,1,-0.4496,4.4,4.2,5.5,True,True,
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,150,149.5,0.8725,0.8538,0.8631,-750,FanDuel,6,-0.0218,226.1,224.0,220.5,True,False,Likely hit
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,175,174.5,0.7715,0.7442,0.7579,-350,FanDuel,4,-0.0256,226.1,224.0,220.5,True,False,
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,200,199.5,0.6424,0.6225,0.6325,-180,Fanatics,7,-0.0162,226.1,224.0,220.5,True,False,
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,225,224.5,0.4961,0.467,0.4816,105,Fanatics,4,-0.0128,226.1,224.0,220.5,True,False,
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,250,249.5,0.3584,0.3406,0.3495,188,FanDuel,7,0.0065,226.1,224.0,220.5,True,False,
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,275,274.5,0.2504,0.2274,0.2389,320,FanDuel,4,0.0033,226.1,224.0,220.5,True,False,
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,300,299.5,0.1588,0.1479,0.1534,580,FanDuel,6,0.043,226.1,224.0,220.5,True,False,
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,325,324.5,0.0814,0.0925,0.0869,1000,Fanatics,3,-0.0437,226.1,224.0,220.5,True,False,
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,350,349.5,0.0423,0.059,0.0506,1640,DraftKings,5,-0.1194,226.1,224.0,220.5,True,False,
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,375,374.5,0.0196,0.0497,0.0346,1800,Bovada,1,-0.3425,226.1,224.0,220.5,True,False,
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,400,399.5,0.011,0.0363,0.0236,2500,Bovada,1,-0.3859,226.1,224.0,220.5,True,False,
+BUF @ NYJ,00-0030565,NYJ,BUF,Geno Smith,QB,Passing yards,450,449.5,0.0039,0.0304,0.0172,3000,Bovada,1,-0.4677,226.1,224.0,220.5,True,False,
 BUF @ NYJ,00-0037248,BUF,NYJ,James Cook,RB,Receiving yards,10,9.5,0.5517,0.44,0.4959,119,DraftKings,2,0.0859,16.6,11.4,7.5,False,True,
 BUF @ NYJ,00-0037248,BUF,NYJ,James Cook,RB,Receiving yards,15,14.5,0.418,0.3124,0.3652,202,DraftKings,1,0.1028,16.6,11.4,7.5,False,True,
 BUF @ NYJ,00-0037248,BUF,NYJ,James Cook,RB,Receiving yards,20,19.5,0.3111,0.2199,0.2655,350,BetRivers,2,0.1947,16.6,11.4,7.5,False,True,
@@ -3240,6 +3458,18 @@ BUF @ NYJ,00-0037248,BUF,NYJ,James Cook,RB,Rushing yards,160,159.5,0.0532,0.059,
 BUF @ NYJ,00-0037248,BUF,NYJ,James Cook,RB,Rushing yards,170,169.5,0.039,0.0377,0.0384,2400,BetOnline.ag,1,-0.0407,92.2,79.3,93.0,True,False,
 BUF @ NYJ,00-0037248,BUF,NYJ,James Cook,RB,Rushing yards,175,174.5,0.0355,0.0624,0.0489,1600,Bovada,2,-0.1679,92.2,79.3,93.0,True,False,
 BUF @ NYJ,00-0037248,BUF,NYJ,James Cook,RB,Rushing yards,200,199.5,0.0213,0.0363,0.0288,2500,Bovada,1,-0.2517,92.2,79.3,93.0,True,False,
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,150,149.5,0.961,0.8985,0.9297,-1400,FanDuel,3,-0.0039,262.9,260.2,234.5,True,False,Likely hit
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,175,174.5,0.9138,0.8263,0.8701,-580,FanDuel,4,0.0201,262.9,260.2,234.5,True,False,Likely hit
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,200,199.5,0.8276,0.7046,0.7661,-275,Fanatics,7,0.0447,262.9,260.2,234.5,True,False,
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,225,224.5,0.7154,0.5583,0.6369,-140,Fanatics,5,0.0918,262.9,260.2,234.5,True,False,Value
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,250,249.5,0.5528,0.4193,0.4861,138,BetRivers,7,0.1568,262.9,260.2,234.5,True,False,Value
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,275,274.5,0.413,0.2948,0.3539,255,BetRivers,5,0.2564,262.9,260.2,234.5,True,False,Value
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,300,299.5,0.2683,0.1926,0.2305,440,Fanatics,6,0.2444,262.9,260.2,234.5,True,False,
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,325,324.5,0.1724,0.1336,0.153,800,Fanatics,4,0.3769,262.9,260.2,234.5,True,False,
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,350,349.5,0.0959,0.0822,0.0891,1500,Fanatics,6,0.425,262.9,260.2,234.5,True,False,
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,375,374.5,0.0585,0.0629,0.0607,1700,FanDuel,3,0.0929,262.9,260.2,234.5,True,False,
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,400,399.5,0.0293,0.0362,0.0328,2900,DraftKings,2,-0.0175,262.9,260.2,234.5,True,False,
+BUF @ NYJ,00-0034857,BUF,NYJ,Josh Allen,QB,Passing yards,450,449.5,0.0065,0.0304,0.0185,3000,Bovada,1,-0.4275,262.9,260.2,234.5,True,False,
 BUF @ NYJ,00-0041032,NYJ,BUF,Kenyon Sadiq,TE,Receptions,1,0.5,0.8868,0.8937,0.8903,-1800,FanDuel,1,-0.0603,2.1,1.8,2.5,True,False,Likely hit
 BUF @ NYJ,00-0041032,NYJ,BUF,Kenyon Sadiq,TE,Receptions,2,1.5,0.5986,0.6692,0.6339,-240,Caesars,5,-0.102,2.1,1.8,2.5,True,False,
 BUF @ NYJ,00-0041032,NYJ,BUF,Kenyon Sadiq,TE,Receptions,3,2.5,0.3279,0.4347,0.3813,122,DraftKings,5,-0.1534,2.1,1.8,2.5,True,False,
@@ -3386,6 +3616,19 @@ JAX @ TEN,00-0034837,TEN,JAX,Calvin Ridley,WR,Receiving yards,85,84.5,0.0301,0.0
 JAX @ TEN,00-0034837,TEN,JAX,Calvin Ridley,WR,Receiving yards,95,94.5,0.0175,0.0555,0.0365,1600,BetOnline.ag,1,-0.3796,31.3,25.1,12.5,True,True,
 JAX @ TEN,00-0034837,TEN,JAX,Calvin Ridley,WR,Receptions,2,1.5,0.6271,0.3851,0.5061,145,BetRivers,1,0.2399,2.2,1.9,1.5,True,True,
 JAX @ TEN,00-0034837,TEN,JAX,Calvin Ridley,WR,Receptions,3,2.5,0.3497,0.1814,0.2655,420,BetRivers,1,0.3808,2.2,1.9,1.5,True,True,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,125,124.5,0.8719,0.8576,0.8648,-1000,FanDuel,2,-0.0488,204.7,200.8,201.5,True,False,Likely hit
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,150,149.5,0.788,0.7934,0.7907,-425,Fanatics,6,-0.0233,204.7,200.8,201.5,True,False,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,175,174.5,0.6542,0.6635,0.6588,-205,Fanatics,4,-0.0198,204.7,200.8,201.5,True,False,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,200,199.5,0.5057,0.5314,0.5186,-110,Fanatics,7,-0.01,204.7,200.8,201.5,True,False,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,225,224.5,0.3651,0.3815,0.3733,164,FanDuel,4,-0.0145,204.7,200.8,201.5,True,False,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,250,249.5,0.2336,0.2603,0.2469,280,FanDuel,6,-0.0617,204.7,200.8,201.5,True,False,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,275,274.5,0.1463,0.1685,0.1574,490,FanDuel,3,-0.0716,204.7,200.8,201.5,True,False,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,300,299.5,0.0805,0.1048,0.0927,880,DraftKings,6,-0.0919,204.7,200.8,201.5,True,False,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,325,324.5,0.0374,0.0684,0.0529,1500,Fanatics,3,-0.1538,204.7,200.8,201.5,True,False,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,350,349.5,0.017,0.0555,0.0363,2400,DraftKings,3,-0.0937,204.7,200.8,201.5,True,False,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,375,374.5,0.0125,0.0393,0.0259,2300,Bovada,1,-0.3786,204.7,200.8,201.5,True,False,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,400,399.5,0.0045,0.0325,0.0185,2800,Bovada,1,-0.4625,204.7,200.8,201.5,True,False,
+JAX @ TEN,00-0040676,TEN,JAX,Cam Ward,QB,Passing yards,450,449.5,0.0023,0.0262,0.0142,3500,Bovada,1,-0.4875,204.7,200.8,201.5,True,False,
 JAX @ TEN,00-0041438,TEN,JAX,Carnell Tate,WR,Receiving yards,40,39.5,0.5458,0.6341,0.5899,-205,BetRivers,1,-0.1223,46.9,43.1,51.0,True,True,
 JAX @ TEN,00-0041438,TEN,JAX,Carnell Tate,WR,Receiving yards,50,49.5,0.4209,0.5278,0.4744,-127,BetRivers,1,-0.1521,46.9,43.1,51.0,True,True,
 JAX @ TEN,00-0041438,TEN,JAX,Carnell Tate,WR,Receiving yards,60,59.5,0.3221,0.4288,0.3755,120,BetRivers,1,-0.174,46.9,43.1,51.0,True,True,
@@ -3468,6 +3711,17 @@ JAX @ TEN,00-0035261,TEN,JAX,Tony Pollard,RB,Rushing yards,40,39.5,0.6057,0.7161
 JAX @ TEN,00-0035261,TEN,JAX,Tony Pollard,RB,Rushing yards,50,49.5,0.4682,0.5874,0.5278,-165,BetRivers,1,-0.1523,50.6,47.0,56.5,True,False,
 JAX @ TEN,00-0035261,TEN,JAX,Tony Pollard,RB,Rushing yards,60,59.5,0.359,0.4602,0.4096,105,BetRivers,1,-0.1603,50.6,47.0,56.5,True,False,
 JAX @ TEN,00-0035261,TEN,JAX,Tony Pollard,RB,Rushing yards,70,69.5,0.2561,0.356,0.306,165,BetRivers,1,-0.189,50.6,47.0,56.5,True,False,
+JAX @ TEN,00-0036971,JAX,TEN,Trevor Lawrence,QB,Passing yards,175,174.5,0.9138,0.8386,0.8762,-800,FanDuel,3,-0.0143,262.9,260.3,236.5,True,False,Likely hit
+JAX @ TEN,00-0036971,JAX,TEN,Trevor Lawrence,QB,Passing yards,200,199.5,0.8276,0.7338,0.7807,-320,DraftKings,6,0.0247,262.9,260.3,236.5,True,False,
+JAX @ TEN,00-0036971,JAX,TEN,Trevor Lawrence,QB,Passing yards,225,224.5,0.7154,0.6002,0.6578,-165,BetRivers,4,0.0565,262.9,260.3,236.5,True,False,Value
+JAX @ TEN,00-0036971,JAX,TEN,Trevor Lawrence,QB,Passing yards,250,249.5,0.5528,0.4602,0.5065,116,BetRivers,8,0.0941,262.9,260.3,236.5,True,False,Value
+JAX @ TEN,00-0036971,JAX,TEN,Trevor Lawrence,QB,Passing yards,275,274.5,0.413,0.331,0.372,190,Fanatics,3,0.0788,262.9,260.3,236.5,True,False,Value
+JAX @ TEN,00-0036971,JAX,TEN,Trevor Lawrence,QB,Passing yards,300,299.5,0.2683,0.2273,0.2478,360,BetMGM,7,0.1399,262.9,260.3,236.5,True,False,
+JAX @ TEN,00-0036971,JAX,TEN,Trevor Lawrence,QB,Passing yards,325,324.5,0.1724,0.1509,0.1617,575,Fanatics,3,0.0911,262.9,260.3,236.5,True,False,
+JAX @ TEN,00-0036971,JAX,TEN,Trevor Lawrence,QB,Passing yards,350,349.5,0.0959,0.0858,0.0908,1050,BetMGM,7,0.0448,262.9,260.3,236.5,True,False,
+JAX @ TEN,00-0036971,JAX,TEN,Trevor Lawrence,QB,Passing yards,375,374.5,0.0585,0.0656,0.0621,1400,Bovada,2,-0.0688,262.9,260.3,236.5,True,False,
+JAX @ TEN,00-0036971,JAX,TEN,Trevor Lawrence,QB,Passing yards,400,399.5,0.0293,0.0406,0.0349,2500,DraftKings,2,-0.0917,262.9,260.3,236.5,True,False,
+JAX @ TEN,00-0036971,JAX,TEN,Trevor Lawrence,QB,Passing yards,450,449.5,0.0065,0.0304,0.0185,3000,Bovada,1,-0.4275,262.9,260.3,236.5,True,False,
 JAX @ TEN,00-0038117,TEN,JAX,Wan'Dale Robinson,WR,Receiving yards,30,29.5,0.6793,0.566,0.6227,-150,BetRivers,1,0.0378,46.1,42.3,35.0,True,True,
 JAX @ TEN,00-0038117,TEN,JAX,Wan'Dale Robinson,WR,Receiving yards,40,39.5,0.5319,0.423,0.4775,123,BetRivers,1,0.0647,46.1,42.3,35.0,True,True,
 JAX @ TEN,00-0038117,TEN,JAX,Wan'Dale Robinson,WR,Receptions,2,1.5,0.9044,0.89,0.8972,-1667,BetRivers,1,-0.049,4.5,4.3,4.5,True,False,Likely hit
