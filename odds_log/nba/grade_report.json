@@ -1,0 +1,139 @@
+{
+ "days": [
+  "2026-11-11"
+ ],
+ "groups": [
+  {
+   "group": "Value legs",
+   "bets": 0,
+   "won": 0,
+   "lost": 0,
+   "hit": 0.0,
+   "units": 0.0,
+   "roi": 0.0,
+   "exp_hit": null,
+   "clv_n": 54,
+   "beat": 0.074,
+   "lost_clv": 0.0
+  },
+  {
+   "group": "Suggested-parlay legs",
+   "bets": 0,
+   "won": 0,
+   "lost": 0,
+   "hit": 0.0,
+   "units": 0.0,
+   "roi": 0.0,
+   "exp_hit": null,
+   "clv_n": 4,
+   "beat": 0.0,
+   "lost_clv": 0.0
+  },
+  {
+   "group": "All +edge legs",
+   "bets": 0,
+   "won": 0,
+   "lost": 0,
+   "hit": 0.0,
+   "units": 0.0,
+   "roi": 0.0,
+   "exp_hit": null,
+   "clv_n": 188,
+   "beat": 0.043,
+   "lost_clv": 0.005
+  },
+  {
+   "group": "Negative-edge legs (control)",
+   "bets": 0,
+   "won": 0,
+   "lost": 0,
+   "hit": 0.0,
+   "units": 0.0,
+   "roi": 0.0,
+   "exp_hit": null,
+   "clv_n": 578,
+   "beat": 0.016,
+   "lost_clv": 0.029
+  }
+ ],
+ "by_kind": [
+  {
+   "group": "Assists",
+   "bets": 0,
+   "won": 0,
+   "lost": 0,
+   "hit": 0.0,
+   "units": 0.0,
+   "roi": 0.0,
+   "exp_hit": null,
+   "clv_n": 6,
+   "beat": 0.0,
+   "lost_clv": 0.0
+  },
+  {
+   "group": "Points",
+   "bets": 0,
+   "won": 0,
+   "lost": 0,
+   "hit": 0.0,
+   "units": 0.0,
+   "roi": 0.0,
+   "exp_hit": null,
+   "clv_n": 21,
+   "beat": 0.19,
+   "lost_clv": 0.0
+  },
+  {
+   "group": "Pts+Reb+Ast",
+   "bets": 0,
+   "won": 0,
+   "lost": 0,
+   "hit": 0.0,
+   "units": 0.0,
+   "roi": 0.0,
+   "exp_hit": null,
+   "clv_n": 18,
+   "beat": 0.0,
+   "lost_clv": 0.0
+  },
+  {
+   "group": "Rebounds",
+   "bets": 0,
+   "won": 0,
+   "lost": 0,
+   "hit": 0.0,
+   "units": 0.0,
+   "roi": 0.0,
+   "exp_hit": null,
+   "clv_n": 6,
+   "beat": 0.0,
+   "lost_clv": 0.0
+  },
+  {
+   "group": "Threes",
+   "bets": 0,
+   "won": 0,
+   "lost": 0,
+   "hit": 0.0,
+   "units": 0.0,
+   "roi": 0.0,
+   "exp_hit": null,
+   "clv_n": 3,
+   "beat": 0.0,
+   "lost_clv": 0.0
+  },
+  {
+   "group": "Total",
+   "bets": 0,
+   "won": 0,
+   "lost": 0,
+   "hit": 0.0,
+   "units": 0.0,
+   "roi": 0.0,
+   "exp_hit": null,
+   "clv_n": 0,
+   "beat": null,
+   "lost_clv": null
+  }
+ ]
+}

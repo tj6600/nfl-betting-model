@@ -102,20 +102,20 @@ for g in pred.merge(slate[['game_id', 'tip']], on='game_id').itertuples():
         ch, _, _ = M.probs(g.margin, g.total, hs.point, 0)
         row['spread'] = float(hs.point)
         for side, s, pm, pb in [(g.home, hs, float(ch), nv), (g.away, as_, 1 - float(ch), 1 - nv)]:
-            row['legs'].append(mk_leg(f'{g.game_id}-sp-{side}', gm, 'Spread', f'{side} {s.point:+g}', gm, s.price, pm, pb, MODEL_W_GAME)['id'])
+            row['legs'].append(mk_leg(f'{g.game_id}-sp-{side}', gm, 'Spread', f'{side} {s.point:+g}', gm, s.price, pm, pb, MODEL_W_GAME, extra=dict(gid=int(g.game_id), market='spread', side=side, line=float(s.point)))['id'])
     if 'Over' in to and 'Under' in to:
         o, u = to['Over'], to['Under']
         nv = imp(o.price) / (imp(o.price) + imp(u.price))
         _, po, _ = M.probs(g.margin, g.total, 0, o.point)
         row['line_total'] = float(o.point)
         for side, s, pm, pb in [('Over', o, float(po), nv), ('Under', u, 1 - float(po), 1 - nv)]:
-            row['legs'].append(mk_leg(f'{g.game_id}-to-{side}', gm, 'Total', f'{side} {s.point:g}', gm, s.price, pm, pb, MODEL_W_GAME)['id'])
+            row['legs'].append(mk_leg(f'{g.game_id}-to-{side}', gm, 'Total', f'{side} {s.point:g}', gm, s.price, pm, pb, MODEL_W_GAME, extra=dict(gid=int(g.game_id), market='total', side=side, line=float(s.point)))['id'])
     if g.home in ml and g.away in ml:
         h, a = ml[g.home], ml[g.away]
         nv = imp(h.price) / (imp(h.price) + imp(a.price))
         _, _, pw = M.probs(g.margin, g.total, 0, 0)
         for side, s, pm, pb in [(g.home, h, float(pw), nv), (g.away, a, 1 - float(pw), 1 - nv)]:
-            row['legs'].append(mk_leg(f'{g.game_id}-ml-{side}', gm, 'Moneyline', f'{side} to win', gm, s.price, pm, pb, MODEL_W_GAME)['id'])
+            row['legs'].append(mk_leg(f'{g.game_id}-ml-{side}', gm, 'Moneyline', f'{side} to win', gm, s.price, pm, pb, MODEL_W_GAME, extra=dict(gid=int(g.game_id), market='moneyline', side=side, line=None))['id'])
     games.append(row)
 
 # ---------- props ----------
@@ -193,7 +193,7 @@ for x in FU.itertuples():
                     for side, pr_, pm, pb in [('Over', int(so.price.iloc[0]), po_m, nv), ('Under', int(su.price.iloc[0]), 1 - po_m, 1 - nv)]:
                         L = mk_leg(f'{x.pid}-{k}-{side}', p['game'], PR.LABEL[k], f'{x.name} {side} {ln:g} {PR.LABEL[k].lower()}',
                                    f'{x.team} vs {x.opp} · proj {proj:.1f}', pr_, pm, pb, MODEL_W_PROP, flags=flags,
-                                   extra=dict(pid=int(x.pid), stat=k, team=x.team))
+                                   extra=dict(pid=int(x.pid), stat=k, team=x.team, gid=int(x.game_id), market=k, side=side, line=float(ln)))
                         e[side.lower()] = dict(id=L['id'], price=pr_, p=L['p'], pm=L['pm'], pb=L['pb'], edge=L['edge'], ev=L['ev'])
         p['props'][k] = e
     players.append(p)
@@ -221,6 +221,16 @@ pool += sorted([l for l in legs if l['cat'] != 'Value' and ok(l) and l['edge'] >
 slips = build_slips(pool)
 sug = slips[0] if slips else []
 
+# pick log: every priced leg as offered when this board was built, keyed to the odds snapshot it used.
+# scripts/nba_grade.py grades the earliest log of each day against results and closing lines.
+if legs:
+    stamp = os.path.basename(pfile)[17:-5] if pfile else os.path.basename(gf)[6:-5]
+    os.makedirs(os.path.join(O.DIR, 'picks'), exist_ok=True)
+    lf = os.path.join(O.DIR, 'picks', f'{day}_{stamp}.csv')
+    if not os.path.exists(lf):
+        pl = pd.DataFrame([{k: l.get(k) for k in ['id', 'gid', 'game', 'kind', 'market', 'side', 'line', 'pid', 'team', 'label', 'price', 'p', 'pm', 'pb', 'edge', 'ev', 'cat']}
+                           | {'flagged': bool(l['flags']), 'suggested': l['id'] in sug} for l in legs])
+        pl.to_csv(lf, index=False)
 # backtest summary for the page
 bt = {}
 bf = os.path.join(D.DIR, 'backtest_games.csv')
@@ -236,7 +246,9 @@ pb = os.path.join(D.DIR, 'backtest_props.json')
 if os.path.exists(pb):
     bt['props'] = json.load(open(pb))
 
-DATA = dict(injuries=INJURY is not None, day=day, dayLabel=pd.Timestamp(day).strftime('%A, %B %-d'), taken=taken.strftime('%A %-I:%M %p ET') if taken is not None else None,
+gr = os.path.join(O.DIR, 'grade_report.json')
+LIVE = json.load(open(gr)) if os.path.exists(gr) else None
+DATA = dict(live=LIVE, injuries=INJURY is not None, day=day, dayLabel=pd.Timestamp(day).strftime('%A, %B %-d'), taken=taken.strftime('%A %-I:%M %p ET') if taken is not None else None,
             propsTaken=os.path.basename(pfile)[17:-5] if pfile else None, through=G.date.max(), book=BOOK,
             games=games, players=players, legs=legs, suggested=sug, slips=slips, pool=[l['id'] for l in pool], backtest=bt,
             teams=[dict(team=t.team, off=round(t.off, 1), deff=round(t.deff, 1), net=round(t.net, 1)) for t in teams.itertuples()])
