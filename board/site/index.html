@@ -185,6 +185,7 @@ table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
 .savedrow .lnk { font-size: 13px; }
 .savedchip { display: inline-flex; align-items: center; gap: 2px; }
 .savedchip .chip { padding: 4px 10px; font-size: 13px; }
+.seglab { flex-basis: 100%; font-size: 12px; margin-bottom: -4px; }
 /* Phones: nothing should need a sideways swipe except a wide table. Tabs, game buttons and button groups wrap
    onto extra lines instead of scrolling (clipped .seg groups used to hide filters past the screen edge). */
 .tablewrap { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
@@ -625,8 +626,16 @@ const amer = (d) => (d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d -
 const PK = 'props-parlay-v2';
 const PBOOKS = ['DraftKings'];
 const ABBR = { DraftKings: 'DK', FanDuel: 'FD' };
-const PS = { kind: 'all', mode: 'value', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25, note: '', sel: {} };
+const PS = { kinds: new Set(), mode: 'value', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25, note: '', sel: {} };
 try { PS.mode = localStorage.getItem('props-mode') === 'likely' ? 'likely' : 'value'; } catch (e) {}
+// market filter: pick any mix of markets (e.g. TDs + Receptions); none picked = every market
+try { PS.kinds = new Set(JSON.parse(localStorage.getItem('props-kinds') || '[]')); } catch (e) {}
+const kindOk = (l) => !PS.kinds.size || PS.kinds.has(mkt(l));
+const kindsName = () => [...PS.kinds].map((k) => MKTS.find((m) => m[0] === k)[1].toLowerCase()).join(' + ');
+function toggleKind(k) {
+  if (k === 'all') PS.kinds.clear(); else if (PS.kinds.has(k)) PS.kinds.delete(k); else PS.kinds.add(k);
+  try { localStorage.setItem('props-kinds', JSON.stringify([...PS.kinds])); } catch (e) {}
+}
 // market of a leg, for the filter: game lines split into moneyline / spread / total
 const mkt = (l) => (l.kind !== 'Game' ? l.kind : /moneyline/i.test(l.label) ? 'ML' : /^(Over|Under)/.test(l.label) ? 'Total' : 'Spread');
 const MKTS = [['all', 'All'], ['ML', 'Moneyline'], ['Spread', 'Spread'], ['Total', 'Game total'], ['TD', 'TDs'], ['Pass', 'Pass yds'], ['Rush', 'Rush yds'], ['Rec', 'Rec yds'], ['Recs', 'Receptions'], ['Milestone', 'Milestones']];
@@ -698,7 +707,7 @@ try { SS.size = +localStorage.getItem('props-legs') || null; } catch (e) {}
 let SAVED = []; try { SAVED = JSON.parse(localStorage.getItem('props-saved') || '[]').map((s) => ({ ...s, legs: s.legs.filter((id) => LEG[id]) })).filter((s) => s.legs.length); } catch (e) { SAVED = []; }
 const saveSaved = () => { try { localStorage.setItem('props-saved', JSON.stringify(SAVED)); } catch (e) {} };
 function sugPool() {
-  const ok = (l) => inScope(l) && !l.flag && l.offers.DraftKings != null && (PS.kind === 'all' || mkt(l) === PS.kind);
+  const ok = (l) => inScope(l) && !l.flag && l.offers.DraftKings != null && kindOk(l);
   // Most likely to hit: the highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+)
   if (PS.mode === 'likely') return LEGS.filter((l) => ok(l) && l.p >= 0.55 && l.edge >= 0.01).sort((a, b) => b.p - a.p || b.edge - a.edge);
   const v = LEGS.filter((l) => ok(l) && l.p >= 0.55 && l.edge >= 0.03).sort((a, b) => b.edge - a.edge);
@@ -761,12 +770,13 @@ function renderParlay() {
   const q = el('input'); q.type = 'search'; q.placeholder = 'Search a player, team or game'; q.value = PS.q; q.setAttribute('aria-label', 'Search legs');
   q.oninput = (e) => { PS.q = e.target.value; drawList(); };
   const seg = el('div', 'seg');
-  seg.setAttribute('aria-label', 'Market');
+  seg.setAttribute('aria-label', 'Markets (pick one or more)');
+  const segl = el('span', 'dim seglab', 'Markets: tap one or more');
   for (const [k, t] of MKTS) {
     const n = k === 'all' ? 0 : GROUPS.filter((g) => g.mkt === k && inScope(g.sides[0])).length;
     if (k !== 'all' && !n) continue;
-    const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', PS.kind === k);
-    b.onclick = () => { PS.kind = k; SS.idx = -1; renderParlay(); }; seg.append(b);
+    const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', k === 'all' ? !PS.kinds.size : PS.kinds.has(k));
+    b.onclick = () => { toggleKind(k); SS.idx = -1; renderParlay(); }; seg.append(b);
   }
   const tg = el('label', 'tog'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = PS.plus; cb.onchange = (e) => { PS.plus = e.target.checked; drawList(); };
   tg.append(cb, document.createTextNode(' Positive EV side only'));
@@ -779,13 +789,13 @@ function renderParlay() {
   for (const [v, t] of [[0, 'Any chance'], [0.25, '25%+'], [0.4, '40%+'], [0.55, '55%+'], [0.7, '70%+']]) {
     const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', PS.minp === v); b.onclick = () => { PS.minp = v; renderParlay(); }; mp.append(b);
   }
-  ctl.append(q, seg, so, mp, tg, tg2); pick.append(ctl);
+  ctl.append(q, segl, seg, so, mp, tg, tg2); pick.append(ctl);
   const list = el('div', 'pllist'); pick.append(list);
   function drawList() {
     const qq = PS.q.trim().toLowerCase();
     const okSide = (l) => (!PS.plus || l.ev > 0) && l.p >= PS.minp;
     const metric = PS.sort === 'ev' ? (l) => l.ev : PS.sort === 'p' ? (l) => l.p : (l) => l.edge;
-    const gs = GROUPS.filter((g) => inScope(g.sides[0]) && (PS.kind === 'all' || g.mkt === PS.kind) && (!PS.clean || !g.flag)
+    const gs = GROUPS.filter((g) => inScope(g.sides[0]) && (!PS.kinds.size || PS.kinds.has(g.mkt)) && (!PS.clean || !g.flag)
       && (!qq || g.text.includes(qq)) && g.sides.some(okSide))
       .map((g) => ({ g, m: Math.max(...g.sides.filter(okSide).map(metric)) })).sort((a, b) => b.m - a.m).slice(0, 80).map((x) => x.g);
     ph.lastChild.textContent = `${gs.length >= 80 ? 'top 80' : gs.length} bets`;
@@ -849,7 +859,7 @@ function renderParlay() {
       b.onclick = () => { PS.mode = k; try { localStorage.setItem('props-mode', k); } catch (e) {} SS.idx = -1; const g2 = sugState(); if (g2.slips.length) { SS.idx = 0; slip = g2.slips[0].slice(); PS.price = ''; PS.note = ''; saveSlip(); } renderParlay(); };
       seg.append(b);
     }
-    const mk = PS.kind === 'all' ? '' : ` Only ${MKTS.find((m) => m[0] === PS.kind)[1].toLowerCase()} legs (market filter on the left).`;
+    const mk = !PS.kinds.size ? '' : ` Only ${kindsName()} legs (market filter).`;
     md.append(seg, el('span', 'dim sugbest', (PS.mode === 'likely' ? 'Highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+ chance, no flags).' : 'Biggest edge first (edge 3+ pts, 55%+ chance), then near-value legs.') + mk));
     sl.append(md);
   }
