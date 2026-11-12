@@ -37,8 +37,11 @@ function growth(ids) {
   const f = (b * p - (1 - p)) / b; if (f <= 0) return 0;
   return p * Math.log(1 + f * b) + (1 - p) * Math.log(1 - f);
 }
-const SIZES = [2, 3, 4, 5, 6, 11].filter((k) => buildSlips(k, 1).length);
-const BEST = SIZES.length ? SIZES.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), SIZES[0]) : null;
+const SIZES = [1, 2, 3, 4, 5, 6, 11].filter((k) => buildSlips(k, 1).length);
+// best parlay size by growth; when no parlay has positive growth (or none can be built), suggest a straight bet
+const PSIZES = SIZES.filter((k) => k > 1 && growth(buildSlips(k, 1)[0]) > 0);
+const BEST = PSIZES.length ? PSIZES.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), PSIZES[0]) : SIZES.includes(1) ? 1 : null;
+const sizeName = (k) => (k === 1 ? 'Straight' : String(k));
 let legCount = null;
 try { legCount = +localStorage.getItem('nba-legs') || null; } catch (e) {}
 if (!SIZES.includes(legCount)) legCount = BEST;
@@ -220,15 +223,15 @@ function boardParlay() {
     const lc = el('div', 'sugnav');
     lc.append(el('b', null, 'Legs'));
     const seg = el('div', 'seg');
-    SIZES.forEach((k) => { const b = el('button', null, k === BEST ? `${k} ★` : String(k)); b.setAttribute('aria-pressed', k === legCount); b.title = k === BEST ? 'Best number of legs tonight' : ''; b.onclick = () => { setSize(k); loadSug(0); }; seg.append(b); });
+    SIZES.forEach((k) => { const b = el('button', null, k === BEST ? `${sizeName(k)} ★` : sizeName(k)); b.setAttribute('aria-pressed', k === legCount); b.title = k === BEST ? 'Best number of legs tonight' : ''; b.onclick = () => { setSize(k); loadSug(0); }; seg.append(b); });
     lc.append(seg);
-    lc.append(el('span', 'dim sugbest', `★ ${BEST} legs is best tonight`));
+    lc.append(el('span', 'dim sugbest', BEST === 1 ? '★ No parlay is worth it tonight: take a straight bet' : `★ ${BEST} legs is best tonight`));
     sl.append(lc);
   }
   if (SLIPS.length) {
     const nav = el('div', 'sugnav');
     const prev = el('button', 'lnk', '‹'); prev.setAttribute('aria-label', 'Previous suggestion'); prev.onclick = () => loadSug(sugIdx < 0 ? SLIPS.length - 1 : sugIdx - 1);
-    const lab = el('span', 'suglab', sugIdx >= 0 ? `Suggestion ${sugIdx + 1} of ${SLIPS.length}` : `${SLIPS.length} suggested parlays`);
+    const lab = el('span', 'suglab', sugIdx >= 0 ? `${legCount === 1 ? 'Straight bet' : 'Suggestion'} ${sugIdx + 1} of ${SLIPS.length}` : `${SLIPS.length} suggested parlays`);
     const next = el('button', 'lnk', '›'); next.setAttribute('aria-label', 'Next suggestion'); next.onclick = () => loadSug(sugIdx + 1);
     const shuf = el('button', 'lnk sugb', sugIdx < 0 ? 'Load suggested' : 'Shuffle');
     shuf.onclick = () => { if (sugIdx < 0 || SLIPS.length < 2) return loadSug(0); let k = sugIdx; while (k === sugIdx) k = Math.floor(Math.random() * SLIPS.length); loadSug(k); };

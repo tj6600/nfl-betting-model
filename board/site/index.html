@@ -636,7 +636,8 @@ const scopeName = () => (state.game !== 'all' ? state.game : state.win !== 'all'
 // 55%+ and 3+ pts edge first, then near-value (52%+, 1.5+ pts). One leg per player or market, one game line per game,
 // at most 2 legs per team in a single game. Across games: 1 leg per game (3 for slips over 6 legs). No leg is reused
 // across suggestions, so each one is different.
-const SUG_SIZES = [2, 3, 4, 5, 6, 11];
+const SUG_SIZES = [1, 2, 3, 4, 5, 6, 11];
+const sizeName = (k) => (k === 1 ? 'Straight' : String(k));
 const SS = { size: null, idx: -1 };
 try { SS.size = +localStorage.getItem('props-legs') || null; } catch (e) {}
 let SAVED = []; try { SAVED = JSON.parse(localStorage.getItem('props-saved') || '[]').map((s) => ({ ...s, legs: s.legs.filter((id) => LEG[id]) })).filter((s) => s.legs.length); } catch (e) { SAVED = []; }
@@ -673,7 +674,9 @@ function growth(ids) {
 }
 function sugState() {
   const sizes = SUG_SIZES.filter((k) => buildSlips(k, 1).length);
-  const best = sizes.length ? sizes.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), sizes[0]) : null;
+  // best parlay size by growth; when no parlay has positive growth (or none can be built), suggest a straight bet
+  const ps = sizes.filter((k) => k > 1 && growth(buildSlips(k, 1)[0]) > 0);
+  const best = ps.length ? ps.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), ps[0]) : sizes.includes(1) ? 1 : null;
   const size = sizes.includes(SS.size) ? SS.size : best;
   return { sizes, best, size, slips: size ? buildSlips(size) : [] };
 }
@@ -779,13 +782,13 @@ function renderParlay() {
   if (SG.sizes.length) {
     const lc = el('div', 'sugnav'); lc.append(el('b', null, 'Legs'));
     const seg = el('div', 'seg');
-    SG.sizes.forEach((k) => { const b = el('button', null, k === SG.best ? `${k} ★` : String(k)); b.type = 'button'; b.setAttribute('aria-pressed', k === SG.size);
+    SG.sizes.forEach((k) => { const b = el('button', null, k === SG.best ? `${sizeName(k)} ★` : sizeName(k)); b.type = 'button'; b.setAttribute('aria-pressed', k === SG.size);
       b.onclick = () => { SS.size = k; try { localStorage.setItem('props-legs', k); } catch (e) {} SS.idx = -1; const s2 = buildSlips(k); if (s2.length) { SS.idx = 0; slip = s2[0].slice(); PS.price = ''; PS.note = ''; saveSlip(); } renderParlay(); }; seg.append(b); });
-    lc.append(seg, el('span', 'dim sugbest', `★ ${SG.best} legs is best for ${scopeName()}`)); sl.append(lc);
+    lc.append(seg, el('span', 'dim sugbest', SG.best === 1 ? `★ No parlay is worth it for ${scopeName()}: take a straight bet` : `★ ${SG.best} legs is best for ${scopeName()}`)); sl.append(lc);
     const nav = el('div', 'sugnav');
     const prev = el('button', 'lnk', '‹'); prev.type = 'button'; prev.setAttribute('aria-label', 'Previous suggestion'); prev.onclick = () => loadSug(SS.idx < 0 ? SG.slips.length - 1 : SS.idx - 1);
     const next = el('button', 'lnk', '›'); next.type = 'button'; next.setAttribute('aria-label', 'Next suggestion'); next.onclick = () => loadSug(SS.idx + 1);
-    nav.append(prev, el('span', 'suglab', SS.idx >= 0 ? `Suggestion ${SS.idx + 1} of ${SG.slips.length}` : `${SG.slips.length} suggested parlays`), next); sl.append(nav);
+    nav.append(prev, el('span', 'suglab', SS.idx >= 0 ? `${SG.size === 1 ? 'Straight bet' : 'Suggestion'} ${SS.idx + 1} of ${SG.slips.length}` : `${SG.slips.length} suggested parlays`), next); sl.append(nav);
   }
   if (SAVED.length || slip.length) {
     const sv = el('div', 'savedrow'); const key = (ids) => ids.slice().sort().join('|');
