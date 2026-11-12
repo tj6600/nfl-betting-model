@@ -96,24 +96,30 @@ def history_games(start, end):
     print('games history done;', left, 'credits left')
 
 
-def history_props(days):
-    """For each game on each day: shots on goal + saves at DraftKings, 90 minutes before puck drop."""
-    left = None
+def history_props(days, markets=None, budget=None):
+    """For each game on each day: shots on goal + saves at DraftKings, 90 minutes before puck drop.
+    markets: comma list (default both). budget: stop before spending more than this many credits."""
+    left, start = None, None
+    mk = markets or ','.join(PROP_MARKETS)
+    per_game = 10 * len(mk.split(','))
     for d in days:
         evf = os.path.join(HIST, 'events', f'{d}.json')
         if os.path.exists(evf):
             evs = json.load(open(evf))
         else:
             r, left = _call(f'historical/sports/{SPORT}/events', date=f'{d}T16:00:00Z')
+            start = start if start is not None else int(left) + 1
             evs = [e for e in r['data'] if pd.Timestamp(e['commence_time']).tz_convert('America/New_York').date() == d]
             _save(evs, evf)
         for e in evs:
             f = os.path.join(HIST, 'props', f"{d}_{e['id']}.json")
             if os.path.exists(f):
                 continue
+            if budget is not None and left is not None and start is not None and (start - int(left)) + per_game > budget:
+                print('budget reached; stopping'); return
             t = (pd.Timestamp(e['commence_time']) - pd.Timedelta(minutes=90)).strftime('%Y-%m-%dT%H:%M:%SZ')
             try:
-                r, left = _call(f"historical/sports/{SPORT}/events/{e['id']}/odds", markets=','.join(PROP_MARKETS), date=t)
+                r, left = _call(f"historical/sports/{SPORT}/events/{e['id']}/odds", markets=mk, date=t)
                 _save(r, f)
             except Exception as ex:
                 print(d, e['id'], 'failed', ex)
@@ -185,4 +191,7 @@ if __name__ == '__main__':
     elif cmd == 'history-games':
         history_games(D(sys.argv[2]), D(sys.argv[3]))
     elif cmd == 'history-props':
-        history_props([D(x) for x in sys.argv[2:]])
+        # optional flags: --markets=player_shots_on_goal --budget=500
+        fl = dict(a[2:].split('=', 1) for a in sys.argv[2:] if a.startswith('--'))
+        history_props([D(x) for x in sys.argv[2:] if not x.startswith('--')], fl.get('markets'),
+                      int(fl['budget']) if 'budget' in fl else None)

@@ -4,6 +4,7 @@ Lines come from odds_log/nhl/history (python -m nhlmodel.odds history-props ...)
 puck drop. Models are fit on 2024-25 only and tested on 2025-26 lines, so nothing leaks.
 
   python scripts/nhl_props_backtest.py            # writes output/nhl_props_backtest.json
+  python scripts/nhl_props_backtest.py --season 2026-27   # fit on 2024-26, test on this season's lines only
 """
 import os, sys, json
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -82,16 +83,23 @@ def evaluate(df, label):
 
 
 def main():
+    global OUT
     games, sk, go, tg = load()
     pr = history_prop_rows()
     lines = attach_games(pair_lines(pr), games)
+    train, test = [TRAIN], 20252026
+    if '--season' in sys.argv and sys.argv[sys.argv.index('--season') + 1] == '2026-27':
+        train, test = [20242025, 20252026], 20262027
+        OUT = OUT.replace('.json', '_2026-27.json')
+    lines = lines.merge(games[['game_id', 'season']], on='game_id')
+    lines = lines[lines.season == test].drop(columns='season')
     lines['key'] = lines.player.map(norm_name)
     lines['p_mkt'] = novig(am_to_prob(lines.Over), am_to_prob(lines.Under))[0]
     report = {}
 
     # shots on goal
     skf, lm = skater_features(sk, tg)
-    m = SogModel().fit(skf, lm, skf.season == TRAIN)
+    m = SogModel().fit(skf, lm, skf.season.isin(train))
     skf['mu'] = m.mu(skf)
     skf['key'] = skf.full_name.map(norm_name)
     s = lines[lines.stat == 'sog'].merge(skf[['game_id', 'key', 'mu', 'sog', 'n_prior', 'team']], on=['game_id', 'key'], how='inner')
@@ -105,9 +113,11 @@ def main():
 
     # goalie saves
     st, lm2 = goalie_features(go, tg)
-    gm = SavesModel().fit(st, lm2, st.season == TRAIN)
+    gm = SavesModel().fit(st, lm2, st.season.isin(train))
     st['mu'] = gm.mu(st)
     st['key'] = st.full_name.map(norm_name)
+    if not (lines.stat == 'saves').any():
+        json.dump(report, open(OUT, 'w'), indent=1); s.to_csv(OUT.replace('.json', '_sog.csv'), index=False); return
     v = lines[lines.stat == 'saves'].merge(st[['game_id', 'key', 'mu', 'saves', 'n_starts']], on=['game_id', 'key'], how='inner')
     v['p_model'] = np.array([p_over(pt, mu, gm.r)[0] for pt, mu in zip(v.point, v.mu)])
     v['y'] = (v.saves > v.point).astype(int)
