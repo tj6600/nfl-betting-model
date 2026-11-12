@@ -91,3 +91,70 @@ def features(game_ids):
     f['rain'] = (f.wx_precip >= 1.0).astype(float)
     f['cold'] = (40 - f.wx_temp).clip(lower=0)
     return f[['game_id', 'wx_wind', 'wind_over12', 'rain', 'cold']]
+
+
+# ---- weather adjustments for player props (fit by scripts/weather_props_backtest.py) ----
+PROPS_FILE = os.path.join(os.path.dirname(__file__), '..', 'odds_log', 'weather_props.json')
+FORECAST_FILE = os.path.join(os.path.dirname(__file__), '..', 'odds_log', 'weather_forecast.csv')
+STAT_NAMES = {'pass': 'pass yds', 'rec': 'rec yds', 'recs': 'catches', 'rush': 'rush yds', 'td': 'TD chance'}
+
+
+def prop_weather(games):
+    """Game-time weather and prop multipliers for upcoming games (rows of games.csv).
+
+    Weather: the Open-Meteo forecast when it can be fetched (rain = 1+ mm over the 3 hours from kickoff), otherwise
+    odds_log/weather_forecast.csv (rain = its chance of rain, so 70% counts as 0.7 of a rainy game). Domes and closed
+    roofs are neutral. Multipliers use only the backtest effects whose 90% interval excludes zero:
+    exp(wind_coef * (wind - 12)+/5 + rain_coef * rain + cold_coef * (40 - temp)+/10).
+    """
+    coefs = json.load(open(PROPS_FILE)) if os.path.exists(PROPS_FILE) else {}
+    g = games[['game_id', 'roof', 'stadium_id', 'gameday', 'gametime', 'season', 'game_type', 'result']].copy()
+    last_roof = G[G.roof.notna()].sort_values('gameday').groupby('stadium_id').roof.last()   # upcoming games often have no roof yet
+    g['roof'] = g.roof.fillna(g.stadium_id.map(last_roof))
+    src = pd.DataFrame(columns=['game_id', 'wind', 'rain', 'temp', 'src'])
+    try:   # forecast for just these games (does not touch the history cache)
+        g['ko'] = kickoff_utc(g); rows = []
+        for sid, d in g[g.stadium_id.isin(STADIUMS) & ~g.roof.isin(INDOOR)].groupby('stadium_id'):
+            h = _series(*STADIUMS[sid], d.ko.min().strftime('%Y-%m-%d'), (d.ko.max() + pd.Timedelta(hours=4)).strftime('%Y-%m-%d'), True)
+            if h.empty and not rows:
+                print('Open-Meteo forecast unreachable; using odds_log/weather_forecast.csv'); break
+            for r in d.itertuples():
+                w = h[(h.time >= r.ko.floor('h')) & (h.time < r.ko.floor('h') + pd.Timedelta(hours=3))] if len(h) else h
+                if len(w):
+                    rows.append({'game_id': r.game_id, 'wind': w.wind_speed_10m.mean(), 'rain': min(1.0, w.precipitation.sum()),
+                                 'temp': w.temperature_2m.mean(), 'src': 'Open-Meteo forecast'})
+        if rows: src = pd.DataFrame(rows)
+    except Exception as e:
+        print('weather forecast unavailable:', e)
+    if os.path.exists(FORECAST_FILE):
+        f = pd.read_csv(FORECAST_FILE).drop_duplicates('game_id', keep='last')
+        f = f[f.game_id.isin(g.game_id) & ~f.game_id.isin(src.game_id)]
+        src = pd.concat([src, pd.DataFrame({'game_id': f.game_id, 'wind': f.wind_mph, 'rain': f.precip_pct / 100.0, 'temp': f.temp_f,
+                                            'src': 'forecast (' + f.source.astype(str) + ')'})], ignore_index=True)
+    out = g[['game_id', 'roof']].merge(src, on='game_id', how='left')
+    for c in ['wind', 'rain', 'temp']:
+        out[c] = pd.to_numeric(out[c], errors='coerce').astype(float)
+    indoor = out.roof.isin(INDOOR)
+    out.loc[indoor, ['wind', 'rain', 'temp']] = [0.0, 0.0, 70.0]; out.loc[indoor, 'src'] = 'indoors'
+    known = out.wind.notna()
+    x = {'wind12': ((out.wind - 12).clip(lower=0) / 5).fillna(0), 'rain': out.rain.fillna(0), 'cold': ((40 - out.temp).clip(lower=0) / 10).fillna(0)}
+    notes = [[] for _ in range(len(out))]
+    for stat in STAT_NAMES:
+        lm = np.zeros(len(out))
+        for k, c in coefs.get(stat, {}).get('coef', {}).items():
+            if c['use']:
+                lm = lm + c['est'] * x[k].values
+        out[f'm_{stat}'] = np.exp(lm)
+        for i, m in enumerate(out[f'm_{stat}']):
+            if abs(m - 1) >= 0.01:
+                notes[i].append(f'{STAT_NAMES[stat]} {(m - 1) * 100:+.0f}%')
+    def desc(r):
+        if r.src == 'indoors': return 'Indoors'
+        if r.wind != r.wind: return 'No forecast yet'
+        bits = [f'{r.wind:.0f} mph wind', f'{r.temp:.0f}°F']
+        if r.rain >= 0.2: bits.insert(1, f'rain {r.rain * 100:.0f}%' if 'Open-Meteo' not in r.src else 'rain')
+        return ', '.join(bits)
+    out['desc'] = [desc(r) for r in out.itertuples()]
+    out['note'] = [', '.join(n) for n in notes]
+    out['known'] = known
+    return out

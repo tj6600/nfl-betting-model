@@ -10,7 +10,7 @@ ROOT = os.path.join(os.path.dirname(__file__), '..')
 import numpy as np, pandas as pd
 from nflmodel.model import G
 from nflmodel.odds import all_snapshots, TEAMS
-from nflmodel import touchdowns as T, yards as Y, passing as PY
+from nflmodel import touchdowns as T, yards as Y, passing as PY, weather as W
 
 VALUE_EV, VALUE_P, MIN_BOOKS = 0.05, 0.57, 3
 W_MODEL = 0.5           # untested against real prop lines, so the model's chance is blended 50/50 with the books' no-vig chance
@@ -32,6 +32,10 @@ for g in target.itertuples():
     lines.append({'game_id': g.game_id, 'home_team': g.home_team, 'away_team': g.away_team,
                   'spread_line': -sp.iloc[0] if len(sp) else g.spread_line, 'total_line': tt.iloc[0] if len(tt) else g.total_line})
 lines = pd.DataFrame(lines)
+# game-time weather: projections are scaled by the backtested weather effects (odds_log/weather_props.json)
+WX = W.prop_weather(target).set_index('game_id')
+print(WX[['desc', 'src', 'note']].to_string())
+wxm = lambda gid, stat: float(WX[f'm_{stat}'].get(gid, 1.0)) if gid in WX.index else 1.0
 ov_path = os.path.join(ROOT, 'odds_log', 'injury_overrides.csv')
 P = T.upcoming(season, week, T.implied_points(lines), pd.read_csv(ov_path) if os.path.exists(ov_path) else None)
 P = P.merge(Y.team_margin(lines), on='posteam', how='left', suffixes=('', '_m'))
@@ -95,7 +99,7 @@ for (home, away, k, kind), grp in O.groupby(['home_team', 'away_team', 'k', 'kin
     if kind == 'pass':
         pl = QB[(QB.home_team == home) & (QB.away_team == away) & (QB.k == k)]
         if pl.empty: continue
-        r = pl.iloc[0]; mu = float(r.mu)
+        r = pl.iloc[0]; mu = float(r.mu) * wxm(r.game_id, 'pass')
         imp = lambda o: np.where(o < 0, -o / (-o + 100.0), 100.0 / (o + 100.0))
         po = float(imp(grp[grp.side == 'Over'].price.median())) if (grp.side == 'Over').any() else np.nan
         pu = float(imp(grp[grp.side == 'Under'].price.median())) if (grp.side == 'Under').any() else np.nan
@@ -124,7 +128,7 @@ for (home, away, k, kind), grp in O.groupby(['home_team', 'away_team', 'k', 'kin
                             model_only=model_p, market_prob=mkt, model_prob=p, ev=p * float(dec(x.price)) - 1,
                             carries=r.h_attempts, targets=0.0, recent_yds=r.h_passing_yards, imp_pts=r.imp_pts, exp_margin=r.exp_margin,
                             def_yds=r.def_prior, missed_n=r.missed_last, dc_rank=np.nan, dc_prev=np.nan, dc_demoted=0.0,
-                            volume=r.h_starts, regular=bool(r.h_starts >= 3)))
+                            volume=r.h_starts, regular=bool(r.h_starts >= 3), wx_mult=round(wxm(r.game_id, 'pass'), 3)))
         continue
     pl = P[(P.home_team == home) & (P.away_team == away) & (P.k == k)]
     if pl.empty or pl.iloc[0].position not in Y.STATS[kind]['pos']:
@@ -132,7 +136,7 @@ for (home, away, k, kind), grp in O.groupby(['home_team', 'away_team', 'k', 'kin
     r = pl.iloc[0].copy()
     r['def_yds'] = r[f'def_{kind}']
     b, spread = models[kind]
-    mu = float(Y.apply(b, Y.design(pd.DataFrame([r]), kind))[0])
+    mu = float(Y.apply(b, Y.design(pd.DataFrame([r]), kind))[0]) * wxm(r.game_id, kind)
     cons = grp.point.median()
     # books' no-vig chance of the Over at the consensus number (median prices of each side)
     imp = lambda o: np.where(o < 0, -o / (-o + 100.0), 100.0 / (o + 100.0))
@@ -168,7 +172,7 @@ for (home, away, k, kind), grp in O.groupby(['home_team', 'away_team', 'k', 'kin
                         ev=p * float(dec(x.price)) - 1, carries=r.h_carries, targets=r.h_targets,
                         recent_yds=r['h_' + Y.STATS[kind]['y']], imp_pts=r.imp_pts, exp_margin=r.exp_margin, def_yds=r.def_yds,
                         missed_n=r.missed_n, dc_rank=r.dc_rank, dc_prev=r.dc_prev, dc_demoted=r.dc_demoted,
-                        volume=r[Y.STATS[kind]['vol']], regular=bool(r[Y.STATS[kind]['vol']] >= MIN_VOL[kind])))
+                        volume=r[Y.STATS[kind]['vol']], regular=bool(r[Y.STATS[kind]['vol']] >= MIN_VOL[kind]), wx_mult=round(wxm(r.game_id, kind), 3)))
 M = pd.DataFrame(out)
 M['gap'] = (M.projection - M.line) / M.line
 risky = (M.missed_n >= 1) | (M.dc_demoted == 1) | (M.gap.abs() > MAX_GAP)

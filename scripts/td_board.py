@@ -57,7 +57,13 @@ for r in A.itertuples():
                     depth=num(r.dc_rank, int), depthPrev=num(r.dc_prev, int),
                     books=[dict(b=b.book, p=int(b.price)) for b in bks.itertuples()]))
 taken = pd.Timestamp(os.path.basename(props)[11:26].replace('T', ' ')[:-1] if False else os.path.basename(props)[11:].split('.')[0].replace('Z', ''))
-D = dict(season=season, week=week, taken=taken.tz_localize('UTC').tz_convert('America/New_York').strftime('%A, %B %-d at %-I:%M %p ET'), players=out)
+from nflmodel import weather as W
+try:
+    WXB = W.prop_weather(GW)
+    weather = {f'{r.away_team} @ {r.home_team}': dict(desc=r.desc, note=r.note) for r in GW.merge(WXB[['game_id', 'desc', 'note']], on='game_id').itertuples()}
+except Exception as e:
+    print('weather unavailable:', e); weather = {}
+D = dict(weather=weather, season=season, week=week, taken=taken.tz_localize('UTC').tz_convert('America/New_York').strftime('%A, %B %-d at %-I:%M %p ET'), players=out)
 # rushing / receiving / passing yards
 MK = {'Rushing yards': 'rush', 'Receiving yards': 'rec', 'Passing yards': 'pass', 'Receptions': 'recs'}
 YKEYS = {'player_rush_yds': 'rush', 'player_reception_yds': 'rec', 'player_pass_yds': 'pass', 'player_receptions': 'recs'}
