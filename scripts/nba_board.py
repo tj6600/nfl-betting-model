@@ -135,25 +135,18 @@ for s in slate.itertuples():
                            starter=x.starter, dnp=False, reason=None))
 U = pd.DataFrame(up)
 tot = {g['id']: g.get('line_total', g['total']) for g in games}
-F = PR.features(pd.concat([P, U], ignore_index=True), G, totals=tot)
+# injuries: players listed Out sit; the props model hands their production to teammates (props.SHARE, backtested)
+OUT = set()
+if INJURY is not None and len(U):
+    OUT = {(g, i) for g, i in zip(U.game_id, U.pid) if (INJURY.get(int(i)) or {}).get('status') == 'Out'}
+F = PR.features(pd.concat([P, U], ignore_index=True), G, totals=tot, out=OUT)
 hist = F[F.date < day]
 SP = PR.Spread().fit(hist[hist.season >= D.SEASON - 2])
 FU = F[(F.date == day) & F.game_id.isin(slate.game_id)]
-FU = FU[(FU.n_prev >= 3) & (FU.m_ewm >= 10)].copy()
-# injuries: drop players listed Out and hand part of their production to healthy teammates
-# (USAGE_SHARE of the vacated projection, split by each teammate's own projection; not backtested)
-USAGE_SHARE = 0.6
-if INJURY is not None:
-    st = FU.pid.map(lambda i: (INJURY.get(int(i)) or {}).get('status'))
-    out_rows = FU[st == 'Out']
-    FU = FU[st != 'Out'].copy()
-    for (gid, t), o in out_rows.groupby(['game_id', 'team']):
-        mates = (FU.game_id == gid) & (FU.team == t)
-        for k in PR.STATS:
-            vac = o[f'{k}_proj'].sum(); have = FU.loc[mates, f'{k}_proj'].sum()
-            if have > 0:
-                FU.loc[mates, f'{k}_proj'] *= 1 + USAGE_SHARE * vac / have
-        FU.loc[mates, 'boost'] = ', '.join(o['name'])
+gone = FU[FU.absent]
+FU = FU[(FU.n_prev >= 3) & (FU.m_ewm >= 10) & ~FU.apply(lambda r: (r.game_id, r.pid) in OUT, axis=1)].copy()
+bn = gone.groupby(['game_id', 'team']).name.apply(lambda s: ', '.join(s)).to_dict()
+FU['boost'] = [bn.get((g, t)) if v > 0 else None for g, t, v in zip(FU.game_id, FU.team, FU.vacated)]
 key = lambda s: s.str.lower().str.replace(r'[^a-z]', '', regex=True).str.replace(r'(jr|sr|ii|iii|iv)$', '', regex=True)
 if len(PRW):
     PRW['k'] = key(PRW.player)

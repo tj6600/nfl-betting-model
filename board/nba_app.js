@@ -16,7 +16,13 @@ try { slip = JSON.parse(localStorage.getItem('nba-slip-' + D.day) || '[]').filte
 const saveSlip = () => { try { localStorage.setItem('nba-slip-' + D.day, JSON.stringify(slip)); } catch (e) {} };
 // suggested parlays are built here so the leg count can be chosen: best remaining legs, 1 per game and 1 per player,
 // no leg reused across suggestions (same rule as scripts/nba_board.py)
-const POOL = (D.pool || []).map((id) => LEG[id]).filter(Boolean);
+// two ways to build: 'value' = biggest edge first (scripts/nba_board.py pool); 'likely' = most likely to hit first,
+// among legs that still pay more than they risk on average (edge 1+ pt) and carry no flags
+const VALUE_POOL = (D.pool || []).map((id) => LEG[id]).filter(Boolean);
+const LIKELY_POOL = D.legs.filter((l) => l.edge >= 1 && l.p >= 0.55 && !l.flags.length).sort((a, b) => b.p - a.p || b.edge - a.edge);
+let mode = 'value';
+try { mode = localStorage.getItem('nba-mode') === 'likely' ? 'likely' : 'value'; } catch (e) {}
+let POOL = mode === 'likely' ? LIKELY_POOL : VALUE_POOL;
 function buildSlips(size, n = 6) {
   const out = [], used = new Set();
   for (let s = 0; s < n; s++) {
@@ -38,15 +44,23 @@ function growth(ids) {
   const f = (b * p - (1 - p)) / b; if (f <= 0) return 0;
   return p * Math.log(1 + f * b) + (1 - p) * Math.log(1 - f);
 }
-const SIZES = [1, 2, 3, 4, 5, 6, 11].filter((k) => buildSlips(k, 1).length);
+let SIZES = [], BEST = null;
 // best parlay size by growth; when no parlay has positive growth (or none can be built), suggest a straight bet
-const PSIZES = SIZES.filter((k) => k > 1 && growth(buildSlips(k, 1)[0]) > 0);
-const BEST = PSIZES.length ? PSIZES.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), PSIZES[0]) : SIZES.includes(1) ? 1 : null;
+function sizesFor() {
+  SIZES = [1, 2, 3, 4, 5, 6, 11].filter((k) => buildSlips(k, 1).length);
+  const PS = SIZES.filter((k) => k > 1 && growth(buildSlips(k, 1)[0]) > 0);
+  BEST = PS.length ? PS.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), PS[0]) : SIZES.includes(1) ? 1 : null;
+}
+sizesFor();
 const sizeName = (k) => (k === 1 ? 'Straight' : String(k));
 let legCount = null;
 try { legCount = +localStorage.getItem('nba-legs') || null; } catch (e) {}
 if (!SIZES.includes(legCount)) legCount = BEST;
 let SLIPS = [];
+const setMode = (m) => {
+  mode = m; POOL = m === 'likely' ? LIKELY_POOL : VALUE_POOL; try { localStorage.setItem('nba-mode', m); } catch (e) {}
+  sizesFor(); if (!SIZES.includes(legCount)) legCount = BEST;
+};
 const setSize = (k) => { legCount = k; try { localStorage.setItem('nba-legs', k); } catch (e) {} SLIPS = POOL.length ? buildSlips(k) : (D.slips || []); };
 setSize(legCount);
 let sugIdx = -1;   // which suggestion is loaded (-1 = own slip)
@@ -193,7 +207,7 @@ function boardParlay() {
   const B = $('board'); B.innerHTML = '';
   const cols = el('div', 'cols pl');
   const list = el('div', 'col');
-  const h = el('div', 'colhead'); h.append(el('h2', null, 'Legs'), el('span', null, 'Ranked by edge, DraftKings prices')); list.append(h);
+  const h = el('div', 'colhead'); h.append(el('h2', null, 'Legs'), el('span', null, mode === 'likely' ? 'Ranked by chance to hit, DraftKings prices' : 'Ranked by edge, DraftKings prices')); list.append(h);
   const ctl = el('div', 'plctl');
   const q = el('input'); q.type = 'search'; q.placeholder = 'Search legs'; q.value = state.pq; q.oninput = (e) => { state.pq = e.target.value.toLowerCase(); drawList(); };
   const kinds = el('div', 'seg'); [['all', 'All'], ['game', 'Game lines'], ['prop', 'Props']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', state.pkind === k); b.onclick = () => { state.pkind = k; render(); }; kinds.append(b); });
@@ -205,7 +219,7 @@ function boardParlay() {
     let ls = D.legs.filter((l) => l.p >= state.pmin);
     if (state.pkind === 'game') ls = ls.filter((l) => !l.pid); if (state.pkind === 'prop') ls = ls.filter((l) => l.pid);
     if (state.pq) ls = ls.filter((l) => (l.label + ' ' + l.game).toLowerCase().includes(state.pq));
-    ls.sort((a, b) => b.edge - a.edge);
+    ls.sort(mode === 'likely' ? (a, b) => (b.edge >= 1) - (a.edge >= 1) || b.p - a.p : (a, b) => b.edge - a.edge);
     if (!ls.length) pl.append(el('div', 'empty', 'No legs match.'));
     ls.slice(0, 200).forEach((L) => {
       const r = el('div', 'leg'); const who = el('div', 'who');
@@ -220,6 +234,15 @@ function boardParlay() {
   const acts = el('span', 'acts');
   const clr = el('button', 'lnk', 'Clear'); clr.onclick = () => { slip = []; sugIdx = -1; saveSlip(); render(); };
   acts.append(clr); sh.append(acts); sl.append(sh);
+  {
+    const md = el('div', 'sugnav');
+    md.append(el('b', null, 'Build for'));
+    const seg = el('div', 'seg');
+    [['value', 'Best value'], ['likely', 'Most likely to hit']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', mode === k); b.onclick = () => { setMode(k); setSize(legCount); if (SLIPS.length) loadSug(0); else { sugIdx = -1; render(); } }; seg.append(b); });
+    md.append(seg);
+    md.append(el('span', 'dim sugbest', mode === 'likely' ? 'Highest-chance legs that still pay more than they risk on average (edge 1+, 55%+ chance, no flags)' : 'Biggest edge first (edge 3+, 55%+ chance)'));
+    sl.append(md);
+  }
   if (SIZES.length) {
     const lc = el('div', 'sugnav');
     lc.append(el('b', null, 'Legs'));
@@ -254,7 +277,7 @@ function boardParlay() {
     sl.append(sv);
   }
   const legs = slip.map((id) => LEG[id]).filter(Boolean);
-  if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : 'Add legs from the list. No leg meets the value rule (edge 3+, chance 55%+) on this slate.'));
+  if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : mode === 'likely' ? 'Add legs from the list. No leg is both 55%+ to hit and +EV on this slate.' : 'Add legs from the list. No leg meets the value rule (edge 3+, chance 55%+) on this slate.'));
   const box = el('div', 'slipl');
   legs.forEach((L) => { const d = el('div'); const n = el('span', null, L.label); n.append(el('small', null, `${L.game} · ${pct(L.p)}`)); const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
   if (legs.length) {
