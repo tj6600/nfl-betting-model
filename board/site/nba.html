@@ -185,6 +185,41 @@ table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
 .savedrow .lnk { font-size: 13px; }
 .savedchip { display: inline-flex; align-items: center; gap: 2px; }
 .savedchip .chip { padding: 4px 10px; font-size: 13px; }
+/* Phones: nothing should need a sideways swipe except a wide table. Tabs, game buttons and button groups wrap
+   onto extra lines instead of scrolling (clipped .seg groups used to hide filters past the screen edge). */
+.tablewrap { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+@media (max-width: 640px) {
+  .wrap { gap: 14px; padding-block: 14px 36px; }
+  .tabs { flex-wrap: wrap; overflow: visible; gap: 2px 4px; }
+  .tab { font-size: 15px; padding: 6px 9px 7px; }
+  .strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); overflow: visible; gap: 6px; padding-bottom: 0; }
+  .game { min-width: 0; padding: 6px 8px; }
+  .game .m { font-size: 16px; white-space: nowrap; }
+  .game .t { font-size: 11px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; border: 0; background: none; overflow: visible; border-radius: 0; }
+  .seg button, .seg.sides button { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 7px 10px; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"], .seg.sides button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .bar input[type="search"], .plctl input[type="search"] { flex-basis: 100%; }
+  input, select { font-size: 16px; }   /* iOS zooms the page into any field under 16px */
+  .chip { font-size: 13px; padding: 5px 10px; }
+  .pllist { max-height: none; overflow: visible; }
+  table.res td, table.res th { padding: 6px 8px; white-space: normal; font-size: 13px; letter-spacing: 0; }
+  table.res td:first-child, table.res th:first-child { padding-left: 12px; }
+  .overlay { padding: 12px 8px; }
+  .loghead h2 { font-size: 22px; }
+  .colhead { flex-wrap: wrap; gap: 4px 8px; }
+  .detail { grid-template-columns: 1fr; padding: 12px; }
+  .stats { gap: 6px; }
+  .stat b { font-size: 19px; }
+  .sugnav { gap: 6px; }
+  .suglab { min-width: 0; flex: 1 1 auto; }
+  .detail.one { padding: 10px 6px; }
+  table.res .pill { font-size: 10px; padding: 2px 5px; letter-spacing: .02em; }
+  .opt { display: none; }   /* secondary table columns (milestone ladder: model, books, fair price) */
+  .logpanel table.res td, .logpanel table.res th { padding: 5px 6px; font-size: 13px; letter-spacing: 0; }
+  .logpanel table.res td:first-child, .logpanel table.res th:first-child { padding-left: 10px; }
+}
 </style>
 <style>
 .sportnav { display: flex; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; }

@@ -1,4 +1,4 @@
-"""Rushing and receiving yards over/under picks: model vs sportsbook lines.
+"""Rushing and receiving yards (and receptions) over/under picks: model vs sportsbook lines.
 
 1. Fits the yards model (nflmodel/yards.py) on every finished 2021+ game.
 2. Prices this week's players (same player pool as the TD picks: active, not ruled out).
@@ -15,7 +15,9 @@ from nflmodel import touchdowns as T, yards as Y, passing as PY
 VALUE_EV, VALUE_P, MIN_BOOKS = 0.05, 0.57, 3
 W_MODEL = 0.5           # untested against real prop lines, so the model's chance is blended 50/50 with the books' no-vig chance
 MAX_GAP = 0.25          # model projection more than 25% away from the line: the books likely know something (role, injury)
-MIN_VOL = {'rush': 8.0, 'rec': 3.0}   # carries or targets a game for a regular role
+MIN_VOL = {'rush': 8.0, 'rec': 3.0, 'recs': 3.0}   # carries or targets a game for a regular role
+MARKET = {'rush': 'Rushing yards', 'rec': 'Receiving yards', 'recs': 'Receptions'}
+KEYS = {'player_rush_yds': 'rush', 'player_reception_yds': 'rec', 'player_pass_yds': 'pass', 'player_receptions': 'recs'}
 today = pd.Timestamp.now(tz='UTC').tz_localize(None).normalize()
 up = G[(G.game_type == 'REG') & G.result.isna() & (pd.to_datetime(G.gameday) >= today - pd.Timedelta(days=1))]
 season = int(up.season.min()); week = int(up[up.season == season].week.min())
@@ -50,12 +52,18 @@ for kind in Y.STATS:
     P = P.merge(dn, on=['defteam', 'position'], how='left')
 
 # odds: one row per player, market, side and book
+# yards come from the newest yards_*.json; receptions from the newest recs_*.json (`python -m nflmodel.odds recs`),
+# keeping only games that haven't started more than a day ago so an old week's file is ignored
 f = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'props', 'yards_*.json')))[-1]
+rf = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'props', 'recs_*.json')))
+events = json.load(open(f))
+if rf:
+    events += [e for e in json.load(open(rf[-1])) if pd.Timestamp(e['commence_time']).tz_localize(None) >= today - pd.Timedelta(days=1)]
 rows = []
-for e in json.load(open(f)):
+for e in events:
     for bk in e.get('bookmakers', []):
         for m in bk['markets']:
-            kind = {'player_rush_yds': 'rush', 'player_reception_yds': 'rec', 'player_pass_yds': 'pass'}.get(m['key'])
+            kind = KEYS.get(m['key'])
             if kind is None: continue
             for o in m['outcomes']:
                 if o.get('description') and o.get('point') is not None:
@@ -153,7 +161,7 @@ for (home, away, k, kind), grp in O.groupby(['home_team', 'away_team', 'k', 'kin
         mkt = (mkt_over if side == 'Over' else 1 - mkt_over) if mkt_over == mkt_over else model_p
         p = W_MODEL * model_p + (1 - W_MODEL) * mkt
         out.append(dict(game=f'{away} @ {home}', pid=r.pid, team=r.posteam, opp=r.defteam, player=r.full_name, position=r.position,
-                        market='Rushing yards' if kind == 'rush' else 'Receiving yards', side=side, line=cons, best_line=x.point,
+                        market=MARKET[kind], side=side, line=cons, best_line=x.point,
                         best_price=int(x.price), best_book=x.book, books=g2.book.nunique(), projection=round(mu, 1),
                         median=round(float(spread.quantile([mu], .5)[0]), 1),
                         q25=round(float(spread.quantile([mu], .25)[0]), 1), q75=round(float(spread.quantile([mu], .75)[0]), 1), model_only=model_p, market_prob=mkt, model_prob=p,
@@ -192,7 +200,7 @@ if af:
                         rows.append({'home_team': TEAMS.get(e['home_team']), 'away_team': TEAMS.get(e['away_team']), 'kind': kind,
                                      'player': o['description'], 'point': pt, 'price': o['price'], 'book': bk['title']})
     A = pd.DataFrame(rows); A['k'] = T._key(A.player)
-    base_rows = M[M.market != 'Passing yards'].drop_duplicates(['pid', 'market']).copy()
+    base_rows = M[M.market.isin(['Rushing yards', 'Receiving yards'])].drop_duplicates(['pid', 'market']).copy()
     base_rows['kind'] = np.where(base_rows.market.str.startswith('Rush'), 'rush', 'rec')
     base_rows['k'] = T._key(base_rows.player)
     imp = lambda o: np.where(o < 0, -o / (-o + 100.0), 100.0 / (o + 100.0))
