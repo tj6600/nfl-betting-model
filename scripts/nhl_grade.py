@@ -26,6 +26,9 @@ def main():
     rows = []
     for day, f in logs.items():
         L = pd.read_csv(f)
+        # the lean is the side of each bet with the bigger edge (both sides are logged)
+        L['key'] = L.gid.astype(str) + '|' + L.market.astype(str) + '|' + L.pid.fillna(0).astype(int).astype(str)
+        L['lean'] = L.edge == L.groupby('key').edge.transform('max')
         g = games[games.game_date == day]
         if not len(g):
             continue
@@ -55,7 +58,7 @@ def main():
                 res = (v > l.line) == (l.side == 'Over')
             if res is None:
                 continue
-            rows.append(dict(day=day, kind=l.kind, cat=l.cat if isinstance(l.cat, str) else '', pick=bool(getattr(l, 'pick', False)),
+            rows.append(dict(day=day, kind=l.kind, lean=bool(l.lean), cat=l.cat if isinstance(l.cat, str) else '', pick=bool(getattr(l, 'pick', False)),
                              flagged=bool(l.flagged), price=l.price, p=l.p, won=bool(res), units=(dec(l.price) - 1) if res else -1.0))
     R = pd.DataFrame(rows)
     out = dict(days=sorted(R.day.unique().tolist()) if len(R) else [], groups=[])
@@ -64,11 +67,16 @@ def main():
             if not len(x): return
             out['groups'].append(dict(group=name, bets=int(len(x)), won=int(x.won.sum()), lost=int((~x.won).sum()), hit=float(x.won.mean()),
                                       exp_hit=float(x.p.mean()), units=round(float(x.units.sum()), 2), roi=float(x.units.mean())))
+        props = R[R.lean & R.kind.isin(['Shots on goal', 'Saves'])]
         grp('Board winner picks', R[R.pick])
+        grp('Prop leans (shots + saves)', props)
         grp('Value legs', R[R.cat == 'Value'])
-        grp('Shots on goal, edge 3+ side', R[(R.kind == 'Shots on goal') & ((R.p - 1 / R.price.map(dec)) >= 0.03)])
-        for k in ['Shots on goal', 'Saves', 'Moneyline', 'Puck line', 'Total']:
-            grp(f'All {k.lower()} legs', R[R.kind == k])
+        for k in ['Shots on goal', 'Saves', 'Puck line', 'Total']:
+            grp(f'{k} leans', R[R.lean & (R.kind == k)])
+        last = R.day.max()
+        lp = props[props.day == last]; lw = R[R.pick & (R.day == last)]
+        out['latest_day'] = dict(day=last, props_won=int(lp.won.sum()), props_lost=int((~lp.won).sum()),
+                                 picks_won=int(lw.won.sum()), picks_lost=int((~lw.won).sum()))
     json.dump(out, open(os.path.join(O.DIR, 'grade_report.json'), 'w'), indent=1)
     print(f"graded {len(R)} legs over {len(out['days'])} days")
 
