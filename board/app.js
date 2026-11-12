@@ -369,7 +369,7 @@ const amer = (d) => (d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d -
 const PK = 'props-parlay-v2';
 const PBOOKS = ['DraftKings'];
 const ABBR = { DraftKings: 'DK', FanDuel: 'FD' };
-const PS = { lim: 80, kinds: new Set(), mode: 'value', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25, note: '', sel: {} };
+const PS = { lim: 80, open: new Set(), glim: {}, kinds: new Set(), mode: 'value', q: '', plus: true, clean: true, price: '', sort: 'edge', minp: 0.25, note: '', sel: {} };
 try { PS.mode = localStorage.getItem('props-mode') === 'likely' ? 'likely' : 'value'; } catch (e) {}
 // market filter: pick any mix of markets (e.g. TDs + Receptions); none picked = every market
 try { PS.kinds = new Set(JSON.parse(localStorage.getItem('props-kinds') || '[]')); } catch (e) {}
@@ -561,6 +561,31 @@ function renderParlay() {
     if (PS.kinds.size > 1) {
       const per = Math.ceil(PS.lim / PS.kinds.size), seen = {};
       top = all.filter((x) => { const k = x.g.sides[0].alt && !PS.kinds.has(mkt(x.g.sides[0])) ? 'Milestone' : mkt(x.g.sides[0]); seen[k] = (seen[k] || 0) + 1; return seen[k] <= per; });
+    }
+    // phones and tablets: one tap-to-open section per market, so you can jump between markets without scrolling past every leg
+    if (matchMedia('(max-width: 1024px)').matches) {
+      const key = (l) => (l.alt ? 'Milestone' : mkt(l));
+      const by = {}; for (const x of all) (by[key(x.g.sides[0])] = by[key(x.g.sides[0])] || []).push(x.g);
+      const keys = MKTS.map(([k]) => k).filter((k) => by[k]);
+      ph.lastChild.textContent = `${all.length} bets`;
+      list.replaceChildren();
+      if (!keys.length) list.append(el('div', 'empty', 'Nothing matches. Try another search or turn off Positive EV only.'));
+      for (const k of keys) {
+        const gl = by[k], lim = PS.glim[k] || 25;
+        const d = el('details', 'mgrp'); d.open = PS.open.has(k) || keys.length === 1 || !!qq;
+        const best = Math.max(...gl[0].sides.map(metric));
+        const sm = el('summary'); sm.append(el('span', 'mname', MKTS.find((m) => m[0] === k)[1]),
+          el('span', 'dim', `${gl.length} bet${gl.length > 1 ? 's' : ''} · best ${PS.sort === 'p' ? pct(best) : PS.sort === 'ev' ? `EV ${best > 0 ? '+' : ''}${(best * 100).toFixed(0)}%` : `edge ${pts(best)}`}`));
+        d.append(sm);
+        d.ontoggle = () => { if (d.open) PS.open.add(k); else PS.open.delete(k); };
+        for (const g of gl.slice(0, lim)) d.append(groupRow(g));
+        if (gl.length > lim) {
+          const more = el('button', 'lnk more', `Show more ${MKTS.find((m) => m[0] === k)[1]} (${gl.length - lim} left)`); more.type = 'button';
+          more.onclick = () => { PS.glim[k] = lim + 25; PS.open.add(k); drawList(); }; d.append(more);
+        }
+        list.append(d);
+      }
+      return;
     }
     const gs = top.map((x) => x.g);
     ph.lastChild.textContent = `${gs.length < all.length ? `top ${gs.length} of ${all.length}` : gs.length} bets`;
