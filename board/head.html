@@ -170,4 +170,13 @@ table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
   .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (prefers-reduced-motion: no-preference) { .fill { transition: width .25s ease; } }
+.sugnav { display: flex; align-items: center; gap: 10px; padding: 10px 14px 0; flex-wrap: wrap; }
+.sugnav .lnk { font-size: 22px; line-height: 1; padding: 0 6px; }
+.sugnav .seg button { padding: 6px 10px; }
+.suglab { font: 600 14px var(--body); min-width: 130px; text-align: center; }
+.sugbest { font-size: 12px; }
+.savedrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px 0; }
+.savedrow .lnk { font-size: 13px; }
+.savedchip { display: inline-flex; align-items: center; gap: 2px; }
+.savedchip .chip { padding: 4px 10px; font-size: 13px; }
 </style>
