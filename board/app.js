@@ -52,13 +52,13 @@ const CONF = {
     sorts: [['ev', 'Sort: expected value'], ['chance', 'Sort: chance of lean'], ['gap', 'Sort: projection vs line'], ['line', 'Sort: line']],
   },
   ms: {
-    lede: 'Chances to reach yardage milestones, like 40+ receiving or 50+ rushing, priced against the books\' alternate lines. Each chip is one milestone and its chance. Open a player for every milestone with its best price.',
+    lede: 'Chances to reach milestones, like 40+ receiving yards, 50+ rushing or 5+ receptions, priced against the books\' alternate lines. Each chip is one milestone and its chance. Open a player for every milestone with its best price.',
     cats: [['all', 'All players'], ['Likely hit', 'Likely hit'], ['Value', 'Value']],
-    pos: ['all', 'rush', 'rec'],
+    pos: ['all', 'rush', 'rec', 'recs'],
     sorts: [['sure', 'Sort: surest hit'], ['ev', 'Sort: best EV'], ['median', 'Sort: projected yards']],
   },
 };
-const SEG = { all: 'All', rush: 'Rushing', rec: 'Receiving' };
+const SEG = { all: 'All', rush: 'Rushing', rec: 'Receiving', recs: 'Receptions' };
 const MS_LEGEND = '<span><i style="width:22px;height:12px;border-radius:4px;background:color-mix(in srgb, var(--turf) 70%, transparent)"></i>Darker chip = likelier</span><span><span class="pill likely">Likely hit</span> 80%+ chance</span><span><span class="pill value">Value</span> 5%+ EV at the best price</span>';
 const MS_FOOT = 'Each chance blends the yards model 50/50 with the books\' own chance (their alternate-line price with an estimated 6% margin taken out). Likely hit means 80%+ for a regular with no role flags. Expect most likely hits to show a small negative EV: books price heavy favorites like -400 to -1800 with extra margin, so a likely hit is safe for a parlay leg but rarely value on its own. Value needs 5%+ EV and at least two books offering the milestone.';
 const YARDS_LEGEND = '<span><i style="width:26px;height:8px;border-radius:3px;background:var(--bar)"></i>Middle half of outcomes</span><span><i style="width:3px;height:14px;background:var(--turf)"></i>Model median</span><span><i style="width:2px;height:14px;background:var(--tick)"></i>Book line</span><span><span class="pill value">Value</span></span><span><span class="pill check">Check role</span></span>';
@@ -288,7 +288,7 @@ function ydDetail(p) {
   d.append(a, b, c); return d;
 }
 // ---- milestones ----
-const mlabel = (p, x) => `${x.m}+ ${p.market === 'rush' ? 'rush' : 'rec'}`;
+const mlabel = (p, x) => `${x.m}+ ${p.market === 'rush' ? 'rush' : p.market === 'recs' ? 'catches' : 'rec'}`;
 function chip(x, hot) {
   const c = el('span', 'step' + (hot ? ' hot' : '')); c.style.setProperty('--a', Math.round(12 + x.p * 70) + '%');
   c.append(el('b', null, `${x.m}+`), document.createTextNode(' ' + pct(x.p))); return c;
@@ -299,7 +299,7 @@ function msRow(p) {
   if (pts.length > 7) { const k = (pts.length - 1) / 6; pts = [...new Set([0, 1, 2, 3, 4, 5, 6].map((i) => Math.round(i * k)))].map((i) => pts[i]); }
   if (!pts.includes(p.head)) pts = [...pts, p.head].sort((a, b) => a.m - b.m);
   pts.forEach((x) => lad.append(chip(x, x === p.head)));
-  const m = el('div', 'meter'); m.append(lad, el('div', 'l', `median ${p.median.toFixed(0)} yds${p.line != null ? ` · main line ${p.line}` : ''}`));
+  const m = el('div', 'meter'); m.append(lad, el('div', 'l', `median ${p.market === 'recs' ? p.median.toFixed(1) + ' catches' : p.median.toFixed(0) + ' yds'}${p.line != null ? ` · main line ${p.line}` : ''}`));
   const pr = el('div', 'price'); const h = p.head;
   pr.append(el('span', 'side over', mlabel(p, h)), el('span', 'e', `${fmtOdds(h.price)} · ${pct(h.p)}`),
     el('span', 'e ' + (h.ev >= 0 ? 'pos' : 'neg'), `EV ${h.ev > 0 ? '+' : ''}${(h.ev * 100).toFixed(0)}%`));
@@ -322,7 +322,7 @@ function msDetail(p) {
     tbody.append(tr);
   }
   tb.append(tbody); wrap.append(tb);
-  const n = el('p', 'note', `Model projects ${p.projection.toFixed(0)} yards on average and ${p.median.toFixed(0)} at the median. "Model" is the yards model alone, "Books" is their chance with the margin removed, and "Chance" is the blend used. Fair price is what the blended chance is worth; a best price longer than it is value. On a phone, Model, Books, Fair price and Book are hidden to fit the screen.${p.risky ? ' Role flag: he missed his last game, moved down the depth chart, or the model and books disagree a lot, so he is kept out of Likely hit and Value.' : ''}`);
+  const n = el('p', 'note', `Model projects ${p.market === 'recs' ? `${p.projection.toFixed(1)} catches on average and ${p.median.toFixed(1)}` : `${p.projection.toFixed(0)} yards on average and ${p.median.toFixed(0)}`} at the median. "Model" is the ${p.market === 'recs' ? 'receptions' : 'yards'} model alone, "Books" is their chance with the margin removed, and "Chance" is the blend used. Fair price is what the blended chance is worth; a best price longer than it is value. On a phone, Model, Books, Fair price and Book are hidden to fit the screen.${p.risky ? ' Role flag: he missed his last game, moved down the depth chart, or the model and books disagree a lot, so he is kept out of Likely hit and Value.' : ''}`);
   n.style.marginTop = '8px';
   const lb = logButton(p.pid, { kind: p.market, line: p.head.m - 0.5, side: 'Over' });
   d.append(wrap, n); if (lb) d.append(lb); return d;
@@ -369,15 +369,21 @@ const PS = { kinds: new Set(), mode: 'value', q: '', plus: true, clean: true, pr
 try { PS.mode = localStorage.getItem('props-mode') === 'likely' ? 'likely' : 'value'; } catch (e) {}
 // market filter: pick any mix of markets (e.g. TDs + Receptions); none picked = every market
 try { PS.kinds = new Set(JSON.parse(localStorage.getItem('props-kinds') || '[]')); } catch (e) {}
-const kindOk = (l) => !PS.kinds.size || PS.kinds.has(mkt(l));
+const kindOk = (l) => !PS.kinds.size || PS.kinds.has(mkt(l)) || (l.alt && PS.kinds.has('Milestone'));
+// safer alt lines for a player's market (55%+, no flag), likeliest first. The list hint shows ones priced within 2 pts of
+// fair (and says what the extra juice costs); "Most likely to hit" only takes fairly priced ones (edge 0+, see sugPool).
+const ALT_BY_KEY = {};
+for (const l of LEGS) if (l.alt && !l.flag && l.p >= 0.55 && l.edge >= -0.02 && l.offers.DraftKings != null) (ALT_BY_KEY[l.key] = ALT_BY_KEY[l.key] || []).push(l);
+Object.values(ALT_BY_KEY).forEach((xs) => xs.sort((a, b) => b.p - a.p));
 const kindsName = () => [...PS.kinds].map((k) => MKTS.find((m) => m[0] === k)[1].toLowerCase()).join(' + ');
 function toggleKind(k) {
   if (k === 'all') PS.kinds.clear(); else if (PS.kinds.has(k)) PS.kinds.delete(k); else PS.kinds.add(k);
   try { localStorage.setItem('props-kinds', JSON.stringify([...PS.kinds])); } catch (e) {}
 }
 // market of a leg, for the filter: game lines split into moneyline / spread / total
-const mkt = (l) => (l.kind !== 'Game' ? l.kind : /moneyline/i.test(l.label) ? 'ML' : /^(Over|Under)/.test(l.label) ? 'Total' : 'Spread');
-const MKTS = [['all', 'All'], ['ML', 'Moneyline'], ['Spread', 'Spread'], ['Total', 'Game total'], ['TD', 'TDs'], ['Pass', 'Pass yds'], ['Rush', 'Rush yds'], ['Rec', 'Rec yds'], ['Recs', 'Receptions'], ['Milestone', 'Milestones']];
+// alt lines (milestones like "40+ rec yds" or "5+ receptions") count as their own market (Rush/Rec/Recs) and also as 'Milestone'
+const mkt = (l) => (l.alt ? l.id.split('-')[2] : l.kind !== 'Game' ? l.kind : /moneyline/i.test(l.label) ? 'ML' : /^(Over|Under)/.test(l.label) ? 'Total' : 'Spread');
+const MKTS = [['all', 'All'], ['ML', 'Moneyline'], ['Spread', 'Spread'], ['Total', 'Game total'], ['TD', 'TDs'], ['Pass', 'Pass yds'], ['Rush', 'Rush yds'], ['Rec', 'Rec yds'], ['Recs', 'Receptions'], ['Milestone', 'Alt lines']];
 // one row per bet: both sides of an over/under or spread together, so either side can be picked
 const GROUPS = Object.values(LEGS.reduce((acc, l) => { (acc[l.grp] = acc[l.grp] || { grp: l.grp, title: l.gt, kind: l.kind, sides: [] }).sides.push(l); return acc; }, {}))
   .map((g) => { g.sides.sort((a, b) => (a.sl === 'Over' ? -1 : b.sl === 'Over' ? 1 : 0)); g.flag = g.sides.map((x) => x.flag).find((f) => f && f !== 'season disagrees') || '';
@@ -448,7 +454,9 @@ const saveSaved = () => { try { localStorage.setItem('props-saved', JSON.stringi
 function sugPool() {
   const ok = (l) => inScope(l) && !l.flag && l.offers.DraftKings != null && kindOk(l);
   // Most likely to hit: the highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+)
-  if (PS.mode === 'likely') return LEGS.filter((l) => ok(l) && l.p >= 0.55 && l.edge >= 0.01).sort((a, b) => b.p - a.p || b.edge - a.edge);
+  // Alt lines join when fairly priced (edge 0+): a slip holds one leg per player and market, so the likelier of the main line
+  // and its alt line wins (e.g. 3+ receptions at 84% over Over 4.5 at 58%)
+  if (PS.mode === 'likely') return LEGS.filter((l) => ok(l) && l.p >= 0.55 && (l.alt ? l.edge >= 0 : l.edge >= 0.01)).sort((a, b) => b.p - a.p || b.edge - a.edge);
   const v = LEGS.filter((l) => ok(l) && l.p >= 0.55 && l.edge >= 0.03).sort((a, b) => b.edge - a.edge);
   const nv = LEGS.filter((l) => ok(l) && !(l.p >= 0.55 && l.edge >= 0.03) && l.p >= 0.52 && l.edge >= 0.015).sort((a, b) => b.edge - a.edge);
   return v.concat(nv);
@@ -512,7 +520,7 @@ function renderParlay() {
   seg.setAttribute('aria-label', 'Markets (pick one or more)');
   const segl = el('span', 'dim seglab', 'Markets: tap one or more');
   for (const [k, t] of MKTS) {
-    const n = k === 'all' ? 0 : GROUPS.filter((g) => g.mkt === k && inScope(g.sides[0])).length;
+    const n = k === 'all' ? 0 : GROUPS.filter((g) => (k === 'Milestone' ? g.sides[0].alt : g.mkt === k) && inScope(g.sides[0])).length;
     if (k !== 'all' && !n) continue;
     const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', k === 'all' ? !PS.kinds.size : PS.kinds.has(k));
     b.onclick = () => { toggleKind(k); SS.idx = -1; renderParlay(); }; seg.append(b);
@@ -534,7 +542,7 @@ function renderParlay() {
     const qq = PS.q.trim().toLowerCase();
     const okSide = (l) => (!PS.plus || l.ev > 0) && l.p >= PS.minp;
     const metric = PS.sort === 'ev' ? (l) => l.ev : PS.sort === 'p' ? (l) => l.p : (l) => l.edge;
-    const gs = GROUPS.filter((g) => inScope(g.sides[0]) && (!PS.kinds.size || PS.kinds.has(g.mkt)) && (!PS.clean || !g.flag)
+    const gs = GROUPS.filter((g) => inScope(g.sides[0]) && kindOk(g.sides[0]) && (!PS.clean || !g.flag)
       && (!qq || g.text.includes(qq)) && g.sides.some(okSide))
       .map((g) => ({ g, m: Math.max(...g.sides.filter(okSide).map(metric)) })).sort((a, b) => b.m - a.m).slice(0, 80).map((x) => x.g);
     ph.lastChild.textContent = `${gs.length >= 80 ? 'top 80' : gs.length} bets`;
@@ -544,7 +552,7 @@ function renderParlay() {
   }
   function groupRow(g) {
     const r = el('div', 'leg'); const w = el('div', 'who'); const l0 = g.sides[0];
-    const kindName = l0.kind === 'Milestone' ? 'Milestone' : l0.kind === 'Game' ? 'Game line' : l0.kind === 'TD' ? 'Touchdown' : l0.kind === 'Recs' ? 'Receptions' : l0.kind + ' yards';
+    const kindName = l0.kind === 'Milestone' ? 'Alt line' : l0.kind === 'Game' ? 'Game line' : l0.kind === 'TD' ? 'Touchdown' : l0.kind === 'Recs' ? 'Receptions' : l0.kind + ' yards';
     const lean = g.sides.reduce((a, b) => (b.edge > a.edge ? b : a));
     const cat = g.sides.map((x) => x.cat).find((c) => c) || '';
     const nm = l0.pid && LOGS[l0.pid] ? el('button', 'n namebtn', g.title) : el('span', 'n', g.title);
@@ -552,7 +560,7 @@ function renderParlay() {
       nm.type = 'button'; nm.title = 'Season game log';
       nm.onclick = () => { const c = g.sides.find((x) => x.id === PS.sel[g.grp]) || g.sides.find((x) => slip.includes(x.id)) || g.sides.reduce((a, b) => (b.edge > a.edge ? b : a));
         const num = Number((c.label.match(/[\d.]+/) || [])[0]);
-        showLog(l0.pid, l0.kind === 'TD' ? { kind: 'td' } : l0.kind === 'Game' || l0.kind === 'Pass' ? null : { kind: /rush/.test(c.label) ? 'rush' : l0.kind === 'Recs' ? 'recs' : 'rec', line: l0.kind === 'Milestone' ? num - 0.5 : num, side: l0.kind === 'Milestone' ? 'Over' : c.sl }); };
+        showLog(l0.pid, l0.kind === 'TD' ? { kind: 'td' } : l0.kind === 'Game' || l0.kind === 'Pass' ? null : { kind: /rush/.test(c.label) ? 'rush' : /receptions/.test(c.label) ? 'recs' : 'rec', line: l0.kind === 'Milestone' ? num - 0.5 : num, side: l0.kind === 'Milestone' ? 'Over' : c.sl }); };
     }
     const mv = l0.pid && LOGS[l0.pid] && LOGS[l0.pid].move;
     w.append(nm, el('span', 's', `${kindName} · ${l0.game}${cat ? ' · ' + cat : ''}${g.flag ? ' · ' + g.flag : ''}${mv ? ` · new team (from ${mv.frm})` : ''}`));
@@ -572,6 +580,13 @@ function renderParlay() {
     box.append(seg, st);
     if (g.sides.length > 1 && cur !== lean && lean.edge > 0) box.append(el('span', 'e dim', `Going against our lean (${lean.sl})`));
     if (cur.flag === 'season disagrees') box.append(el('span', 'e warnc', `Caution: hit only ${cur.season} this season`));
+    // safer alt line for this player's market, when one is fairly priced and likelier than the side shown
+    const alt = !l0.alt && l0.kind !== 'Game' && cur.sl === 'Over' && (ALT_BY_KEY[l0.key] || []).find((a) => a.p > cur.p + 0.05);
+    if (alt) {
+      const ab = el('button', 'lnk althint', `Safer alt: ${alt.label} ${fmtOdds(alt.offers.DraftKings)} · ${pct(alt.p)} · ${alt.edge >= 0 ? 'fair price' : `juice costs ${(-alt.edge * 100).toFixed(1)} pts`}${slip.includes(alt.id) ? ' (in slip)' : ''}`); ab.type = 'button';
+      ab.onclick = () => { slip = [...slip.filter((i) => LEG[i].key !== alt.key), alt.id]; SS.idx = -1; saveSlip(); renderParlay(); };
+      box.append(ab);
+    }
     const on = slip.includes(cur.id);
     const b = el('button', 'add' + (on ? ' on' : ''), on ? 'Added' : 'Add'); b.type = 'button'; b.setAttribute('aria-label', (on ? 'Remove ' : 'Add ') + legName(cur));
     b.onclick = () => { slip = on ? slip.filter((i) => i !== cur.id) : [...slip.filter((i) => !g.sides.some((x) => x.id === i)), cur.id]; SS.idx = -1; saveSlip(); renderParlay(); };

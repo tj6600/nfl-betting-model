@@ -187,21 +187,28 @@ print(M[M.category != ''][['game', 'player', 'market', 'side', 'line', 'best_lin
 
 # ---- milestones (alternate lines: "40+ receiving yards" = Over 39.5) ----
 ALT_MARGIN = 1.06    # alternate lines have no Under side; book chances are divided by an estimated 6% margin
+# yards from the newest altyards_*.json, receptions ("5+ receptions" = Over 4.5) from the newest altrecs_*.json
 af = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'props', 'altyards_*.json')))
-if af:
+arf = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'props', 'altrecs_*.json')))
+fresh = lambda e: pd.Timestamp(e['commence_time']).tz_localize(None) >= today - pd.Timedelta(days=1)
+alt_events = (json.load(open(af[-1])) if af else []) + ([e for e in json.load(open(arf[-1])) if fresh(e)] if arf else [])
+ALT_KIND = {'player_rush_yds_alternate': 'rush', 'player_reception_yds_alternate': 'rec', 'player_receptions_alternate': 'recs'}
+if alt_events:
     rows = []
-    for e in json.load(open(af[-1])):
+    for e in alt_events:
         for bk in e.get('bookmakers', []):
             for m in bk['markets']:
-                kind = 'rush' if m['key'].startswith('player_rush') else 'rec'
+                kind = ALT_KIND.get(m['key'])
+                if kind is None: continue
                 for o in m['outcomes']:
                     pt = o.get('point')
-                    if o.get('name') == 'Over' and o.get('description') and pt is not None and (pt + 0.5) % 5 == 0 and 9.5 <= pt <= 199.5:
+                    ok = pt is not None and ((0.5 <= pt <= 14.5) if kind == 'recs' else ((pt + 0.5) % 5 == 0 and 9.5 <= pt <= 199.5))
+                    if o.get('name') == 'Over' and o.get('description') and ok:
                         rows.append({'home_team': TEAMS.get(e['home_team']), 'away_team': TEAMS.get(e['away_team']), 'kind': kind,
                                      'player': o['description'], 'point': pt, 'price': o['price'], 'book': bk['title']})
     A = pd.DataFrame(rows); A['k'] = T._key(A.player)
-    base_rows = M[M.market.isin(['Rushing yards', 'Receiving yards'])].drop_duplicates(['pid', 'market']).copy()
-    base_rows['kind'] = np.where(base_rows.market.str.startswith('Rush'), 'rush', 'rec')
+    base_rows = M[M.market.isin(['Rushing yards', 'Receiving yards', 'Receptions'])].drop_duplicates(['pid', 'market']).copy()
+    base_rows['kind'] = base_rows.market.map({v: k for k, v in MARKET.items()})
     base_rows['k'] = T._key(base_rows.player)
     imp = lambda o: np.where(o < 0, -o / (-o + 100.0), 100.0 / (o + 100.0))
     out = []; ms_books = []

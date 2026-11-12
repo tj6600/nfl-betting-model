@@ -111,7 +111,7 @@ if os.path.exists(mf):
     M = pd.read_csv(mf); ms = []
     gl = {r.game: r for r in GW.assign(game=GW.away_team + ' @ ' + GW.home_team).itertuples()}
     for (pid, market), grp in M.groupby(['pid', 'market'], sort=False):
-        r = grp.iloc[0]; kind = 'rush' if market.startswith('Rush') else 'rec'; g = gl.get(r.game)
+        r = grp.iloc[0]; kind = MK[market]; g = gl.get(r.game)
         if g is None: continue
         steps = [dict(m=int(x.milestone), p=round(float(x.prob), 4), model=round(float(x.model_only), 4), book=round(float(x.book_prob), 4),
                       price=int(x.best_price), bk=x.best_book, n=int(x.books), ev=round(float(x.ev), 4),
@@ -221,17 +221,18 @@ if os.path.exists(yb):
 # milestones: one number, only the price differs by book
 mb = mf.replace('_milestones.csv', '_milestones_books.csv')
 if os.path.exists(mb):
-    Ms = pd.read_csv(mf); Ms['kind'] = np.where(Ms.market.str.startswith('Rush'), 'rush', 'rec')
+    Ms = pd.read_csv(mf); Ms['kind'] = Ms.market.map(MK)
     Ms = Ms.set_index(['pid', 'kind', 'milestone'])
     for r in pd.read_csv(mb).itertuples():
         if (r.pid, r.kind, r.milestone) not in Ms.index: continue
         m = Ms.loc[(r.pid, r.kind, r.milestone)]
         if not 0.05 <= m.prob <= 0.97: continue
-        kind = 'Rush' if r.kind == 'rush' else 'Rec'
+        kind = r.kind.title()   # Rush, Rec, Recs: the same key as the player's main line, so a slip holds one or the other
+        unit = 'receptions' if r.kind == 'recs' else f'{kind.lower()} yds'
         flag = 'Check role' if m.risky else ('' if m.regular else 'small role')
         add_leg(f'm-{r.pid}-{kind}-{r.milestone}', r.book, r.price, game=m.game, kind='Milestone', who=m.player, team=m.team,
-                label=f'{r.milestone}+ {kind.lower()} yds', model=float(m.model_only),
-                pid=r.pid, grp=f'm-{r.pid}-{kind}-{r.milestone}', gt=f'{m.player} {r.milestone}+ {kind.lower()} yds', sl='Yes', bp=float(m.book_prob), cat=_cat(m.category),
+                label=f'{r.milestone}+ {unit}', model=float(m.model_only), alt=True, main=float(m.main_line) if m.main_line == m.main_line else None,
+                pid=r.pid, grp=f'm-{r.pid}-{kind}-{r.milestone}', gt=f'{m.player} {r.milestone}+ {unit}', sl='Yes', bp=float(m.book_prob), cat=_cat(m.category),
                 key=f'{r.pid}-{kind}', flag=flag)
 # chance = model blended with the books' no-vig chance: 50/50 normally, leaning on the books for long shots
 # (model weight 0.5 at a 25%+ book chance, sliding to 0.2 below about 12%), since the model is least reliable in the tails.
@@ -308,7 +309,7 @@ for l in legs:
     rows = [r for r in logs[l['pid']]['g'] if r[3] is not None]
     num = float(re.search(r'[\d.]+', l['label']).group())
     line = num - 0.5 if l['kind'] == 'Milestone' else num
-    i = 4 if 'rush' in l['label'] else 6 if l['kind'] == 'Recs' else 7
+    i = 4 if 'rush' in l['label'] else 6 if 'receptions' in l['label'] else 7
     over = l['kind'] == 'Milestone' or l['sl'] == 'Over'
     hits = sum((r[i] > line) if over else (r[i] < line) for r in rows)
     l['season'] = f'{hits}/{len(rows)}'
