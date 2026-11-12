@@ -242,7 +242,7 @@ if os.path.exists(mb):
         flag = 'Check role' if m.risky else ('' if m.regular else 'small role')
         add_leg(f'm-{r.pid}-{kind}-{r.milestone}', r.book, r.price, game=m.game, kind='Milestone', who=m.player, team=m.team,
                 label=f'{r.milestone}+ {unit}', model=float(m.model_only), alt=True, main=float(m.main_line) if m.main_line == m.main_line else None,
-                pid=r.pid, grp=f'm-{r.pid}-{kind}-{r.milestone}', gt=f'{m.player} {r.milestone}+ {unit}', sl='Yes', bp=float(m.book_prob), cat=_cat(m.category),
+                pid=r.pid, grp=f'm-{r.pid}-{kind}', gt=f'{m.player} alt {unit}', sl=f'{r.milestone}+', bp=float(m.book_prob), cat=_cat(m.category),
                 key=f'{r.pid}-{kind}', flag=flag)
 # chance = model blended with the books' no-vig chance: 50/50 normally, leaning on the books for long shots
 # (model weight 0.5 at a 25%+ book chance, sliding to 0.2 below about 12%), since the model is least reliable in the tails.
@@ -315,7 +315,7 @@ print(len(logs), 'game logs')
 # The recency weights reach back into earlier seasons and old teams, so a player in a new role can be
 # projected off his old usage (e.g. a backup turned starter); his own season is the warning sign.
 for l in legs:
-    if l['kind'] not in ('Rush', 'Rec', 'Recs', 'Milestone') or l.get('pid') not in logs: continue
+    if l['kind'] not in ('Rush', 'Rec', 'Recs', 'Milestone') or l.get('pid') not in logs or 'pass' in l['label']: continue
     rows = [r for r in logs[l['pid']]['g'] if r[3] is not None]
     num = float(re.search(r'[\d.]+', l['label']).group())
     line = num - 0.5 if l['kind'] == 'Milestone' else num

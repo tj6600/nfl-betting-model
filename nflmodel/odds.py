@@ -106,6 +106,8 @@ if __name__ == '__main__':
         props_snapshot()
     elif 'alt' in sys.argv[1:]:
         props_snapshot(markets='player_rush_yds_alternate,player_reception_yds_alternate', prefix='altyards')
+    elif 'altpass' in sys.argv[1:]:
+        props_snapshot(markets='player_pass_yds_alternate', prefix='altpass')   # ~1 credit per game
     elif 'altrecs' in sys.argv[1:]:
         props_snapshot(markets='player_receptions_alternate', prefix='altrecs')   # ~1 credit per game
     elif 'recs' in sys.argv[1:]:
