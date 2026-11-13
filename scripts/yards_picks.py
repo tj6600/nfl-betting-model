@@ -78,6 +78,31 @@ P['k'] = T._key(P.full_name)
 dec = lambda o: np.where(o < 0, 1 + 100 / -o, 1 + o / 100)
 out = []; per_book = []
 PARLAY_BOOKS = ['DraftKings', 'FanDuel']   # the books Thomas uses; per-book prices feed the parlay builder
+HOME_BOOK = 'DraftKings'                   # leans are priced at DraftKings' own line and price whenever DK has the prop
+
+
+def _imp(o):
+    return np.where(o < 0, -o / (-o + 100.0), 100.0 / (o + 100.0))
+
+
+def side_quote(grp, side, mkt_over):
+    """The quote a lean is priced at, and the books' no-vig chance at that same number.
+
+    DraftKings' own line and price when DK lists this side (else the best number elsewhere). The market chance comes
+    from that book's two prices at that number; if it only lists one side, the median no-vig of the books that list
+    both sides at that number; only then the consensus (which may sit at a different number)."""
+    g2 = grp[grp.side == side]
+    dk = g2[g2.book == HOME_BOOK]
+    x = dk.iloc[0] if len(dk) else g2.sort_values(['point', 'price'], ascending=[side == 'Over', False]).iloc[0]
+    nv = []
+    for bk, bg in grp[grp.point == x.point].groupby('book'):
+        o, u = bg[bg.side == 'Over'], bg[bg.side == 'Under']
+        if len(o) and len(u):
+            io, iu = float(_imp(o.price.iloc[0])), float(_imp(u.price.iloc[0])); nv.append((bk == x.book, io / (io + iu)))
+    own = [v for same, v in nv if same]
+    pov = own[0] if own else (float(np.median([v for _, v in nv])) if nv else mkt_over)
+    mkt = (pov if side == 'Over' else 1 - pov) if pov == pov else np.nan
+    return x, mkt
 # ---- passing yards (nflmodel/passing.py): this week's expected starter for each team ----
 QS = PY.load(range(2021, season + 1))
 pb, pspread = PY.fit(PY.features(QS))
@@ -117,9 +142,9 @@ for (home, away, k, kind), grp in O.groupby(['home_team', 'away_team', 'k', 'kin
         for side in ['Over', 'Under']:
             g2 = grp[grp.side == side]
             if g2.empty: continue
-            x = g2.sort_values(['point', 'price'], ascending=[side == 'Over', False]).iloc[0]
+            x, mkt = side_quote(grp, side, mkt_over)
             p_over = float(pspread.p_over([mu], [x.point])[0]); model_p = p_over if side == 'Over' else 1 - p_over
-            mkt = (mkt_over if side == 'Over' else 1 - mkt_over) if mkt_over == mkt_over else model_p
+            mkt = mkt if mkt == mkt else model_p
             p = W_MODEL * model_p + (1 - W_MODEL) * mkt
             out.append(dict(game=f'{away} @ {home}', pid=r.pid, team=r.posteam, opp=r.defteam, player=r['name'], position='QB',
                             market='Passing yards', side=side, line=cons, best_line=x.point, best_price=int(x.price), best_book=x.book,
@@ -157,12 +182,10 @@ for (home, away, k, kind), grp in O.groupby(['home_team', 'away_team', 'k', 'kin
     for side in ['Over', 'Under']:
         g2 = grp[grp.side == side]
         if g2.empty: continue
-        # best number for this side, then best price at that number
-        g2 = g2.sort_values(['point', 'price'], ascending=[side == 'Over', False])
-        x = g2.iloc[0]
+        x, mkt = side_quote(grp, side, mkt_over)     # DraftKings' number and price, market chance at that number
         p_over = float(spread.p_over([mu], [x.point])[0])
         model_p = p_over if side == 'Over' else 1 - p_over
-        mkt = (mkt_over if side == 'Over' else 1 - mkt_over) if mkt_over == mkt_over else model_p
+        mkt = mkt if mkt == mkt else model_p
         p = W_MODEL * model_p + (1 - W_MODEL) * mkt
         out.append(dict(game=f'{away} @ {home}', pid=r.pid, team=r.posteam, opp=r.defteam, player=r.full_name, position=r.position,
                         market=MARKET[kind], side=side, line=cons, best_line=x.point,
