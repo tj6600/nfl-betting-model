@@ -1,4 +1,84 @@
 {
- "days": [],
- "groups": []
+ "days": [
+  "2026-11-12"
+ ],
+ "groups": [
+  {
+   "group": "Board winner picks",
+   "bets": 11,
+   "won": 4,
+   "lost": 7,
+   "hit": 0.36363636363636365,
+   "exp_hit": 0.5701727272727273,
+   "units": -4.85,
+   "roi": -0.44095447899846446
+  },
+  {
+   "group": "Prop leans (shots + saves)",
+   "bets": 202,
+   "won": 114,
+   "lost": 88,
+   "hit": 0.5643564356435643,
+   "exp_hit": 0.5155861386138614,
+   "units": 13.71,
+   "roi": 0.06786611923153517
+  },
+  {
+   "group": "Value legs",
+   "bets": 1,
+   "won": 1,
+   "lost": 0,
+   "hit": 1.0,
+   "exp_hit": 0.586,
+   "units": 0.8,
+   "roi": 0.8
+  },
+  {
+   "group": "Shots on goal leans",
+   "bets": 198,
+   "won": 111,
+   "lost": 87,
+   "hit": 0.5606060606060606,
+   "exp_hit": 0.5148959595959596,
+   "units": 12.19,
+   "roi": 0.06155224425837568
+  },
+  {
+   "group": "Saves leans",
+   "bets": 4,
+   "won": 3,
+   "lost": 1,
+   "hit": 0.75,
+   "exp_hit": 0.5497500000000001,
+   "units": 1.52,
+   "roi": 0.3804029304029304
+  },
+  {
+   "group": "Puck line leans",
+   "bets": 11,
+   "won": 3,
+   "lost": 8,
+   "hit": 0.2727272727272727,
+   "exp_hit": 0.4184818181818182,
+   "units": -4.31,
+   "roi": -0.39176904176904176
+  },
+  {
+   "group": "Total leans",
+   "bets": 11,
+   "won": 9,
+   "lost": 2,
+   "hit": 0.8181818181818182,
+   "exp_hit": 0.5101636363636364,
+   "units": 6.33,
+   "roi": 0.5751139648855198
+  }
+ ],
+ "latest_day": {
+  "day": "2026-11-12",
+  "props_won": 114,
+  "props_lost": 88,
+  "picks_won": 4,
+  "picks_lost": 7
+ }
 }
