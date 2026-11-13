@@ -102,20 +102,20 @@ for g in pred.merge(slate[['game_id', 'tip']], on='game_id').itertuples():
         ch, _, _ = M.probs(g.margin, g.total, hs.point, 0)
         row['spread'] = float(hs.point)
         for side, s, pm, pb in [(g.home, hs, float(ch), nv), (g.away, as_, 1 - float(ch), 1 - nv)]:
-            row['legs'].append(mk_leg(f'{g.game_id}-sp-{side}', gm, 'Spread', f'{side} {s.point:+g}', gm, s.price, pm, pb, MODEL_W_GAME, extra=dict(gid=int(g.game_id), market='spread', side=side, line=float(s.point)))['id'])
+            row['legs'].append(mk_leg(f'{g.game_id}-sp-{side}', gm, 'Spread', f'{side} {s.point:+g}', gm, s.price, pm, pb, MODEL_W_GAME, extra=dict(gid=int(g.game_id), market='spread', side=side, line=float(s.point), sid=getattr(s, 'sid', None)))['id'])
     if 'Over' in to and 'Under' in to:
         o, u = to['Over'], to['Under']
         nv = imp(o.price) / (imp(o.price) + imp(u.price))
         _, po, _ = M.probs(g.margin, g.total, 0, o.point)
         row['line_total'] = float(o.point)
         for side, s, pm, pb in [('Over', o, float(po), nv), ('Under', u, 1 - float(po), 1 - nv)]:
-            row['legs'].append(mk_leg(f'{g.game_id}-to-{side}', gm, 'Total', f'{side} {s.point:g}', gm, s.price, pm, pb, MODEL_W_GAME, extra=dict(gid=int(g.game_id), market='total', side=side, line=float(s.point)))['id'])
+            row['legs'].append(mk_leg(f'{g.game_id}-to-{side}', gm, 'Total', f'{side} {s.point:g}', gm, s.price, pm, pb, MODEL_W_GAME, extra=dict(gid=int(g.game_id), market='total', side=side, line=float(s.point), sid=getattr(s, 'sid', None)))['id'])
     if g.home in ml and g.away in ml:
         h, a = ml[g.home], ml[g.away]
         nv = imp(h.price) / (imp(h.price) + imp(a.price))
         _, _, pw = M.probs(g.margin, g.total, 0, 0)
         for side, s, pm, pb in [(g.home, h, float(pw), nv), (g.away, a, 1 - float(pw), 1 - nv)]:
-            row['legs'].append(mk_leg(f'{g.game_id}-ml-{side}', gm, 'Moneyline', f'{side} to win', gm, s.price, pm, pb, MODEL_W_GAME, extra=dict(gid=int(g.game_id), market='moneyline', side=side, line=None))['id'])
+            row['legs'].append(mk_leg(f'{g.game_id}-ml-{side}', gm, 'Moneyline', f'{side} to win', gm, s.price, pm, pb, MODEL_W_GAME, extra=dict(gid=int(g.game_id), market='moneyline', side=side, line=None, sid=getattr(s, 'sid', None)))['id'])
     games.append(row)
 
 # ---------- props ----------
@@ -186,7 +186,8 @@ for x in FU.itertuples():
                     for side, pr_, pm, pb in [('Over', int(so.price.iloc[0]), po_m, nv), ('Under', int(su.price.iloc[0]), 1 - po_m, 1 - nv)]:
                         L = mk_leg(f'{x.pid}-{k}-{side}', p['game'], PR.LABEL[k], f'{x.name} {side} {ln:g} {PR.LABEL[k].lower()}',
                                    f'{x.team} vs {x.opp} · proj {proj:.1f}', pr_, pm, pb, MODEL_W_PROP, flags=flags,
-                                   extra=dict(pid=int(x.pid), stat=k, team=x.team, gid=int(x.game_id), market=k, side=side, line=float(ln)))
+                                   extra=dict(pid=int(x.pid), stat=k, team=x.team, gid=int(x.game_id), market=k, side=side, line=float(ln),
+                                              sid=(so if side == 'Over' else su).get('sid', pd.Series([None])).iloc[0]))
                         e[side.lower()] = dict(id=L['id'], price=pr_, p=L['p'], pm=L['pm'], pb=L['pb'], edge=L['edge'], ev=L['ev'])
         p['props'][k] = e
     players.append(p)

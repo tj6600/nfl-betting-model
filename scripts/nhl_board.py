@@ -192,6 +192,28 @@ for x in st[st.game_id.isin(gl)].itertuples():
             e[side.lower()] = dict(id=L['id'], price=price, p=L['p'], edge=L['edge'], ev=L['ev'])
     goalies.append(dict(id=int(x.player_id), name=x.full_name, team=x.team, opp=x.opp, game=g['game'], confirmed=conf, flags=flags, log=log, saves=e))
 
+# ---------- DraftKings betslip ids (The Odds API includeSids) so a slip can open in DraftKings ----------
+SID = {}
+gfile = O.latest('games')
+if gfile:
+    gr = O.game_rows(json.load(open(gfile)))
+    if 'sid' in gr:
+        mk = {'h2h': 'moneyline', 'spreads': 'puckline', 'totals': 'total'}
+        for r in gr[gr.sid.notna()].itertuples():
+            pt = None if r.market == 'h2h' or r.point != r.point else float(r.point)
+            SID[('g', f'{r.away} @ {r.home}', mk.get(r.market), r.side, pt)] = r.sid
+if pfile:
+    pr_ = O.prop_rows(json.load(open(pfile)))
+    if 'sid' in pr_:
+        for r in pr_[pr_.sid.notna()].itertuples():
+            SID[('p', norm_name(r.player), r.stat, r.side, float(r.point))] = r.sid
+NAME = {**{x['id']: x['name'] for x in players}, **{x['id']: x['name'] for x in goalies}}
+for L in legs:
+    if L.get('pid') is not None:
+        L['sid'] = SID.get(('p', norm_name(NAME.get(L['pid'], '')), L['market'], L['side'], float(L['line'])))
+    else:
+        L['sid'] = SID.get(('g', L['game'], L['market'], L['side'], L.get('line')))
+
 # ---------- picks and suggested pool (same rules as the NBA board) ----------
 for L in legs:
     L['pick'] = bool(L.get('market') == 'moneyline' and gl[L['gid']].get('pick') == L['side'])

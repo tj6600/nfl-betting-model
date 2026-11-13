@@ -36,7 +36,7 @@ def _call(path, **q):
     if not key:
         raise SystemExit('ODDS_API_KEY is not set.')
     q = urllib.parse.urlencode({'apiKey': key, 'regions': 'us', 'bookmakers': 'draftkings', 'oddsFormat': 'american',
-                                'dateFormat': 'iso', **q})
+                                'dateFormat': 'iso', 'includeLinks': 'true', 'includeSids': 'true', **q})
     with urllib.request.urlopen(f'{BASE}/{path}?{q}', timeout=60) as r:
         return json.loads(r.read()), r.headers.get('x-requests-remaining')
 
@@ -135,7 +135,7 @@ def game_rows(events):
             for m in b['markets']:
                 for o in m['outcomes']:
                     rows.append(dict(event=e['id'], start=e['commence_time'], home=h, away=a, book=b['key'],
-                                     market=m['key'], side=NAMES.get(o['name'], o['name']), point=o.get('point'), price=o['price']))
+                                     market=m['key'], side=NAMES.get(o['name'], o['name']), point=o.get('point'), price=o['price'], link=o.get('link'), sid=o.get('sid')))
     return pd.DataFrame(rows)
 
 
@@ -151,7 +151,7 @@ def prop_rows(events):
                     if o.get('description') and o.get('point') is not None:
                         rows.append(dict(event=e['id'], start=e['commence_time'], home=h, away=a, book=b['key'],
                                          stat=PROP_MARKETS[m['key']], player=o['description'], side=o['name'],
-                                         point=o['point'], price=o['price']))
+                                         point=o['point'], price=o['price'], link=o.get('link'), sid=o.get('sid')))
     return pd.DataFrame(rows)
 
 
