@@ -2,7 +2,9 @@
 
 Expected yards come from a ridge regression on the player's recent (recency-weighted) yards and
 usage, his recent role, his team's implied points and expected margin (teams that lead run more),
-and the opponent's yards allowed to his position. The chance of going over a line comes from the
+the opponent's yards allowed to his position, his offensive snap share (nflverse snap counts: recency-weighted and
+his latest game, which catches role changes before targets do) and his share of the team's skill-player usage
+among teammates who play (so a teammate ruled out at any position frees up looks). The chance of going over a line comes from the
 spread of past outcomes around the prediction: actual / expected ratios from training games,
 grouped by how many yards were expected (low projections are much more volatile).
 """
@@ -17,6 +19,46 @@ STATS = {
     'recs': dict(y='receptions', vol='h_targets', min_vol=1.5, pos=['WR', 'TE', 'RB'], edges=[0, 2, 3, 4, 5, 6, 1e9]),
 }
 DEF_HALF = 8.0
+SNAP_HALF = 4.0     # player games
+SNAP_POS = ['WR', 'TE', 'RB', 'FB']
+
+
+def _nkey(s):
+    return s.str.lower().str.replace(r'[^a-z]', '', regex=True)
+
+
+def snap_table(seasons=range(2021, 2027)):
+    """Offensive snap share per player-game: h_snap / last_snap going into the game, now_snap / now_last after it."""
+    from .roster import _load
+    S = pd.concat([_load('snaps', y) for y in seasons], ignore_index=True)
+    S = S[S.position.isin(SNAP_POS)].merge(G[['game_id', 'gameday']], on='game_id')
+    S['k'] = _nkey(S.player); S = S.sort_values(['k', 'position', 'gameday'])
+    al = 1 - 0.5 ** (1 / SNAP_HALF); g = S.groupby(['k', 'position']).offense_pct
+    S['h_snap'] = g.transform(lambda x: x.shift(1).ewm(alpha=al).mean())
+    S['last_snap'] = g.shift(1)
+    S['now_snap'] = g.transform(lambda x: x.ewm(alpha=al).mean())
+    S['now_last'] = S.offense_pct
+    return S
+
+
+def add_snaps(df, S=None, current=False):
+    """Snap features for training rows (by game) or, with current=True, for this week's players (latest game)."""
+    S = snap_table() if S is None else S
+    df = df.copy(); df['k'] = _nkey(df.full_name)
+    if current:
+        last = S.groupby(['k', 'position']).tail(1)[['k', 'position', 'now_snap', 'now_last']]
+        last = last.rename(columns={'now_snap': 'h_snap', 'now_last': 'last_snap'})
+        df = df.drop(columns=['h_snap', 'last_snap'], errors='ignore').merge(last, on=['k', 'position'], how='left')
+    else:
+        df = df.merge(S[['game_id', 'k', 'h_snap', 'last_snap']].drop_duplicates(['game_id', 'k']), on=['game_id', 'k'], how='left')
+    return df.drop(columns='k')
+
+
+def add_room_team(df, by):
+    """His share of the usage of the team's skill players in the frame (those who play / are active this week)."""
+    df = df.copy()
+    df['room_team'] = df.h_opp_share / df.groupby(by).h_opp_share.transform('sum').clip(lower=1e-6)
+    return df
 
 
 def team_margin(g):
@@ -51,6 +93,13 @@ def design(df, kind):
     X['yds_x_pts'] = X.h_yds * X.pts
     X['yds_x_margin'] = X.h_yds * X.margin
     X['yds_x_room'] = X.h_yds * X.room
+    # snap share (falls back to a usage-based guess when the snap counts have no row for him)
+    guess = (df.h_opp_share * 3).clip(0, 1)
+    hs = (df['h_snap'] if 'h_snap' in df else guess).fillna(guess).clip(0, 1)
+    ls = (df['last_snap'] if 'last_snap' in df else hs).fillna(hs)
+    X['snap'] = hs.values; X['snap_last'] = (ls - hs).values
+    rt = (df['room_team'] if 'room_team' in df else df.room_share * 0.3).fillna(0.0)
+    X['room_team'] = rt.values; X['yds_x_roomteam'] = X.h_yds * X.room_team
     for p in ['QB', 'WR', 'TE']:
         X['pos_' + p] = (df.position == p).astype(float)
     return X.fillna(0.0)
@@ -69,6 +118,10 @@ def frame(kind, df=None):
     """Training rows for one stat: player-games of regulars at the usual positions, with defense and margin."""
     c = STATS[kind]
     df = T.training_frame() if df is None else df
+    if 'h_snap' not in df:
+        df = add_snaps(df)
+    if 'room_team' not in df:
+        df = add_room_team(df, ['game_id', 'posteam'])
     df = df.merge(team_margin(G), on=['game_id', 'posteam'], how='left')
     d = defense_yards(T.history(), c['y'])
     df = df.merge(d[['game_id', 'defteam', 'position', 'prior']].rename(columns={'prior': 'def_yds'}),
