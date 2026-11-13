@@ -32,6 +32,8 @@ const OPEN = new Set(), GLIM = {};
 try { KINDS = new Set(JSON.parse(localStorage.getItem('nhl-kinds') || '[]')); } catch (e) {}
 const kindOk = (L) => !KINDS.size || KINDS.has(L.kind);
 const MKTS = [...new Set(D.legs.map((L) => L.kind))];
+// markets DraftKings won't take in a same-game parlay: such a leg can't share its game with any other leg
+const NO_SGP = new Set(['Saves']);
 function buildSlips(size, n = 6) {
   const out = [], used = new Set();
   const pool = POOL.filter(kindOk);
@@ -40,6 +42,7 @@ function buildSlips(size, n = 6) {
     const slip = [], g = {}, pl = new Set(), perGame = Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / Math.max(1, nG))));   // more per game only when the slate is too small
     for (const L of pool) {
       if (used.has(L.id) || (g[L.game] || 0) >= perGame || (L.pid && pl.has(L.pid))) continue;
+      if ((g[L.game] || 0) && (NO_SGP.has(L.kind) || slip.some((id) => LEG[id].game === L.game && NO_SGP.has(LEG[id].kind)))) continue;
       slip.push(L.id); g[L.game] = (g[L.game] || 0) + 1; if (L.pid) pl.add(L.pid);
       if (slip.length >= size) break;
     }
@@ -328,7 +331,11 @@ function boardParlay() {
     sl.append(st);
     const games = {}; legs.forEach((l) => { games[l.game] = (games[l.game] || 0) + 1; });
     const warns = [];
-    Object.entries(games).filter(([, n]) => n > 1).forEach(([g, n]) => warns.push(['warn', `${n} legs from ${g}: DraftKings prices same-game legs together, so the real payout differs and the legs are not independent.`]));
+    Object.entries(games).filter(([, n]) => n > 1).forEach(([g, n]) => {
+      const bad = legs.filter((l) => l.game === g && NO_SGP.has(l.kind));
+      if (bad.length) warns.push(['bad', `DraftKings won't put goalie saves in a same-game parlay: ${bad.map((l) => l.label).join(', ')} can't be combined with the other ${g} leg${n > 2 ? 's' : ''}. Keep one leg from that game.`]);
+      else warns.push(['warn', `${n} legs from ${g}: DraftKings prices same-game legs together, so the real payout differs and the legs are not independent.`]);
+    });
     legs.filter((l) => l.edge < 0).forEach((l) => warns.push(['bad', `${l.label} has negative edge.`]));
     legs.filter((l) => l.flags.length).forEach((l) => warns.push(['warn', `${l.label}: ${l.flags.join('; ')}.`]));
     const good = ev > 0 && !warns.some((w) => w[0] === 'bad');
