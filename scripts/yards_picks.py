@@ -12,7 +12,7 @@ from nflmodel.model import G
 from nflmodel.odds import all_snapshots, TEAMS
 from nflmodel import touchdowns as T, yards as Y, passing as PY, weather as W
 
-VALUE_EV, VALUE_P, MIN_BOOKS = 0.05, 0.57, 3
+VALUE_EV, VALUE_P, MIN_BOOKS = 0.05, 0.60, 3   # 60%: 2025 DK-line test (wk 7+12) went 37-27 at 60%+ vs 71-60 at 57%+
 W_MODEL = 0.5           # untested against real prop lines, so the model's chance is blended 50/50 with the books' no-vig chance
 MAX_GAP = 0.25          # model projection more than 25% away from the line: the books likely know something (role, injury)
 MIN_VOL = {'rush': 8.0, 'rec': 3.0, 'recs': 3.0}   # carries or targets a game for a regular role

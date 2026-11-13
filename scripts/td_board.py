@@ -328,12 +328,24 @@ for l in legs:
 
 # suggested parlay: at each book, the best-edge qualifying leg from each of the four strongest games; keep the book with the higher EV
 LG = pd.DataFrame(legs)
+ALL = LG.copy()
 LG = LG[(LG.cat.isin(['Value', 'Optimal', 'Secure', 'TD value', 'Likely hit'])) & (LG.flag == '') & (LG.p >= 0.55)]
+# an Over on a yards/receptions line under 60% ("not secure") is swapped for the same player's likeliest alternate line
+# that is 60%+ and fairly priced (edge 0+) at DraftKings; alt lines are overs only, so Unders stay (same rule as board/app.js)
+ALTS = ALL[(ALL.alt == True) & (ALL.flag == '') & (ALL.p >= 0.6) & (ALL.edge >= 0) & ALL.offers.map(lambda o: 'DraftKings' in o)] if 'alt' in ALL else ALL.iloc[:0]
+def _safer(r):
+    if r.get('alt') == True or r.kind not in ('Rush', 'Rec', 'Recs', 'Pass') or r.sl != 'Over' or r.p >= 0.6: return r
+    c = ALTS[(ALTS.key == r.key) & (ALTS.p > r.p)].sort_values('p', ascending=False)
+    if c.empty: return r
+    a = c.iloc[0].copy(); a['swapped'] = True; print(f'  safer alt: {r.who} {r.label} ({r.p:.0%}) -> {a.label} ({a.p:.0%})'); return a
+if len(LG):
+    LG = pd.DataFrame([_safer(r) for _, r in LG.iterrows()]).drop_duplicates('id')
+    LG['swapped'] = LG.get('swapped', False).fillna(False).astype(bool) if 'swapped' in LG else False
 sug = []
 for b in PARLAY_BOOKS:
     X = LG[LG.offers.map(lambda o: b in o)].copy()
     X['d'] = X.offers.map(lambda o: _dec(o[b])); X['evb'] = X.p * X.d - 1; X['edgeb'] = X.p - 1 / X.d
-    X = X[X.evb > 0.03].sort_values('edgeb', ascending=False).groupby('game').head(1).head(4)
+    X = X[(X.evb > 0.03) | X.swapped].sort_values('edgeb', ascending=False).groupby('game').head(1).head(4)
     sug.append((X.p.prod() * X.d.prod() - 1, b == 'DraftKings', b, list(X.id), X.p.prod(), X.d.prod()))
     print(f'suggested at {b}: EV {sug[-1][0]:+.1%}, hit {sug[-1][4]:.1%}, decimal {sug[-1][5]:.2f}:', list(X.label + ' ' + X.who.where(X.kind != 'Game', '')))
 best = max(sug)

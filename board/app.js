@@ -62,9 +62,9 @@ const SEG = { all: 'All', rush: 'Rushing', rec: 'Receiving', recs: 'Receptions',
 const MS_LEGEND = '<span><i style="width:22px;height:12px;border-radius:4px;background:color-mix(in srgb, var(--turf) 70%, transparent)"></i>Darker chip = likelier</span><span><span class="pill likely">Likely hit</span> 80%+ chance</span><span><span class="pill value">Value</span> 5%+ EV at the best price</span>';
 const MS_FOOT = 'Each chance blends the yards model 50/50 with the books\' own chance (their alternate-line price with an estimated 6% margin taken out). Likely hit means 80%+ for a regular with no role flags. Expect most likely hits to show a small negative EV: books price heavy favorites like -400 to -1800 with extra margin, so a likely hit is safe for a parlay leg but rarely value on its own. Value needs 5%+ EV and at least two books offering the milestone.';
 const YARDS_LEGEND = '<span><i style="width:26px;height:8px;border-radius:3px;background:var(--bar)"></i>Middle half of outcomes</span><span><i style="width:3px;height:14px;background:var(--turf)"></i>Model median</span><span><i style="width:2px;height:14px;background:var(--tick)"></i>Book line</span><span><span class="pill value">Value</span></span><span><span class="pill check">Check role</span></span>';
-const PASS_FOOT = 'The passing model projects each expected starter from his recent passing yards and attempts, his team\'s expected points and margin (teams that trail throw more), and the passing yards the defense has allowed lately. Fit on earlier seasons and tested on the next, it missed by 53 to 57 yards a game in 2024, 2025 and 2026, against 56 to 60 for the QB\'s season average. There are no past prop lines to test against, so the chance shown blends the model 50/50 with the books\' no-vig chance. Value needs 57%+ and 5%+ EV at the best line. The starter is whoever started the team\'s latest game and is on the active roster; check the news for late QB changes.';
-const RECS_FOOT = 'The receptions model uses the same inputs as the yards model (recent catches, targets, his share at his position, team expected points and margin, and catches the defense allows to his position), fit on the catch count. Fit on earlier seasons and tested on the next, it missed by 1.40 to 1.45 catches a game in 2024, 2025 and 2026, against 1.44 to 1.48 for his recent average, and its over/under chances were well calibrated. Catches are lopsided too, so unders hit a bit more often than averages suggest. There are no past prop lines to test against, so the chance shown blends the model 50/50 with the books\' no-vig chance. Value needs 57%+ and 5%+ EV at the best line. "Small roles" means under 3 targets a game.';
-const YARDS_FOOT = 'The yards model projects each player from his recent yards and usage, his recent role, his team\'s expected points and margin (teams that lead run more), and the opponent\'s yards allowed to his position. It beat each player\'s recent average on 2024 and 2025 games, and its over/under chances were well calibrated there. Yards are lopsided: a few big games pull the average up, so the median is usually below the average and unders win a bit more often than averages suggest. There are no past prop lines to test against, so the chance shown blends the model 50/50 with the books\' no-vig chance. Value needs 57%+ and 5%+ EV at the best line. Check role means he missed his last game, the depth chart moved him down, or the model and line are more than 25% apart (the books likely know something). "Small roles" means under 8 carries or 3 targets a game.';
+const PASS_FOOT = 'The passing model projects each expected starter from his recent passing yards and attempts, his team\'s expected points and margin (teams that trail throw more), and the passing yards the defense has allowed lately. Fit on earlier seasons and tested on the next, it missed by 53 to 57 yards a game in 2024, 2025 and 2026, against 56 to 60 for the QB\'s season average. On past DraftKings lines the model alone was overconfident (it said 64% where 53% hit), so the chance shown blends it 50/50 with the books\' no-vig chance. Value needs 60%+ and 5%+ EV at DraftKings\' line and price: on 2025 DraftKings lines (weeks 7 and 12), picks at 60%+ went 37-27 while 57-60% ones gave the profit back. The starter is whoever started the team\'s latest game and is on the active roster; check the news for late QB changes.';
+const RECS_FOOT = 'The receptions model uses the same inputs as the yards model (recent catches, targets, his share at his position, team expected points and margin, and catches the defense allows to his position), fit on the catch count. Fit on earlier seasons and tested on the next, it missed by 1.40 to 1.45 catches a game in 2024, 2025 and 2026, against 1.44 to 1.48 for his recent average, and its over/under chances were well calibrated. Catches are lopsided too, so unders hit a bit more often than averages suggest. On past DraftKings lines the model alone was overconfident (it said 64% where 53% hit), so the chance shown blends it 50/50 with the books\' no-vig chance. Value needs 60%+ and 5%+ EV at DraftKings\' line and price: on 2025 DraftKings lines (weeks 7 and 12), picks at 60%+ went 37-27 while 57-60% ones gave the profit back. "Small roles" means under 3 targets a game.';
+const YARDS_FOOT = 'The yards model projects each player from his recent yards and usage, his recent role, his team\'s expected points and margin (teams that lead run more), and the opponent\'s yards allowed to his position. It beat each player\'s recent average on 2024 and 2025 games, and its over/under chances were well calibrated there. Yards are lopsided: a few big games pull the average up, so the median is usually below the average and unders win a bit more often than averages suggest. On past DraftKings lines the model alone was overconfident (it said 64% where 53% hit), so the chance shown blends it 50/50 with the books\' no-vig chance. Value needs 60%+ and 5%+ EV at DraftKings\' line and price: on 2025 DraftKings lines (weeks 7 and 12), picks at 60%+ went 37-27 while 57-60% ones gave the profit back. Check role means he missed his last game, the depth chart moved him down, or the model and line are more than 25% apart (the books likely know something). "Small roles" means under 8 carries or 3 targets a game.';
 
 function renderTabs() {
   const box = document.getElementById('tabs'); box.replaceChildren();
@@ -385,6 +385,18 @@ const listOk = (l) => !PS.kinds.size || PS.kinds.has(l.alt ? 'Alt' + mkt(l) : mk
 const ALT_BY_KEY = {};
 for (const l of LEGS) if (l.alt && !l.flag && l.p >= 0.55 && l.edge >= -0.02 && l.offers.DraftKings != null) (ALT_BY_KEY[l.key] = ALT_BY_KEY[l.key] || []).push(l);
 Object.values(ALT_BY_KEY).forEach((xs) => xs.sort((a, b) => b.p - a.p));
+// "Secure" = 60%+ (on 2025 DraftKings lines, picks at 60%+ held up and 55-60% ones gave the profit back).
+// A suggested Over on a yards or receptions line that isn't secure is swapped for the same player's alternate line
+// ("40+ rec yds") that is 60%+ and fairly priced (edge 0+), likeliest first: a safer leg, and the parlay still pays.
+// Alt lines are overs only, so a shaky Under stays as it is. SWAP_OF[alt id] = the main line it replaced (shown on the slip).
+const SECURE = 0.6, SWAP_OF = {};
+const ALT_MAIN = new Set(['Rush', 'Rec', 'Recs', 'Pass']);
+function safer(l) {
+  if (l.alt || !ALT_MAIN.has(l.kind) || l.sl !== 'Over' || l.p >= SECURE) return l;
+  const a = (ALT_BY_KEY[l.key] || []).find((x) => x.p >= SECURE && x.edge >= 0 && x.p > l.p && kindOk(x) && inScope(x));
+  if (!a) return l;
+  SWAP_OF[a.id] = l; return a;
+}
 const kindsName = () => [...PS.kinds].map((k) => MKTS.find((m) => m[0] === k)[1].toLowerCase()).join(' + ');
 function toggleKind(k) {
   if (k === 'all') PS.kinds.clear(); else if (PS.kinds.has(k)) PS.kinds.delete(k); else PS.kinds.add(k);
@@ -474,11 +486,13 @@ function sugPool() {
   // Most likely to hit: the highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+)
   // Alt lines join when fairly priced (edge 0+): a slip holds one leg per player and market, so the likelier of the main line
   // and its alt line wins (e.g. 3+ receptions at 84% over Over 4.5 at 58%)
-  if (PS.mode === 'likely') return LEGS.filter((l) => ok(l) && l.p >= 0.55 && (l.alt ? l.edge >= 0 : l.edge >= 0.01)).sort((a, b) => b.p - a.p || b.edge - a.edge);
+  if (PS.mode === 'likely') return dedupe(LEGS.filter((l) => ok(l) && l.p >= 0.55 && (l.alt ? l.edge >= 0 : l.edge >= 0.01)).map(safer).sort((a, b) => b.p - a.p || b.edge - a.edge));
+  // best value: legs keep their main line's place in the edge ranking when an alt line stands in for them
   const v = LEGS.filter((l) => ok(l) && l.p >= 0.55 && l.edge >= 0.03).sort((a, b) => b.edge - a.edge);
   const nv = LEGS.filter((l) => ok(l) && !(l.p >= 0.55 && l.edge >= 0.03) && l.p >= 0.52 && l.edge >= 0.015).sort((a, b) => b.edge - a.edge);
-  return v.concat(nv);
+  return dedupe(v.concat(nv).map(safer));
 }
+const dedupe = (xs) => { const seen = new Set(); return xs.filter((l) => !seen.has(l.id) && seen.add(l.id)); };
 function buildSlips(size, n = 6) {
   const pool = sugPool(), out = [], used = new Set();
   const nG = new Set(pool.map((l) => l.game)).size, one = state.game !== 'all' || nG === 1;   // a window can hold just one game
@@ -714,6 +728,7 @@ function renderParlay() {
       const nm = l.pid && LOGS[l.pid] ? el('button', 'namebtn', legName(l)) : el('b', null, legName(l));
       if (nm.tagName === 'BUTTON') { nm.type = 'button'; nm.title = 'Season game log'; nm.onclick = () => showLog(l.pid, logCtx(l)); }
       left.append(nm, el('small', null, `${l.game} · ${PBOOKS.filter((b) => l.offers[b] != null).map((b) => `${ABBR[b]} ${fmtOdds(l.offers[b])}`).join(' · ')}`));
+      if (SWAP_OF[l.id]) left.append(el('small', 'dim', `Safer alt for ${SWAP_OF[l.id].label} (${pct(SWAP_OF[l.id].p)}, under 60%)`));
       const right = el('span', 'num ' + (l.ev >= 0 ? 'pos' : 'neg'), `${pct(l.p)} · ${pts(l.edge)} · EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`);
       const x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Remove ' + legName(l)); x.onclick = () => { slip = slip.filter((i) => i !== l.id); SS.idx = -1; saveSlip(); renderParlay(); };
       r.append(left, right, x); lsx.append(r);
