@@ -140,10 +140,15 @@ if len(R):
     rep['groups'] = [summ(R[R.cat == 'Value'], 'Value legs'), summ(R[R.suggested], 'Suggested-parlay legs'),
                      summ(clean[clean.edge >= 0], 'All +edge legs'), summ(R[R.edge < 0], 'Negative-edge legs (control)')]
     rep['by_kind'] = [summ(R[(R.cat == 'Value') & (R.kind == k)], k) for k in sorted(R.kind.unique()) if ((R.cat == 'Value') & (R.kind == k)).any()]
+import parlays as PZ
+rep['parlays'] = PZ.grade(O.DIR, {(r['day'], r['id']): r['result'] for r in rows if r['result']})
 json.dump(rep, open(os.path.join(O.DIR, 'grade_report.json'), 'w'), indent=1)
 md = [f"# NBA pick grading ({', '.join(rep['days'])})", '', '| Group | Bets | W-L | Hit | Expected | Units | ROI | CLV checked | Beat close | Lost to close |', '|---|---|---|---|---|---|---|---|---|---|']
 for s in rep['groups'] + rep.get('by_kind', []):
     md.append(f"| {s['group']} | {s['bets']} | {s['won']}-{s['lost']} | {s['hit']:.1%} | {s['exp_hit'] if s['exp_hit'] is None else format(s['exp_hit'], '.1%')} | {s['units']:+.2f} | {s['roi']:+.1%} | {s['clv_n']} | "
               f"{'' if s['beat'] is None else format(s['beat'], '.0%')} | {'' if s['lost_clv'] is None else format(s['lost_clv'], '.0%')} |")
+if rep['parlays']['groups']:
+    md += ['', '## Suggested parlays', '', '| Group | Parlays | W-L | Hit | Expected | Units | ROI |', '|---|---|---|---|---|---|---|']
+    md += [f"| {s['group']} | {s['bets']} | {s['won']}-{s['lost']} | {s['hit']:.1%} | {s['exp_hit']:.1%} | {s['units']:+.2f} | {s['roi']:+.1%} |" for s in rep['parlays']['groups']]
 open(os.path.join(O.DIR, 'grade_report.md'), 'w').write('\n'.join(md) + '\n')
 print('\n'.join(md))

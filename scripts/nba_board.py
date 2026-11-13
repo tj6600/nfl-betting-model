@@ -225,6 +225,9 @@ if legs:
         pl = pd.DataFrame([{k: l.get(k) for k in ['id', 'gid', 'game', 'kind', 'market', 'side', 'line', 'pid', 'team', 'label', 'price', 'p', 'pm', 'pb', 'edge', 'ev', 'cat']}
                            | {'flagged': bool(l['flags']), 'suggested': l['id'] in sug} for l in legs])
         pl.to_csv(lf, index=False)
+    # suggested parlays as the page builds them (both modes, every leg count), graded by scripts/nba_grade.py
+    import parlays as PZ
+    PZ.log(O.DIR, day, stamp, legs, [l['id'] for l in pool], lambda L: L['edge'] >= 1 and L['p'] >= 0.55 and not L['flags'])
 # backtest summary for the page
 bt = {}
 bf = os.path.join(D.DIR, 'backtest_games.csv')

@@ -358,6 +358,15 @@ function boardRecord() {
     c.append(el('p', 'note logfoot', 'Every priced leg is logged when the board is built (about 2:47 PM ET) and graded at that DraftKings price, 1 unit per leg; players who sit are void. Beat close = DraftKings moved its line toward our side by tip-off, or kept the line and raised our side\'s chance by half a point or more. Beating the close more often than losing to it is the earliest sign of a real edge; results take hundreds of bets to mean much.'));
     c.style.marginBottom = '16px'; B.append(c);
   }
+  const pz = lv && lv.parlays && lv.parlays.groups.filter((g) => g.bets);
+  if (pz && pz.length) {
+    const c = el('div', 'col'); const h = el('div', 'colhead'); h.append(el('h2', null, 'Suggested parlays at DraftKings'), el('span', null, `${lv.parlays.days.length} slate${lv.parlays.days.length > 1 ? 's' : ''} logged`)); c.append(h);
+    const tw = el('div', 'tablewrap'); const t = el('table', 'res'); const hr = el('tr');
+    ['Parlays', 'Count', 'W-L', 'Hit', 'Expected', 'Units', 'ROI'].forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr);
+    pz.forEach((g) => { const tr = el('tr'); [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), fmtp(g.exp_hit), sgn(g.units), sgn(Math.round(g.roi * 1000) / 10) + '%'].forEach((x, i) => tr.append(el('td', i ? 'num' : null, String(x)))); t.append(tr); });
+    tw.append(t); c.append(tw); c.append(el('p', 'note logfoot', 'Each day\'s suggested parlays are saved when the board is built, for both Best value and Most likely to hit and every leg count (up to 6 suggestions each), and graded as whole parlays at DraftKings prices, 1 unit each. A parlay loses if any leg loses; pushed or voided legs drop out. Expected is the chance the board gave the parlays.'));
+    c.style.marginBottom = '16px'; B.append(c);
+  }
   if (!bt.rows) { B.append(el('div', 'empty', 'No backtest yet.')); return; }
   const tiles = el('div', 'tiles');
   const r0 = bt.rows[0];

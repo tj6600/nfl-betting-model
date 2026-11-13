@@ -229,6 +229,10 @@ if legs:
     lf = os.path.join(O.DIR, 'picks', f'{day}_{stamp}.csv')
     pd.DataFrame([{k: l.get(k) for k in ['id', 'gid', 'game', 'kind', 'market', 'side', 'line', 'pid', 'team', 'label', 'price', 'p', 'pm', 'pb', 'edge', 'ev', 'cat']}
                   | {'flagged': bool(l['flags']), 'pick': l['pick']} for l in legs]).to_csv(lf, index=False)
+    # suggested parlays as the page builds them (both modes, every leg count), graded by scripts/nhl_grade.py
+    import parlays as PZ
+    PZ.log(O.DIR, day, stamp, legs, [l['id'] for l in pool],
+           lambda L: (L['edge'] >= 1 or L.get('pick')) and L['p'] >= 0.55 and L['price'] >= -200 and not L['flags'], no_sgp={'Saves'})
 
 # ---------- backtest summary for the Model record tab ----------
 bt = {}
