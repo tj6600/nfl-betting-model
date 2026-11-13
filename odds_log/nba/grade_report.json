@@ -14,9 +14,9 @@
    "units": -14.18,
    "roi": -0.167,
    "exp_hit": 0.585,
-   "clv_n": 30,
-   "beat": 0.633,
-   "lost_clv": 0.3
+   "clv_n": 77,
+   "beat": 0.545,
+   "lost_clv": 0.273
   },
   {
    "group": "Suggested-parlay legs",
@@ -27,9 +27,9 @@
    "units": -0.27,
    "roi": -0.034,
    "exp_hit": 0.601,
-   "clv_n": 4,
+   "clv_n": 8,
    "beat": 0.5,
-   "lost_clv": 0.25
+   "lost_clv": 0.125
   },
   {
    "group": "All +edge legs",
@@ -40,9 +40,9 @@
    "units": -22.64,
    "roi": -0.074,
    "exp_hit": 0.544,
-   "clv_n": 102,
-   "beat": 0.51,
-   "lost_clv": 0.363
+   "clv_n": 344,
+   "beat": 0.462,
+   "lost_clv": 0.308
   },
   {
    "group": "Negative-edge legs (control)",
@@ -53,9 +53,9 @@
    "units": -58.85,
    "roi": -0.06,
    "exp_hit": 0.486,
-   "clv_n": 356,
-   "beat": 0.368,
-   "lost_clv": 0.413
+   "clv_n": 1137,
+   "beat": 0.339,
+   "lost_clv": 0.388
   }
  ],
  "by_kind": [
@@ -68,9 +68,9 @@
    "units": -0.45,
    "roi": -0.056,
    "exp_hit": 0.594,
-   "clv_n": 2,
-   "beat": 1.0,
-   "lost_clv": 0.0
+   "clv_n": 8,
+   "beat": 0.5,
+   "lost_clv": 0.375
   },
   {
    "group": "Points",
@@ -81,9 +81,9 @@
    "units": -8.69,
    "roi": -0.263,
    "exp_hit": 0.581,
-   "clv_n": 12,
-   "beat": 0.583,
-   "lost_clv": 0.417
+   "clv_n": 26,
+   "beat": 0.654,
+   "lost_clv": 0.269
   },
   {
    "group": "Pts+Reb+Ast",
@@ -94,9 +94,9 @@
    "units": -9.34,
    "roi": -0.334,
    "exp_hit": 0.585,
-   "clv_n": 10,
-   "beat": 0.5,
-   "lost_clv": 0.3
+   "clv_n": 23,
+   "beat": 0.478,
+   "lost_clv": 0.348
   },
   {
    "group": "Rebounds",
@@ -107,9 +107,9 @@
    "units": 4.01,
    "roi": 0.364,
    "exp_hit": 0.582,
-   "clv_n": 5,
-   "beat": 0.8,
-   "lost_clv": 0.2
+   "clv_n": 16,
+   "beat": 0.562,
+   "lost_clv": 0.188
   },
   {
    "group": "Spread",
@@ -120,9 +120,9 @@
    "units": 0.0,
    "roi": 0.0,
    "exp_hit": null,
-   "clv_n": 0,
-   "beat": null,
-   "lost_clv": null
+   "clv_n": 1,
+   "beat": 0.0,
+   "lost_clv": 0.0
   },
   {
    "group": "Threes",
@@ -133,8 +133,8 @@
    "units": 1.29,
    "roi": 0.322,
    "exp_hit": 0.607,
-   "clv_n": 1,
-   "beat": 1.0,
+   "clv_n": 3,
+   "beat": 0.333,
    "lost_clv": 0.0
   },
   {
@@ -150,5 +150,174 @@
    "beat": null,
    "lost_clv": null
   }
- ]
+ ],
+ "parlays": {
+  "days": [
+   "2026-11-11",
+   "2026-11-12",
+   "2026-11-13"
+  ],
+  "groups": [
+   {
+    "group": "Best value: \u2605 suggestion",
+    "bets": 2,
+    "won": 0,
+    "lost": 2,
+    "hit": 0.0,
+    "exp_hit": 0.36128724,
+    "units": -2.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Best value: straight (all 6 suggestions)",
+    "bets": 12,
+    "won": 4,
+    "lost": 8,
+    "hit": 0.3333333333333333,
+    "exp_hit": 0.5969833333333333,
+    "units": -4.12,
+    "roi": -0.3431709956709956
+   },
+   {
+    "group": "Best value: 2-leg (all 6 suggestions)",
+    "bets": 12,
+    "won": 1,
+    "lost": 11,
+    "hit": 0.08333333333333333,
+    "exp_hit": 0.3575517658333333,
+    "units": -8.54,
+    "roi": -0.7120206489675516
+   },
+   {
+    "group": "Best value: 3-leg (all 6 suggestions)",
+    "bets": 12,
+    "won": 0,
+    "lost": 12,
+    "hit": 0.0,
+    "exp_hit": 0.209925576563,
+    "units": -12.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Best value: 4-leg (all 6 suggestions)",
+    "bets": 12,
+    "won": 0,
+    "lost": 12,
+    "hit": 0.0,
+    "exp_hit": 0.11959238392567355,
+    "units": -12.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Best value: 5-leg (all 6 suggestions)",
+    "bets": 12,
+    "won": 0,
+    "lost": 12,
+    "hit": 0.0,
+    "exp_hit": 0.07060345245448657,
+    "units": -12.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Best value: 6-leg (all 6 suggestions)",
+    "bets": 12,
+    "won": 0,
+    "lost": 12,
+    "hit": 0.0,
+    "exp_hit": 0.0391978676635469,
+    "units": -12.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Best value: 11-leg (all 6 suggestions)",
+    "bets": 10,
+    "won": 0,
+    "lost": 10,
+    "hit": 0.0,
+    "exp_hit": 0.002425534425686765,
+    "units": -10.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Most likely to hit: \u2605 suggestion",
+    "bets": 2,
+    "won": 0,
+    "lost": 2,
+    "hit": 0.0,
+    "exp_hit": 0.22878726789942,
+    "units": -2.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Most likely to hit: straight (all 6 suggestions)",
+    "bets": 12,
+    "won": 5,
+    "lost": 7,
+    "hit": 0.4166666666666667,
+    "exp_hit": 0.6372416666666666,
+    "units": -3.77,
+    "roi": -0.31381830481213696
+   },
+   {
+    "group": "Most likely to hit: 2-leg (all 6 suggestions)",
+    "bets": 12,
+    "won": 3,
+    "lost": 9,
+    "hit": 0.25,
+    "exp_hit": 0.3865865466666667,
+    "units": -2.57,
+    "roi": -0.2139377156688834
+   },
+   {
+    "group": "Most likely to hit: 3-leg (all 6 suggestions)",
+    "bets": 12,
+    "won": 1,
+    "lost": 11,
+    "hit": 0.08333333333333333,
+    "exp_hit": 0.23039969918258332,
+    "units": -7.84,
+    "roi": -0.6532543328504151
+   },
+   {
+    "group": "Most likely to hit: 4-leg (all 6 suggestions)",
+    "bets": 12,
+    "won": 0,
+    "lost": 12,
+    "hit": 0.0,
+    "exp_hit": 0.13512304900826988,
+    "units": -12.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Most likely to hit: 5-leg (all 6 suggestions)",
+    "bets": 12,
+    "won": 0,
+    "lost": 12,
+    "hit": 0.0,
+    "exp_hit": 0.07985944175113192,
+    "units": -12.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Most likely to hit: 6-leg (all 6 suggestions)",
+    "bets": 12,
+    "won": 0,
+    "lost": 12,
+    "hit": 0.0,
+    "exp_hit": 0.045934846700433137,
+    "units": -12.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Most likely to hit: 11-leg (all 6 suggestions)",
+    "bets": 9,
+    "won": 0,
+    "lost": 9,
+    "hit": 0.0,
+    "exp_hit": 0.003225349942989689,
+    "units": -9.0,
+    "roi": -1.0
+   }
+  ]
+ }
 }

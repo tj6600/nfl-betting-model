@@ -8,7 +8,7 @@ const headStep = (p) => {
 };
 const MS = (D.milestones || []).map((p) => { const h = headStep(p); return { ...p, head: h, p: h.p, ev: Math.max(...p.steps.map((x) => x.ev)) }; });
 const state = { tab: 'td', cat: 'all', game: 'all', win: 'all', pos: 'all', q: '', sort: null, small: true, open: null };
-const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(YD.some((p) => p.market === 'recs') ? [['recs', 'Receptions']] : []).concat(YD.some((p) => p.market === 'pass') ? [['pass', 'Passing yards']] : []).concat(MS.length ? [['ms', 'Milestones']] : []).concat(D.legs ? [['parlay', 'Parlay builder']] : []).concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
+const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(YD.some((p) => p.market === 'recs') ? [['recs', 'Receptions']] : []).concat(YD.some((p) => p.market === 'pass') ? [['pass', 'Passing yards']] : []).concat(MS.length ? [['ms', 'Milestones']] : []).concat(D.legs ? [['parlay', 'Parlay builder']] : []).concat(D.record ? [['record', 'Model record']] : []).concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
 const PILL = { 'TD value': 'value', 'Value': 'value', 'Most likely': 'likely', 'Check role': 'check', 'Likely hit': 'likely' };
 const fmtOdds = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
@@ -364,6 +364,48 @@ function renderTest() {
   board.append(mk('Yards leans', 'confident leans (57%+) vs stand-in line', B.yards, (r) => [[r.name], [`${r.market.split(' ')[0]} · ${r.team}`, 'dim'],
     [`${r.lean} ${r.line}`], [`proj ${r.proj.toFixed(0)}`, 'num dim'], [`actual ${r.actual.toFixed(0)}`, 'num'], [r.right ? 'Right' : 'Wrong', r.right ? 'pos' : 'neg']]));
   document.getElementById('foot').textContent = `There are no saved prop lines for week ${B.week}, so touchdowns are graded on whether the player scored, and yards are graded against a stand-in line: his season average before week ${B.week}, rounded to .5. Real books set yards lines a little below the average, because a few big games pull the average up, so the Under results here look better than they would against real lines. Treat this as a check that the chances are sensible. The real test is this week's picks, graded against real lines after the games.`;
+}
+// ---- model record: picks and suggested parlays, graded at DraftKings once the games are final (nflmodel/record.py) ----
+function renderRecord() {
+  const R = D.record, wk = (d) => `week ${+d.split('_wk')[1]}`;
+  document.getElementById('lede').textContent = `How the board's picks and suggested parlays have done, graded at DraftKings' own line and price once each game is final. ` +
+    (R.graded.length ? `Graded so far: ${R.graded.map(wk).join(', ')}.` : `Nothing is graded yet: the ${R.weeks.map(wk).join(', ')} picks and parlays are saved and grade after the games, when the board is rebuilt on Monday.`);
+  for (const id of ['cats', 'games', 'legend']) document.getElementById(id).replaceChildren();
+  document.querySelector('.bar').style.display = 'none';
+  const board = document.getElementById('board'); board.replaceChildren(); board.className = 'cols';
+  const sg = (u) => `${u > 0 ? '+' : ''}${u.toFixed(2)}`;
+  const mk = (title, sub, rows) => {
+    const c = el('section', 'col'); const h = el('div', 'colhead'); h.append(el('h2', null, title), el('span', null, sub)); c.append(h);
+    const wrap = el('div', 'tablewrap'); const tb = el('table', 'res'); const tbody = el('tbody');
+    const hd = el('tr'); ['', 'Won–lost', 'Hit', 'Expected', 'Units', 'ROI'].forEach((x) => hd.append(el('th', x ? 'num' : null, x))); tbody.append(hd);
+    for (const r of rows) {
+      const tr = el('tr');
+      [[r.group.replace(' (all 6 suggestions)', '')], [`${r.won}–${r.lost}`, 'num'], [`${(r.hit * 100).toFixed(0)}%`, 'num'], [r.exp_hit < 0.01 ? '<1%' : `${(r.exp_hit * 100).toFixed(0)}%`, 'num dim'],
+        [sg(r.units), 'num ' + (r.units >= 0 ? 'pos' : 'neg')], [`${r.roi >= 0 ? '+' : ''}${(r.roi * 100).toFixed(0)}%`, 'num ' + (r.roi >= 0 ? 'pos' : 'neg')]]
+        .forEach(([v, cls]) => tr.append(el('td', cls || null, v)));
+      tbody.append(tr);
+    }
+    tb.append(tbody); wrap.append(tb); c.append(wrap); return c;
+  };
+  if (R.picks.length) {
+    const tiles = el('div', 'tiles');
+    for (const r of R.picks.slice(0, 1).concat(R.parlays.groups.filter((g) => /★/.test(g.group)))) {
+      const t = el('div', 'tile');
+      t.append(el('span', 'k', r.group), el('span', 'big', `${r.won}–${r.lost}`), el('span', 's', `${sg(r.units)} units · ${(r.hit * 100).toFixed(0)}% hit, model expected ${(r.exp_hit * 100).toFixed(0)}%`));
+      tiles.append(t);
+    }
+    board.append(tiles);
+    board.append(mk('Board picks', '1 unit each at DraftKings', R.picks));
+  }
+  if (R.parlays.groups.length) board.append(mk('Suggested parlays', 'all 6 suggestions at each size, 1 unit each', R.parlays.groups));
+  const bt = el('section', 'col'); const bh = el('div', 'colhead'); bh.append(el('h2', null, 'Backtests'), el('span', null, 'before live tracking')); bt.append(bh);
+  const ul = el('ul', 'notes');
+  ['Game spreads against closing lines, 2023–25: 48–51% depending on the model version. Break-even at -110 is 52.4%, so no edge at the close.',
+    'Game spreads against opening lines, 2019–20 (about 430 games): 53.8%, and the lines tended to move toward the picks. This is why game picks are made from Monday openers.',
+    'Passing yards projections miss by about 53–57 yards a game, about 4 yards better than the season average or last 5 games.',
+    D.blind ? `Props blind test on week ${D.blind.week}: see the Week ${D.blind.week} test tab.` : null].filter(Boolean).forEach((x) => ul.append(el('li', null, x)));
+  bt.append(ul); board.append(bt);
+  document.getElementById('foot').textContent = 'Picks are the board\'s categorized bets (Value, TD value, Optimal, Secure and the rest), saved the first time each week\'s board is built. Suggested parlays are the Parlay builder\'s 6 suggestions at each leg count for the whole week and every market, in both Build for modes; ★ is the size it recommended. A parlay loses if any leg loses; push and void legs drop out, as at DraftKings. A player who doesn\'t play voids his yards bet; an anytime TD with no touches counts as a loss. Grading uses free nflverse scores and stats, so it costs no odds credits. These are tracking picks, not bets.';
 }
 // ---- parlay builder ----
 const LEGS = D.legs || []; const LEG = Object.fromEntries(LEGS.map((l) => [l.id, l]));
@@ -760,6 +802,7 @@ function renderParlay() {
 }
 function render() {
   if (state.tab === 'test') { renderTabs(); renderTest(); return; }
+  if (state.tab === 'record') { renderTabs(); renderRecord(); return; }
   if (state.tab === 'parlay') { renderTabs(); renderParlay(); return; }
   document.querySelector('.bar').style.display = '';
   const cf = CONF[state.tab];

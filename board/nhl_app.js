@@ -367,6 +367,9 @@ function boardRecord() {
     mk('Live record at DraftKings', ['Group', 'Bets', 'W-L', 'Hit', 'Units', 'ROI'], lv.groups.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), sgn(g.units), roi(g.roi)]),
        `${lv.days.length} slate${lv.days.length > 1 ? 's' : ''} graded. Every priced leg is logged when the board is built and graded at that DraftKings price, 1 unit per leg.`);
   }
+  const pz = lv && lv.parlays && lv.parlays.groups.filter((g) => g.bets);
+  if (pz && pz.length) mk('Suggested parlays at DraftKings', ['Parlays', 'Count', 'W-L', 'Hit', 'Expected', 'Units', 'ROI'], pz.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), fmtp(g.exp_hit), sgn(g.units), roi(g.roi)]),
+     'Each day\'s suggested parlays are saved when the board is built, for both Best value and Most likely to hit and every leg count (up to 6 suggestions each), and graded as whole parlays at DraftKings prices, 1 unit each. A parlay loses if any leg loses; pushed or voided legs drop out. Expected is the chance the board gave the parlays.');
   if (bt.winners) {
     const rows = []; Object.entries(bt.winners).forEach(([se, r]) => { [['model', 'Model'], ['blend', 'Board pick (blend)'], ['draftkings', 'DraftKings favorite']].forEach(([k, l]) => rows.push([`${se.slice(0, 4)}-${se.slice(6)}`, l, r.games, fmtp(r[k].all), r[k].conf60 ? `${fmtp(r[k].conf60[1])} (${r[k].conf60[0]})` : '—'])); });
     mk('Picking winners', ['Season', 'Picker', 'Games', 'Correct', 'When 60%+ sure (games)'], rows, 'Hockey is close to a coin flip: even DraftKings\' favorite wins only about 55-62% of the time. When the board is 60%+ sure, its pick wins about two times in three.');

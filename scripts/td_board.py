@@ -351,6 +351,15 @@ for b in PARLAY_BOOKS:
 best = max(sug)
 D['suggested'] = dict(book=best[2], ids=best[3])
 
+# save this week's picks and suggested parlays (same rules as the Parlay builder), then grade every finished week for the
+# Model record tab (nflmodel/record.py: free nflverse scores and stats, DraftKings prices)
+import parlays as PZ
+from nflmodel import record as REC
+REC.log_legs(season, week, legs)
+PZ.log(os.path.join(ROOT, 'odds_log'), f'{season}_wk{week:02d}', taken.strftime('%Y-%m-%dT%H%MZ'), legs, nfl=True)
+D['record'] = REC.record()
+print('model record:', len(D['record']['picks']), 'pick groups,', len(D['record']['parlays']['groups']), 'parlay groups; graded weeks', D['record']['graded'])
+
 # latest blind test (scripts/props_blind_test.py), shown on its own tab
 bl = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'blind', '*_summary.csv')))
 if bl:
