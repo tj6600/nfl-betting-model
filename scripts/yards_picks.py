@@ -39,6 +39,9 @@ wxm = lambda gid, stat: float(WX[f'm_{stat}'].get(gid, 1.0)) if gid in WX.index 
 ov_path = os.path.join(ROOT, 'odds_log', 'injury_overrides.csv')
 P = T.upcoming(season, week, T.implied_points(lines), pd.read_csv(ov_path) if os.path.exists(ov_path) else None)
 P = P.merge(Y.team_margin(lines), on='posteam', how='left', suffixes=('', '_m'))
+# snap share from nflverse snap counts (latest game + recency-weighted) and share of the team's active skill-player usage
+P = Y.add_room_team(Y.add_snaps(P, current=True), 'posteam')
+print(f"snap counts matched for {P.h_snap.notna().mean():.0%} of players")
 P = P.merge(lines[['game_id', 'home_team', 'away_team']], on='game_id')
 try:
     snaps = T.depth_snapshots([season]); P = T.add_depth(P, snaps, now=snaps.dt.max() + pd.Timedelta(minutes=1))
