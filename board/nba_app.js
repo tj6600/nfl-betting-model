@@ -318,6 +318,15 @@ function boardParlay() {
     const st = el('div', 'stats pad');
     [[pct(p), 'Hit chance'], [fmt(toAm(d)), 'Payout'], [sgn(Math.round(ev * 100)) + '%', 'Expected value']].forEach(([v, k]) => { const s = el('div', 'stat'); s.append(el('b', null, v), el('span', null, k)); st.append(s); });
     sl.append(st);
+    // DraftKings betslip link: every leg's DraftKings outcome id, so the slip opens in DraftKings ready to place
+    const sids = legs.map((l) => l.sid).filter(Boolean);
+    const dk = el('div', 'dkrow');
+    if (sids.length) {
+      const a = el('a', 'lnk sugb dkbtn', sids.length === legs.length ? 'Open in DraftKings' : `Open ${sids.length} of ${legs.length} legs in DraftKings`);
+      a.href = 'https://sportsbook.draftkings.com/?outcomes=' + sids.map(encodeURIComponent).join('+'); a.target = '_blank'; a.rel = 'noopener';
+      dk.append(a, el('span', 'dim', sids.length === legs.length ? 'Loads these legs into your DraftKings betslip. Sign in, check the prices, and place it.' : 'The other legs have no DraftKings link on this pull; add them by hand.'));
+    } else dk.append(el('span', 'dim', 'No DraftKings link for these legs yet: links come with the next odds pull.'));
+    sl.append(dk);
     const games = {}; legs.forEach((l) => { games[l.game] = (games[l.game] || 0) + 1; });
     const warns = [];
     Object.entries(games).filter(([, n]) => n > 1).forEach(([g, n]) => warns.push(['warn', `${n} legs from ${g}: DraftKings prices same-game legs together, so the real payout differs and the legs are not independent.`]));
