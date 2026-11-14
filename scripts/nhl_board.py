@@ -24,7 +24,9 @@ W = {'Moneyline': 0.5,   # blend had the best log loss; model alone ~ DK
      'Puck line': 0.25,  # DK clearly better than the model
      'Total': 0.25,      # DK better than the model at the close
      'Shots on goal': 0.5,  # blend beat DK in both seasons
-     'Saves': 0.5}       # blend slightly better than DK, small sample
+     'Saves': 0.5,       # blend slightly better than DK, small sample
+     'Alt shots': 0.5, 'Alt saves': 0.5}   # alternate lines ("3+ shots"), same models as the main lines
+ALT_MARGIN = 1.06   # alt lines have no Under to remove the vig; book chances are divided by an estimated 6% margin (as for NFL)
 
 ap = argparse.ArgumentParser(); ap.add_argument('--update', action='store_true'); ap.add_argument('--date')
 ap.add_argument('--no-log', action='store_true', help='rebuild the page only; save no pick or parlay log (the 9 AM grading run)')
@@ -128,6 +130,24 @@ if len(PRW):
     PRW = PRW[PRW.book == 'draftkings'].copy(); PRW['k'] = PRW.player.map(norm_name)
 
 
+# alternate lines (Over only) for the parlays: python -m nhlmodel.odds alt
+afile = O.latest('alt', day)
+ALT = O.alt_rows(json.load(open(afile))) if afile else O.alt_rows([])
+if len(ALT): ALT['k'] = ALT.player.map(norm_name)
+
+
+def alt_legs(x, g, stat, mu, r, kind, unit, flags):
+    """One leg per DraftKings alt rung for this player (kept when the blended chance is 50-97%)."""
+    if not len(ALT): return
+    for a in ALT[(ALT.k == norm_name(x.full_name)) & (ALT.stat == stat)].itertuples():
+        n = int(a.point + 0.5)
+        L = mk_leg(f'{x.player_id}-{stat}-alt{n}', g['game'], kind, f'{x.full_name} {n}+ {unit}', f'{x.team} vs {x.opp} · proj {mu:.1f}',
+                   int(a.price), float(p_over(a.point, mu, r)[0]), min(0.995, imp(a.price) / ALT_MARGIN), flags,
+                   dict(pid=int(x.player_id), team=x.team, gid=int(x.game_id), market=stat, side='Over', line=float(a.point), alt=True,
+                        sid=a.sid if isinstance(a.sid, str) else None))
+        if not 0.5 <= L['p'] <= 0.97: legs.remove(L)
+
+
 def prop_line(name, stat):
     if not len(PRW): return None
     q = PRW[(PRW.k == norm_name(name)) & (PRW.stat == stat)]
@@ -166,6 +186,7 @@ for x in up.itertuples():
             L = mk_leg(f'{x.player_id}-sog-{side}', g['game'], 'Shots on goal', f'{x.full_name} {side} {ln:g} shots', f'{x.team} vs {x.opp} · proj {mu:.1f}',
                        price, pmm, pb, flags, dict(pid=int(x.player_id), team=x.team, gid=int(x.game_id), market='sog', side=side, line=ln))
             e[side.lower()] = dict(id=L['id'], price=price, p=L['p'], edge=L['edge'], ev=L['ev'])
+    alt_legs(x, g, 'sog', mu, sm.r, 'Alt shots', 'shots', flags)
     players.append(dict(id=int(x.player_id), name=x.full_name, team=x.team, opp=x.opp, game=g['game'], pos='D' if x.position == 'D' else 'F',
                         toi=round(float(x.s_toi), 1), pp=round(float(x.l_pp_cf), 2), flags=flags, log=log, gp=int(len(cur)),
                         avg=round(float(cur.sog.mean()), 2) if len(cur) else None, sog=e))
@@ -191,6 +212,7 @@ for x in st[st.game_id.isin(gl)].itertuples():
             L = mk_leg(f'{x.player_id}-sv-{side}', g['game'], 'Saves', f'{x.full_name} {side} {ln:g} saves', f'{x.team} vs {x.opp} · proj {mu:.1f}',
                        price, pmm, pb, flags, dict(pid=int(x.player_id), team=x.team, gid=int(x.game_id), market='saves', side=side, line=ln))
             e[side.lower()] = dict(id=L['id'], price=price, p=L['p'], edge=L['edge'], ev=L['ev'])
+    alt_legs(x, g, 'saves', mu, vm.r, 'Alt saves', 'saves', flags)
     goalies.append(dict(id=int(x.player_id), name=x.full_name, team=x.team, opp=x.opp, game=g['game'], confirmed=conf, flags=flags, log=log, saves=e))
 
 # ---------- DraftKings betslip ids (The Odds API includeSids) so a slip can open in DraftKings ----------
@@ -210,6 +232,8 @@ if pfile:
             SID[('p', norm_name(r.player), r.stat, r.side, float(r.point))] = r.sid
 NAME = {**{x['id']: x['name'] for x in players}, **{x['id']: x['name'] for x in goalies}}
 for L in legs:
+    if L.get('alt'):
+        continue    # alt legs carry their own DraftKings id
     if L.get('pid') is not None:
         L['sid'] = SID.get(('p', norm_name(NAME.get(L['pid'], '')), L['market'], L['side'], float(L['line'])))
     else:
@@ -218,10 +242,10 @@ for L in legs:
 # ---------- picks and suggested pool (same rules as the NBA board) ----------
 for L in legs:
     L['pick'] = bool(L.get('market') == 'moneyline' and gl[L['gid']].get('pick') == L['side'])
-    L['cat'] = 'Value' if (L['edge'] >= 3 and L['p'] >= 0.55 and not L['flags']) else ''
+    L['cat'] = 'Value' if (L['edge'] >= 3 and L['p'] >= 0.55 and not L['flags'] and not L.get('alt')) else ''
 ok = lambda l: not l['flags']
 pool = sorted([l for l in legs if l['cat'] == 'Value'], key=lambda l: -l['edge'])
-pool += sorted([l for l in legs if l['cat'] != 'Value' and ok(l) and l['edge'] >= 1.5 and l['p'] >= 0.52], key=lambda l: -l['edge'])
+pool += sorted([l for l in legs if l['cat'] != 'Value' and ok(l) and not l.get('alt') and l['edge'] >= 1.5 and l['p'] >= 0.52], key=lambda l: -l['edge'])
 
 # pick log for grading (scripts/nhl_grade.py): every priced leg plus each game's winner pick
 stamp = pd.Timestamp.now(tz='UTC').strftime('%Y-%m-%dT%H%MZ')
@@ -229,7 +253,7 @@ if legs and not args.no_log:
     os.makedirs(os.path.join(O.DIR, 'picks'), exist_ok=True)
     lf = os.path.join(O.DIR, 'picks', f'{day}_{stamp}.csv')
     pd.DataFrame([{k: l.get(k) for k in ['id', 'gid', 'game', 'kind', 'market', 'side', 'line', 'pid', 'team', 'label', 'price', 'p', 'pm', 'pb', 'edge', 'ev', 'cat']}
-                  | {'flagged': bool(l['flags']), 'pick': l['pick']} for l in legs]).to_csv(lf, index=False)
+                  | {'alt': bool(l.get('alt')), 'flagged': bool(l['flags']), 'pick': l['pick']} for l in legs]).to_csv(lf, index=False)
     # suggested parlays as the page builds them (both modes, every leg count), graded by scripts/nhl_grade.py
     import parlays as PZ
     PZ.log(O.DIR, day, stamp, legs, [l['id'] for l in pool],

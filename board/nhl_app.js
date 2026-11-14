@@ -19,10 +19,20 @@ const saveSlip = () => { try { localStorage.setItem('nhl-slip-' + D.day, JSON.st
 // no leg reused across suggestions (same rule as scripts/nhl_board.py)
 // two ways to build: 'value' = biggest edge first (scripts/nhl_board.py pool); 'likely' = most likely to hit first,
 // among legs that still pay more than they risk on average (edge 1+ pt) and carry no flags
-const VALUE_POOL = (D.pool || []).map((id) => LEG[id]).filter(Boolean);
+// alternate lines (alt: true, Over only, e.g. "25+ points") as in the NFL builder: a shaky Over main line (under 60%) gives way to
+// the same player's likeliest fairly priced alt line at 60%+, and Most likely to hit slips of 3+ legs lead with alt lines
+// that are 70%+ and fairly priced (edge 0+), likeliest first (scripts parlays.py suggest() uses the same rules)
+const SECURE = 0.6, ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3;
+const ALT_BY = {};
+for (const l of D.legs) if (l.alt && !l.flags.length && l.p >= SECURE && l.edge >= 0) (ALT_BY[l.pid + '|' + l.market] = ALT_BY[l.pid + '|' + l.market] || []).push(l);
+Object.values(ALT_BY).forEach((xs) => xs.sort((a, b) => b.p - a.p));
+const safer = (l) => (l.alt || l.side !== 'Over' || l.p >= SECURE) ? l : ((ALT_BY[l.pid + '|' + l.market] || []).find((a) => a.p > l.p) || l);
+const dedupe = (xs) => { const s = new Set(); return xs.filter((l) => !s.has(l.id) && s.add(l.id)); };
+const ALT_FIRST = D.legs.filter((l) => l.alt && !l.flags.length && l.p >= ALT_FIRST_P && l.edge >= 0).sort((a, b) => b.p - a.p || b.edge - a.edge);
+const VALUE_POOL = dedupe((D.pool || []).map((id) => LEG[id]).filter(Boolean).map(safer));
 // NHL: the board's winner picks count as "likely" even without an edge (Thomas wants correct picks more than edge),
 // but nothing priced shorter than -200, so no leg risks much more than it pays
-const LIKELY_POOL = D.legs.filter((l) => (l.edge >= 1 || l.pick) && l.p >= 0.55 && l.price >= -200 && !l.flags.length).sort((a, b) => b.p - a.p || b.edge - a.edge);
+const LIKELY_POOL = dedupe(D.legs.filter((l) => (l.edge >= 1 || l.pick) && l.p >= 0.55 && l.price >= -200 && !l.flags.length).sort((a, b) => b.p - a.p || b.edge - a.edge).map(safer));
 let mode = 'value';
 try { mode = localStorage.getItem('nhl-mode') === 'likely' ? 'likely' : 'value'; } catch (e) {}
 let POOL = mode === 'likely' ? LIKELY_POOL : VALUE_POOL;
@@ -36,7 +46,7 @@ const MKTS = [...new Set(D.legs.map((L) => L.kind))];
 const NO_SGP = new Set(['Saves']);
 function buildSlips(size, n = 6) {
   const out = [], used = new Set();
-  const pool = POOL.filter(kindOk);
+  const pool = (mode === 'likely' && size >= ALT_FIRST_SIZE ? dedupe(ALT_FIRST.concat(POOL)) : POOL).filter(kindOk);
   for (let s = 0; s < n; s++) {
     const nG = new Set(pool.map((L) => L.game)).size;
     const slip = [], g = {}, pl = new Set(), perGame = Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / Math.max(1, nG))));   // more per game only when the slate is too small
@@ -283,7 +293,7 @@ function boardParlay() {
     const seg = el('div', 'seg');
     [['value', 'Best value'], ['likely', 'Most likely to hit']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', mode === k); b.onclick = () => { setMode(k); setSize(legCount); if (SLIPS.length) loadSug(0); else { sugIdx = -1; render(); } }; seg.append(b); });
     md.append(seg);
-    md.append(el('span', 'dim sugbest', (mode === 'likely' ? 'Highest-chance legs: board winner picks plus legs with edge 1+, 55%+ chance, nothing shorter than -200' : 'Biggest edge first (edge 3+, 55%+ chance)') + (KINDS.size ? `. Only ${[...KINDS].join(' + ')} legs (market filter).` : '')));
+    md.append(el('span', 'dim sugbest', (mode === 'likely' ? 'Highest-chance legs: board winner picks plus legs with edge 1+, 55%+ chance, nothing shorter than -200. Slips of 3+ legs start with alt lines 70%+ to hit, and a shaky Over swaps to a safer alt line' : 'Biggest edge first (edge 3+, 55%+ chance)') + (KINDS.size ? `. Only ${[...KINDS].join(' + ')} legs (market filter).` : '')));
     sl.append(md);
   }
   if (SIZES.length) {
