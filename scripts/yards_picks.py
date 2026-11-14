@@ -113,7 +113,11 @@ out_names = set()
 if os.path.exists(ov_path):
     ov = pd.read_csv(ov_path); out_names = set(ov[(ov.season == season) & (ov.week == week) & (ov.status == 'Out')].player)
 teams = list(lines.home_team) + list(lines.away_team)
-QB = PY.current(QS, season, week, teams, out_names)
+_pk = O[O.kind == 'pass'] if 'kind' in O else O.iloc[0:0]
+_listed = {}
+for _h, _a, _k in zip(_pk.home_team, _pk.away_team, _pk.k):   # a DK passing prop names the QB the book expects to start
+    _listed.setdefault(_h, set()).add(_k); _listed.setdefault(_a, set()).add(_k)
+QB = PY.current(QS, season, week, teams, out_names, listed=_listed)
 ctx = T.implied_points(lines).merge(Y.team_margin(lines), on=['game_id', 'posteam'])
 opp = pd.concat([lines[['game_id', 'home_team', 'away_team']].rename(columns={'home_team': 'posteam', 'away_team': 'defteam'}),
                  lines[['game_id', 'home_team', 'away_team']].rename(columns={'away_team': 'posteam', 'home_team': 'defteam'})])
