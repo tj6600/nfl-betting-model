@@ -387,17 +387,19 @@ function renderRecord() {
     }
     tb.append(tbody); wrap.append(tb); c.append(wrap); return c;
   };
-  if (R.picks.length) {
+  const tileRows = R.picks.slice(0, 1).concat(R.parlays.groups.filter((g) => /★/.test(g.group)), (R.legs || []).filter((g) => /★/.test(g.group)));
+  if (tileRows.length) {
     const tiles = el('div', 'tiles');
-    for (const r of R.picks.slice(0, 1).concat(R.parlays.groups.filter((g) => /★/.test(g.group)))) {
+    for (const r of tileRows) {
       const t = el('div', 'tile');
       t.append(el('span', 'k', r.group), el('span', 'big', `${r.won}–${r.lost}`), el('span', 's', `${sg(r.units)} units · ${(r.hit * 100).toFixed(0)}% hit, model expected ${(r.exp_hit * 100).toFixed(0)}%`));
       tiles.append(t);
     }
     board.append(tiles);
-    board.append(mk('Board picks', '1 unit each at DraftKings', R.picks));
   }
+  if (R.picks.length) board.append(mk('Board picks', '1 unit each at DraftKings', R.picks));
   if (R.parlays.groups.length) board.append(mk('Suggested parlays', 'all 6 suggestions at each size, 1 unit each', R.parlays.groups));
+  if ((R.legs || []).length) board.append(mk('Legs in suggested parlays', 'each leg the suggestions chose, as a 1-unit straight bet at DraftKings', R.legs));
   const bt = el('section', 'col'); const bh = el('div', 'colhead'); bh.append(el('h2', null, 'Backtests'), el('span', null, 'before live tracking')); bt.append(bh);
   const ul = el('ul', 'notes');
   ['Game spreads against closing lines, 2023–25: 48–51% depending on the model version. Break-even at -110 is 52.4%, so no edge at the close.',
@@ -405,7 +407,7 @@ function renderRecord() {
     'Passing yards projections miss by about 53–57 yards a game, about 4 yards better than the season average or last 5 games.',
     D.blind ? `Props blind test on week ${D.blind.week}: see the Week ${D.blind.week} test tab.` : null].filter(Boolean).forEach((x) => ul.append(el('li', null, x)));
   bt.append(ul); board.append(bt);
-  document.getElementById('foot').textContent = 'Picks are the board\'s categorized bets (Value, TD value, Optimal, Secure and the rest) on main over/under lines, game lines and TDs; alt lines aren\'t counted, since the main line already covers the player. They are saved the first time each week\'s board is built. Games that had already kicked off when the board was built are left out, so the record never counts a pick made after the fact. Suggested parlays are the Parlay builder\'s 6 suggestions at each leg count for the whole week and every market, in both Build for modes; ★ is the size it recommended. A parlay loses if any leg loses; push and void legs drop out, as at DraftKings. A player who doesn\'t play voids his yards bet; an anytime TD with no touches counts as a loss. Grading uses free nflverse scores and stats, so it costs no odds credits. These are tracking picks, not bets.';
+  document.getElementById('foot').textContent = 'Picks are the board\'s categorized bets (Value, TD value, Optimal, Secure and the rest) on main over/under lines, game lines and TDs; alt lines aren\'t counted, since the main line already covers the player. They are saved the first time each week\'s board is built. Games that had already kicked off when the board was built are left out, so the record never counts a pick made after the fact. Suggested parlays are the Parlay builder\'s 6 suggestions at each leg count for the whole week and every market, in both Build for modes; ★ is the size it recommended. Legs in suggested parlays grades every leg those suggestions picked, alt lines included, as its own 1-unit straight bet; ★ legs are the ones in the recommended parlay. A parlay loses if any leg loses; push and void legs drop out, as at DraftKings. A player who doesn\'t play voids his yards bet; an anytime TD with no touches counts as a loss. Grading uses free nflverse scores and stats, so it costs no odds credits. These are tracking picks, not bets.';
 }
 // ---- parlay builder ----
 const LEGS = D.legs || []; const LEG = Object.fromEntries(LEGS.map((l) => [l.id, l]));
