@@ -1,6 +1,6 @@
 """Build the NBA board (board/site/nba.html): game picks, player props, parlay builder, game logs.
 
-  python scripts/nba_board.py [--update] [--date YYYY-MM-DD]
+  python scripts/nba_board.py [--update] [--date YYYY-MM-DD] [--no-log]
 
 --update first adds newly finished games to nba_data/ (hoopR raw JSON; no pyarrow needed).
 Prices come from the latest odds_log/nba snapshots (python -m nbamodel.odds games / props).
@@ -11,6 +11,7 @@ from nbamodel import data as D, games as M, props as PR, odds as O, injuries as 
 
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 ap = argparse.ArgumentParser(); ap.add_argument('--update', action='store_true'); ap.add_argument('--date')
+ap.add_argument('--no-log', action='store_true', help='rebuild the page only; save no pick or parlay log (the 9 AM grading run)')
 args = ap.parse_args()
 if args.update:
     D.update()
@@ -217,7 +218,7 @@ sug = slips[0] if slips else []
 
 # pick log: every priced leg as offered when this board was built, keyed to the odds snapshot it used.
 # scripts/nba_grade.py grades the earliest log of each day against results and closing lines.
-if legs:
+if legs and not args.no_log:
     stamp = os.path.basename(pfile)[17:-5] if pfile else os.path.basename(gf)[6:-5]
     os.makedirs(os.path.join(O.DIR, 'picks'), exist_ok=True)
     lf = os.path.join(O.DIR, 'picks', f'{day}_{stamp}.csv')
