@@ -151,6 +151,11 @@ FU['boost'] = [bn.get((g, t)) if v > 0 else None for g, t, v in zip(FU.game_id, 
 key = lambda s: s.str.lower().str.replace(r'[^a-z]', '', regex=True).str.replace(r'(jr|sr|ii|iii|iv)$', '', regex=True)
 if len(PRW):
     PRW['k'] = key(PRW.player)
+# alternate lines ("25+ points", Over only) for the parlays: python -m nbamodel.odds alt
+afile = O.latest('alt', day)
+ALT = O.alt_rows(json.load(open(afile))) if afile else O.alt_rows([])
+ALT['k'] = key(ALT.player) if len(ALT) else ''
+ALT_MARGIN = 1.06    # alt lines have no Under to remove the vig; book chances are divided by an estimated 6% margin (as for NFL)
 FU = FU.assign(k=key(FU.name))
 gl = {g['id']: g for g in games}
 players = []
@@ -190,12 +195,20 @@ for x in FU.itertuples():
                                    extra=dict(pid=int(x.pid), stat=k, team=x.team, gid=int(x.game_id), market=k, side=side, line=float(ln),
                                               sid=(so if side == 'Over' else su).get('sid', pd.Series([None])).iloc[0]))
                         e[side.lower()] = dict(id=L['id'], price=pr_, p=L['p'], pm=L['pm'], pb=L['pb'], edge=L['edge'], ev=L['ev'])
+        for a in (ALT[(ALT.k == x.k) & (ALT.stat == k)].itertuples() if len(ALT) else []):
+            n = int(a.point + 0.5)
+            pm_ = 0.5 + 0.85 * (float(SP.p_over(k, proj, a.point)[0]) - 0.5)
+            L = mk_leg(f'{x.pid}-{k}-alt{n}', p['game'], 'Alt ' + PR.LABEL[k].lower(), f'{x.name} {n}+ {PR.LABEL[k].lower()}',
+                       f'{x.team} vs {x.opp} · proj {proj:.1f}', int(a.price), pm_, min(0.995, imp(a.price) / ALT_MARGIN), MODEL_W_PROP, flags=flags,
+                       extra=dict(pid=int(x.pid), stat=k, team=x.team, gid=int(x.game_id), market=k, side='Over', line=float(a.point), alt=True,
+                                  sid=a.sid if isinstance(a.sid, str) else None))
+            if not 0.5 <= L['p'] <= 0.97: legs.remove(L)   # keep the rungs worth a parlay leg
         p['props'][k] = e
     players.append(p)
 
 # picks: value = edge >= 3 pts and chance >= 55%, no flag
 for L in legs:
-    L['cat'] = 'Value' if (L['edge'] >= 3 and L['p'] >= 0.55 and not L['flags']) else ''
+    L['cat'] = 'Value' if (L['edge'] >= 3 and L['p'] >= 0.55 and not L['flags'] and not L.get('alt')) else ''
 # suggested slips: up to 6 different parlays, each the best remaining legs (1 per game, 1 per player, 2-4 legs);
 # a leg is used in at most one slip so each suggestion is different. Value legs first, then near-value (edge 1.5+, 52%+).
 def build_slips(pool, n=6, size=4):
@@ -212,7 +225,7 @@ def build_slips(pool, n=6, size=4):
     return slips
 ok = lambda l: not l['flags']
 pool = sorted([l for l in legs if l['cat'] == 'Value'], key=lambda l: -l['edge'])
-pool += sorted([l for l in legs if l['cat'] != 'Value' and ok(l) and l['edge'] >= 1.5 and l['p'] >= 0.52], key=lambda l: -l['edge'])
+pool += sorted([l for l in legs if l['cat'] != 'Value' and ok(l) and not l.get('alt') and l['edge'] >= 1.5 and l['p'] >= 0.52], key=lambda l: -l['edge'])
 slips = build_slips(pool)
 sug = slips[0] if slips else []
 
@@ -224,7 +237,7 @@ if legs and not args.no_log:
     lf = os.path.join(O.DIR, 'picks', f'{day}_{stamp}.csv')
     if not os.path.exists(lf):
         pl = pd.DataFrame([{k: l.get(k) for k in ['id', 'gid', 'game', 'kind', 'market', 'side', 'line', 'pid', 'team', 'label', 'price', 'p', 'pm', 'pb', 'edge', 'ev', 'cat']}
-                           | {'flagged': bool(l['flags']), 'suggested': l['id'] in sug} for l in legs])
+                           | {'alt': bool(l.get('alt')), 'flagged': bool(l['flags']), 'suggested': l['id'] in sug} for l in legs])
         pl.to_csv(lf, index=False)
     # suggested parlays as the page builds them (both modes, every leg count), graded by scripts/nba_grade.py
     import parlays as PZ

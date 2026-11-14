@@ -72,7 +72,7 @@ for day, f in logs.items():
                 else:
                     a = float(pr[l.market].iloc[0])
                     r['result'] = 'push' if a == l.line else ('win' if (a > l.line) == (l.side == 'Over') else 'loss')
-            if cp is not None and len(cp):
+            if cp is not None and len(cp) and not bool(getattr(l, 'alt', False) == True):   # alt rungs have no closing main line to compare
                 q = cp[(cp.k == key(pd.Series([names.get(l.pid, '')])).iloc[0]) & (cp.stat == l.market)]
                 if len(q):
                     cl = q.point.mode().iloc[0]; r['close_line'] = float(cl)

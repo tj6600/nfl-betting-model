@@ -28,7 +28,9 @@ def main():
         L = pd.read_csv(f)
         # the lean is the side of each bet with the bigger edge (both sides are logged)
         L['key'] = L.gid.astype(str) + '|' + L.market.astype(str) + '|' + L.pid.fillna(0).astype(int).astype(str)
-        L['lean'] = L.edge == L.groupby('key').edge.transform('max')
+        alt = L['alt'].fillna(False).astype(bool) if 'alt' in L else pd.Series(False, index=L.index)
+        L['key'] = L['key'] + alt.map({True: '|alt', False: ''})
+        L['lean'] = (L.edge == L.groupby('key').edge.transform('max')) & ~alt   # alt rungs are parlay legs, not leans
         g = games[games.game_date == day]
         if not len(g):
             continue

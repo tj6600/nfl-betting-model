@@ -2,6 +2,7 @@
 
   python -m nhlmodel.odds games                  # moneyline, puck line, totals for upcoming games: 3 credits
   python -m nhlmodel.odds props [YYYY-MM-DD]     # shots on goal + goalie saves for one slate: 2 credits per game
+  python -m nhlmodel.odds alt [YYYY-MM-DD]       # alternate shots on goal + saves ("3+ shots") for parlays: 2 credits per game
   python -m nhlmodel.odds history-games 2025-10-21 2026-04-16   # one 5 PM ET snapshot per day: 20 credits/day
   python -m nhlmodel.odds history-props 2026-01-14 [...]        # per game, 90 min before puck drop: 20 credits/game
 
@@ -17,6 +18,7 @@ DIR = os.path.join(ROOT, 'odds_log', 'nhl')
 HIST = os.path.join(DIR, 'history')
 ET = dt.timezone(dt.timedelta(hours=-5))
 PROP_MARKETS = {'player_shots_on_goal': 'sog', 'player_total_saves': 'saves'}
+ALT_MARKETS = {'player_shots_on_goal_alternate': 'sog', 'player_total_saves_alternate': 'saves'}
 
 NAMES = {
     'Anaheim Ducks': 'ANA', 'Arizona Coyotes': 'ARI', 'Boston Bruins': 'BOS', 'Buffalo Sabres': 'BUF',
@@ -74,7 +76,36 @@ def props(day=None):
     return out
 
 
+def alt(day=None):
+    day = day or dt.datetime.now(ET).date()
+    out, left = [], None
+    for e in slate_events(day):
+        d, left = _call(f"sports/{SPORT}/events/{e['id']}/odds", markets=','.join(ALT_MARKETS))
+        out.append(d)
+    f = os.path.join(DIR, f'alt_{day}_{_stamp()}.json'); _save(out, f)
+    print(f'{len(out)} games of alternate lines saved to {f}; {left} credits left')
+    return out
+
+
+def alt_rows(events):
+    """DraftKings alternate lines, Over only ("3+ shots" = Over 2.5)."""
+    rows = []
+    for e in events:
+        h, a = NAMES.get(e['home_team']), NAMES.get(e['away_team'])
+        for b in e.get('bookmakers', []):
+            if b['key'] != 'draftkings': continue
+            for m in b['markets']:
+                st = ALT_MARKETS.get(m['key'])
+                for o in m['outcomes'] if st else []:
+                    if o.get('description') and o.get('point') is not None and o.get('name', 'Over') == 'Over':
+                        rows.append(dict(event=e['id'], home=h, away=a, stat=st, player=o['description'], point=float(o['point']),
+                                         price=o['price'], sid=o.get('sid')))
+    return pd.DataFrame(rows, columns=['event', 'home', 'away', 'stat', 'player', 'point', 'price', 'sid'])
+
+
 def latest(kind, day=None):
+    if kind == 'alt':
+        fs = sorted(glob.glob(os.path.join(DIR, f'alt_{day}_*.json' if day else 'alt_*.json'))); return fs[-1] if fs else None
     pat = 'games_*.json' if kind == 'games' else f'props_{day}_*.json' if day else 'props_*.json'
     fs = sorted(glob.glob(os.path.join(DIR, pat)))
     return fs[-1] if fs else None
@@ -188,6 +219,8 @@ if __name__ == '__main__':
         games()
     elif cmd == 'props':
         props(D(sys.argv[2]) if len(sys.argv) > 2 else None)
+    elif cmd == 'alt':
+        alt(D(sys.argv[2]) if len(sys.argv) > 2 else None)
     elif cmd == 'history-games':
         history_games(D(sys.argv[2]), D(sys.argv[3]))
     elif cmd == 'history-props':

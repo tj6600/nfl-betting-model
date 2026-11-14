@@ -43,12 +43,42 @@ def build(pool, size, n=6, no_sgp=()):
     return out
 
 
+SECURE = 0.60   # an Over main line under 60% gives way to the same player's likeliest fairly priced alt line at 60%+ (as for NFL)
+
+
+def _alt_tools(legs):
+    """NBA/NHL alt lines (alt=True, Over only, edge in points): the safer() swap and the 70%+ alt-first list."""
+    alts = {}
+    for L in legs:
+        if L.get('alt') and not L.get('flags') and L['p'] >= SECURE and L['edge'] >= 0:
+            alts.setdefault((L.get('pid'), L.get('market')), []).append(L)
+    for xs in alts.values(): xs.sort(key=lambda x: -x['p'])
+
+    def safer(L):
+        if L.get('alt') or L.get('side') != 'Over' or L['p'] >= SECURE: return L
+        return next((a for a in alts.get((L.get('pid'), L.get('market')), []) if a['p'] > L['p']), L)
+    first = sorted([L for L in legs if L.get('alt') and not L.get('flags') and L['p'] >= ALT_FIRST_P and L['edge'] >= 0],
+                   key=lambda L: (-L['p'], -L['edge']))
+    return safer, first
+
+
+def _dedupe(xs):
+    seen = set(); return [L for L in xs if not (L['id'] in seen or seen.add(L['id']))]
+
+
 def suggest(legs, pool_ids, likely, no_sgp=()):
-    """legs: the board's legs; pool_ids: the value pool in order; likely(L) -> bool for the likely pool."""
+    """legs: the board's legs; pool_ids: the value pool in order; likely(L) -> bool for the likely pool.
+    Same as the page (board/nba_app.js, nhl_app.js): shaky Overs swap to a safer alt line, and Most likely to hit
+    slips of 3+ legs lead with alt lines that are 70%+ and fairly priced."""
     by = {L['id']: L for L in legs}
-    pools = {'value': [by[i] for i in pool_ids if i in by],
-             'likely': sorted([L for L in legs if likely(L)], key=lambda L: (-L['p'], -L['edge']))}
-    return _pack(pools, lambda pool, k: build(pool, k, no_sgp=no_sgp))
+    safer, first = _alt_tools(legs)
+    pools = {'value': _dedupe([safer(by[i]) for i in pool_ids if i in by]),
+             'likely': _dedupe([safer(L) for L in sorted([L for L in legs if likely(L)], key=lambda L: (-L['p'], -L['edge']))])}
+
+    def builder(pool, k):
+        if pool is pools['likely'] and k >= ALT_FIRST_SIZE: pool = _dedupe(first + pool)
+        return build(pool, k, no_sgp=no_sgp)
+    return _pack(pools, builder)
 
 
 # ---- NFL: the same rules as board/app.js (sugPool, safer, buildSlips) for the whole week and every market ----
