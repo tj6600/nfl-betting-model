@@ -40,8 +40,8 @@ def log_legs(season, week, legs):
     return f
 
 
-def _week(day):
-    s, w = day.split('_wk'); return int(s), int(w)
+def _week(day):   # '2026_wk10', or '2026_wk10thu' for a log of one week's Thursday game alone
+    s, w = day.split('_wk'); return int(s), int(w[:2])
 
 
 def results(want):
@@ -116,6 +116,8 @@ def record():
         res = results(want)
     except Exception as e:   # data download failed: show what's logged, grade next run
         print('NFL record: grading skipped,', e); res = {}
+    # a parlay log like 2026_wk10thu_* grades with its week's results
+    res.update({(d, i): v for d in plogs if d not in picks for (d0, i), v in list(res.items()) if d0 == '%d_wk%02d' % _week(d)})
     rows = []
     for day, ls in picks.items():
         for l in ls:
@@ -155,5 +157,5 @@ def record():
         grp(f'{name}: every suggested leg', list(every.values()))
         grp(f'{name}: alt-line legs', [r for r in every.values() if r['alt']])
         grp(f'{name}: main-line legs', [r for r in every.values() if not r['alt']])
-    return dict(weeks=sorted(picks), graded=sorted({d for (d, _), v in res.items() if v}), picks=pick_groups, legs=groups,
+    return dict(weeks=sorted(picks), graded=sorted({'%d_wk%02d' % _week(d) for (d, _), v in res.items() if v}), picks=pick_groups, legs=groups,
                 parlays=PZ.grade(LOG, {k: v for k, v in res.items() if v}))
