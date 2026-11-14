@@ -96,7 +96,7 @@ def results(want):
 
 
 MKT = {'Game': 'Game lines', 'TD': 'Anytime TDs', 'Rush': 'Yards and receptions', 'Rec': 'Yards and receptions',
-       'Recs': 'Yards and receptions', 'Pass': 'Yards and receptions', 'Milestone': 'Alt lines'}
+       'Recs': 'Yards and receptions', 'Pass': 'Yards and receptions'}
 
 
 def record():
@@ -121,6 +121,7 @@ def record():
         for l in ls:
             r = res.get((day, l['id']))
             if l['cat'] == 'Check role': continue   # a warning, not a pick
+            if l['kind'] == 'Milestone': continue   # alt lines aren't counted; the main over/under covers the player (Thomas, 2026-11-14)
             if r in ('win', 'loss'):
                 rows.append(dict(cat=l['cat'], mkt=MKT.get(l['kind'], l['kind']), won=r == 'win', p=l['p'],
                                  units=PZ.dec(l['price']) - 1 if r == 'win' else -1.0))
@@ -134,5 +135,25 @@ def record():
     grp('All picks', rows)
     for mk in dict.fromkeys(MKT.values()): grp(mk, [r for r in rows if r['mkt'] == mk])
     for c in sorted({r['cat'] for r in rows}): grp(f'{c} picks', [r for r in rows if r['cat'] == c])
-    return dict(weeks=sorted(picks), graded=sorted({d for (d, _), v in res.items() if v}), picks=groups,
+    pick_groups, groups = groups, []
+    # the legs the parlay suggestions chose, each as a 1-unit straight bet at its DK price (alt lines included)
+    for mode, name in [('value', 'Best value'), ('likely', 'Most likely to hit')]:
+        star, every = {}, {}
+        for day, f in plogs.items():
+            m = json.load(open(f)).get(mode)
+            if not m: continue
+            for k, slips in m['slips'].items():
+                for i, sl in enumerate(slips):
+                    for L in sl:
+                        r = res.get((day, L['id']))
+                        if r not in ('win', 'loss'): continue
+                        row = dict(won=r == 'win', p=L['p'], alt=L['id'].startswith('m-'),
+                                   units=PZ.dec(L['price']) - 1 if r == 'win' else -1.0)
+                        every[(day, L['id'])] = row
+                        if str(m['best']) == k and i == 0: star[(day, L['id'])] = row
+        grp(f'{name}: ★ suggestion legs', list(star.values()))
+        grp(f'{name}: every suggested leg', list(every.values()))
+        grp(f'{name}: alt-line legs', [r for r in every.values() if r['alt']])
+        grp(f'{name}: main-line legs', [r for r in every.values() if not r['alt']])
+    return dict(weeks=sorted(picks), graded=sorted({d for (d, _), v in res.items() if v}), picks=pick_groups, legs=groups,
                 parlays=PZ.grade(LOG, {k: v for k, v in res.items() if v}))
