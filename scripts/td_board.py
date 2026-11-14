@@ -384,8 +384,10 @@ D['suggested'] = dict(book=best[2], ids=best[3])
 # Model record tab (nflmodel/record.py: free nflverse scores and stats, DraftKings prices)
 import parlays as PZ
 from nflmodel import record as REC
-REC.log_legs(season, week, legs)
-PZ.log(os.path.join(ROOT, 'odds_log'), f'{season}_wk{week:02d}', taken.strftime('%Y-%m-%dT%H%MZ'), legs, nfl=True)
+_gone = REC.started(season, week)   # only games not yet kicked off count as picks (no hindsight in the record)
+_pre = [l for l in legs if l['game'] not in _gone]
+REC.log_legs(season, week, _pre)
+PZ.log(os.path.join(ROOT, 'odds_log'), f'{season}_wk{week:02d}', taken.strftime('%Y-%m-%dT%H%MZ'), _pre, nfl=True)
 D['record'] = REC.record()
 print('model record:', len(D['record']['picks']), 'pick groups,', len(D['record']['parlays']['groups']), 'parlay groups; graded weeks', D['record']['graded'])
 

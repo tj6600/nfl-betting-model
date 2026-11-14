@@ -19,6 +19,16 @@ RX_M = re.compile(r'^m-(.+)-(Rush|Rec|Recs|Pass)-(\d+)$')
 STAT = {'Rush': 'rush_yds', 'Rec': 'rec_yds', 'Recs': 'receptions', 'Pass': 'passing_yards'}
 
 
+def started(season, week, now=None):
+    """'AWAY @ HOME' for this week's games that have kicked off (nflverse gameday + gametime are US Eastern).
+    A board built after kickoff knows how the game went (snaps, injuries), so those legs are never logged as picks."""
+    from nflmodel.model import G
+    now = pd.Timestamp.now(tz='UTC') if now is None else pd.Timestamp(now)
+    g = G[(G.season == season) & (G.week == week)]
+    ko = pd.to_datetime(g.gameday.astype(str) + ' ' + g.gametime.fillna('00:00')).dt.tz_localize('America/New_York')
+    return set((g.away_team + ' @ ' + g.home_team)[ko.dt.tz_convert('UTC') <= now])
+
+
 def log_legs(season, week, legs):
     """Save this week's categorized legs once (the earliest board of the week is the record)."""
     d = os.path.join(LOG, 'nfl_legs'); os.makedirs(d, exist_ok=True)
