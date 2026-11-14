@@ -1,6 +1,6 @@
 """Build the NHL board (board/site/nhl.html): game picks, shots on goal, goalie saves, parlay builder.
 
-  python scripts/nhl_board.py [--update] [--date YYYY-MM-DD]
+  python scripts/nhl_board.py [--update] [--date YYYY-MM-DD] [--no-log]
 
 --update refreshes the current season from the GitHub mirror first (python -m nhlmodel.data).
 Game lines and probable goalies come from ESPN's scoreboard (DraftKings prices, free). Shots-on-goal and saves lines
@@ -27,6 +27,7 @@ W = {'Moneyline': 0.5,   # blend had the best log loss; model alone ~ DK
      'Saves': 0.5}       # blend slightly better than DK, small sample
 
 ap = argparse.ArgumentParser(); ap.add_argument('--update', action='store_true'); ap.add_argument('--date')
+ap.add_argument('--no-log', action='store_true', help='rebuild the page only; save no pick or parlay log (the 9 AM grading run)')
 args = ap.parse_args()
 if args.update:
     D.fetch(D.CURRENT); D.build()
@@ -224,7 +225,7 @@ pool += sorted([l for l in legs if l['cat'] != 'Value' and ok(l) and l['edge'] >
 
 # pick log for grading (scripts/nhl_grade.py): every priced leg plus each game's winner pick
 stamp = pd.Timestamp.now(tz='UTC').strftime('%Y-%m-%dT%H%MZ')
-if legs:
+if legs and not args.no_log:
     os.makedirs(os.path.join(O.DIR, 'picks'), exist_ok=True)
     lf = os.path.join(O.DIR, 'picks', f'{day}_{stamp}.csv')
     pd.DataFrame([{k: l.get(k) for k in ['id', 'gid', 'game', 'kind', 'market', 'side', 'line', 'pid', 'team', 'label', 'price', 'p', 'pm', 'pb', 'edge', 'ev', 'cat']}
