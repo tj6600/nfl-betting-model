@@ -523,8 +523,18 @@ const SS = { size: null, idx: -1 };
 try { SS.size = +localStorage.getItem('props-legs') || null; } catch (e) {}
 let SAVED = []; try { SAVED = JSON.parse(localStorage.getItem('props-saved') || '[]').map((s) => ({ ...s, legs: s.legs.filter((id) => LEG[id]) })).filter((s) => s.legs.length); } catch (e) { SAVED = []; }
 const saveSaved = () => { try { localStorage.setItem('props-saved', JSON.stringify(SAVED)); } catch (e) {} };
-function sugPool() {
+// 3+ leg slips lead with alternate lines that are 70%+ and fairly priced (edge 0+), likeliest first, so bigger parlays are
+// built from legs that are likely to hit; the chosen mode's own pool fills in after them (same rule in parlays.py)
+const ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3;
+function sugPool(size = 1) {
   const ok = (l) => inScope(l) && !l.flag && l.offers.DraftKings != null && kindOk(l);
+  if (size >= ALT_FIRST_SIZE) {
+    const first = LEGS.filter((l) => l.alt && ok(l) && l.p >= ALT_FIRST_P && l.edge >= 0).sort((a, b) => b.p - a.p || b.edge - a.edge);
+    return dedupe(first.concat(modePool(ok)));
+  }
+  return modePool(ok);
+}
+function modePool(ok) {
   // Most likely to hit: the highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+)
   // Alt lines join when fairly priced (edge 0+): a slip holds one leg per player and market, so the likelier of the main line
   // and its alt line wins (e.g. 3+ receptions at 84% over Over 4.5 at 58%)
@@ -536,7 +546,7 @@ function sugPool() {
 }
 const dedupe = (xs) => { const seen = new Set(); return xs.filter((l) => !seen.has(l.id) && seen.add(l.id)); };
 function buildSlips(size, n = 6) {
-  const pool = sugPool(), out = [], used = new Set();
+  const pool = sugPool(size), out = [], used = new Set();
   const nG = new Set(pool.map((l) => l.game)).size, one = state.game !== 'all' || nG === 1;   // a window can hold just one game
   // across games: 1 leg per game, more only when the scope has too few games to fill the slip (max 3 per game)
   const perGame = one ? size : Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / nG)));
@@ -737,7 +747,7 @@ function renderParlay() {
       seg.append(b);
     }
     const mk = !PS.kinds.size ? '' : ` Only ${kindsName()} legs (market filter).`;
-    md.append(seg, el('span', 'dim sugbest', (PS.mode === 'likely' ? 'Highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+ chance, no flags).' : 'Biggest edge first (edge 3+ pts, 55%+ chance), then near-value legs.') + mk));
+    md.append(seg, el('span', 'dim sugbest', (PS.mode === 'likely' ? 'Highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+ chance, no flags).' : 'Biggest edge first (edge 3+ pts, 55%+ chance), then near-value legs.') + ' Slips of 3+ legs start with alternate lines that are 70%+ likely and fairly priced.' + mk));
     sl.append(md);
   }
   if (SG.sizes.length) {

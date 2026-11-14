@@ -70,7 +70,14 @@ def nfl_pools(legs):
                     key=lambda L: (-L['p'], -L['edge']))
     v = sorted([L for L in legs if ok(L) and L['p'] >= 0.55 and L['edge'] >= 0.03], key=lambda L: -L['edge'])
     nv = sorted([L for L in legs if ok(L) and not (L['p'] >= 0.55 and L['edge'] >= 0.03) and L['p'] >= 0.52 and L['edge'] >= 0.015], key=lambda L: -L['edge'])
-    return {'value': dedupe([safer(L) for L in v + nv]), 'likely': dedupe(likely)}
+    pools = {'value': dedupe([safer(L) for L in v + nv]), 'likely': dedupe(likely)}
+    # 3+ leg slips lead with alternate lines that are 70%+ and fairly priced, likeliest first (Thomas, 2026-11-13: bigger
+    # parlays should be built from alt lines so each leg is likely to hit); the mode's own pool fills in after them
+    pools['_alt_first'] = sorted([L for L in legs if L.get('alt') and ok(L) and L['p'] >= ALT_FIRST_P and L['edge'] >= 0], key=lambda L: (-L['p'], -L['edge']))
+    return pools
+
+
+ALT_FIRST_P, ALT_FIRST_SIZE = 0.70, 3
 
 
 def nfl_build(pool, size, n=6):
@@ -97,7 +104,12 @@ def nfl_build(pool, size, n=6):
 
 
 def nfl_suggest(legs):
-    return _pack(nfl_pools(legs), nfl_build)
+    pools = nfl_pools(legs); alt_first = pools.pop('_alt_first')
+    def builder(pool, size, n=6):
+        if size >= ALT_FIRST_SIZE:
+            seen = set(); pool = [L for L in alt_first + pool if not (L['id'] in seen or seen.add(L['id']))]
+        return nfl_build(pool, size, n)
+    return _pack(pools, builder)
 
 
 def _name(L): return L['label'] if L['kind'] == 'Game' or not L.get('who') else f"{L['who']} {L['label']}"
