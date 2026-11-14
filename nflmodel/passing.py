@@ -109,11 +109,14 @@ def predict(b, df):
     return apply(b, design(df))
 
 
-def current(q, season, week, teams, out_names=()):
+def current(q, season, week, teams, out_names=(), listed=None):
     """Expected starter per team for (season, week), with form through his latest start.
 
     Starter = the QB with the most attempts in the team's latest game this season, unless he is ACT-less
-    (not on the week's active roster) or named Out; then the team's next most recent starter."""
+    (not on the week's active roster) or named Out; then the team's next most recent starter.
+    listed: {team: set of name keys} of QBs DraftKings posts a passing-yards prop for. An active QB on the team
+    who is listed comes first, even if he has never started for it (a QB just traded or signed, e.g. Jacoby
+    Brissett to BAL in week 10 2026): his form comes from his starts for his old team, and new_team marks the move."""
     from .roster import _load as _load_extra
     ros = _load_extra('roster', season)
     act = ros[(ros.week == week) & (ros.status == 'ACT') & (ros.position == 'QB')][['gsis_id', 'team']].rename(columns={'gsis_id': 'pid', 'team': 'posteam'})
@@ -124,6 +127,11 @@ def current(q, season, week, teams, out_names=()):
         tq = s[(s.season == season) & (s.posteam == t)].sort_values('gameday')
         cands = list(dict.fromkeys(tq.pid[::-1]))          # most recent starters first
         okp = set(act[act.posteam == t].pid)
+        if listed and listed.get(t):
+            from .touchdowns import _key
+            nm = s.sort_values('gameday').groupby('pid').name.last()
+            dk = [p for p in okp if p in nm.index and _key(pd.Series([nm[p]])).iloc[0] in listed[t]]
+            cands = [p for p in cands if p in dk] + [p for p in dk if p not in cands] + [p for p in cands if p not in dk]
         pick = next((p for p in cands if p in okp and s[s.pid == p].name.iloc[-1] not in out_names), None)
         if pick is None:
             continue
