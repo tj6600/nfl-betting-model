@@ -153,17 +153,43 @@ def _inv(q):   # standard normal quantile by bisection
     return (lo + hi) / 2
 LEGS = {}
 PARLAY_BOOKS = ['DraftKings']
-def add_leg(lid, book, price, **kw):
+# DraftKings outcome ids ("sid", pulled with includeSids, no extra credits) so a slip can open in the DraftKings betslip
+# with its legs loaded: https://sportsbook.draftkings.com/?outcomes=<sid>+<sid> (same link as the NBA and NHL pages)
+SID = {}
+_PK = {'player_rush_yds': 'rush', 'player_reception_yds': 'rec', 'player_pass_yds': 'pass', 'player_receptions': 'recs'}
+_AK = {'player_rush_yds_alternate': 'rush', 'player_reception_yds_alternate': 'rec', 'player_receptions_alternate': 'recs', 'player_pass_yds_alternate': 'pass'}
+_pt = lambda v: None if v is None or v != v else round(float(v), 1)
+for pre in ['anytime_td', 'yards', 'recs', 'altyards', 'altrecs', 'altpass']:
+    fs = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'props', f'{pre}_*.json')))
+    if not fs: continue
+    for e in json.load(open(fs[-1])):
+        h, a = TEAMS.get(e['home_team']), TEAMS.get(e['away_team'])
+        for bk in e.get('bookmakers', []):
+            if bk.get('key') != 'draftkings': continue
+            for m in bk['markets']:
+                for o in m['outcomes']:
+                    if not o.get('sid') or not o.get('description'): continue
+                    k = T._key(pd.Series([o['description']])).iloc[0]
+                    if m['key'] == 'player_anytime_td' and o.get('name', 'Yes') == 'Yes': SID[('td', h, a, k)] = o['sid']
+                    elif m['key'] in _PK: SID[('y', h, a, _PK[m['key']], k, o['name'], _pt(o.get('point')))] = o['sid']
+                    elif m['key'] in _AK and o.get('name') == 'Over': SID[('m', h, a, _AK[m['key']], k, _pt(o.get('point')))] = o['sid']
+
+
+def add_leg(lid, book, price, sk=None, **kw):
     if book not in PARLAY_BOOKS: return
     l = LEGS.setdefault(lid, dict(id=lid, offers={}, bps=[], **kw))
     if book in l['offers']: return
     l['offers'][book] = int(price)
+    if book == 'DraftKings' and sk is not None and SID.get(sk): l['sid'] = SID[sk]
     if kw.get('bp') == kw.get('bp') and kw.get('bp') is not None: l['bps'].append(kw['bp'])
 
 # game lines: rebuild the model's margin and total from the picks file, then price every DraftKings/FanDuel number
 gp = pd.read_csv(os.path.join(ROOT, 'odds_log', 'picks', f'{season}_wk{week:02d}.csv'))
 snapf = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'snapshots', '*.csv')))[-1]
 SN = pd.read_csv(snapf); SN = SN[SN.book.isin(['draftkings', 'fanduel'])]
+if 'sid' in SN:
+    for x in SN[(SN.book == 'draftkings') & SN.sid.notna()].itertuples():
+        SID[('g', x.home_team, x.away_team, x.market, x.side, None if x.market == 'moneyline' else _pt(x.point))] = x.sid
 sdm, sdt, GM = [], [], {}
 for game, gg in gp.groupby('game'):
     away, home = game.split(' @ ')
@@ -202,7 +228,7 @@ for (home, away, book, market), bg in SN.groupby(['home_team', 'away_team', 'boo
             grp, gt, sl = f'g-{gi["game_id"]}-tot-{x.point:g}', f'{game} total {x.point:g}', x.side
         bp = _imp(x.price) / (_imp(x.price) + _imp(other.price.iloc[0])) if len(other) else np.nan
         cat = gp[(gp.game == game) & (gp.market == market) & (gp.side == x.side)].category
-        add_leg(lid, bk, x.price, game=game, kind='Game', who=game, label=lab, grp=grp, gt=gt, sl=sl, model=float(model), bp=bp,
+        add_leg(lid, bk, x.price, sk=('g', home, away, market, x.side, None if market == 'moneyline' else _pt(x.point)), game=game, kind='Game', who=game, label=lab, grp=grp, gt=gt, sl=sl, model=float(model), bp=bp,
                 cat=_cat(cat.iloc[0]) if len(cat) else '', key=f'{game}-{market}', flag='')
 # touchdowns: one number, so only the price differs by book
 for r in A.itertuples():
@@ -211,7 +237,7 @@ for r in A.itertuples():
     bks = O[(O.home == home) & (O.away == away) & (O.k == k) & O.book.isin(['DraftKings', 'FanDuel'])]
     flag = 'Check role' if r.category == 'Check role' else ('small role' if r.h_carries + r.h_targets < 3 else '')
     for b in bks.itertuples():
-        add_leg(f't-{r.pid}', b.book, b.price, game=r.game, kind='TD', who=r.full_name, pid=r.pid, label='anytime TD', grp=f't-{r.pid}', gt=f'{r.full_name} anytime TD', sl='Yes', team=r.posteam, model=float(r.model_prob),
+        add_leg(f't-{r.pid}', b.book, b.price, sk=('td', home, away, k), game=r.game, kind='TD', who=r.full_name, pid=r.pid, label='anytime TD', grp=f't-{r.pid}', gt=f'{r.full_name} anytime TD', sl='Yes', team=r.posteam, model=float(r.model_prob),
                 bp=float(r.book_prob) if r.book_prob == r.book_prob else np.nan, cat=_cat(r.category), key=f'td-{r.pid}', flag=flag)
 # yards over/unders: each book's own number, with the model's chance at that number (scripts/yards_picks.py)
 yb = yf.replace('_yards.csv', '_yards_books.csv')
@@ -223,7 +249,8 @@ if os.path.exists(yb):
         m = base.iloc[0]; kind = r.kind.title()   # Rush, Rec, Pass, Recs (receptions)
         unit = 'receptions' if r.kind == 'recs' else f'{kind.lower()} yds'
         flag = 'Check role' if m.category == 'Check role' else ('' if m.regular else 'small role')
-        add_leg(f'y-{r.pid}-{kind}-{r.side}-{r.point:g}', r.book, r.price, game=m.game, kind=kind, who=m.player, team=m.team,
+        ya, yh = m.game.split(' @ ')
+        add_leg(f'y-{r.pid}-{kind}-{r.side}-{r.point:g}', r.book, r.price, sk=('y', yh, ya, r.kind, T._key(pd.Series([m.player])).iloc[0], r.side, _pt(r.point)), game=m.game, kind=kind, who=m.player, team=m.team,
                 label=f'{r.side} {r.point:g} {unit}', model=float(r.model_only),
                 pid=r.pid, grp=f'y-{r.pid}-{kind}-{r.point:g}', gt=f'{m.player} {r.point:g} {unit}', sl=r.side,
                 bp=float(r.book_p) if r.book_p == r.book_p else float(m.market_prob), cat=_cat(m.category) if m.best_line == r.point else '',
@@ -240,7 +267,8 @@ if os.path.exists(mb):
         kind = r.kind.title()   # Rush, Rec, Recs: the same key as the player's main line, so a slip holds one or the other
         unit = 'receptions' if r.kind == 'recs' else f'{kind.lower()} yds'
         flag = 'Check role' if m.risky else ('' if m.regular else 'small role')
-        add_leg(f'm-{r.pid}-{kind}-{r.milestone}', r.book, r.price, game=m.game, kind='Milestone', who=m.player, team=m.team,
+        ma, mh = m.game.split(' @ ')
+        add_leg(f'm-{r.pid}-{kind}-{r.milestone}', r.book, r.price, sk=('m', mh, ma, r.kind, T._key(pd.Series([m.player])).iloc[0], _pt(r.milestone - 0.5)), game=m.game, kind='Milestone', who=m.player, team=m.team,
                 label=f'{r.milestone}+ {unit}', model=float(m.model_only), alt=True, main=float(m.main_line) if m.main_line == m.main_line else None,
                 pid=r.pid, grp=f'm-{r.pid}-{kind}', gt=f'{m.player} alt {unit}', sl=f'{r.milestone}+', bp=float(m.book_prob), cat=_cat(m.category),
                 key=f'{r.pid}-{kind}', flag=flag)
@@ -260,6 +288,7 @@ for l in LEGS.values():
              ev=round(pp * d - 1, 4), edge=round(pp - 1 / d, 4))
     legs.append(l)
 D['legs'] = legs
+print(sum(1 for l in legs if l.get('sid')), 'of', len(legs), 'legs have a DraftKings betslip id')
 # season game logs for every player on the board (play-by-play derived; weeks his team played without him show as DNP)
 H = T.history(); H = H[H.season == season]
 pids = {l['pid'] for l in legs if l.get('pid')} | {p['id'] for p in out} | {y['pid'] for y in D.get('yards', [])}

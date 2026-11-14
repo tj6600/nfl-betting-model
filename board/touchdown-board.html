@@ -1050,6 +1050,15 @@ function renderParlay() {
       r.append(left, right, x); lsx.append(r);
     }
     sl.append(lsx);
+    // DraftKings betslip link: every leg's DraftKings outcome id, so the slip opens in DraftKings ready to place (as on NBA/NHL)
+    const sids = m.ls.map((l) => l.sid).filter(Boolean);
+    const dk = el('div', 'dkrow');
+    if (sids.length) {
+      const a = el('a', 'lnk sugb dkbtn', sids.length === m.ls.length ? 'Open in DraftKings' : `Open ${sids.length} of ${m.ls.length} legs in DraftKings`);
+      a.href = 'https://sportsbook.draftkings.com/?outcomes=' + sids.map(encodeURIComponent).join('+'); a.target = '_blank'; a.rel = 'noopener';
+      dk.append(a, el('span', 'dim', sids.length === m.ls.length ? 'Loads these legs into your DraftKings betslip. Sign in, check the prices, and place it.' : 'The other legs have no DraftKings link on this pull; add them by hand.'));
+    } else dk.append(el('span', 'dim', 'No DraftKings link for these legs yet: links come with the next odds pull.'));
+    sl.append(dk);
     if (m.book) {
       const pl = el('div', 'placeat'); pl.append(el('b', null, `Place at ${m.book}: ${fmtOdds(amer(m.dBook))}`),
         el('span', null, 'Every leg priced at DraftKings\' current number. DraftKings may boost or trim the payout on its slip; if so, enter what it shows below.'));
