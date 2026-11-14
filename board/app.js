@@ -523,12 +523,13 @@ const SS = { size: null, idx: -1 };
 try { SS.size = +localStorage.getItem('props-legs') || null; } catch (e) {}
 let SAVED = []; try { SAVED = JSON.parse(localStorage.getItem('props-saved') || '[]').map((s) => ({ ...s, legs: s.legs.filter((id) => LEG[id]) })).filter((s) => s.legs.length); } catch (e) { SAVED = []; }
 const saveSaved = () => { try { localStorage.setItem('props-saved', JSON.stringify(SAVED)); } catch (e) {} };
-// 3+ leg slips lead with alternate lines that are 70%+ and fairly priced (edge 0+), likeliest first, so bigger parlays are
-// built from legs that are likely to hit; the chosen mode's own pool fills in after them (same rule in parlays.py)
+// "Most likely to hit": 3+ leg slips lead with alternate lines that are 70%+ and fairly priced (edge 0+), likeliest first, so
+// bigger parlays are built from legs that are likely to hit; the likely pool fills in after them (same rule in parlays.py).
+// "Best value" is unchanged.
 const ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3;
 function sugPool(size = 1) {
   const ok = (l) => inScope(l) && !l.flag && l.offers.DraftKings != null && kindOk(l);
-  if (size >= ALT_FIRST_SIZE) {
+  if (PS.mode === 'likely' && size >= ALT_FIRST_SIZE) {
     const first = LEGS.filter((l) => l.alt && ok(l) && l.p >= ALT_FIRST_P && l.edge >= 0).sort((a, b) => b.p - a.p || b.edge - a.edge);
     return dedupe(first.concat(modePool(ok)));
   }
@@ -747,7 +748,7 @@ function renderParlay() {
       seg.append(b);
     }
     const mk = !PS.kinds.size ? '' : ` Only ${kindsName()} legs (market filter).`;
-    md.append(seg, el('span', 'dim sugbest', (PS.mode === 'likely' ? 'Highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+ chance, no flags).' : 'Biggest edge first (edge 3+ pts, 55%+ chance), then near-value legs.') + ' Slips of 3+ legs start with alternate lines that are 70%+ likely and fairly priced.' + mk));
+    md.append(seg, el('span', 'dim sugbest', (PS.mode === 'likely' ? 'Highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+ chance, no flags). Slips of 3+ legs start with alternate lines that are 70%+ likely and fairly priced.' : 'Biggest edge first (edge 3+ pts, 55%+ chance), then near-value legs.') + mk));
     sl.append(md);
   }
   if (SG.sizes.length) {

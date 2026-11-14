@@ -350,13 +350,6 @@ for b in PARLAY_BOOKS:
     print(f'suggested at {b}: EV {sug[-1][0]:+.1%}, hit {sug[-1][4]:.1%}, decimal {sug[-1][5]:.2f}:', list(X.label + ' ' + X.who.where(X.kind != 'Game', '')))
 best = max(sug)
 D['suggested'] = dict(book=best[2], ids=best[3])
-# the headline 4-leg suggestion follows the builder's rule for 3+ legs: alternate lines that are 70%+ and fairly priced
-# lead (one per game), filled out by the value legs above
-import parlays as _PZ
-_alt = _PZ.nfl_suggest(legs)['value']['slips'].get('4')
-if _alt:
-    D['suggested'] = dict(book='DraftKings', ids=[L['id'] for L in _alt[0]])
-    print('suggested (alt-first, 4 legs):', [L['label'] for L in _alt[0]])
 
 # save this week's picks and suggested parlays (same rules as the Parlay builder), then grade every finished week for the
 # Model record tab (nflmodel/record.py: free nflverse scores and stats, DraftKings prices)
