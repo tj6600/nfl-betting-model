@@ -96,7 +96,7 @@ def results(want):
 
 
 MKT = {'Game': 'Game lines', 'TD': 'Anytime TDs', 'Rush': 'Yards and receptions', 'Rec': 'Yards and receptions',
-       'Recs': 'Yards and receptions', 'Pass': 'Yards and receptions', 'Milestone': 'Alt lines'}
+       'Recs': 'Yards and receptions', 'Pass': 'Yards and receptions'}
 
 
 def record():
@@ -121,6 +121,7 @@ def record():
         for l in ls:
             r = res.get((day, l['id']))
             if l['cat'] == 'Check role': continue   # a warning, not a pick
+            if l['kind'] == 'Milestone': continue   # alt lines aren't counted; the main over/under covers the player (Thomas, 2026-11-14)
             if r in ('win', 'loss'):
                 rows.append(dict(cat=l['cat'], mkt=MKT.get(l['kind'], l['kind']), won=r == 'win', p=l['p'],
                                  units=PZ.dec(l['price']) - 1 if r == 'win' else -1.0))
