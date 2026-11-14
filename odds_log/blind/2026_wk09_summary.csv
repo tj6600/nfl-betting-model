@@ -1,0 +1,7 @@
+test,group,picks,right,wrong,expected,hit
+Touchdowns,Likely (50%+),14,8,6,8.4,0.571
+Touchdowns,Good chance (35-50%),17,6,11,7.1,0.353
+Rushing yards,All leans,38,23,15,25.4,0.605
+Rushing yards,Confident leans (57%+),31,19,12,21.5,0.613
+Receiving yards,All leans,136,87,49,85.8,0.64
+Receiving yards,Confident leans (57%+),95,65,30,64.0,0.684
