@@ -27,7 +27,7 @@ def fetch(api_key=None):
     if not key:
         raise SystemExit('ODDS_API_KEY is not set. Add it to the cloud environment as an environment variable.')
     q = urllib.parse.urlencode({'apiKey': key, 'regions': 'us', 'markets': 'h2h,spreads,totals',
-                                'oddsFormat': 'american', 'dateFormat': 'iso'})
+                                'oddsFormat': 'american', 'dateFormat': 'iso', 'includeSids': 'true'})
     with urllib.request.urlopen(f'{API}?{q}', timeout=60) as r:
         remaining = r.headers.get('x-requests-remaining')
         events = json.loads(r.read())
@@ -47,7 +47,7 @@ def to_rows(events, taken_at):
                     rows.append({'taken_at': taken_at, 'event_id': ev['id'], 'kickoff': ev['commence_time'],
                                  'home_team': home, 'away_team': away, 'book': bk['key'],
                                  'market': {'h2h': 'moneyline', 'spreads': 'spread', 'totals': 'total'}[mk['key']],
-                                 'side': side, 'point': oc.get('point'), 'price': oc.get('price')})
+                                 'side': side, 'point': oc.get('point'), 'price': oc.get('price'), 'sid': oc.get('sid')})
     df = pd.DataFrame(rows)
     if len(df):
         cons = (df.groupby(['taken_at', 'event_id', 'kickoff', 'home_team', 'away_team', 'market', 'side'], dropna=False)
@@ -90,7 +90,8 @@ def props_snapshot(days=8, markets='player_anytime_td', prefix='anytime_td'):
     soon = [e for e in events if dt.datetime.fromisoformat(e['commence_time'].replace('Z', '+00:00')) < now + dt.timedelta(days=days)]
     out, remaining = [], None
     for e in soon:
-        q = urllib.parse.urlencode({'apiKey': key, 'regions': 'us', 'markets': markets, 'oddsFormat': 'american'})
+        # includeSids: each outcome's sportsbook id (free), so the board can open a DraftKings betslip with the legs loaded
+        q = urllib.parse.urlencode({'apiKey': key, 'regions': 'us', 'markets': markets, 'oddsFormat': 'american', 'includeSids': 'true'})
         with urllib.request.urlopen(f"{base}/events/{e['id']}/odds?{q}", timeout=60) as r:
             remaining = r.headers.get('x-requests-remaining'); out.append(json.loads(r.read()))
     d = os.path.join(os.path.dirname(SNAP_DIR), 'props'); os.makedirs(d, exist_ok=True)

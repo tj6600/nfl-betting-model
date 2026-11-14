@@ -523,8 +523,19 @@ const SS = { size: null, idx: -1 };
 try { SS.size = +localStorage.getItem('props-legs') || null; } catch (e) {}
 let SAVED = []; try { SAVED = JSON.parse(localStorage.getItem('props-saved') || '[]').map((s) => ({ ...s, legs: s.legs.filter((id) => LEG[id]) })).filter((s) => s.legs.length); } catch (e) { SAVED = []; }
 const saveSaved = () => { try { localStorage.setItem('props-saved', JSON.stringify(SAVED)); } catch (e) {} };
-function sugPool() {
+// "Most likely to hit": 3+ leg slips lead with alternate lines that are 70%+ and fairly priced (edge 0+), likeliest first, so
+// bigger parlays are built from legs that are likely to hit; the likely pool fills in after them (same rule in parlays.py).
+// "Best value" is unchanged.
+const ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3;
+function sugPool(size = 1) {
   const ok = (l) => inScope(l) && !l.flag && l.offers.DraftKings != null && kindOk(l);
+  if (PS.mode === 'likely' && size >= ALT_FIRST_SIZE) {
+    const first = LEGS.filter((l) => l.alt && ok(l) && l.p >= ALT_FIRST_P && l.edge >= 0).sort((a, b) => b.p - a.p || b.edge - a.edge);
+    return dedupe(first.concat(modePool(ok)));
+  }
+  return modePool(ok);
+}
+function modePool(ok) {
   // Most likely to hit: the highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+)
   // Alt lines join when fairly priced (edge 0+): a slip holds one leg per player and market, so the likelier of the main line
   // and its alt line wins (e.g. 3+ receptions at 84% over Over 4.5 at 58%)
@@ -536,7 +547,7 @@ function sugPool() {
 }
 const dedupe = (xs) => { const seen = new Set(); return xs.filter((l) => !seen.has(l.id) && seen.add(l.id)); };
 function buildSlips(size, n = 6) {
-  const pool = sugPool(), out = [], used = new Set();
+  const pool = sugPool(size), out = [], used = new Set();
   const nG = new Set(pool.map((l) => l.game)).size, one = state.game !== 'all' || nG === 1;   // a window can hold just one game
   // across games: 1 leg per game, more only when the scope has too few games to fill the slip (max 3 per game)
   const perGame = one ? size : Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / nG)));
@@ -737,7 +748,7 @@ function renderParlay() {
       seg.append(b);
     }
     const mk = !PS.kinds.size ? '' : ` Only ${kindsName()} legs (market filter).`;
-    md.append(seg, el('span', 'dim sugbest', (PS.mode === 'likely' ? 'Highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+ chance, no flags).' : 'Biggest edge first (edge 3+ pts, 55%+ chance), then near-value legs.') + mk));
+    md.append(seg, el('span', 'dim sugbest', (PS.mode === 'likely' ? 'Highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+ chance, no flags). Slips of 3+ legs start with alternate lines that are 70%+ likely and fairly priced.' : 'Biggest edge first (edge 3+ pts, 55%+ chance), then near-value legs.') + mk));
     sl.append(md);
   }
   if (SG.sizes.length) {
@@ -776,6 +787,15 @@ function renderParlay() {
       r.append(left, right, x); lsx.append(r);
     }
     sl.append(lsx);
+    // DraftKings betslip link: every leg's DraftKings outcome id, so the slip opens in DraftKings ready to place (as on NBA/NHL)
+    const sids = m.ls.map((l) => l.sid).filter(Boolean);
+    const dk = el('div', 'dkrow');
+    if (sids.length) {
+      const a = el('a', 'lnk sugb dkbtn', sids.length === m.ls.length ? 'Open in DraftKings' : `Open ${sids.length} of ${m.ls.length} legs in DraftKings`);
+      a.href = 'https://sportsbook.draftkings.com/?outcomes=' + sids.map(encodeURIComponent).join('+'); a.target = '_blank'; a.rel = 'noopener';
+      dk.append(a, el('span', 'dim', sids.length === m.ls.length ? 'Loads these legs into your DraftKings betslip. Sign in, check the prices, and place it.' : 'The other legs have no DraftKings link on this pull; add them by hand.'));
+    } else dk.append(el('span', 'dim', 'No DraftKings link for these legs yet: links come with the next odds pull.'));
+    sl.append(dk);
     if (m.book) {
       const pl = el('div', 'placeat'); pl.append(el('b', null, `Place at ${m.book}: ${fmtOdds(amer(m.dBook))}`),
         el('span', null, 'Every leg priced at DraftKings\' current number. DraftKings may boost or trim the payout on its slip; if so, enter what it shows below.'));
