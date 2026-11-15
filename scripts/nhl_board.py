@@ -257,7 +257,7 @@ if legs and not args.no_log:
     # suggested parlays as the page builds them (both modes, every leg count), graded by scripts/nhl_grade.py
     import parlays as PZ
     PZ.log(O.DIR, day, stamp, legs, [l['id'] for l in pool],
-           lambda L: (L['edge'] >= 1 or L.get('pick')) and L['p'] >= 0.55 and L['price'] >= -200 and not L['flags'], no_sgp={'Saves'})
+           lambda L: (L['edge'] >= 1 or L.get('pick')) and L['p'] >= 0.55 and L['price'] >= -200 and not L['flags'], no_sgp={'Saves', 'Alt saves'})
 
 # ---------- backtest summary for the Model record tab ----------
 bt = {}

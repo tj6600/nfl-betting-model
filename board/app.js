@@ -380,7 +380,7 @@ function renderRecord() {
     const hd = el('tr'); ['', 'Won–lost', 'Hit', 'Expected', 'Units', 'ROI'].forEach((x) => hd.append(el('th', x ? 'num' : null, x))); tbody.append(hd);
     for (const r of rows) {
       const tr = el('tr');
-      [[r.group.replace(' (all 6 suggestions)', '')], [`${r.won}–${r.lost}`, 'num'], [`${(r.hit * 100).toFixed(0)}%`, 'num'], [r.exp_hit < 0.01 ? '<1%' : `${(r.exp_hit * 100).toFixed(0)}%`, 'num dim'],
+      [[r.group.replace(' (all suggestions)', '')], [`${r.won}–${r.lost}`, 'num'], [`${(r.hit * 100).toFixed(0)}%`, 'num'], [r.exp_hit < 0.01 ? '<1%' : `${(r.exp_hit * 100).toFixed(0)}%`, 'num dim'],
         [sg(r.units), 'num ' + (r.units >= 0 ? 'pos' : 'neg')], [`${r.roi >= 0 ? '+' : ''}${(r.roi * 100).toFixed(0)}%`, 'num ' + (r.roi >= 0 ? 'pos' : 'neg')]]
         .forEach(([v, cls]) => tr.append(el('td', cls || null, v)));
       tbody.append(tr);
@@ -398,7 +398,7 @@ function renderRecord() {
     board.append(tiles);
   }
   if (R.picks.length) board.append(mk('Board picks', '1 unit each at DraftKings', R.picks));
-  if (R.parlays.groups.length) board.append(mk('Suggested parlays', 'all 6 suggestions at each size, 1 unit each', R.parlays.groups));
+  if (R.parlays.groups.length) board.append(mk('Suggested parlays', 'every suggestion at each size (up to 6 a week), 1 unit each', R.parlays.groups));
   if ((R.legs || []).length) board.append(mk('Legs in suggested parlays', 'each leg the suggestions chose, as a 1-unit straight bet at DraftKings', R.legs));
   const bt = el('section', 'col'); const bh = el('div', 'colhead'); bh.append(el('h2', null, 'Backtests'), el('span', null, 'before live tracking')); bt.append(bh);
   const ul = el('ul', 'notes');
@@ -548,25 +548,47 @@ function modePool(ok) {
   return dedupe(v.concat(nv).map(safer));
 }
 const dedupe = (xs) => { const seen = new Set(); return xs.filter((l) => !seen.has(l.id) && seen.add(l.id)); };
+// market family, for mixing markets within a slip (alt and main lines of a stat are one family)
+function fam(L) {
+  if (L.kind === 'Milestone') return (L.key || '').split('-').pop().toLowerCase();
+  let k = L.kind.toLowerCase(); if (k.startsWith('alt ')) k = k.slice(4);
+  return k === 'shots on goal' ? 'shots' : k;
+}
+// up to n slips: at most half of a slip from one market family when the pool allows; legs are used once across the
+// suggestions first, then (least-used first) a leg may appear in up to 3, so each size shows n different slips
+// whenever the pool allows. Same rule as parlays.py many(). pick(pool, size, allowed, cap) -> array of legs or null
+function many(pool, size, n, pick) {
+  const out = [], uses = {}, seen = new Set(), cap = size < 2 ? size : Math.ceil(size / 2);
+  for (let s = 0; s < n; s++) {
+    let slip = null;
+    for (const [mx, c] of [[0, cap], [0, size], [1, cap], [1, size], [2, cap], [2, size]]) {
+      const cand = mx ? pool.map((L, i) => [L, i]).sort((a, b) => (uses[a[0].id] || 0) - (uses[b[0].id] || 0) || a[1] - b[1]).map((x) => x[0]) : pool;
+      const t = pick(cand, size, (L) => (uses[L.id] || 0) <= mx, c);
+      if (t && !seen.has(t.map((L) => L.id).sort().join('|'))) { slip = t; break; }
+    }
+    if (!slip) break;
+    seen.add(slip.map((L) => L.id).sort().join('|')); out.push(slip.map((L) => L.id));
+    slip.forEach((L) => { uses[L.id] = (uses[L.id] || 0) + 1; });
+  }
+  return out;
+}
 function buildSlips(size, n = 6) {
-  const pool = sugPool(size), out = [], used = new Set();
+  const pool = sugPool(size);
   const nG = new Set(pool.map((l) => l.game)).size, one = state.game !== 'all' || nG === 1;   // a window can hold just one game
   // across games: 1 leg per game, more only when the scope has too few games to fill the slip (max 3 per game)
   const perGame = one ? size : Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / nG)));
-  for (let s = 0; s < n; s++) {
-    const pick = [], g = {}, gl = {}, team = {};
+  return many(pool, size, n, (pool, size, allowed, cap) => {
+    const pick = [], g = {}, gl = {}, team = {}, fm = {};
     for (const l of pool) {
-      if (pick.length >= size) break;
-      if (used.has(l.id) || (g[l.game] || 0) >= perGame) continue;
+      if (!allowed(l) || (g[l.game] || 0) >= perGame || (fm[fam(l)] || 0) >= cap) continue;
       if (pick.some((x) => x.key === l.key || (x.kind !== 'Game' && l.kind !== 'Game' && x.who === l.who))) continue;
       if (l.kind === 'Game') { if (gl[l.game]) continue; gl[l.game] = 1; }
       else if (one && size <= 3) { const t = l.team || ''; if ((team[t] || 0) >= 2) continue; team[t] = (team[t] || 0) + 1; }
-      pick.push(l); g[l.game] = (g[l.game] || 0) + 1;
+      pick.push(l); g[l.game] = (g[l.game] || 0) + 1; fm[fam(l)] = (fm[fam(l)] || 0) + 1;
+      if (pick.length >= size) return pick;
     }
-    if (pick.length < size) break;
-    pick.forEach((l) => used.add(l.id)); out.push(pick.map((l) => l.id));
-  }
-  return out;
+    return null;
+  });
 }
 // Kelly bankroll growth of a slip at DraftKings, each leg's chance cut 2 points for model error
 function growth(ids) {
