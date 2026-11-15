@@ -17,7 +17,7 @@ URL = 'https://github.com/nflverse/nflverse-data/releases/download/stats_player/
 CACHE = os.environ.get('NFL_STATS_DIR', os.path.join(os.path.dirname(__file__), '..', 'data'))
 HALF, DEF_HALF, MIN_ATT = 6.0, 8.0, 15
 COLS = ['player_id', 'player_display_name', 'position', 'season', 'week', 'season_type', 'game_id', 'team', 'opponent_team',
-        'attempts', 'completions', 'passing_yards', 'sacks_suffered', 'carries']
+        'attempts', 'completions', 'passing_yards', 'sacks_suffered', 'carries', 'passing_tds', 'passing_interceptions']
 
 
 def load(seasons):
