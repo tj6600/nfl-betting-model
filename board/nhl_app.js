@@ -1,4 +1,7 @@
 const D = JSON.parse(document.getElementById('nhl-data').textContent);
+// games that have started: DraftKings pulls pregame lines at the start, so their legs leave suggestions and the DraftKings link
+const STARTS = {}; (D.games || []).forEach((g) => { if (g.start) STARTS[g.game] = g.start; });
+const started = (game) => !!STARTS[game] && Date.parse(STARTS[game]) <= Date.now();
 const LEG = Object.fromEntries(D.legs.map((l) => [l.id, l]));
 const STATS = [['sog', 'Shots on goal'], ['saves', 'Goalie saves']];
 const SRC = (k) => (k === 'saves' ? D.goalies : D.players);
@@ -69,7 +72,7 @@ function many(pool, size, n, pick) {
   return out;
 }
 function buildSlips(size, n = 6) {
-  const pool = (mode === 'likely' && size >= ALT_FIRST_SIZE ? dedupe(ALT_FIRST.concat(POOL)) : POOL).filter(kindOk);
+  const pool = (mode === 'likely' && size >= ALT_FIRST_SIZE ? dedupe(ALT_FIRST.concat(POOL)) : POOL).filter((L) => kindOk(L) && !started(L.game));
   const nG = new Set(pool.map((L) => L.game)).size;
   const perGame = Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / Math.max(1, nG))));   // more per game only when the slate is too small
   return many(pool, size, n, (pool, size, allowed, cap) => {
@@ -362,12 +365,12 @@ function boardParlay() {
     [[pct(p), 'Hit chance'], [fmt(toAm(d)), 'Payout'], [sgn(Math.round(ev * 100)) + '%', 'Expected value']].forEach(([v, k]) => { const s = el('div', 'stat'); s.append(el('b', null, v), el('span', null, k)); st.append(s); });
     sl.append(st);
     // DraftKings betslip link: every leg's DraftKings outcome id, so the slip opens in DraftKings ready to place
-    const sids = legs.map((l) => l.sid).filter(Boolean);
+    const sids = legs.filter((l) => !started(l.game)).map((l) => l.sid).filter(Boolean);
     const dk = el('div', 'dkrow');
     if (sids.length) {
       const a = el('a', 'lnk sugb dkbtn', sids.length === legs.length ? 'Open in DraftKings' : `Open ${sids.length} of ${legs.length} legs in DraftKings`);
       a.href = 'https://sportsbook.draftkings.com/?outcomes=' + sids.map(encodeURIComponent).join('+'); a.target = '_blank'; a.rel = 'noopener';
-      dk.append(a, el('span', 'dim', sids.length === legs.length ? 'Loads these legs into your DraftKings betslip. Sign in, check the prices, and place it.' : 'The other legs have no DraftKings link on this pull; add them by hand.'));
+      dk.append(a, el('span', 'dim', sids.length === legs.length ? 'Loads these legs into your DraftKings betslip. Sign in, check the prices, and place it.' : 'The other legs have no DraftKings link (game started, or none on this pull); add them by hand.'));
     } else dk.append(el('span', 'dim', 'No DraftKings link for these legs yet: links come with the next odds pull.'));
     sl.append(dk);
     const games = {}; legs.forEach((l) => { games[l.game] = (games[l.game] || 0) + 1; });
@@ -377,6 +380,7 @@ function boardParlay() {
       if (bad.length) warns.push(['bad', `DraftKings won't put goalie saves in a same-game parlay: ${bad.map((l) => l.label).join(', ')} can't be combined with the other ${g} leg${n > 2 ? 's' : ''}. Keep one leg from that game.`]);
       else warns.push(['warn', `${n} legs from ${g}: DraftKings prices same-game legs together, so the real payout differs and the legs are not independent.`]);
     });
+    legs.filter((l) => started(l.game)).forEach((l) => warns.push(['bad', `${l.game} has started: DraftKings has pulled its pregame lines, so ${l.label} won't load. Swap it out.`]));
     legs.filter((l) => l.edge < 0).forEach((l) => warns.push(['bad', `${l.label} has negative edge.`]));
     legs.filter((l) => l.flags.length).forEach((l) => warns.push(['warn', `${l.label}: ${l.flags.join('; ')}.`]));
     const good = ev > 0 && !warns.some((w) => w[0] === 'bad');

@@ -257,6 +257,17 @@ if os.path.exists(yb):
                 key=f'{r.pid}-{kind}', flag=flag)
 # milestones: one number, only the price differs by book
 mb = mf.replace('_milestones.csv', '_milestones_books.csv')
+# alt ladders from an older pull than the main props (weekly runs refresh only alt passing): DraftKings has moved or
+# pulled many of those rungs, so they're flagged (kept off suggestions and the DraftKings link) with the pull date
+def _newest(prefix):
+    fs = sorted(glob.glob(os.path.join(ROOT, 'odds_log', 'props', f'{prefix}_*.json')))
+    return pd.Timestamp(re.search(r'_(\d{4}-\d\d-\d\dT\d{4})Z', fs[-1]).group(1)) if fs else None
+_main = max([t for t in (_newest('yards'), _newest('recs')) if t is not None], default=None)
+ALT_AGE = {}
+for _k, _f in [('rush', 'altyards'), ('rec', 'altyards'), ('recs', 'altrecs'), ('pass', 'altpass')]:
+    _t = _newest(_f)
+    if _t is not None and _main is not None and _main - _t > pd.Timedelta(hours=12):
+        ALT_AGE[_k] = _t.tz_localize('UTC').tz_convert('America/New_York').strftime('%b %-d')
 if os.path.exists(mb):
     Ms = pd.read_csv(mf); Ms['kind'] = Ms.market.map(MK)
     Ms = Ms.set_index(['pid', 'kind', 'milestone'])
@@ -267,6 +278,7 @@ if os.path.exists(mb):
         kind = r.kind.title()   # Rush, Rec, Recs: the same key as the player's main line, so a slip holds one or the other
         unit = 'receptions' if r.kind == 'recs' else f'{kind.lower()} yds'
         flag = 'Check role' if m.risky else ('' if m.regular else 'small role')
+        if r.kind in ALT_AGE: flag = f'old line (pulled {ALT_AGE[r.kind]})'
         ma, mh = m.game.split(' @ ')
         add_leg(f'm-{r.pid}-{kind}-{r.milestone}', r.book, r.price, sk=('m', mh, ma, r.kind, T._key(pd.Series([m.player])).iloc[0], _pt(r.milestone - 0.5)), game=m.game, kind='Milestone', who=m.player, team=m.team,
                 label=f'{r.milestone}+ {unit}', model=float(m.model_only), alt=True, main=float(m.main_line) if m.main_line == m.main_line else None,
@@ -288,6 +300,10 @@ for l in LEGS.values():
              ev=round(pp * d - 1, 4), edge=round(pp - 1 / d, 4))
     legs.append(l)
 D['legs'] = legs
+# kickoff (UTC) per game: the page drops legs from games that have started (DraftKings pulls pregame lines at kickoff)
+_wk = G[(G.season == season) & (G.week == week)]
+D['starts'] = {f'{g.away_team} @ {g.home_team}': pd.Timestamp(f'{g.gameday.date()} {g.gametime if isinstance(g.gametime, str) else "00:00"}').tz_localize('America/New_York').tz_convert('UTC').strftime('%Y-%m-%dT%H:%M:%SZ')
+               for g in _wk.itertuples()}
 print(sum(1 for l in legs if l.get('sid')), 'of', len(legs), 'legs have a DraftKings betslip id')
 # season game logs for every player on the board (play-by-play derived; weeks his team played without him show as DNP)
 H = T.history(); H = H[H.season == season]
