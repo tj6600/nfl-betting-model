@@ -529,14 +529,17 @@ const SS = { size: null, idx: -1 };
 try { SS.size = +localStorage.getItem('props-legs') || null; } catch (e) {}
 let SAVED = []; try { SAVED = JSON.parse(localStorage.getItem('props-saved') || '[]').map((s) => ({ ...s, legs: s.legs.filter((id) => LEG[id]) })).filter((s) => s.legs.length); } catch (e) { SAVED = []; }
 const saveSaved = () => { try { localStorage.setItem('props-saved', JSON.stringify(SAVED)); } catch (e) {} };
-// "Most likely to hit": 3+ leg slips lead with alternate lines that are 70%+ and fairly priced (edge 0+), likeliest first, so
+// "Most likely to hit": 3+ leg slips lead with alternate lines that are 70%+ (up to 3 pts juice, -500 or longer), likeliest first, so
 // bigger parlays are built from legs that are likely to hit; the likely pool fills in after them (same rule in parlays.py).
 // "Best value" is unchanged.
-const ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3;
+// Alt juice (Thomas, 2026-11-15): DraftKings prices 70%+ alt rungs with heavy margin, so almost none were fairly priced and
+// Most likely to hit fell back to main lines. A rung may now cost up to 3 pts of juice, but not shorter than -500, so it still pays.
+const ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3, ALT_JUICE = 0.03, ALT_MIN_PRICE = -500;
+const altFirstOk = (l) => l.p >= ALT_FIRST_P && l.edge >= -ALT_JUICE && l.offers.DraftKings >= ALT_MIN_PRICE;
 function sugPool(size = 1) {
   const ok = (l) => inScope(l) && !l.flag && l.offers.DraftKings != null && kindOk(l) && !started(l.game);
   if (PS.mode === 'likely' && size >= ALT_FIRST_SIZE) {
-    const first = LEGS.filter((l) => l.alt && ok(l) && l.p >= ALT_FIRST_P && l.edge >= 0).sort((a, b) => b.p - a.p || b.edge - a.edge);
+    const first = LEGS.filter((l) => l.alt && ok(l) && altFirstOk(l)).sort((a, b) => b.p - a.p || b.edge - a.edge);
     return dedupe(first.concat(modePool(ok)));
   }
   return modePool(ok);
@@ -776,7 +779,7 @@ function renderParlay() {
       seg.append(b);
     }
     const mk = !PS.kinds.size ? '' : ` Only ${kindsName()} legs (market filter).`;
-    md.append(seg, el('span', 'dim sugbest', (PS.mode === 'likely' ? 'Highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+ chance, no flags). Slips of 3+ legs start with alternate lines that are 70%+ likely and fairly priced.' : 'Biggest edge first (edge 3+ pts, 55%+ chance), then near-value legs.') + mk));
+    md.append(seg, el('span', 'dim sugbest', (PS.mode === 'likely' ? 'Highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+ chance, no flags). Slips of 3+ legs start with alternate lines that are 70%+ likely, cost at most 3 pts of juice and are priced -500 or longer.' : 'Biggest edge first (edge 3+ pts, 55%+ chance), then near-value legs.') + mk));
     sl.append(md);
   }
   if (SG.sizes.length) {

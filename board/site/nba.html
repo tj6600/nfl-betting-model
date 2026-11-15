@@ -320,14 +320,14 @@ const saveSlip = () => { try { localStorage.setItem('nba-slip-' + D.day, JSON.st
 // among legs that still pay more than they risk on average (edge 1+ pt) and carry no flags
 // alternate lines (alt: true, Over only, e.g. "25+ points") as in the NFL builder: a shaky Over main line (under 60%) gives way to
 // the same player's likeliest fairly priced alt line at 60%+, and Most likely to hit slips of 3+ legs lead with alt lines
-// that are 70%+ and fairly priced (edge 0+), likeliest first (scripts parlays.py suggest() uses the same rules)
-const SECURE = 0.6, ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3;
+// that are 70%+, cost at most 3 pts of juice and are priced -500 or longer, likeliest first (parlays.py uses the same rules)
+const SECURE = 0.6, ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3, ALT_JUICE = 3, ALT_MIN_PRICE = -500;   // alt rungs may cost up to 3 pts of juice, -500 or longer (Thomas, 2026-11-15)
 const ALT_BY = {};
 for (const l of D.legs) if (l.alt && !l.flags.length && l.p >= SECURE && l.edge >= 0) (ALT_BY[l.pid + '|' + l.market] = ALT_BY[l.pid + '|' + l.market] || []).push(l);
 Object.values(ALT_BY).forEach((xs) => xs.sort((a, b) => b.p - a.p));
 const safer = (l) => (l.alt || l.side !== 'Over' || l.p >= SECURE) ? l : ((ALT_BY[l.pid + '|' + l.market] || []).find((a) => a.p > l.p) || l);
 const dedupe = (xs) => { const s = new Set(); return xs.filter((l) => !s.has(l.id) && s.add(l.id)); };
-const ALT_FIRST = D.legs.filter((l) => l.alt && !l.flags.length && l.p >= ALT_FIRST_P && l.edge >= 0).sort((a, b) => b.p - a.p || b.edge - a.edge);
+const ALT_FIRST = D.legs.filter((l) => l.alt && !l.flags.length && l.p >= ALT_FIRST_P && l.edge >= -ALT_JUICE && l.price >= ALT_MIN_PRICE).sort((a, b) => b.p - a.p || b.edge - a.edge);
 const VALUE_POOL = dedupe((D.pool || []).map((id) => LEG[id]).filter(Boolean).map(safer));
 const LIKELY_POOL = dedupe(D.legs.filter((l) => l.edge >= 1 && l.p >= 0.55 && !l.flags.length).sort((a, b) => b.p - a.p || b.edge - a.edge).map(safer));
 let mode = 'value';

@@ -85,7 +85,7 @@ def _alt_tools(legs):
     def safer(L):
         if L.get('alt') or L.get('side') != 'Over' or L['p'] >= SECURE: return L
         return next((a for a in alts.get((L.get('pid'), L.get('market')), []) if a['p'] > L['p']), L)
-    first = sorted([L for L in legs if L.get('alt') and not L.get('flags') and L['p'] >= ALT_FIRST_P and L['edge'] >= 0],
+    first = sorted([L for L in legs if L.get('alt') and not L.get('flags') and L['p'] >= ALT_FIRST_P and L['edge'] >= -ALT_JUICE_PTS and L['price'] >= ALT_MIN_PRICE],
                    key=lambda L: (-L['p'], -L['edge']))
     return safer, first
 
@@ -97,7 +97,7 @@ def _dedupe(xs):
 def suggest(legs, pool_ids, likely, no_sgp=()):
     """legs: the board's legs; pool_ids: the value pool in order; likely(L) -> bool for the likely pool.
     Same as the page (board/nba_app.js, nhl_app.js): shaky Overs swap to a safer alt line, and Most likely to hit
-    slips of 3+ legs lead with alt lines that are 70%+ and fairly priced."""
+    slips of 3+ legs lead with alt lines that are 70%+ (up to 3 pts juice, -500 or longer)."""
     by = {L['id']: L for L in legs}
     safer, first = _alt_tools(legs)
     pools = {'value': _dedupe([safer(by[i]) for i in pool_ids if i in by]),
@@ -129,13 +129,16 @@ def nfl_pools(legs):
     v = sorted([L for L in legs if ok(L) and L['p'] >= 0.55 and L['edge'] >= 0.03], key=lambda L: -L['edge'])
     nv = sorted([L for L in legs if ok(L) and not (L['p'] >= 0.55 and L['edge'] >= 0.03) and L['p'] >= 0.52 and L['edge'] >= 0.015], key=lambda L: -L['edge'])
     pools = {'value': dedupe([safer(L) for L in v + nv]), 'likely': dedupe(likely)}
-    # 3+ leg slips lead with alternate lines that are 70%+ and fairly priced, likeliest first (Thomas, 2026-11-13: bigger
+    # 3+ leg slips lead with alternate lines that are 70%+ (up to 3 pts juice, -500 or longer), likeliest first (Thomas, 2026-11-13: bigger
     # 'Most likely to hit' parlays should be built from alt lines so each leg is likely to hit); the mode's own pool fills in after them
-    pools['_alt_first'] = sorted([L for L in legs if L.get('alt') and ok(L) and L['p'] >= ALT_FIRST_P and L['edge'] >= 0], key=lambda L: (-L['p'], -L['edge']))
+    pools['_alt_first'] = sorted([L for L in legs if L.get('alt') and ok(L) and L['p'] >= ALT_FIRST_P and L['edge'] >= -ALT_JUICE_PTS / 100 and L['price'] >= ALT_MIN_PRICE], key=lambda L: (-L['p'], -L['edge']))
     return pools
 
 
 ALT_FIRST_P, ALT_FIRST_SIZE = 0.70, 3
+# Thomas, 2026-11-15: DraftKings' 70%+ alt rungs are almost never fairly priced, so allow up to 3 pts of juice
+# (NBA/NHL edges are in points, NFL's are fractions), but no shorter than -500 so each rung still adds payout
+ALT_JUICE_PTS, ALT_MIN_PRICE = 3, -500
 
 
 def nfl_build(pool, size, n=6):
