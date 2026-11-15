@@ -249,6 +249,10 @@ if os.path.exists(yb):
         m = base.iloc[0]; kind = r.kind.title()   # Rush, Rec, Pass, Recs (receptions)
         unit = 'receptions' if r.kind == 'recs' else f'{kind.lower()} yds'
         flag = 'Check role' if m.category == 'Check role' else ('' if m.regular else 'small role')
+        # projection more than double or under half the line (receptions: 3+ catches apart): the books almost always know
+        # something the model can't see (role change, injury), so the leg is flagged and kept off suggestions (Thomas, 2026-11-14)
+        far = abs(m.projection - r.point) >= 3 if r.kind == 'recs' else (r.point > 0 and not 0.5 <= m.projection / r.point <= 2)
+        if far: flag = 'Check role'
         ya, yh = m.game.split(' @ ')
         add_leg(f'y-{r.pid}-{kind}-{r.side}-{r.point:g}', r.book, r.price, sk=('y', yh, ya, r.kind, T._key(pd.Series([m.player])).iloc[0], r.side, _pt(r.point)), game=m.game, kind=kind, who=m.player, team=m.team,
                 label=f'{r.side} {r.point:g} {unit}', model=float(r.model_only),
