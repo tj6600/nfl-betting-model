@@ -89,6 +89,7 @@ for g in pred.merge(slate[['game_id', 'tip']], on='game_id').itertuples():
     q = GR[(GR.home == g.home) & (GR.away == g.away)] if len(GR) else GR
     dk = q[q.book == BOOK]
     row = dict(id=int(g.game_id), game=gm, home=g.home, away=g.away, tip=pd.Timestamp(g.tip).strftime('%-I:%M %p'),
+               start=pd.Timestamp(g.tip).tz_localize('America/New_York').tz_convert('UTC').strftime('%Y-%m-%dT%H:%M:%SZ'),
                margin=round(g.margin, 1), total=round(g.total, 1), p_home=round(g.p_home, 1), p_away=round(g.p_away, 1),
                rank_home=int(teams.reset_index(drop=True).index[teams.team.values == g.home][0]) + 1,
                rank_away=int(teams.reset_index(drop=True).index[teams.team.values == g.away][0]) + 1,

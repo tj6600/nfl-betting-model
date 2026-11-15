@@ -1,4 +1,7 @@
 const D = JSON.parse(document.getElementById('td-data').textContent);
+// games that have kicked off: DraftKings pulls pregame lines at kickoff, so their legs leave suggestions and the DraftKings link
+const STARTS = D.starts || {};
+const started = (game) => !!STARTS[game] && Date.parse(STARTS[game]) <= Date.now();
 const TD = D.players.map((p) => ({ ...p, opps: p.carries + p.targets, edge: p.book == null ? null : p.model - p.book }));
 const YD = D.yards || [];
 const headStep = (p) => {
@@ -484,6 +487,7 @@ function warnings(ids) {
   for (const [g, xs] of Object.entries(byGame)) if (xs.length > 1) w.push(['warn', `${xs.length} legs from ${g}. Same-game legs move together, and this math treats them as independent. Books also price same-game parlays differently.`]);
   const byKey = {}; ls.forEach((l) => { (byKey[l.key] = byKey[l.key] || []).push(l); });
   for (const xs of Object.values(byKey)) if (xs.length > 1) w.push(['bad', `${xs.map(legName).join(' and ')} are the same bet market twice. Most books won't allow it, and the chances aren't independent.`]);
+  ls.filter((l) => started(l.game)).forEach((l) => w.push(['bad', `${l.game} has kicked off: DraftKings has pulled its pregame lines, so ${legName(l)} won't load. Swap it out.`]));
   ls.filter((l) => l.ev < 0).forEach((l) => w.push(['bad', `${legName(l)} is negative EV on its own (${(l.ev * 100).toFixed(0)}%). It drags the whole parlay down.`]));
   ls.filter((l) => l.flag).forEach((l) => w.push(['warn', `${legName(l)}: ${l.flag === 'Check role' ? 'role flag (missed time, moved down the depth chart, or the model and books disagree a lot)' : l.flag === 'season disagrees' ? `this side has hit only ${l.season} games this season, so the model may be leaning on an old role` : 'small role, so the chance is less reliable'}.`]));
   ls.filter((l) => l.p < 0.25).forEach((l) => w.push(['warn', `${legName(l)} is a long shot (${pct1(l.p)}). Most of its EV rests on the model being right about a rare event, and it cuts the parlay's hit chance a lot.`]));
@@ -530,7 +534,7 @@ const saveSaved = () => { try { localStorage.setItem('props-saved', JSON.stringi
 // "Best value" is unchanged.
 const ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3;
 function sugPool(size = 1) {
-  const ok = (l) => inScope(l) && !l.flag && l.offers.DraftKings != null && kindOk(l);
+  const ok = (l) => inScope(l) && !l.flag && l.offers.DraftKings != null && kindOk(l) && !started(l.game);
   if (PS.mode === 'likely' && size >= ALT_FIRST_SIZE) {
     const first = LEGS.filter((l) => l.alt && ok(l) && l.p >= ALT_FIRST_P && l.edge >= 0).sort((a, b) => b.p - a.p || b.edge - a.edge);
     return dedupe(first.concat(modePool(ok)));
@@ -812,12 +816,12 @@ function renderParlay() {
     }
     sl.append(lsx);
     // DraftKings betslip link: every leg's DraftKings outcome id, so the slip opens in DraftKings ready to place (as on NBA/NHL)
-    const sids = m.ls.map((l) => l.sid).filter(Boolean);
+    const sids = m.ls.filter((l) => !started(l.game)).map((l) => l.sid).filter(Boolean);
     const dk = el('div', 'dkrow');
     if (sids.length) {
       const a = el('a', 'lnk sugb dkbtn', sids.length === m.ls.length ? 'Open in DraftKings' : `Open ${sids.length} of ${m.ls.length} legs in DraftKings`);
       a.href = 'https://sportsbook.draftkings.com/?outcomes=' + sids.map(encodeURIComponent).join('+'); a.target = '_blank'; a.rel = 'noopener';
-      dk.append(a, el('span', 'dim', sids.length === m.ls.length ? 'Loads these legs into your DraftKings betslip. Sign in, check the prices, and place it.' : 'The other legs have no DraftKings link on this pull; add them by hand.'));
+      dk.append(a, el('span', 'dim', sids.length === m.ls.length ? 'Loads these legs into your DraftKings betslip. Sign in, check the prices, and place it.' : 'The other legs have no DraftKings link (game started, old alt line, or none on this pull); add them by hand.'));
     } else dk.append(el('span', 'dim', 'No DraftKings link for these legs yet: links come with the next odds pull.'));
     sl.append(dk);
     if (m.book) {

@@ -95,7 +95,7 @@ for r in slate.itertuples():
     pr = gm.probs(lh, la)
     tp = gm.total_pmf(lh, la)
     nh, na = NOTES.get((g, r.home), {}), NOTES.get((g, r.away), {})
-    row = dict(id=g, game=gm_, home=r.home, away=r.away, tip=pd.Timestamp(r.start).tz_convert(ET).strftime('%-I:%M %p'),
+    row = dict(id=g, game=gm_, home=r.home, away=r.away, tip=pd.Timestamp(r.start).tz_convert(ET).strftime('%-I:%M %p'), start=pd.Timestamp(r.start).tz_convert('UTC').strftime('%Y-%m-%dT%H:%M:%SZ'),
                xg_home=round(lh, 2), xg_away=round(la, 2), total=round(sum(t * p for t, p in tp.items()), 2),
                p_home=round(pr['home_win'], 3), gk_home=nh.get('goalie'), gk_away=na.get('goalie'),
                gk_home_ok=nh.get('confirmed', False), gk_away_ok=na.get('confirmed', False),
