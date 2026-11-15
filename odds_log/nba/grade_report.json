@@ -171,7 +171,7 @@
     "roi": -1.0
    },
    {
-    "group": "Best value: straight (all 6 suggestions)",
+    "group": "Best value: straight (all suggestions)",
     "bets": 18,
     "won": 7,
     "lost": 11,
@@ -181,7 +181,7 @@
     "roi": -0.23323554461169138
    },
    {
-    "group": "Best value: 2-leg (all 6 suggestions)",
+    "group": "Best value: 2-leg (all suggestions)",
     "bets": 18,
     "won": 2,
     "lost": 16,
@@ -191,7 +191,7 @@
     "roi": -0.6000384249755037
    },
    {
-    "group": "Best value: 3-leg (all 6 suggestions)",
+    "group": "Best value: 3-leg (all suggestions)",
     "bets": 18,
     "won": 0,
     "lost": 18,
@@ -201,7 +201,7 @@
     "roi": -1.0
    },
    {
-    "group": "Best value: 4-leg (all 6 suggestions)",
+    "group": "Best value: 4-leg (all suggestions)",
     "bets": 18,
     "won": 0,
     "lost": 18,
@@ -211,7 +211,7 @@
     "roi": -1.0
    },
    {
-    "group": "Best value: 5-leg (all 6 suggestions)",
+    "group": "Best value: 5-leg (all suggestions)",
     "bets": 18,
     "won": 0,
     "lost": 18,
@@ -221,7 +221,7 @@
     "roi": -1.0
    },
    {
-    "group": "Best value: 6-leg (all 6 suggestions)",
+    "group": "Best value: 6-leg (all suggestions)",
     "bets": 18,
     "won": 0,
     "lost": 18,
@@ -231,7 +231,7 @@
     "roi": -1.0
    },
    {
-    "group": "Best value: 11-leg (all 6 suggestions)",
+    "group": "Best value: 11-leg (all suggestions)",
     "bets": 16,
     "won": 0,
     "lost": 16,
@@ -251,7 +251,7 @@
     "roi": -1.0
    },
    {
-    "group": "Most likely to hit: straight (all 6 suggestions)",
+    "group": "Most likely to hit: straight (all suggestions)",
     "bets": 18,
     "won": 7,
     "lost": 11,
@@ -261,7 +261,7 @@
     "roi": -0.3570452131100667
    },
    {
-    "group": "Most likely to hit: 2-leg (all 6 suggestions)",
+    "group": "Most likely to hit: 2-leg (all suggestions)",
     "bets": 18,
     "won": 3,
     "lost": 15,
@@ -271,7 +271,7 @@
     "roi": -0.475958477112589
    },
    {
-    "group": "Most likely to hit: 3-leg (all 6 suggestions)",
+    "group": "Most likely to hit: 3-leg (all suggestions)",
     "bets": 18,
     "won": 1,
     "lost": 17,
@@ -281,7 +281,7 @@
     "roi": -0.7688362219002767
    },
    {
-    "group": "Most likely to hit: 4-leg (all 6 suggestions)",
+    "group": "Most likely to hit: 4-leg (all suggestions)",
     "bets": 18,
     "won": 0,
     "lost": 18,
@@ -291,7 +291,7 @@
     "roi": -1.0
    },
    {
-    "group": "Most likely to hit: 5-leg (all 6 suggestions)",
+    "group": "Most likely to hit: 5-leg (all suggestions)",
     "bets": 18,
     "won": 0,
     "lost": 18,
@@ -301,7 +301,7 @@
     "roi": -1.0
    },
    {
-    "group": "Most likely to hit: 6-leg (all 6 suggestions)",
+    "group": "Most likely to hit: 6-leg (all suggestions)",
     "bets": 18,
     "won": 0,
     "lost": 18,
@@ -311,7 +311,7 @@
     "roi": -1.0
    },
    {
-    "group": "Most likely to hit: 11-leg (all 6 suggestions)",
+    "group": "Most likely to hit: 11-leg (all suggestions)",
     "bets": 15,
     "won": 0,
     "lost": 15,

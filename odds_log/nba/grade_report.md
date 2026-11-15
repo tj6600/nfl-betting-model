@@ -19,18 +19,18 @@
 | Group | Parlays | W-L | Hit | Expected | Units | ROI |
 |---|---|---|---|---|---|---|
 | Best value: ★ suggestion | 3 | 0-3 | 0.0% | 36.6% | -3.00 | -100.0% |
-| Best value: straight (all 6 suggestions) | 18 | 7-11 | 38.9% | 60.0% | -4.20 | -23.3% |
-| Best value: 2-leg (all 6 suggestions) | 18 | 2-16 | 11.1% | 36.2% | -10.80 | -60.0% |
-| Best value: 3-leg (all 6 suggestions) | 18 | 0-18 | 0.0% | 21.6% | -18.00 | -100.0% |
-| Best value: 4-leg (all 6 suggestions) | 18 | 0-18 | 0.0% | 12.5% | -18.00 | -100.0% |
-| Best value: 5-leg (all 6 suggestions) | 18 | 0-18 | 0.0% | 7.3% | -18.00 | -100.0% |
-| Best value: 6-leg (all 6 suggestions) | 18 | 0-18 | 0.0% | 4.2% | -18.00 | -100.0% |
-| Best value: 11-leg (all 6 suggestions) | 16 | 0-16 | 0.0% | 0.3% | -16.00 | -100.0% |
+| Best value: straight (all suggestions) | 18 | 7-11 | 38.9% | 60.0% | -4.20 | -23.3% |
+| Best value: 2-leg (all suggestions) | 18 | 2-16 | 11.1% | 36.2% | -10.80 | -60.0% |
+| Best value: 3-leg (all suggestions) | 18 | 0-18 | 0.0% | 21.6% | -18.00 | -100.0% |
+| Best value: 4-leg (all suggestions) | 18 | 0-18 | 0.0% | 12.5% | -18.00 | -100.0% |
+| Best value: 5-leg (all suggestions) | 18 | 0-18 | 0.0% | 7.3% | -18.00 | -100.0% |
+| Best value: 6-leg (all suggestions) | 18 | 0-18 | 0.0% | 4.2% | -18.00 | -100.0% |
+| Best value: 11-leg (all suggestions) | 16 | 0-16 | 0.0% | 0.3% | -16.00 | -100.0% |
 | Most likely to hit: ★ suggestion | 3 | 0-3 | 0.0% | 19.0% | -3.00 | -100.0% |
-| Most likely to hit: straight (all 6 suggestions) | 18 | 7-11 | 38.9% | 64.2% | -6.43 | -35.7% |
-| Most likely to hit: 2-leg (all 6 suggestions) | 18 | 3-15 | 16.7% | 39.3% | -8.57 | -47.6% |
-| Most likely to hit: 3-leg (all 6 suggestions) | 18 | 1-17 | 5.6% | 23.7% | -13.84 | -76.9% |
-| Most likely to hit: 4-leg (all 6 suggestions) | 18 | 0-18 | 0.0% | 14.1% | -18.00 | -100.0% |
-| Most likely to hit: 5-leg (all 6 suggestions) | 18 | 0-18 | 0.0% | 8.4% | -18.00 | -100.0% |
-| Most likely to hit: 6-leg (all 6 suggestions) | 18 | 0-18 | 0.0% | 4.9% | -18.00 | -100.0% |
-| Most likely to hit: 11-leg (all 6 suggestions) | 15 | 0-15 | 0.0% | 0.3% | -15.00 | -100.0% |
+| Most likely to hit: straight (all suggestions) | 18 | 7-11 | 38.9% | 64.2% | -6.43 | -35.7% |
+| Most likely to hit: 2-leg (all suggestions) | 18 | 3-15 | 16.7% | 39.3% | -8.57 | -47.6% |
+| Most likely to hit: 3-leg (all suggestions) | 18 | 1-17 | 5.6% | 23.7% | -13.84 | -76.9% |
+| Most likely to hit: 4-leg (all suggestions) | 18 | 0-18 | 0.0% | 14.1% | -18.00 | -100.0% |
+| Most likely to hit: 5-leg (all suggestions) | 18 | 0-18 | 0.0% | 8.4% | -18.00 | -100.0% |
+| Most likely to hit: 6-leg (all suggestions) | 18 | 0-18 | 0.0% | 4.9% | -18.00 | -100.0% |
+| Most likely to hit: 11-leg (all suggestions) | 15 | 0-15 | 0.0% | 0.3% | -15.00 | -100.0% |
