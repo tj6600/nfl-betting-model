@@ -39,21 +39,43 @@ const OPEN = new Set(), GLIM = {};
 try { KINDS = new Set(JSON.parse(localStorage.getItem('nba-kinds') || '[]')); } catch (e) {}
 const kindOk = (L) => !KINDS.size || KINDS.has(L.kind);
 const MKTS = [...new Set(D.legs.map((L) => L.kind))];
-function buildSlips(size, n = 6) {
-  const out = [], used = new Set();
-  const pool = (mode === 'likely' && size >= ALT_FIRST_SIZE ? dedupe(ALT_FIRST.concat(POOL)) : POOL).filter(kindOk);
+// market family, for mixing markets within a slip (alt and main lines of a stat are one family)
+function fam(L) {
+  if (L.kind === 'Milestone') return (L.key || '').split('-').pop().toLowerCase();
+  let k = L.kind.toLowerCase(); if (k.startsWith('alt ')) k = k.slice(4);
+  return k === 'shots on goal' ? 'shots' : k;
+}
+// up to n slips: at most half of a slip from one market family when the pool allows; legs are used once across the
+// suggestions first, then (least-used first) a leg may appear in up to 3, so each size shows n different slips
+// whenever the pool allows. Same rule as parlays.py many(). pick(pool, size, allowed, cap) -> array of legs or null
+function many(pool, size, n, pick) {
+  const out = [], uses = {}, seen = new Set(), cap = size < 2 ? size : Math.ceil(size / 2);
   for (let s = 0; s < n; s++) {
-    const nG = new Set(pool.map((L) => L.game)).size;
-    const slip = [], g = {}, pl = new Set(), perGame = Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / Math.max(1, nG))));   // more per game only when the slate is too small
-    for (const L of pool) {
-      if (used.has(L.id) || (g[L.game] || 0) >= perGame || (L.pid && pl.has(L.pid))) continue;
-      slip.push(L.id); g[L.game] = (g[L.game] || 0) + 1; if (L.pid) pl.add(L.pid);
-      if (slip.length >= size) break;
+    let slip = null;
+    for (const [mx, c] of [[0, cap], [0, size], [1, cap], [1, size], [2, cap], [2, size]]) {
+      const cand = mx ? pool.map((L, i) => [L, i]).sort((a, b) => (uses[a[0].id] || 0) - (uses[b[0].id] || 0) || a[1] - b[1]).map((x) => x[0]) : pool;
+      const t = pick(cand, size, (L) => (uses[L.id] || 0) <= mx, c);
+      if (t && !seen.has(t.map((L) => L.id).sort().join('|'))) { slip = t; break; }
     }
-    if (slip.length < size) break;
-    slip.forEach((id) => used.add(id)); out.push(slip);
+    if (!slip) break;
+    seen.add(slip.map((L) => L.id).sort().join('|')); out.push(slip.map((L) => L.id));
+    slip.forEach((L) => { uses[L.id] = (uses[L.id] || 0) + 1; });
   }
   return out;
+}
+function buildSlips(size, n = 6) {
+  const pool = (mode === 'likely' && size >= ALT_FIRST_SIZE ? dedupe(ALT_FIRST.concat(POOL)) : POOL).filter(kindOk);
+  const nG = new Set(pool.map((L) => L.game)).size;
+  const perGame = Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / Math.max(1, nG))));   // more per game only when the slate is too small
+  return many(pool, size, n, (pool, size, allowed, cap) => {
+    const slip = [], g = {}, pl = new Set(), fm = {};
+    for (const L of pool) {
+      if (!allowed(L) || (g[L.game] || 0) >= perGame || (L.pid && pl.has(L.pid)) || (fm[fam(L)] || 0) >= cap) continue;
+      slip.push(L); g[L.game] = (g[L.game] || 0) + 1; fm[fam(L)] = (fm[fam(L)] || 0) + 1; if (L.pid) pl.add(L.pid);
+      if (slip.length >= size) return slip;
+    }
+    return null;
+  });
 }
 // growth score: Kelly bankroll growth of the slip, with each leg's chance cut 2 points for model error
 function growth(ids) {
@@ -374,7 +396,7 @@ function boardRecord() {
     const tw = el('div', 'tablewrap'); const t = el('table', 'res'); const hr = el('tr');
     ['Parlays', 'Count', 'W-L', 'Hit', 'Expected', 'Units', 'ROI'].forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr);
     pz.forEach((g) => { const tr = el('tr'); [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), fmtp(g.exp_hit), sgn(g.units), sgn(Math.round(g.roi * 1000) / 10) + '%'].forEach((x, i) => tr.append(el('td', i ? 'num' : null, String(x)))); t.append(tr); });
-    tw.append(t); c.append(tw); c.append(el('p', 'note logfoot', 'Each day\'s suggested parlays are saved when the board is built, for both Best value and Most likely to hit and every leg count (up to 6 suggestions each), and graded as whole parlays at DraftKings prices, 1 unit each. A parlay loses if any leg loses; pushed or voided legs drop out. Expected is the chance the board gave the parlays.'));
+    tw.append(t); c.append(tw); c.append(el('p', 'note logfoot', 'Each day\'s suggested parlays are saved when the board is built, for both Best value and Most likely to hit and every leg count (up to 6 suggestions each a day; fewer on a slate without enough qualifying legs, and from Nov 15 a leg can repeat in up to 3 suggestions so the 6 fill more often), and graded as whole parlays at DraftKings prices, 1 unit each. A parlay loses if any leg loses; pushed or voided legs drop out. Expected is the chance the board gave the parlays.'));
     c.style.marginBottom = '16px'; B.append(c);
   }
   if (!bt.rows) { B.append(el('div', 'empty', 'No backtest yet.')); return; }

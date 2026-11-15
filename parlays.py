@@ -5,7 +5,9 @@ same rule in Python so each day's suggestions can be saved and graded:
   * pools: 'value' = the board's pool (Value legs by edge, then near-value);
            'likely' = legs 55%+ to hit that still pay more than they risk (edge 1+ pt), no flags, by chance.
   * a slip takes the best remaining legs: one per player, up to perGame legs a game (1 unless the slate is too
-    small to fill the slip), no leg reused across the 6 suggestions, and legs in no_sgp markets never share a game.
+    small to fill the slip), at most half the slip from one market family when the pool allows, and legs in no_sgp
+    markets never share a game. Legs are used once across the 6 suggestions; when that runs out a leg may appear in up
+    to 3, so each size shows 6 different slips whenever the pool allows (see many()).
   * best = the leg count whose first suggestion has the highest Kelly growth with each chance cut 2 pts
     (1 = straight bet when no parlay grows a bankroll).
 
@@ -26,21 +28,47 @@ def growth(slip):
     return 0.0 if f <= 0 else p * math.log(1 + f * b) + (1 - p) * math.log(1 - f)
 
 
-def build(pool, size, n=6, no_sgp=()):
-    out, used = [], set()
+def fam(L):
+    """Market family, for mixing markets within a slip (alt and main lines of a stat are the same family)."""
+    if L['kind'] == 'Milestone': return L['key'].rsplit('-', 1)[-1].lower()             # NFL alt ladders: key 'pid-Rec'
+    k = L['kind'].lower(); k = k[4:] if k.startswith('alt ') else k
+    return 'shots' if k == 'shots on goal' else k
+
+
+def many(pool, size, n, pick):
+    """Up to n slips. Each slip mixes markets (at most half its legs from one market family) when the pool allows it.
+    Legs are used once across the n suggestions first; when that runs out, a leg may appear in up to 3 suggestions
+    (least-used legs first) so each size still shows n different slips when the pool allows (Thomas, 2026-11-14).
+    pick(pool, size, allowed(L) -> bool, cap) returns a slip (list of legs) or None."""
+    out, uses, seen = [], {}, set()
+    cap = size if size < 2 else math.ceil(size / 2)
     for _ in range(n):
-        nG = len({L['game'] for L in pool})
-        per = min(3, max(3 if size > 6 else 1, math.ceil(size / max(1, nG))))
-        slip, g, pl = [], {}, set()
-        for L in pool:
-            if L['id'] in used or g.get(L['game'], 0) >= per or (L.get('pid') and L['pid'] in pl): continue
-            if g.get(L['game'], 0) and (L['kind'] in no_sgp or any(x['game'] == L['game'] and x['kind'] in no_sgp for x in slip)): continue
-            slip.append(L); g[L['game']] = g.get(L['game'], 0) + 1
-            if L.get('pid'): pl.add(L['pid'])
-            if len(slip) >= size: break
-        if len(slip) < size: break
-        used.update(L['id'] for L in slip); out.append(slip)
+        slip = None
+        for mx, c in ((0, cap), (0, size), (1, cap), (1, size), (2, cap), (2, size)):
+            cand = sorted(pool, key=lambda L: uses.get(L['id'], 0)) if mx else pool
+            s = pick(cand, size, lambda L, mx=mx: uses.get(L['id'], 0) <= mx, c)
+            if s and frozenset(L['id'] for L in s) not in seen:
+                slip = s; break
+        if not slip: break
+        seen.add(frozenset(L['id'] for L in slip)); out.append(slip)
+        for L in slip: uses[L['id']] = uses.get(L['id'], 0) + 1
     return out
+
+
+def build(pool, size, n=6, no_sgp=()):
+    nG = len({L['game'] for L in pool})
+    per = min(3, max(3 if size > 6 else 1, math.ceil(size / max(1, nG))))
+
+    def pick(pool, size, allowed, cap):
+        slip, g, pl, fm = [], {}, set(), {}
+        for L in pool:
+            if not allowed(L) or g.get(L['game'], 0) >= per or (L.get('pid') and L['pid'] in pl) or fm.get(fam(L), 0) >= cap: continue
+            if g.get(L['game'], 0) and (L['kind'] in no_sgp or any(x['game'] == L['game'] and x['kind'] in no_sgp for x in slip)): continue
+            slip.append(L); g[L['game']] = g.get(L['game'], 0) + 1; fm[fam(L)] = fm.get(fam(L), 0) + 1
+            if L.get('pid'): pl.add(L['pid'])
+            if len(slip) >= size: return slip
+        return None
+    return many(pool, size, n, pick)
 
 
 SECURE = 0.60   # an Over main line under 60% gives way to the same player's likeliest fairly priced alt line at 60%+ (as for NFL)
@@ -111,15 +139,14 @@ ALT_FIRST_P, ALT_FIRST_SIZE = 0.70, 3
 
 
 def nfl_build(pool, size, n=6):
-    out, used = [], set()
     nG = len({L['game'] for L in pool}); one = nG == 1
     per = size if one else min(3, max(3 if size > 6 else 1, math.ceil(size / max(1, nG))))
-    for _ in range(n):
-        pick, g, gl, team = [], {}, set(), {}
+
+    def pick(pool, size, allowed, cap):
+        out, g, gl, team, fm = [], {}, set(), {}, {}
         for L in pool:
-            if len(pick) >= size: break
-            if L['id'] in used or g.get(L['game'], 0) >= per: continue
-            if any(x['key'] == L['key'] or (x['kind'] != 'Game' and L['kind'] != 'Game' and x['who'] == L['who']) for x in pick): continue
+            if not allowed(L) or g.get(L['game'], 0) >= per or fm.get(fam(L), 0) >= cap: continue
+            if any(x['key'] == L['key'] or (x['kind'] != 'Game' and L['kind'] != 'Game' and x['who'] == L['who']) for x in out): continue
             if L['kind'] == 'Game':
                 if L['game'] in gl: continue
                 gl.add(L['game'])
@@ -127,10 +154,10 @@ def nfl_build(pool, size, n=6):
                 t = L.get('team') or ''
                 if team.get(t, 0) >= 2: continue
                 team[t] = team.get(t, 0) + 1
-            pick.append(L); g[L['game']] = g.get(L['game'], 0) + 1
-        if len(pick) < size: break
-        used.update(L['id'] for L in pick); out.append(pick)
-    return out
+            out.append(L); g[L['game']] = g.get(L['game'], 0) + 1; fm[fam(L)] = fm.get(fam(L), 0) + 1
+            if len(out) >= size: return out
+        return None
+    return many(pool, size, n, pick)
 
 
 def nfl_suggest(legs):
@@ -197,5 +224,5 @@ def grade(dirpath, results):
     for mode, name in [('value', 'Best value'), ('likely', 'Most likely to hit')]:
         grp(f'{name}: ★ suggestion', [r for r in rows if r['mode'] == mode and r['best'] and r['idx'] == 0])
         for k in SIZES:
-            grp(f'{name}: {"straight" if k == 1 else f"{k}-leg"} (all 6 suggestions)', [r for r in rows if r['mode'] == mode and r['size'] == k])
+            grp(f'{name}: {"straight" if k == 1 else f"{k}-leg"} (all suggestions)', [r for r in rows if r['mode'] == mode and r['size'] == k])
     return dict(days=sorted(logs), groups=groups)
