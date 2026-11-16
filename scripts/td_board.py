@@ -431,13 +431,13 @@ html = (open(os.path.join(B, 'head.html')).read() + open(os.path.join(B, 'body.h
 open(os.path.join(B, 'touchdown-board.html'), 'w').write(html)
 # sport switch shown on the hosted site (each sport is its own page: index.html = NFL, nba.html = NBA)
 SPORT_CSS = """<style>
-.sportnav { display: flex; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; }
+.sportnav { display: flex; flex-wrap: wrap; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; }
 .sportnav a { font: 700 15px var(--display, sans-serif); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; background: var(--panel); }
 .sportnav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 </style>"""
-def sport_nav(cur):
-    return ('<nav class="sportnav" aria-label="Sport">' + ''.join(
-        f'<a href="{href}"{" aria-current=\"page\"" if k == cur else ""}>{k.upper()}</a>' for k, href in [('nfl', 'index.html'), ('nba', 'nba.html'), ('nhl', 'nhl.html')]) + '</nav>\n')
+def sport_nav(cur):   # NFL, NBA, NHL and Bank Builder (bank.py)
+    import bank as BANK
+    return BANK.nav(cur)
 # standalone copy for a static host (render.yaml publishes board/site): a full document, kept out of search engines
 head = open(os.path.join(B, 'head.html')).read()
 body = html[len(head):]
@@ -457,3 +457,7 @@ if not os.path.exists(nba) or 'nba-placeholder' in open(nba).read():
         + '\n</head>\n<body>\n' + sport_nav('nba')
         + '<div class="wrap nba-placeholder"><header><span class="eyebrow">NBA</span><h1>NBA Props Board</h1>'
         + '<p class="lede">The NBA model is being built: game picks, player points, rebounds and assists, and the same parlay builder as the NFL board, priced at DraftKings. This page fills in once it is ready.</p></header></div>\n</body>\n</html>\n')
+
+# Bank Builder page (bank.py): heavy-favorite slips from all three boards, rebuilt whenever a board builds
+import bank as BANK
+BANK.safe_build()

@@ -142,6 +142,11 @@ if len(R):
     rep['by_kind'] = [summ(R[(R.cat == 'Value') & (R.kind == k)], k) for k in sorted(R.kind.unique()) if ((R.cat == 'Value') & (R.kind == k)).any()]
 import parlays as PZ
 rep['parlays'] = PZ.grade(O.DIR, {(r['day'], r['id']): r['result'] for r in rows if r['result']})
+# leg results for the Bank Builder record (bank.py)
+_lr = {}
+for r in rows:
+    if r['result']: _lr.setdefault(r['day'], {})[r['id']] = r['result']
+json.dump(_lr, open(os.path.join(O.DIR, 'leg_results.json'), 'w'))
 json.dump(rep, open(os.path.join(O.DIR, 'grade_report.json'), 'w'), indent=1)
 md = [f"# NBA pick grading ({', '.join(rep['days'])})", '', '| Group | Bets | W-L | Hit | Expected | Units | ROI | CLV checked | Beat close | Lost to close |', '|---|---|---|---|---|---|---|---|---|---|']
 for s in rep['groups'] + rep.get('by_kind', []):

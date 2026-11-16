@@ -112,10 +112,20 @@ def record():
         for m in json.load(open(f)).values():
             for slips in m['slips'].values():
                 for s in slips: want.setdefault(_week(day), {}).update({L['id']: L['game'] for L in s})
+    import bank as BANK   # Bank Builder slips' NFL legs (bank.py) are graded here too
+    bw = BANK.nfl_wanted()
+    for k, ids in bw.items(): want.setdefault(k, {}).update(ids)
     try:
         res = results(want)
     except Exception as e:   # data download failed: show what's logged, grade next run
         print('NFL record: grading skipped,', e); res = {}
+    bf = os.path.join(BANK.LOG, 'nfl_results.json')   # kept across runs, so a failed download loses nothing
+    bres = json.load(open(bf)) if os.path.exists(bf) else {}
+    for (se, wk), ids in bw.items():
+        for i in ids:
+            v = res.get(('%d_wk%02d' % (se, wk), i))
+            if v: bres.setdefault('%d_wk%02d' % (se, wk), {})[i] = v
+    if bw: os.makedirs(BANK.LOG, exist_ok=True); json.dump(bres, open(bf, 'w'))
     # a parlay log like 2026_wk10thu_* grades with its week's results
     res.update({(d, i): v for d in plogs if d not in picks for (d0, i), v in list(res.items()) if d0 == '%d_wk%02d' % _week(d)})
     rows = []
