@@ -356,6 +356,18 @@ for pid, L in logs.items():
     L['move'] = dict(frm=old_team, to=team, season=int(first.season), week=int(first.week), pos=pos, ctx=ctx, his=his,
                      n_old=len(old), n_new=len(new), chg=round(chg, 3),
                      verdict='benefits' if chg >= 0.10 else 'falls' if chg <= -0.10 else 'similar')
+# QBs: passing per game (nflverse weekly stats) so a QB's game log shows his passing, not just his runs
+try:
+    from nflmodel import passing as _PY
+    _q = _PY.load([season])
+    for pid, L in logs.items():
+        if L['pos'] != 'QB': continue
+        qq = _q[_q.pid == pid]
+        L['pass'] = {str(int(r.week)): [int(r.completions), int(r.attempts), int(r.passing_yards),
+                                        int(getattr(r, 'passing_tds', 0) or 0), int(getattr(r, 'passing_interceptions', 0) or 0)]
+                     for r in qq.itertuples()}
+except Exception as e:   # weekly stats unavailable: QB logs fall back to the rushing columns
+    print('QB passing logs skipped:', e)
 D['logs'] = logs
 print(sum('move' in v for v in logs.values()), 'players on new teams')
 print(len(logs), 'game logs')
