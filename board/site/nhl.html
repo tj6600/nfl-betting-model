@@ -250,6 +250,7 @@ table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
 .sportnav { display: flex; flex-wrap: wrap; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; }
 .sportnav a { font: 700 15px var(--display, sans-serif); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; background: var(--panel); }
 .sportnav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.sportnav a.bell { margin-left: auto; padding: 6px 12px; }
 </style>
 <style>
 .gcards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
@@ -283,7 +284,7 @@ table.log td.miss { color: var(--neg); font-weight: 600; }
 </style>
 </head>
 <body>
-<nav class="sportnav" aria-label="Sport"><a href="index.html">NFL</a><a href="nba.html">NBA</a><a href="nhl.html" aria-current="page">NHL</a><a href="bank.html">Bank Builder</a></nav>
+<nav class="sportnav" aria-label="Sport"><a href="index.html">NFL</a><a href="nba.html">NBA</a><a href="nhl.html" aria-current="page">NHL</a><a href="bank.html">Bank Builder</a><a class="bell" href="alerts.html" aria-label="Alerts" title="Alerts">&#128276;</a></nav>
 <div class="wrap">
   <header>
     <span class="eyebrow" id="eyebrow">NHL</span>

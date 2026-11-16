@@ -276,13 +276,18 @@ SPORT_CSS = """<style>
 .sportnav { display: flex; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; flex-wrap: wrap; }
 .sportnav a { font: 700 15px var(--display, sans-serif); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; background: var(--panel); }
 .sportnav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.sportnav a.bell { margin-left: auto; padding: 6px 12px; }
 </style>"""
 PAGES = [('nfl', 'NFL', 'index.html'), ('nba', 'NBA', 'nba.html'), ('nhl', 'NHL', 'nhl.html'), ('bank', 'Bank Builder', 'bank.html')]
 
 
+# alerts setup page (board/site/alerts.html): push notifications when new boards post (scripts/push_alert.py)
+BELL = '<a class="bell" href="alerts.html" aria-label="Alerts" title="Alerts">&#128276;</a>'
+
+
 def nav(cur):
     return ('<nav class="sportnav" aria-label="Sport">' + ''.join(
-        f'<a href="{h}"{" aria-current=\"page\"" if k == cur else ""}>{t}</a>' for k, t, h in PAGES) + '</nav>\n')
+        f'<a href="{h}"{" aria-current=\"page\"" if k == cur else ""}>{t}</a>' for k, t, h in PAGES) + BELL + '</nav>\n')
 
 
 def safe_build(log_it=True):

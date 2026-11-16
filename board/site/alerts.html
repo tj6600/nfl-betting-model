@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>GoonerGamble alerts</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f6b3a">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="GoonerGamble">
+<script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});</script>
+<style>
+:root { --bg:#f5f7f4; --panel:#fff; --ink:#18211b; --muted:#5d6b61; --line:#dde3dd; --turf:#1f6b3a; }
+@media (prefers-color-scheme: dark) { :root { --bg:#0f1511; --panel:#161e18; --ink:#e6ece7; --muted:#95a399; --line:#27322a; --turf:#5fc27f; color-scheme: dark } }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font: 16px/1.55 "Segoe UI", system-ui, sans-serif; }
+.wrap { max-width: 720px; margin: 0 auto; padding: 32px 16px 56px; }
+.eyebrow { font-weight:700; letter-spacing:.12em; text-transform:uppercase; font-size:13px; color:var(--turf); }
+h1 { font-size: 34px; line-height:1.1; margin: 6px 0 16px; }
+h2 { font-size: 19px; margin: 28px 0 6px; }
+p, li { color: var(--ink); } .muted { color: var(--muted); }
+a { color: var(--turf); }
+
+button { font: 600 16px/1 inherit; font-family: inherit; border: 0; border-radius: 10px; padding: 13px 18px; background: var(--turf); color: #fff; cursor: pointer; }
+button.ghost { background: transparent; color: var(--turf); border: 1px solid var(--line); }
+button:disabled { opacity: .5; cursor: default; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 18px 0; }
+label.chk { display: inline-flex; align-items: center; gap: 6px; margin-right: 16px; font-weight: 600; }
+textarea { width: 100%; min-height: 110px; font: 13px/1.4 ui-monospace, Menlo, monospace; border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: var(--bg); color: var(--ink); word-break: break-all; }
+#status { font-weight: 600; } #status.bad { color: #b03a2e; }
+ol li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<span class="eyebrow">GoonerGamble</span>
+<h1>Alerts</h1>
+<p class="muted">Get a notification on this phone when new picks and parlays post. Alerts are sent by the scheduled runs, so they cost no extra Odds API credits.</p>
+
+<div class="card">
+<p style="margin-top:0"><strong>1. Pick sports</strong></p>
+<label class="chk"><input type="checkbox" value="nfl" checked> NFL</label>
+<label class="chk"><input type="checkbox" value="nba" checked> NBA</label>
+<label class="chk"><input type="checkbox" value="nhl" checked> NHL</label>
+<p><strong>2. Turn on alerts</strong></p>
+<div class="row"><button id="on">Turn on alerts</button><button id="test" class="ghost" disabled>Test on this phone</button></div>
+<p id="status" aria-live="polite"></p>
+</div>
+
+<div class="card" id="codebox" hidden>
+<p style="margin-top:0"><strong>3. One-time setup: save this phone's alert code</strong></p>
+<textarea id="code" readonly></textarea>
+<div class="row"><button id="copy">Copy code</button></div>
+<ol>
+<li>On GitHub, open your <strong>nfl-betting-model</strong> repository, then <strong>Settings</strong>, <strong>Secrets and variables</strong>, <strong>Actions</strong>.</li>
+<li>Tap <strong>New repository secret</strong>, name it <code>GG_PUSH</code>, paste the code as its value, and save. For a second phone, update the secret with both codes, separated by a space.</li>
+<li>Done. The next time a scheduled run posts a new board, this phone gets an alert.</li>
+</ol>
+<p class="muted">This code lets the runs send alerts to this phone only. Treat it like a password: keep it in that GitHub secret, not in chats, emails or the repository. If you turn alerts on again, a new code replaces this one.</p>
+</div>
+
+<p class="muted" id="ios" hidden>On iPhone, alerts only work from the installed app: open this site in Safari, tap Share, then Add to Home Screen, and open this page from the GoonerGamble icon.</p>
+<p><a href="/">Back to the board</a></p>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+const b64u = b => btoa(typeof b === 'string' ? b : String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const say = (t, bad) => { $('#status').textContent = t; $('#status').className = bad ? 'bad' : ''; };
+const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+if (ios && !standalone) $('#ios').hidden = false;
+function show(code) { $('#code').value = code; $('#codebox').hidden = false; $('#test').disabled = false; }
+try { const c = localStorage.getItem('gg-alert-code'); if (c) { show(c); say('Alerts are on for this phone.'); } } catch (e) {}
+
+$('#on').onclick = async () => {
+  try {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window))
+      return say(ios ? 'Add GoonerGamble to your Home Screen first, then open this page from the icon.' : 'This browser cannot get alerts. Use Chrome, or the installed app.', true);
+    const sports = [...document.querySelectorAll('.chk input:checked')].map(i => i.value);
+    if (!sports.length) return say('Pick at least one sport.', true);
+    $('#on').disabled = true; say('Asking for permission...');
+    if (await Notification.requestPermission() !== 'granted') { $('#on').disabled = false; return say('Notifications are blocked. Allow them for this app in your phone settings, then try again.', true); }
+    const reg = await navigator.serviceWorker.ready;
+    const old = await reg.pushManager.getSubscription(); if (old) await old.unsubscribe();
+    // A fresh signing key made on this phone: the private half only ever lives in the code below.
+    const kp = await crypto.subtle.generateKey({name: 'ECDSA', namedCurve: 'P-256'}, true, ['sign']);
+    const pub = await crypto.subtle.exportKey('raw', kp.publicKey);
+    const jwk = await crypto.subtle.exportKey('jwk', kp.privateKey);
+    const sub = (await reg.pushManager.subscribe({userVisibleOnly: true, applicationServerKey: pub})).toJSON();
+    const code = 'gg1.' + b64u(JSON.stringify({d: jwk.d, k: b64u(pub), e: sub.endpoint, a: sub.keys.auth, p: sub.keys.p256dh, s: sports.join(',')}));
+    try { localStorage.setItem('gg-alert-code', code); } catch (e) {}
+    show(code); say('Alerts are on. Finish step 3 once.'); $('#on').disabled = false;
+  } catch (e) { $('#on').disabled = false; say('Could not turn on alerts: ' + e.message, true); }
+};
+$('#test').onclick = async () => {
+  const reg = await navigator.serviceWorker.ready;
+  reg.showNotification('GoonerGamble', {body: 'Alerts work on this phone.', icon: 'icons/icon-192.png', badge: 'icons/icon-192.png'});
+};
+$('#copy').onclick = async () => {
+  try { await navigator.clipboard.writeText($('#code').value); $('#copy').textContent = 'Copied'; }
+  catch (e) { $('#code').select(); document.execCommand('copy'); $('#copy').textContent = 'Copied'; }
+  setTimeout(() => $('#copy').textContent = 'Copy code', 2000);
+};
+</script>
+</body>
+</html>

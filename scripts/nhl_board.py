@@ -312,6 +312,7 @@ SPORT_CSS = """<style>
 .sportnav { display: flex; flex-wrap: wrap; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; }
 .sportnav a { font: 700 15px var(--display, sans-serif); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; background: var(--panel); }
 .sportnav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.sportnav a.bell { margin-left: auto; padding: 6px 12px; }
 </style>"""
 data = json.dumps(clean(DATA), separators=(',', ':')).replace('</', '<\\/')
 html = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'

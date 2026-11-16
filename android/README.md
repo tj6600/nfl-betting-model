@@ -95,3 +95,12 @@ need to clear the app's storage once) and it runs full screen.
 - **Board, picks, layout, new tabs:** nothing to do. The app shows the live site.
 - **Name, icon, colors, package settings:** rebuild in PWABuilder (or Bubblewrap) **with the same signing key**, raise the
   version code by 1, and upload a new release in Play Console.
+
+## Alerts (push notifications)
+
+Tap the 🔔 at the end of the sport bar (or open `/alerts.html`), pick sports, tap **Turn on alerts**, then save the code
+it shows as a GitHub Actions repository secret named `GG_PUSH`. `.github/workflows/alerts.yml` runs on every push to
+epa-model that changes a board page, and `scripts/push_alert.py --from-commit` sends an alert only for new-picks commits
+(NBA board, NHL board, NFL opener, Saturday props refresh, game-day injuries), not for grading commits. It waits about
+2.5 minutes so Render has published the board. No Odds API credits, and the scheduled tasks don't change.
+On iPhone, alerts only work from the Home Screen app (iOS 16.4+).
