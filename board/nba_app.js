@@ -451,7 +451,7 @@ function openLog(p, k) {
   const tw = el('div', 'tablewrap'); const tb = el('table', 'res log');
   const hr = el('tr'); ['Date', 'Opp', 'Min', 'Pts', 'Reb', 'Ast', '3PM', 'PRA'].forEach((c, i) => hr.append(el('th', i > 1 ? 'num' : null, c))); tb.append(hr);
   const line = p.props[k] && p.props[k].line;
-  p.log.forEach((g) => { const tr = el('tr'); [g.d, g.o, g.m, g.pts, g.reb, g.ast, g.fg3m, g.pra].forEach((v, i) => { const keyc = ['', '', '', 'pts', 'reb', 'ast', 'fg3m', 'pra'][i]; tr.append(el('td', (i > 1 ? 'num' : '') + (keyc === k && line != null && v > line ? ' hit' : ''), v)); }); tb.append(tr); });
+  p.log.forEach((g) => { const tr = el('tr'); [g.d, g.o, g.m, g.pts, g.reb, g.ast, g.fg3m, g.pra].forEach((v, i) => { const keyc = ['', '', '', 'pts', 'reb', 'ast', 'fg3m', 'pra'][i]; tr.append(el('td', (i > 1 ? 'num' : '') + (keyc === k && line != null ? (v > line ? ' hit' : ' miss') : ''), v)); }); tb.append(tr); });
   tw.append(tb); pn.append(tw);
   pn.append(el('p', 'note logfoot', line != null ? `Green marks games over tonight's ${SL[k].toLowerCase()} line of ${line}.` : 'Last 12 games played.'));
   ov.append(pn); document.body.append(ov);

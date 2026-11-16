@@ -451,7 +451,7 @@ function openLog(p, k) {
   const cols = gkp ? [['d', 'Date'], ['o', 'Opp'], ['sa', 'Shots'], ['sv', 'Saves'], ['pct', 'SV%']] : [['d', 'Date'], ['o', 'Opp'], ['toi', 'TOI'], ['sog', 'SOG'], ['g', 'G'], ['a', 'A'], ['blk', 'BLK']];
   const key = gkp ? 'sv' : 'sog';
   const hr = el('tr'); cols.forEach(([, c], i) => hr.append(el('th', i > 1 ? 'num' : null, c))); tb.append(hr);
-  p.log.forEach((g) => { const tr = el('tr'); cols.forEach(([c], i) => { const v = c === 'pct' && g[c] != null ? g[c].toFixed(3).slice(1) : g[c]; tr.append(el('td', (i > 1 ? 'num' : '') + (c === key && pr.line != null && g[c] > pr.line ? ' hit' : ''), v ?? '—')); }); tb.append(tr); });
+  p.log.forEach((g) => { const tr = el('tr'); cols.forEach(([c], i) => { const v = c === 'pct' && g[c] != null ? g[c].toFixed(3).slice(1) : g[c]; tr.append(el('td', (i > 1 ? 'num' : '') + (c === key && pr.line != null && g[c] != null ? (g[c] > pr.line ? ' hit' : ' miss') : ''), v ?? '—')); }); tb.append(tr); });
   tw.append(tb); pn.append(tw);
   pn.append(el('p', 'note logfoot', pr.line != null ? `Green marks games over tonight's line of ${pr.line}.` : `Last ${p.log.length} games.`));
   ov.append(pn); document.body.append(ov);

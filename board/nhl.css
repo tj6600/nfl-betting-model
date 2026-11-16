@@ -14,6 +14,7 @@
 .track .line { position: absolute; top: -6px; bottom: -6px; width: 2px; margin-left: -1px; background: var(--tick); }
 table.log td, table.log th { padding: 5px 10px; }
 table.log td.hit { color: var(--pos); font-weight: 600; }
+table.log td.miss { color: var(--neg); font-weight: 600; }
 .logpanel .tablewrap { padding: 0 6px 6px; }
 .lchips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 10px; }
 .sugnav { display: flex; align-items: center; gap: 10px; padding: 10px 14px 0; flex-wrap: wrap; }
