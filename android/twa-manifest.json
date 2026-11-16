@@ -1,8 +1,8 @@
 {
-  "packageId": "com.tj6600.propsboard",
+  "packageId": "com.tj6600.goonergamble",
   "host": "nfl-betting-model-u14v.onrender.com",
-  "name": "Props Board: NFL, NBA, NHL",
-  "launcherName": "Props Board",
+  "name": "GoonerGamble: NFL, NBA, NHL",
+  "launcherName": "GoonerGamble",
   "display": "standalone",
   "orientation": "portrait",
   "themeColor": "#1f6b3a",
@@ -24,7 +24,7 @@
   "appVersionCode": 1,
   "minSdkVersion": 21,
   "signingKey": {
-    "path": "./propsboard-upload.keystore",
+    "path": "./goonergamble-upload.keystore",
     "alias": "upload"
   },
   "shortcuts": [

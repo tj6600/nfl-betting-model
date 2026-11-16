@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Props Board: NFL, NBA, NHL",
-  "short_name": "Props Board",
+  "name": "GoonerGamble: NFL, NBA, NHL",
+  "short_name": "GoonerGamble",
   "description": "Model picks, player props and parlay builder for NFL, NBA and NHL, priced at DraftKings.",
   "start_url": "/?source=app",
   "scope": "/",

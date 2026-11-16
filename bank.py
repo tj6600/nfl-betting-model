@@ -270,7 +270,7 @@ APP_HEAD = ('<link rel="manifest" href="manifest.webmanifest">\n'
             '<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">\n'
             '<meta name="mobile-web-app-capable" content="yes">\n'
             '<meta name="apple-mobile-web-app-capable" content="yes">\n'
-            '<meta name="apple-mobile-web-app-title" content="Props Board">\n'
+            '<meta name="apple-mobile-web-app-title" content="GoonerGamble">\n'
             "<script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>\n")
 SPORT_CSS = """<style>
 .sportnav { display: flex; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; flex-wrap: wrap; }
