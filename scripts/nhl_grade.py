@@ -84,6 +84,9 @@ def main():
                                  picks_won=int(lw.won.sum()), picks_lost=int((~lw.won).sum()))
     import parlays as PZ
     out['parlays'] = PZ.grade(O.DIR, results)
+    _lr = {}   # leg results for the Bank Builder record (bank.py)
+    for (d, i), r in results.items(): _lr.setdefault(d, {})[i] = r
+    json.dump(_lr, open(os.path.join(O.DIR, 'leg_results.json'), 'w'))
     json.dump(out, open(os.path.join(O.DIR, 'grade_report.json'), 'w'), indent=1)
     print(f"graded {len(R)} legs over {len(out['days'])} days")
 
