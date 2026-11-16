@@ -31,6 +31,8 @@ P_MIN, JUICE = 0.70, 3.0             # model chance floor; at most 3 pts under D
 RET = {2: (1.50, 1.75), 3: (1.80, 2.10)}   # $10 returns $15 to $17.50 (2 legs) or $18 to $21 (3 legs)
 WINDOW_H, N_SLIPS, MAX_USE, TOP = 30, 5, 2, 45
 SIZES = (2, 3)
+# backup legs (page filters only): DK -150 to -1200, model 55%+, games in the next 7 days (a leg that meets the bar but starts after WINDOW_H isn't marked backup), top BACKUP_N per league
+BACKUP_LO, BACKUP_HI, BACKUP_P, BACKUP_H, BACKUP_N = -1200, -150, 0.55, 168, 40
 STAKE = 10
 
 
@@ -48,7 +50,7 @@ def _data(page, tag):
 def _t(s): return dt.datetime.fromisoformat(s.replace('Z', '+00:00')) if s else None
 
 
-def legs(now=None):
+def legs(now=None, backup=False):
     """Every eligible leg from the three boards, normalized: sport, day (the grader's key), id, label, game, start, price, p, dk, edge, sid."""
     now = now or dt.datetime.now(dt.timezone.utc)
     out = []
@@ -69,18 +71,26 @@ def legs(now=None):
             if L.get('flags') or L.get('price') is None: continue
             out.append(dict(sport=sport, day=D['day'], id=L['id'], label=L['label'], kind=L['kind'], game=L['game'],
                             start=st.get(L['game']), price=int(L['price']), p=L['p'], sid=L.get('sid')))
-    pool, seen = [], set()
+    pool, extra, seen = [], [], set()
     for L in out:
         s = _t(L['start'])
-        if not s or s <= now or s > now + dt.timedelta(hours=WINDOW_H): continue
-        if not (PRICE_LO <= L['price'] <= PRICE_HI) or L['p'] < P_MIN: continue
+        if not s or s <= now or s > now + dt.timedelta(hours=BACKUP_H): continue
         L['key'] = L['sport'] + '|' + L['id']; L['dk'] = round(imp(L['price']), 4); L['edge'] = round((L['p'] - L['dk']) * 100, 1)
-        if L['edge'] < -JUICE: continue
         k = (L['sport'], L['label'], L['price'])            # the NBA board can list one alt rung twice
         if k in seen: continue
-        seen.add(k); pool.append(L)
+        seen.add(k)
+        good = PRICE_LO <= L['price'] <= PRICE_HI and L['p'] >= P_MIN and L['edge'] >= -JUICE
+        if good and s <= now + dt.timedelta(hours=WINDOW_H): pool.append(L)
+        elif good or (BACKUP_LO <= L['price'] <= BACKUP_HI and L['p'] >= BACKUP_P): extra.append(dict(L, backup=not good))
     pool.sort(key=lambda L: (-L['p'], -L['edge']))
-    return pool
+    if not backup: return pool
+    # next-best legs for a league the user picks on the page when it has too few Bank Builder legs (Thomas, 2026-11-16):
+    # likeliest first, BACKUP_N per league, shown with a lower-hit-chance warning; never suggested or logged by default
+    extra.sort(key=lambda L: (-L['p'], -L['edge']))
+    keep, per = [], {}
+    for L in extra:
+        if per.get(L['sport'], 0) < BACKUP_N: keep.append(L); per[L['sport']] = per.get(L['sport'], 0) + 1
+    return pool, keep
 
 
 def _who(L):   # one leg per player: the label up to its number ("Kevin Durant 18+ points" -> "Kevin Durant")
@@ -222,7 +232,7 @@ def grade():
 # ---------- page ----------
 def build(log_it=True, now=None):
     now = now or dt.datetime.now(dt.timezone.utc)
-    pool = legs(now)
+    pool, extra = legs(now, backup=True)
     S = slips(pool)
     stamp = now.strftime('%Y-%m-%dT%H%MZ')
     from zoneinfo import ZoneInfo
@@ -236,7 +246,7 @@ def build(log_it=True, now=None):
         D = _data(page, tag)
         if D: taken[sport] = D.get(k)
     D = dict(built=stamp, stake=STAKE, rules=dict(lo=PRICE_LO, hi=PRICE_HI, pmin=P_MIN, juice=JUICE, ret={str(k): v for k, v in RET.items()}, window=WINDOW_H),
-             taken=taken, pool=pool, slips={str(k): [[L['key'] for L in s] for s in v] for k, v in S.items()}, record=rec)
+             taken=taken, pool=pool, backup=extra, n_slips=N_SLIPS, max_use=MAX_USE, top=TOP, slips={str(k): [[L['key'] for L in s] for s in v] for k, v in S.items()}, record=rec)
     B = os.path.join(ROOT, 'board')
     head = open(os.path.join(B, 'head.html')).read().replace('<title>Player Props Board</title>', '<title>Bank Builder</title>')
     data = json.dumps(D, separators=(',', ':')).replace('</', '<\\/')
