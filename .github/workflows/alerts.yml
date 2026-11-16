@@ -1,0 +1,30 @@
+# Phone alerts for GoonerGamble: when a scheduled run pushes a new NFL/NBA/NHL board, notify every phone
+# set up on the site's bell page (board/site/alerts.html). The phones' alert codes live in the GG_PUSH secret.
+name: Phone alerts
+on:
+  push:
+    branches: [epa-model]
+    paths: ['board/site/index.html', 'board/site/nba.html', 'board/site/nhl.html']
+permissions:
+  contents: read
+concurrency:
+  group: phone-alerts
+  cancel-in-progress: false
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/push_alert.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --quiet cryptography
+      - name: Send alert (waits for Render to publish the board)
+        env:
+          GG_PUSH: ${{ secrets.GG_PUSH }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: python scripts/push_alert.py --from-commit "$COMMIT_MESSAGE" --delay 150

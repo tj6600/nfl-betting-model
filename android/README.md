@@ -98,8 +98,9 @@ need to clear the app's storage once) and it runs full screen.
 
 ## Alerts (push notifications)
 
-Tap the 🔔 at the end of the sport bar (or open `/alerts.html`), pick sports, tap **Turn on alerts**, then copy the code
-it shows into an environment variable named `GG_PUSH` in the cloud environment the scheduled runs use. The runs call
-`python scripts/push_alert.py <nfl|nba|nhl> "<summary>"` after pushing a new board (no Odds API credits). The
-environment must allow `fcm.googleapis.com` (Android) and `web.push.apple.com` (iPhone). On iPhone, alerts only work
-from the Home Screen app (iOS 16.4+).
+Tap the 🔔 at the end of the sport bar (or open `/alerts.html`), pick sports, tap **Turn on alerts**, then save the code
+it shows as a GitHub Actions repository secret named `GG_PUSH`. `.github/workflows/alerts.yml` runs on every push to
+epa-model that changes a board page, and `scripts/push_alert.py --from-commit` sends an alert only for new-picks commits
+(NBA board, NHL board, NFL opener, Saturday props refresh, game-day injuries), not for grading commits. It waits about
+2.5 minutes so Render has published the board. No Odds API credits, and the scheduled tasks don't change.
+On iPhone, alerts only work from the Home Screen app (iOS 16.4+).

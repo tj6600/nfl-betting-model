@@ -1,16 +1,16 @@
 """Send a GoonerGamble alert (Web Push) to every phone set up on board/site/alerts.html.
 
-Usage (from a scheduled run, after the board is committed and pushed):
-    python scripts/push_alert.py nba "6 value legs, parlays ready"
-    python scripts/push_alert.py nfl "Week 12 opener picks are up" --delay 0
+Runs from GitHub Actions (.github/workflows/alerts.yml) on each push to epa-model that changes a board page:
+    python scripts/push_alert.py --from-commit "$COMMIT_MESSAGE"   # picks the sport from the run's commit message
+or by hand:
+    python scripts/push_alert.py nba "6 value legs, parlays ready" --delay 0
 
-Phones are read from the GG_PUSH environment variable: one or more alert codes (gg1....) separated by spaces,
+Phones are read from the GG_PUSH environment variable (a GitHub Actions repository secret): one or more alert codes (gg1....) separated by spaces,
 commas or new lines, each made on the phone by alerts.html. A code carries that phone's push address and a
 signing key made on the phone, so no shared server key or email is needed. It costs no Odds API credits.
 Without GG_PUSH the script prints a note and exits 0, so runs never fail because of alerts.
 
-Needs network access to the push services: fcm.googleapis.com (Android/Chrome) and web.push.apple.com (iPhone).
-Uses only `cryptography` (preinstalled) and the standard library.
+Uses only `cryptography` and the standard library.
 """
 import argparse, base64, json, os, re, struct, sys, time, urllib.error, urllib.parse, urllib.request
 
@@ -90,16 +90,38 @@ def send(code, msg, ttl=6 * 3600):
     except Exception as e: return 0, str(e)
 
 
+# which scheduled-run commits announce new picks (grading-only commits stay quiet)
+COMMITS = [(r'^NBA board:', 'nba', "Today's NBA picks and parlays are up."),
+           (r'^NHL board:', 'nhl', "Today's NHL picks and parlays are up."),
+           (r'^Odds log: .*opener', 'nfl', "This week's NFL opener picks are up."),
+           (r'^Odds log: .*Saturday props refresh', 'nfl', 'Sunday props refreshed with the latest lines and injuries.'),
+           (r'^Game-day injuries:', 'nfl', 'Injury news re-priced some games before kickoff.')]
+
+
+def from_commit(message):
+    first = (message or '').strip().splitlines()[0] if (message or '').strip() else ''
+    for pat, sport, body in COMMITS:
+        if re.search(pat, first): return sport, body
+    return None, None
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
-    ap.add_argument('sport', choices=sorted(PAGES))
+    ap.add_argument('sport', nargs='?', choices=sorted(PAGES))
+    ap.add_argument('--from-commit', metavar='MESSAGE', help='choose sport and text from a scheduled run commit message; no alert for other commits')
     ap.add_argument('body', nargs='?', default='')
     ap.add_argument('--title')
     ap.add_argument('--delay', type=int, default=150, help='seconds to wait first so Render can publish the pushed board (default 150)')
     a = ap.parse_args(argv)
+    if a.from_commit is not None:
+        a.sport, body = from_commit(a.from_commit)
+        if not a.sport:
+            print('push_alert: not a new-picks commit, no alert'); return 0
+        a.body = a.body or body
+    if not a.sport: ap.error('give a sport or --from-commit')
     codes = parse_codes(os.environ.get('GG_PUSH', ''))
     if not codes:
-        print('push_alert: GG_PUSH is not set, no alert sent (set it up from the bell page on the site)'); return 0
+        print('push_alert: GG_PUSH is not set, no alert sent (set it up from the bell page on the site, then add it as a GitHub Actions secret)'); return 0
     codes = [c for c in codes if a.sport == 'bank' or a.sport in c.get('s', 'nfl,nba,nhl').split(',')]
     if not codes:
         print(f'push_alert: no phone has {a.sport.upper()} alerts on'); return 0
@@ -112,7 +134,7 @@ def main(argv=None):
         host = urllib.parse.urlsplit(c['e']).netloc
         if 200 <= st < 300: ok += 1; print(f'push_alert: phone {i} ({host}) sent')
         elif st in (404, 410): print(f'push_alert: phone {i} ({host}) is no longer subscribed: turn alerts on again on that phone and replace its code in GG_PUSH')
-        elif st == 0: print(f'push_alert: phone {i} ({host}) not reached ({why}); is {host} allowed in the cloud environment network settings?')
+        elif st == 0: print(f'push_alert: phone {i} ({host}) not reached ({why})')
         else: print(f'push_alert: phone {i} ({host}) failed with HTTP {st}: {why}')
     print(f'push_alert: {ok}/{len(codes)} alerts sent')
     return 0

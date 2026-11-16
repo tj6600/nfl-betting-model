@@ -56,11 +56,11 @@ ol li { margin-bottom: 6px; }
 <textarea id="code" readonly></textarea>
 <div class="row"><button id="copy">Copy code</button></div>
 <ol>
-<li>In Claude, open <strong>Settings</strong>, then your cloud environment named <strong>Default</strong>.</li>
-<li>Add an environment variable named <code>GG_PUSH</code> and paste the code as its value. For a second phone, paste its code after the first one with a space between them.</li>
-<li>Save. The next scheduled run sends your first alert.</li>
+<li>On GitHub, open your <strong>nfl-betting-model</strong> repository, then <strong>Settings</strong>, <strong>Secrets and variables</strong>, <strong>Actions</strong>.</li>
+<li>Tap <strong>New repository secret</strong>, name it <code>GG_PUSH</code>, paste the code as its value, and save. For a second phone, update the secret with both codes, separated by a space.</li>
+<li>Done. The next time a scheduled run posts a new board, this phone gets an alert.</li>
 </ol>
-<p class="muted">This code lets the runs send alerts to this phone only. Treat it like a password: keep it in that setting, not in chats, emails or the repository. If you turn alerts on again, a new code replaces this one.</p>
+<p class="muted">This code lets the runs send alerts to this phone only. Treat it like a password: keep it in that GitHub secret, not in chats, emails or the repository. If you turn alerts on again, a new code replaces this one.</p>
 </div>
 
 <p class="muted" id="ios" hidden>On iPhone, alerts only work from the installed app: open this site in Safari, tap Share, then Add to Home Screen, and open this page from the GoonerGamble icon.</p>
