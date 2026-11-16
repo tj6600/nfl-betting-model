@@ -1,8 +1,8 @@
 // Service worker for the installed app (Android, iPhone, Play Store wrapper).
 // Network first: every open shows the newest board the scheduled runs pushed. The cached copy is only used
 // when the phone is offline, so the app never shows a stale board while it has a connection.
-const CACHE = 'props-board-v1';
-const SHELL = ['/', '/index.html', '/nba.html', '/nhl.html', '/bank.html', '/icons/icon-192.png', '/offline.html'];
+const CACHE = 'gooner-v2';
+const SHELL = ['/', '/index.html', '/nba.html', '/nhl.html', '/bank.html', '/icons/icon-192.png', '/offline.html', '/alerts.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).catch(() => {}).then(() => self.skipWaiting()));
@@ -29,4 +29,22 @@ self.addEventListener('fetch', e => {
     if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(key, copy)); }
     return res;
   }).catch(() => caches.match(key).then(hit => hit || (req.mode === 'navigate' ? caches.match('/offline.html') : Response.error()))));
+});
+
+// Alerts (scripts/push_alert.py): the scheduled runs send {title, body, url} when a new board posts.
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (err) { d = {body: e.data && e.data.text()}; }
+  e.waitUntil(self.registration.showNotification(d.title || 'GoonerGamble', {
+    body: d.body || 'New picks are up.', icon: '/icons/icon-192.png', badge: '/icons/icon-192.png',
+    tag: d.tag || 'board', renotify: true, data: {url: d.url || '/'}
+  }));
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const url = new URL((e.notification.data && e.notification.data.url) || '/', self.location.origin).href;
+  e.waitUntil(self.clients.matchAll({type: 'window', includeUncontrolled: true}).then(cs => {
+    for (const c of cs) if ('navigate' in c) return c.navigate(url).then(w => (w || c).focus());
+    return self.clients.openWindow(url);
+  }));
 });

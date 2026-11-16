@@ -95,3 +95,11 @@ need to clear the app's storage once) and it runs full screen.
 - **Board, picks, layout, new tabs:** nothing to do. The app shows the live site.
 - **Name, icon, colors, package settings:** rebuild in PWABuilder (or Bubblewrap) **with the same signing key**, raise the
   version code by 1, and upload a new release in Play Console.
+
+## Alerts (push notifications)
+
+Tap the 🔔 at the end of the sport bar (or open `/alerts.html`), pick sports, tap **Turn on alerts**, then copy the code
+it shows into an environment variable named `GG_PUSH` in the cloud environment the scheduled runs use. The runs call
+`python scripts/push_alert.py <nfl|nba|nhl> "<summary>"` after pushing a new board (no Odds API credits). The
+environment must allow `fcm.googleapis.com` (Android) and `web.push.apple.com` (iPhone). On iPhone, alerts only work
+from the Home Screen app (iOS 16.4+).
