@@ -5,6 +5,16 @@ on:
   push:
     branches: [epa-model]
     paths: ['board/site/index.html', 'board/site/nba.html', 'board/site/nhl.html']
+  workflow_dispatch:   # "Run workflow" button: send a test alert right away
+    inputs:
+      sport:
+        description: Board the alert opens
+        type: choice
+        options: [nfl, nba, nhl]
+        default: nfl
+      message:
+        description: Alert text
+        default: Test alert from GoonerGamble. Alerts are working.
 permissions:
   contents: read
 concurrency:
@@ -23,7 +33,15 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install --quiet cryptography
+      - name: Send test alert
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GG_PUSH: ${{ secrets.GG_PUSH }}
+          SPORT: ${{ inputs.sport }}
+          MESSAGE: ${{ inputs.message }}
+        run: python scripts/push_alert.py "$SPORT" "$MESSAGE" --title "GoonerGamble test" --delay 0
       - name: Send alert (waits for Render to publish the board)
+        if: github.event_name == 'push'
         env:
           GG_PUSH: ${{ secrets.GG_PUSH }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
