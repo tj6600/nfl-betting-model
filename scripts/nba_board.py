@@ -286,7 +286,7 @@ def clean(o):
     return o
 data = json.dumps(clean(DATA), separators=(',', ':')).replace('</', '<\\/')
 html = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        '<meta name="robots" content="noindex, nofollow">\n' + head + SPORT_CSS + '\n<style>\n' + open(os.path.join(B, 'nba.css')).read() + '</style>\n</head>\n<body>\n' + nav
+        '<meta name="robots" content="noindex, nofollow">\n' + BANK.APP_HEAD + head + SPORT_CSS + '\n<style>\n' + open(os.path.join(B, 'nba.css')).read() + '</style>\n</head>\n<body>\n' + nav
         + open(os.path.join(B, 'nba_body.html')).read()
         + f'<script type="application/json" id="nba-data">{data}</script>\n<script>\n' + open(os.path.join(B, 'nba_app.js')).read() + '</script>\n</body>\n</html>\n')
 os.makedirs(os.path.join(B, 'site'), exist_ok=True)

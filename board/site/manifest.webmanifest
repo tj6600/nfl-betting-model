@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "Props Board: NFL, NBA, NHL",
+  "short_name": "Props Board",
+  "description": "Model picks, player props and parlay builder for NFL, NBA and NHL, priced at DraftKings.",
+  "start_url": "/?source=app",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1511",
+  "theme_color": "#1f6b3a",
+  "categories": ["sports"],
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "shortcuts": [
+    {"name": "NFL", "url": "/?source=app", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "NBA", "url": "/nba.html?source=app", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "NHL", "url": "/nhl.html?source=app", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "Bank Builder", "url": "/bank.html?source=app", "icons": [{"src": "icons/icon-192.png", "sizes": "192x192"}]}
+  ]
+}

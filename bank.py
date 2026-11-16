@@ -251,7 +251,7 @@ def build(log_it=True, now=None):
     head = open(os.path.join(B, 'head.html')).read().replace('<title>Player Props Board</title>', '<title>Bank Builder</title>')
     data = json.dumps(D, separators=(',', ':')).replace('</', '<\\/')
     html = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-            '<meta name="robots" content="noindex, nofollow">\n' + head + SPORT_CSS + '\n<style>\n' + open(os.path.join(B, 'bank.css')).read() + '</style>\n</head>\n<body>\n'
+            '<meta name="robots" content="noindex, nofollow">\n' + APP_HEAD + head + SPORT_CSS + '\n<style>\n' + open(os.path.join(B, 'bank.css')).read() + '</style>\n</head>\n<body>\n'
             + nav('bank') + open(os.path.join(B, 'bank_body.html')).read()
             + f'<script type="application/json" id="bank-data">{data}</script>\n<script>\n' + open(os.path.join(B, 'bank_app.js')).read() + '</script>\n</body>\n</html>\n')
     os.makedirs(SITE, exist_ok=True)
@@ -262,6 +262,16 @@ def build(log_it=True, now=None):
 
 
 # the sport switch on every page (td_board.py, nba_board.py and nhl_board.py use nav() too)
+# Installable app tags for every hosted page (board/site/manifest.webmanifest, sw.js): Add to Home Screen on
+# Android/iPhone and the Play Store wrapper (android/README.md). The service worker is network-first, so boards stay fresh.
+APP_HEAD = ('<link rel="manifest" href="manifest.webmanifest">\n'
+            '<meta name="theme-color" content="#1f6b3a">\n'
+            '<link rel="icon" href="icons/favicon-32.png" sizes="32x32">\n'
+            '<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">\n'
+            '<meta name="mobile-web-app-capable" content="yes">\n'
+            '<meta name="apple-mobile-web-app-capable" content="yes">\n'
+            '<meta name="apple-mobile-web-app-title" content="Props Board">\n'
+            "<script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>\n")
 SPORT_CSS = """<style>
 .sportnav { display: flex; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; flex-wrap: wrap; }
 .sportnav a { font: 700 15px var(--display, sans-serif); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; background: var(--panel); }
