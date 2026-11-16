@@ -239,13 +239,26 @@ for L in legs:
     else:
         L['sid'] = SID.get(('g', L['game'], L['market'], L['side'], L.get('line')))
 
-# ---------- picks and suggested pool (same rules as the NBA board) ----------
+# ---------- picks and suggested pool ----------
+import parlays as PZ
+
+
+def is_value(L):
+    """Value legs (Thomas, 2026-11-16): shots on goal need expected value 3%+ (the only market where the model matched DK live;
+    EV 3%+ went 21-18, +4.8%); saves never count (the model was worse than DK); game lines keep edge 3+ and 55%+.
+    Nothing heavier than -200, no flags, no alt rungs."""
+    if L['flags'] or L.get('alt') or L['price'] < PZ.MAX_JUICE or L['kind'] == 'Saves': return False
+    if L['kind'] == 'Shots on goal': return L['ev'] >= 3 and L['p'] >= 0.5
+    return L['edge'] >= 3 and L['p'] >= 0.55
+
+
 for L in legs:
     L['pick'] = bool(L.get('market') == 'moneyline' and gl[L['gid']].get('pick') == L['side'])
-    L['cat'] = 'Value' if (L['edge'] >= 3 and L['p'] >= 0.55 and not L['flags'] and not L.get('alt')) else ''
+    L['cat'] = 'Value' if is_value(L) else ''
 ok = lambda l: not l['flags']
-pool = sorted([l for l in legs if l['cat'] == 'Value'], key=lambda l: -l['edge'])
-pool += sorted([l for l in legs if l['cat'] != 'Value' and ok(l) and not l.get('alt') and l['edge'] >= 1.5 and l['p'] >= 0.52], key=lambda l: -l['edge'])
+pool = sorted([l for l in legs if l['cat'] == 'Value'], key=lambda l: -l['ev'])
+pool += sorted([l for l in legs if l['cat'] != 'Value' and ok(l) and not l.get('alt') and l['kind'] not in ('Saves', 'Alt saves') and l['edge'] >= 1.5
+                and l['p'] >= 0.52 and l['price'] >= PZ.MAX_JUICE], key=lambda l: -l['edge'])
 
 # pick log for grading (scripts/nhl_grade.py): every priced leg plus each game's winner pick
 stamp = pd.Timestamp.now(tz='UTC').strftime('%Y-%m-%dT%H%MZ')
@@ -255,9 +268,8 @@ if legs and not args.no_log:
     pd.DataFrame([{k: l.get(k) for k in ['id', 'gid', 'game', 'kind', 'market', 'side', 'line', 'pid', 'team', 'label', 'price', 'p', 'pm', 'pb', 'edge', 'ev', 'cat']}
                   | {'alt': bool(l.get('alt')), 'flagged': bool(l['flags']), 'pick': l['pick']} for l in legs]).to_csv(lf, index=False)
     # suggested parlays as the page builds them (both modes, every leg count), graded by scripts/nhl_grade.py
-    import parlays as PZ
     PZ.log(O.DIR, day, stamp, legs, [l['id'] for l in pool],
-           lambda L: (L['edge'] >= 1 or L.get('pick')) and L['p'] >= 0.55 and L['price'] >= -200 and not L['flags'], no_sgp={'Saves', 'Alt saves'})
+           lambda L: PZ.likely(L) or (L.get('pick') and L['p'] >= 0.55 and L['price'] >= PZ.MAX_JUICE and not L['flags']), no_sgp={'Saves', 'Alt saves'})
 
 # ---------- backtest summary for the Model record tab ----------
 bt = {}

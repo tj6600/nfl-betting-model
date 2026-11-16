@@ -25,17 +25,20 @@ const saveSlip = () => { try { localStorage.setItem('nhl-slip-' + D.day, JSON.st
 // alternate lines (alt: true, Over only, e.g. "25+ points") as in the NFL builder: a shaky Over main line (under 60%) gives way to
 // the same player's likeliest fairly priced alt line at 60%+, and Most likely to hit slips of 3+ legs lead with alt lines
 // that are 70%+, cost at most 3 pts of juice and are priced -500 or longer, likeliest first (parlays.py uses the same rules)
-const SECURE = 0.6, ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3, ALT_JUICE = 3, ALT_MIN_PRICE = -500;   // alt rungs may cost up to 3 pts of juice, -500 or longer (Thomas, 2026-11-15)
+// Thomas, 2026-11-16: no leg heavier than -200 and at most 3 legs (live grading: 3+ leg parlays 0 for ~200 on NBA), 'likely' legs judged on
+// their chance at no worse than DraftKings' usual juice (edge -3+) instead of a model edge (parlays.py likely(), MAX_JUICE, SHORT_SIZES)
+const SECURE = 0.6, ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3, ALT_JUICE = 3, ALT_MIN_PRICE = -200, MAX_LEGS = 3;
 const ALT_BY = {};
-for (const l of D.legs) if (l.alt && !l.flags.length && l.p >= SECURE && l.edge >= 0) (ALT_BY[l.pid + '|' + l.market] = ALT_BY[l.pid + '|' + l.market] || []).push(l);
+for (const l of D.legs) if (l.alt && !l.flags.length && l.p >= SECURE && l.edge >= -3 && l.price >= ALT_MIN_PRICE) (ALT_BY[l.pid + '|' + l.market] = ALT_BY[l.pid + '|' + l.market] || []).push(l);
 Object.values(ALT_BY).forEach((xs) => xs.sort((a, b) => b.p - a.p));
 const safer = (l) => (l.alt || l.side !== 'Over' || l.p >= SECURE) ? l : ((ALT_BY[l.pid + '|' + l.market] || []).find((a) => a.p > l.p) || l);
 const dedupe = (xs) => { const s = new Set(); return xs.filter((l) => !s.has(l.id) && s.add(l.id)); };
 const ALT_FIRST = D.legs.filter((l) => l.alt && !l.flags.length && l.p >= ALT_FIRST_P && l.edge >= -ALT_JUICE && l.price >= ALT_MIN_PRICE).sort((a, b) => b.p - a.p || b.edge - a.edge);
-const VALUE_POOL = dedupe((D.pool || []).map((id) => LEG[id]).filter(Boolean).map(safer));
+const capped = (xs) => xs.filter((l) => l.price >= ALT_MIN_PRICE);
+const VALUE_POOL = capped(dedupe((D.pool || []).map((id) => LEG[id]).filter(Boolean).map(safer)));
 // NHL: the board's winner picks count as "likely" even without an edge (Thomas wants correct picks more than edge),
 // but nothing priced shorter than -200, so no leg risks much more than it pays
-const LIKELY_POOL = dedupe(D.legs.filter((l) => (l.edge >= 1 || l.pick) && l.p >= 0.55 && l.price >= -200 && !l.flags.length).sort((a, b) => b.p - a.p || b.edge - a.edge).map(safer));
+const LIKELY_POOL = capped(dedupe(D.legs.filter((l) => (l.edge >= -3 || l.pick) && l.p >= 0.55 && l.price >= ALT_MIN_PRICE && !l.flags.length).sort((a, b) => b.p - a.p || b.edge - a.edge).map(safer)));
 let mode = 'value';
 try { mode = localStorage.getItem('nhl-mode') === 'likely' ? 'likely' : 'value'; } catch (e) {}
 let POOL = mode === 'likely' ? LIKELY_POOL : VALUE_POOL;
@@ -95,7 +98,7 @@ function growth(ids) {
 let SIZES = [], BEST = null;
 // best parlay size by growth; when no parlay has positive growth (or none can be built), suggest a straight bet
 function sizesFor() {
-  SIZES = [1, 2, 3, 4, 5, 6, 11].filter((k) => buildSlips(k, 1).length);
+  SIZES = [1, 2, 3, 4, 5, 6, 11].filter((k) => k <= MAX_LEGS && buildSlips(k, 1).length);
   const PS = SIZES.filter((k) => k > 1 && growth(buildSlips(k, 1)[0]) > 0);
   BEST = PS.length ? PS.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), PS[0]) : SIZES.includes(1) ? 1 : null;
 }
@@ -318,7 +321,7 @@ function boardParlay() {
     const seg = el('div', 'seg');
     [['value', 'Best value'], ['likely', 'Most likely to hit']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', mode === k); b.onclick = () => { setMode(k); setSize(legCount); if (SLIPS.length) loadSug(0); else { sugIdx = -1; render(); } }; seg.append(b); });
     md.append(seg);
-    md.append(el('span', 'dim sugbest', (mode === 'likely' ? 'Highest-chance legs: board winner picks plus legs with edge 1+, 55%+ chance, nothing shorter than -200. Slips of 3+ legs start with alt lines 70%+ to hit, and a shaky Over swaps to a safer alt line' : 'Biggest edge first (edge 3+, 55%+ chance)') + (KINDS.size ? `. Only ${[...KINDS].join(' + ')} legs (market filter).` : '')));
+    md.append(el('span', 'dim sugbest', (mode === 'likely' ? 'Highest-chance legs: board winner picks plus legs 55%+ to hit at DraftKings\' usual juice or better, nothing shorter than -200, up to 3 legs. A shaky Over swaps to a safer alt line' : 'Value first: shots on goal with expected value 3%+, game lines with edge 3+ and 55%+ chance (saves don\'t count), nothing shorter than -200') + (KINDS.size ? `. Only ${[...KINDS].join(' + ')} legs (market filter).` : '')));
     sl.append(md);
   }
   if (SIZES.length) {
@@ -355,7 +358,7 @@ function boardParlay() {
     sl.append(sv);
   }
   const legs = slip.map((id) => LEG[id]).filter(Boolean);
-  if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : mode === 'likely' ? 'Add legs from the list. No leg is 55%+ to hit at -200 or longer on this slate.' : 'Add legs from the list. No leg meets the value rule (edge 3+, chance 55%+) on this slate.'));
+  if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : mode === 'likely' ? 'Add legs from the list. No leg is 55%+ to hit at -200 or longer on this slate.' : 'Add legs from the list. No leg meets the value rule on this slate.'));
   const box = el('div', 'slipl');
   legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
   if (legs.length) {
@@ -403,6 +406,8 @@ function boardRecord() {
     mk('Live record at DraftKings', ['Group', 'Bets', 'W-L', 'Hit', 'Units', 'ROI'], lv.groups.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), sgn(g.units), roi(g.roi)]),
        `${lv.days.length} slate${lv.days.length > 1 ? 's' : ''} graded. Every priced leg is logged when the board is built and graded at that DraftKings price, 1 unit per leg.`);
   }
+  if (lv && lv.calibration && lv.calibration.length) mk('Do the chances match?', ['Board said', 'Legs', 'Said on average', 'Actually hit', 'Gap'], lv.calibration.map((g) => [g.bucket, g.n, fmtp(g.said), fmtp(g.hit), sgn(Math.round((g.hit - g.said) * 1000) / 10) + ' pts']),
+     'Every graded leg, both sides. If the board\'s chances are right, each row hits about as often as it said; a row well below means those legs are overrated. Buckets under 100 legs are mostly noise.');
   const pz = lv && lv.parlays && lv.parlays.groups.filter((g) => g.bets);
   if (pz && pz.length) mk('Suggested parlays at DraftKings', ['Parlays', 'Count', 'W-L', 'Hit', 'Expected', 'Units', 'ROI'], pz.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), fmtp(g.exp_hit), sgn(g.units), roi(g.roi)]),
      'Each day\'s suggested parlays are saved when the board is built, for both Best value and Most likely to hit and every leg count (up to 6 suggestions each a day; fewer on a slate without enough qualifying legs, and from Nov 15 a leg can repeat in up to 3 suggestions so the 6 fill more often), and graded as whole parlays at DraftKings prices, 1 unit each. A parlay loses if any leg loses; pushed or voided legs drop out. Expected is the chance the board gave the parlays.');
