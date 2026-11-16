@@ -483,10 +483,10 @@ function showLog(pid, ctx) {
     [(sum(5) / n).toFixed(1), 'targets a game'], [(sum(7) / n).toFixed(0), 'rec yds a game'], [String(sum(8)), `TDs (${(sum(8) / n).toFixed(2)} a game)`]]);
   st.classList.add('pad'); pn.append(st);
   // how this bet would have done in each game this season
-  let hitFn = null; let hitLabel = '';
+  let hitFn = null; let hitLabel = ''; let hitCol = -1;
   if (ctx && ctx.kind === 'td') { hitFn = (r) => r[8] > 0; hitLabel = 'Scored'; }
   else if (ctx && ctx.line != null) {
-    const i = ctx.kind === 'rush' ? 4 : ctx.kind === 'recs' ? 6 : 7; const over = ctx.side !== 'Under';
+    const i = ctx.kind === 'rush' ? 4 : ctx.kind === 'recs' ? 6 : 7; const over = ctx.side !== 'Under'; hitCol = i;
     hitFn = (r) => (over ? r[i] > ctx.line : r[i] < ctx.line); hitLabel = `${over ? 'Over' : 'Under'} ${ctx.line}`;
   }
   if (hitFn) {
@@ -501,7 +501,8 @@ function showLog(pid, ctx) {
     const tr = el('tr'); tr.append(el('td', null, String(r[0])), el('td', null, `${r[2] ? '@' : 'vs'} ${r[1]}`));
     if (r[3] == null) { const td = el('td', 'dim', 'Did not play'); td.colSpan = 6 + (hitFn ? 1 : 0); tr.append(td); }
     else {
-      for (const i of [3, 4, 5, 6, 7, 8]) tr.append(el('td', 'num', String(r[i])));
+      // the stat the line is on: green when it went over the line, red otherwise (Thomas, 2026-11-16)
+      for (const i of [3, 4, 5, 6, 7, 8]) tr.append(el('td', 'num' + (i === hitCol ? (r[i] > ctx.line ? ' pos' : ' neg') : ''), String(r[i])));
       if (hitFn) { const ok = hitFn(r); tr.append(el('td', ok ? 'pos' : 'neg', ok ? 'Hit' : 'Miss')); }
     }
     tbody.append(tr);
