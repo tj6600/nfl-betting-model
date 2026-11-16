@@ -32,3 +32,9 @@
 .bk-own input[type=number] { width: 80px; font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
 .res-w { color: var(--pos); font-weight: 700; } .res-l { color: var(--neg); font-weight: 700; }
 @media (max-width: 520px) { .bk-pay .v { font-size: 24px; } .bk-row { grid-template-columns: auto auto minmax(0, 1fr); } .bk-row .num { grid-column: 3; text-align: left; } }
+.bk-leagues { border: 1px solid var(--line); border-radius: var(--r); background: var(--panel); padding: 8px 14px 10px; margin: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.bk-leagues legend { font: 700 13px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0 4px; }
+.bk-lg { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; min-height: 40px; }
+.bk-lg input { width: 22px; height: 22px; accent-color: var(--turf); margin: 0; }
+.bk-warn { margin: 0; padding: 8px 12px; border-radius: 8px; background: var(--gold-soft); color: var(--gold); font-size: 13px; font-weight: 600; }
+.bk-card.weak { border-color: var(--gold); }
