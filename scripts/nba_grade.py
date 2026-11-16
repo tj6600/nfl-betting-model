@@ -141,6 +141,9 @@ if len(R):
                      summ(clean[clean.edge >= 0], 'All +edge legs'), summ(R[R.edge < 0], 'Negative-edge legs (control)')]
     rep['by_kind'] = [summ(R[(R.cat == 'Value') & (R.kind == k)], k) for k in sorted(R.kind.unique()) if ((R.cat == 'Value') & (R.kind == k)).any()]
 import parlays as PZ
+if len(R):
+    _g = R[R.result.isin(['win', 'loss'])]
+    rep['calibration'] = PZ.calibration(_g.p.tolist(), (_g.result == 'win').astype(int).tolist())
 rep['parlays'] = PZ.grade(O.DIR, {(r['day'], r['id']): r['result'] for r in rows if r['result']})
 # leg results for the Bank Builder record (bank.py)
 _lr = {}

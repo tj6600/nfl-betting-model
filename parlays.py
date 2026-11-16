@@ -17,6 +17,16 @@ Grading: a parlay loses if any leg loses; otherwise it wins at the product of it
 import os, json, glob, math
 
 SIZES = [1, 2, 3, 4, 5, 6, 11]
+# NBA/NHL (Thomas, 2026-11-16): live grading had 3+ leg NBA parlays 0 for ~200 and every leg's chance overrated, so
+# NBA/NHL suggestions stop at 3 legs, no leg is heavier than -200, and 'likely' legs are judged on their chance at a
+# normal price (edge >= -3 pts, i.e. no worse than DraftKings' usual juice) instead of a model edge
+SHORT_SIZES = [1, 2, 3]
+MAX_JUICE = -200
+
+
+def likely(L):
+    """NBA/NHL Most likely to hit pool: 55%+ to hit, -200 or longer, normal juice at most, no flags (NHL adds winner picks)."""
+    return L['p'] >= 0.55 and L['price'] >= MAX_JUICE and L['edge'] >= -3 and not L['flags']
 
 
 def dec(a): return 1 + a / 100 if a > 0 else 1 + 100 / -a
@@ -78,14 +88,14 @@ def _alt_tools(legs):
     """NBA/NHL alt lines (alt=True, Over only, edge in points): the safer() swap and the 70%+ alt-first list."""
     alts = {}
     for L in legs:
-        if L.get('alt') and not L.get('flags') and L['p'] >= SECURE and L['edge'] >= 0:
+        if L.get('alt') and not L.get('flags') and L['p'] >= SECURE and L['edge'] >= -3 and L['price'] >= MAX_JUICE:
             alts.setdefault((L.get('pid'), L.get('market')), []).append(L)
     for xs in alts.values(): xs.sort(key=lambda x: -x['p'])
 
     def safer(L):
         if L.get('alt') or L.get('side') != 'Over' or L['p'] >= SECURE: return L
         return next((a for a in alts.get((L.get('pid'), L.get('market')), []) if a['p'] > L['p']), L)
-    first = sorted([L for L in legs if L.get('alt') and not L.get('flags') and L['p'] >= ALT_FIRST_P and L['edge'] >= -ALT_JUICE_PTS and L['price'] >= ALT_MIN_PRICE],
+    first = sorted([L for L in legs if L.get('alt') and not L.get('flags') and L['p'] >= ALT_FIRST_P and L['edge'] >= -ALT_JUICE_PTS and L['price'] >= MAX_JUICE],
                    key=lambda L: (-L['p'], -L['edge']))
     return safer, first
 
@@ -102,11 +112,12 @@ def suggest(legs, pool_ids, likely, no_sgp=()):
     safer, first = _alt_tools(legs)
     pools = {'value': _dedupe([safer(by[i]) for i in pool_ids if i in by]),
              'likely': _dedupe([safer(L) for L in sorted([L for L in legs if likely(L)], key=lambda L: (-L['p'], -L['edge']))])}
+    pools = {k: [L for L in v if L['price'] >= MAX_JUICE] for k, v in pools.items()}   # no leg heavier than -200
 
     def builder(pool, k):
         if pool is pools['likely'] and k >= ALT_FIRST_SIZE: pool = _dedupe(first + pool)
         return build(pool, k, no_sgp=no_sgp)
-    return _pack(pools, builder)
+    return _pack(pools, builder, SHORT_SIZES)
 
 
 # ---- NFL: the same rules as board/app.js (sugPool, safer, buildSlips) for the whole week and every market ----
@@ -175,15 +186,30 @@ def nfl_suggest(legs):
 def _name(L): return L['label'] if L['kind'] == 'Game' or not L.get('who') else f"{L['who']} {L['label']}"
 
 
-def _pack(pools, builder):
+def _pack(pools, builder, sizes_=SIZES):
     out = {}
     for mode, pool in pools.items():
-        slips = {k: builder(pool, k) for k in SIZES}
-        sizes = [k for k in SIZES if slips[k]]
+        slips = {k: builder(pool, k) for k in sizes_}
+        sizes = [k for k in sizes_ if slips[k]]
         ps = [k for k in sizes if k > 1 and growth(slips[k][0]) > 0]
         best = max(ps, key=lambda k: growth(slips[k][0])) if ps else (1 if 1 in sizes else None)
         out[mode] = dict(best=best, slips={str(k): [[dict(id=L['id'], label=_name(L), game=L['game'], price=int(L['price']), p=L['p']) for L in s]
                                                     for s in slips[k]] for k in sizes})
+    return out
+
+
+CAL_BINS = [(0, .45), (.45, .5), (.5, .55), (.55, .6), (.6, .65), (.65, .7), (.7, .8), (.8, .9), (.9, 1.01)]
+
+
+def calibration(ps, wins):
+    """Do the board's chances match what happened? ps: chances given, wins: 1/0 results (graded legs, both sides of
+    every line). One row per chance bucket; a well calibrated board hits about as often as it said (Thomas, 2026-11-16)."""
+    out = []
+    for lo, hi in CAL_BINS:
+        xs = [(p, w) for p, w in zip(ps, wins) if lo <= p < hi]
+        if xs:
+            out.append(dict(bucket=f'{round(lo * 100)}-{min(100, round(hi * 100))}%', n=len(xs), said=sum(p for p, _ in xs) / len(xs),
+                            hit=sum(w for _, w in xs) / len(xs)))
     return out
 
 

@@ -19,8 +19,10 @@ G, P, S = D.load()
 G = G[G.home.isin(M.TEAMS) & G.away.isin(M.TEAMS)].sort_values('date').reset_index(drop=True)
 P = P[P.team.isin(M.TEAMS)]
 ET = 'America/New_York'
+import parlays as PZ
 MODEL_W_GAME = 0.25   # backtest: the game model adds nothing beyond the line (50.1% ATS), so it gets a small weight
-MODEL_W_PROP = 0.5    # props: no historical prop lines to test against, so half model, half book (as for the NFL board)
+MODEL_W_PROP = 0.1    # props: live grading Nov 11-15 (3,400+ DK lines) had the model's chances worse than DK's in every stat and
+                      # any blend worse than DK alone, so DK's no-vig chance drives props (Thomas, 2026-11-16)
 BOOK = 'DraftKings'
 
 
@@ -207,9 +209,11 @@ for x in FU.itertuples():
         p['props'][k] = e
     players.append(p)
 
-# picks: value = edge >= 3 pts and chance >= 55%, no flag
+# picks: value = edge >= 3 pts and chance >= 55%, no flag, no heavier than -200. Player props never count as value:
+# the live record showed the bigger the model's prop edge, the worse it did (edge 5+ hit 36%), so the edge isn't trusted
 for L in legs:
-    L['cat'] = 'Value' if (L['edge'] >= 3 and L['p'] >= 0.55 and not L['flags'] and not L.get('alt')) else ''
+    L['cat'] = 'Value' if (L['edge'] >= 3 and L['p'] >= 0.55 and L['price'] >= PZ.MAX_JUICE and not L['flags'] and not L.get('alt')
+                           and not L.get('pid')) else ''
 # suggested slips: up to 6 different parlays, each the best remaining legs (1 per game, 1 per player, 2-4 legs);
 # a leg is used in at most one slip so each suggestion is different. Value legs first, then near-value (edge 1.5+, 52%+).
 def build_slips(pool, n=6, size=4):
@@ -226,7 +230,8 @@ def build_slips(pool, n=6, size=4):
     return slips
 ok = lambda l: not l['flags']
 pool = sorted([l for l in legs if l['cat'] == 'Value'], key=lambda l: -l['edge'])
-pool += sorted([l for l in legs if l['cat'] != 'Value' and ok(l) and not l.get('alt') and l['edge'] >= 1.5 and l['p'] >= 0.52], key=lambda l: -l['edge'])
+pool += sorted([l for l in legs if l['cat'] != 'Value' and ok(l) and not l.get('alt') and not l.get('pid') and l['edge'] >= 1.5 and l['p'] >= 0.52
+                and l['price'] >= PZ.MAX_JUICE], key=lambda l: -l['edge'])
 slips = build_slips(pool)
 sug = slips[0] if slips else []
 
@@ -241,8 +246,7 @@ if legs and not args.no_log:
                            | {'alt': bool(l.get('alt')), 'flagged': bool(l['flags']), 'suggested': l['id'] in sug} for l in legs])
         pl.to_csv(lf, index=False)
     # suggested parlays as the page builds them (both modes, every leg count), graded by scripts/nba_grade.py
-    import parlays as PZ
-    PZ.log(O.DIR, day, stamp, legs, [l['id'] for l in pool], lambda L: L['edge'] >= 1 and L['p'] >= 0.55 and not L['flags'])
+    PZ.log(O.DIR, day, stamp, legs, [l['id'] for l in pool], PZ.likely)
 # backtest summary for the page
 bt = {}
 bf = os.path.join(D.DIR, 'backtest_games.csv')

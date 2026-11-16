@@ -64,7 +64,7 @@ def main():
                 continue
             results[(day, l.id)] = 'win' if res else 'loss'
             rows.append(dict(day=day, kind=l.kind, lean=bool(l.lean), cat=l.cat if isinstance(l.cat, str) else '', pick=bool(getattr(l, 'pick', False)),
-                             flagged=bool(l.flagged), price=l.price, p=l.p, won=bool(res), units=(dec(l.price) - 1) if res else -1.0))
+                             flagged=bool(l.flagged), price=l.price, p=l.p, edge=l.edge, won=bool(res), units=(dec(l.price) - 1) if res else -1.0))
     R = pd.DataFrame(rows)
     out = dict(days=sorted(R.day.unique().tolist()) if len(R) else [], groups=[])
     if len(R):
@@ -72,17 +72,20 @@ def main():
             if not len(x): return
             out['groups'].append(dict(group=name, bets=int(len(x)), won=int(x.won.sum()), lost=int((~x.won).sum()), hit=float(x.won.mean()),
                                       exp_hit=float(x.p.mean()), units=round(float(x.units.sum()), 2), roi=float(x.units.mean())))
-        props = R[R.lean & R.kind.isin(['Shots on goal', 'Saves'])]
+        # leans count only when the board saw an edge (Thomas, 2026-11-16: most logged leans had none, so they weren't real picks)
+        R['plus'] = R.lean & (R.edge > 0)
+        props = R[R.plus & R.kind.isin(['Shots on goal', 'Saves'])]
         grp('Board winner picks', R[R.pick])
-        grp('Prop leans (shots + saves)', props)
         grp('Value legs', R[R.cat == 'Value'])
+        grp('Prop leans with an edge (shots + saves)', props)
         for k in ['Shots on goal', 'Saves', 'Puck line', 'Total']:
-            grp(f'{k} leans', R[R.lean & (R.kind == k)])
+            grp(f'{k} leans with an edge', R[R.plus & (R.kind == k)])
         last = R.day.max()
         lp = props[props.day == last]; lw = R[R.pick & (R.day == last)]
         out['latest_day'] = dict(day=last, props_won=int(lp.won.sum()), props_lost=int((~lp.won).sum()),
                                  picks_won=int(lw.won.sum()), picks_lost=int((~lw.won).sum()))
     import parlays as PZ
+    if len(R): out['calibration'] = PZ.calibration(R.p.tolist(), R.won.astype(int).tolist())
     out['parlays'] = PZ.grade(O.DIR, results)
     _lr = {}   # leg results for the Bank Builder record (bank.py)
     for (d, i), r in results.items(): _lr.setdefault(d, {})[i] = r
