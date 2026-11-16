@@ -1,4 +1,4 @@
-# NBA pick grading (2026-11-11, 2026-11-12, 2026-11-13, 2026-11-14, 2026-11-15)
+# NBA pick grading (2026-11-11, 2026-11-12, 2026-11-13, 2026-11-14, 2026-11-15, 2026-11-16)
 
 | Group | Bets | W-L | Hit | Expected | Units | ROI | CLV checked | Beat close | Lost to close |
 |---|---|---|---|---|---|---|---|---|---|
