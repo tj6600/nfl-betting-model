@@ -3,8 +3,8 @@
 ```
              bets  won  avg_model   units    hit    roi
 category                                               
-Check role     10    0      0.178 -10.000  0.000 -1.000
-Most likely     7    4      0.561  -0.535  0.571 -0.076
+Check role     11    0      0.177 -11.000  0.000 -1.000
+Most likely     9    5      0.545  -0.582  0.556 -0.065
 TD value       11    3      0.316  -3.699  0.273 -0.336
 ```
 
