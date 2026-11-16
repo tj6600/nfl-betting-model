@@ -1,4 +1,4 @@
-# Props Board Android app (Play Store wrapper)
+# GoonerGamble Android app (Play Store wrapper)
 
 The Android app is a **Trusted Web Activity (TWA)**: a thin Play Store shell that opens the live Render site
 (https://nfl-betting-model-u14v.onrender.com/) full screen in Chrome's engine. There is no app code to maintain.
@@ -18,7 +18,7 @@ What's already done in the repo:
 | Bubblewrap config | `android/twa-manifest.json` |
 | Play listing art: 512 icon, 1024x500 feature graphic | `android/store/` |
 
-Package name: **`com.tj6600.propsboard`**. It is permanent once uploaded to Play, so keep it.
+Package name: **`com.tj6600.goonergamble`**. It is permanent once uploaded to Play, so keep it.
 
 ## 0. Quick win, no Play Store needed
 
@@ -36,8 +36,8 @@ for you to verify a real Android phone in the Play Console app. Approval can tak
 
 1. Go to https://www.pwabuilder.com, paste `https://nfl-betting-model-u14v.onrender.com/`, and start.
 2. Choose **Package for stores**, then **Android**, then **Options**:
-   - Package ID: `com.tj6600.propsboard`
-   - App name: `Props Board: NFL, NBA, NHL`, Launcher name: `Props Board`
+   - Package ID: `com.tj6600.goonergamble`
+   - App name: `GoonerGamble: NFL, NBA, NHL`, Launcher name: `GoonerGamble`
    - Version `1.0.0`, version code `1`
    - Signing key: **Create new**
 3. Download the zip. It holds:
@@ -51,7 +51,7 @@ for you to verify a real Android phone in the Play Console app. Approval can tak
 
 ## 3. Create the app in Play Console
 
-**Create app** → name *Props Board*, type *App*, *Free*. Then work through **Set up your app**:
+**Create app** → name *GoonerGamble*, type *App*, *Free*. Then work through **Set up your app**:
 
 - **Privacy policy:** `https://nfl-betting-model-u14v.onrender.com/privacy.html`
 - **App access:** all functionality available without special access

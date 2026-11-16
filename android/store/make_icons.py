@@ -32,7 +32,7 @@ def font(sz):
     for p in ['/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf','/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf']:
         if os.path.exists(p): return ImageFont.truetype(p, sz)
     return ImageFont.load_default()
-d.text((430,170), 'Props Board', font=font(76), fill=WHITE)
+d.text((430,180), 'GoonerGamble', font=font(64), fill=WHITE)
 d.text((432,275), 'NFL  ·  NBA  ·  NHL  ·  Bank Builder', font=font(25), fill=GOLD)
 fg.save(f'{R}/android/store/feature-graphic-1024x500.png', optimize=True)
 print('ok')
