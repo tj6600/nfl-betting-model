@@ -1,11 +1,11 @@
 # Anytime TD picks: graded
 
 ```
-             bets  won  avg_model   units    hit    roi
-category                                               
-Check role     11    0      0.177 -11.000  0.000 -1.000
-Most likely     9    5      0.545  -0.582  0.556 -0.065
-TD value       11    3      0.316  -3.699  0.273 -0.336
+             bets  won avg_model     units    hit       roi
+category                                                   
+Check role     11    0  0.177045     -11.0  0.000      -1.0
+Most likely     9    5  0.544667 -0.582456  0.556 -0.064717
+TD value       11    3  0.316182 -3.699468  0.273 -0.336315
 ```
 
 # Yards, receptions and passing picks: graded at DraftKings lines
