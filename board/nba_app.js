@@ -384,6 +384,7 @@ function boardParlay() {
 
 function boardRecord() {
   const B = $('board'); B.innerHTML = '';
+  if (D.live && (D.live.cal_sections || []).length) { const cw = renderCalibration(D.live.cal_sections); cw.style.marginBottom = '8px'; B.append(cw); }
   const bt = D.backtest;
   const lv = D.live;
   const fmtp = (x) => x == null ? '—' : (x * 100).toFixed(1) + '%';
@@ -396,15 +397,6 @@ function boardRecord() {
       g.clv_n ? fmtp(g.beat) : '—', g.clv_n ? fmtp(g.lost_clv) : '—'].forEach((x, i) => tr.append(el('td', i ? 'num' : null, String(x)))); t.append(tr); });
     tw.append(t); c.append(tw);
     c.append(el('p', 'note logfoot', 'Every priced leg is logged when the board is built (about 2:47 PM ET) and graded at that DraftKings price, 1 unit per leg; players who sit are void. Beat close = DraftKings moved its line toward our side by tip-off, or kept the line and raised our side\'s chance by half a point or more. Beating the close more often than losing to it is the earliest sign of a real edge; results take hundreds of bets to mean much.'));
-    c.style.marginBottom = '16px'; B.append(c);
-  }
-  const cal = lv && lv.calibration;
-  if (cal && cal.length) {
-    const c = el('div', 'col'); const h = el('div', 'colhead'); h.append(el('h2', null, 'Do the chances match?'), el('span', null, 'every graded leg, both sides')); c.append(h);
-    const tw = el('div', 'tablewrap'); const t = el('table', 'res'); const hr = el('tr');
-    ['Board said', 'Legs', 'Said on average', 'Actually hit', 'Gap'].forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr);
-    cal.forEach((g) => { const tr = el('tr'); [g.bucket, g.n, fmtp(g.said), fmtp(g.hit), sgn(Math.round((g.hit - g.said) * 1000) / 10) + ' pts'].forEach((x, i) => tr.append(el('td', i ? 'num' : null, String(x)))); t.append(tr); });
-    tw.append(t); c.append(tw); c.append(el('p', 'note logfoot', 'If the board\'s chances are right, each row hits about as often as it said. A row that hits well below what it said means those legs are overrated. Buckets under 100 legs are mostly noise.'));
     c.style.marginBottom = '16px'; B.append(c);
   }
   const pz = lv && lv.parlays && lv.parlays.groups.filter((g) => g.bets);

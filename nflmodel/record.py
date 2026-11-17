@@ -99,6 +99,46 @@ MKT = {'Game': 'Game lines', 'TD': 'Anytime TDs', 'Rush': 'Yards and receptions'
        'Recs': 'Yards and receptions', 'Pass': 'Yards and receptions'}
 
 
+def moneylines():
+    """Every game's moneyline pick, rebuilt from logged data only (no hindsight, no odds credits):
+    the model's win chance from the week's picks file (odds_log/picks/<season>_wk<NN>.csv) blended 50/50 with the
+    DraftKings/FanDuel no-vig chance as the board does, at the first saved odds snapshot taken after the picks were
+    logged and before kickoff. The pick is the side given 50%+, graded at that snapshot's DraftKings price."""
+    import calib as CAL
+    from nflmodel.model import G
+    snaps = sorted(glob.glob(os.path.join(LOG, 'snapshots', '*.csv')))
+    if not snaps: return []
+    SN = pd.concat([pd.read_csv(f) for f in snaps], ignore_index=True)
+    SN = SN[(SN.market == 'moneyline') & SN.book.isin(['draftkings', 'fanduel'])]
+    SN = SN[pd.to_datetime(SN.taken_at, format='%Y-%m-%dT%H%MZ', utc=True) < pd.to_datetime(SN.kickoff, utc=True)]
+    g = G.set_index('game_id'); rows = []
+    for f in sorted(glob.glob(os.path.join(LOG, 'picks', '*_wk[0-9][0-9].csv'))):
+        P = pd.read_csv(f); P = P[P.market == 'moneyline']
+        for gid, pg in P.groupby('game_id'):
+            if gid not in g.index or g.loc[gid, 'result'] != g.loc[gid, 'result']: continue
+            home, away = g.loc[gid, 'home_team'], g.loc[gid, 'away_team']
+            q = SN[(SN.home_team == home) & (SN.away_team == away) & (SN.taken_at >= pg.logged_at.iloc[0])]
+            dk = q[q.book == 'draftkings']
+            if dk.empty: continue
+            first = dk.taken_at.min(); q = q[q.taken_at == q[q.taken_at >= first].groupby('book').taken_at.transform('min')]
+            best = None
+            for x in pg.itertuples():
+                nv = []
+                for b, bq in q.groupby('book'):
+                    a, o = bq[bq.side == x.side], bq[bq.side != x.side]
+                    if len(a) and len(o): ia, io = 1 / PZ.dec(a.price.iloc[0]), 1 / PZ.dec(o.price.iloc[0]); nv.append(ia / (ia + io))
+                pr = dk[(dk.taken_at == first) & (dk.side == x.side)]
+                if not nv or pr.empty: continue
+                bk = min(0.99, max(0.005, sum(nv) / len(nv))); w = 0.5 * min(1.0, max(0.4, (bk - 0.03) / 0.22))
+                pp = w * float(x.model_prob) + (1 - w) * bk
+                if best is None or pp > best['p']: best = dict(p=pp, side=x.side, price=int(pr.price.iloc[0]))
+            if best is None: continue
+            res = float(g.loc[gid, 'result']); m = res if best['side'] == home else -res
+            if m == 0: continue   # a tie pushes
+            rows.append(dict(p=best['p'], won=m > 0, units=PZ.dec(best['price']) - 1 if m > 0 else -1.0))
+    return rows
+
+
 def record():
     """Report for the NFL Model record tab: graded picks by category and market, plus suggested parlays."""
     want, picks = {}, {}
@@ -167,5 +207,30 @@ def record():
         grp(f'{name}: every suggested leg', list(every.values()))
         grp(f'{name}: alt-line legs', [r for r in every.values() if r['alt']])
         grp(f'{name}: main-line legs', [r for r in every.values() if not r['alt']])
-    return dict(weeks=sorted(picks), graded=sorted({'%d_wk%02d' % _week(d) for (d, _), v in res.items() if v}), picks=pick_groups, legs=groups,
+    # calibration by leg type (calib.py): the moneyline pick in every game, then the board's logged picks by market
+    import calib as CAL
+    try: ml = moneylines()
+    except Exception as e: print('NFL record: moneylines skipped,', e); ml = []
+    cr = []
+    for day, ls in picks.items():
+        for l in ls:
+            r = res.get((day, l['id']))
+            if l['cat'] == 'Check role' or r not in ('win', 'loss'): continue
+            cr.append(dict(kind=l['kind'], id=l['id'], p=l['p'], won=r == 'win', units=PZ.dec(l['price']) - 1 if r == 'win' else -1.0))
+    lg = {}
+    for day, f in plogs.items():
+        for m in json.load(open(f)).values():
+            for slips in m['slips'].values():
+                for sl in slips:
+                    for L in sl:
+                        r = res.get((day, L['id']))
+                        if r in ('win', 'loss'): lg[(day, L['id'])] = dict(p=L['p'], won=r == 'win', units=PZ.dec(L['price']) - 1 if r == 'win' else -1.0)
+    cal = CAL.sections(
+        ('Moneyline picks', ml, 'The team the board gave the better chance to win, every game, at the first DraftKings price saved before kickoff.', True),
+        ('Spreads and totals', [r for r in cr if r['kind'] == 'Game' and '-ml-' not in r['id']], "The board's categorized spread and total picks.", True),
+        ('Yards and receptions', [r for r in cr if r['kind'] in ('Rush', 'Rec', 'Recs', 'Pass')], "The board's categorized over/under picks on main lines.", True),
+        ('Anytime TDs', [r for r in cr if r['kind'] == 'TD'], "The board's TD picks; a TD is one-sided, so chances run the full range.", False),
+        ('Alt lines', [r for r in cr if r['kind'] == 'Milestone'], "The board's alt-line picks (Likely hit, Value).", False),
+        ('Legs in suggested parlays', list(lg.values()), 'Every leg the Parlay builder suggested, alt lines included, as its own straight bet.', False))
+    return dict(cal=cal, weeks=sorted(picks), graded=sorted({'%d_wk%02d' % _week(d) for (d, _), v in res.items() if v}), picks=pick_groups, legs=groups,
                 parlays=PZ.grade(LOG, {k: v for k, v in res.items() if v}))

@@ -401,6 +401,7 @@ function renderRecord() {
     }
     board.append(tiles);
   }
+  if ((R.cal || []).length) board.append(renderCalibration(R.cal));
   if (R.picks.length) board.append(mk('Board picks', '1 unit each at DraftKings', R.picks));
   if (R.parlays.groups.length) board.append(mk('Suggested parlays', 'every suggestion at each size (up to 6 a week), 1 unit each', R.parlays.groups));
   if ((R.legs || []).length) board.append(mk('Legs in suggested parlays', 'each leg the suggestions chose, as a 1-unit straight bet at DraftKings', R.legs));
