@@ -2,35 +2,35 @@
 
 | Group | Bets | W-L | Hit | Expected | Units | ROI | CLV checked | Beat close | Lost to close |
 |---|---|---|---|---|---|---|---|---|---|
-| Value legs | 200 | 91-109 | 45.5% | 58.9% | -30.89 | -15.4% | 77 | 55% | 27% |
-| Suggested-parlay legs | 20 | 10-10 | 50.0% | 60.2% | -1.19 | -5.9% | 8 | 50% | 12% |
-| All +edge legs | 881 | 404-477 | 45.9% | 54.6% | -103.95 | -11.8% | 344 | 46% | 31% |
-| Negative-edge legs (control) | 3858 | 2216-1642 | 57.4% | 54.5% | -171.89 | -4.5% | 1137 | 34% | 39% |
-| Assists | 21 | 13-8 | 61.9% | 59.7% | +2.77 | +13.2% | 8 | 50% | 38% |
-| Points | 65 | 25-40 | 38.5% | 58.2% | -18.04 | -27.8% | 26 | 65% | 27% |
-| Pts+Reb+Ast | 59 | 26-33 | 44.1% | 58.2% | -10.04 | -17.0% | 23 | 48% | 35% |
-| Rebounds | 35 | 21-14 | 60.0% | 59.7% | +3.78 | +10.8% | 16 | 56% | 19% |
+| Value legs | 231 | 105-126 | 45.5% | 58.7% | -35.06 | -15.2% | 77 | 55% | 27% |
+| Suggested-parlay legs | 24 | 13-11 | 54.2% | 59.7% | +0.90 | +3.8% | 8 | 50% | 12% |
+| All +edge legs | 1087 | 499-588 | 45.9% | 54.5% | -126.70 | -11.7% | 344 | 46% | 31% |
+| Negative-edge legs (control) | 5419 | 3203-2216 | 59.1% | 56.0% | -228.42 | -4.2% | 1137 | 34% | 39% |
+| Assists | 28 | 19-9 | 67.9% | 59.1% | +7.43 | +26.5% | 8 | 50% | 38% |
+| Points | 71 | 28-43 | 39.4% | 58.1% | -18.34 | -25.8% | 26 | 65% | 27% |
+| Pts+Reb+Ast | 70 | 29-41 | 41.4% | 58.0% | -15.43 | -22.0% | 23 | 48% | 35% |
+| Rebounds | 39 | 22-17 | 56.4% | 59.6% | +1.74 | +4.5% | 16 | 56% | 19% |
 | Spread | 1 | 0-1 | 0.0% | 57.8% | -1.00 | -100.0% | 1 | 0% | 0% |
-| Threes | 17 | 6-11 | 35.3% | 61.3% | -6.36 | -37.4% | 3 | 33% | 0% |
+| Threes | 20 | 7-13 | 35.0% | 61.0% | -7.46 | -37.3% | 3 | 33% | 0% |
 | Total | 2 | 0-2 | 0.0% | 58.4% | -2.00 | -100.0% | 0 |  |  |
 
 ## Suggested parlays
 
 | Group | Parlays | W-L | Hit | Expected | Units | ROI |
 |---|---|---|---|---|---|---|
-| Best value: ★ suggestion | 5 | 0-5 | 0.0% | 35.7% | -5.00 | -100.0% |
-| Best value: straight (all suggestions) | 30 | 11-19 | 36.7% | 60.5% | -8.86 | -29.5% |
-| Best value: 2-leg (all suggestions) | 30 | 4-26 | 13.3% | 36.6% | -16.28 | -54.3% |
-| Best value: 3-leg (all suggestions) | 30 | 0-30 | 0.0% | 21.4% | -30.00 | -100.0% |
-| Best value: 4-leg (all suggestions) | 27 | 0-27 | 0.0% | 12.5% | -27.00 | -100.0% |
-| Best value: 5-leg (all suggestions) | 25 | 0-25 | 0.0% | 7.4% | -25.00 | -100.0% |
-| Best value: 6-leg (all suggestions) | 27 | 0-27 | 0.0% | 4.2% | -27.00 | -100.0% |
-| Best value: 11-leg (all suggestions) | 23 | 0-23 | 0.0% | 0.3% | -23.00 | -100.0% |
-| Most likely to hit: ★ suggestion | 5 | 0-5 | 0.0% | 30.4% | -5.00 | -100.0% |
-| Most likely to hit: straight (all suggestions) | 30 | 11-19 | 36.7% | 65.1% | -11.68 | -38.9% |
-| Most likely to hit: 2-leg (all suggestions) | 30 | 4-26 | 13.3% | 40.5% | -17.11 | -57.0% |
-| Most likely to hit: 3-leg (all suggestions) | 30 | 2-28 | 6.7% | 24.8% | -19.21 | -64.0% |
-| Most likely to hit: 4-leg (all suggestions) | 29 | 0-29 | 0.0% | 14.8% | -29.00 | -100.0% |
-| Most likely to hit: 5-leg (all suggestions) | 26 | 0-26 | 0.0% | 9.0% | -26.00 | -100.0% |
-| Most likely to hit: 6-leg (all suggestions) | 28 | 0-28 | 0.0% | 5.1% | -28.00 | -100.0% |
-| Most likely to hit: 11-leg (all suggestions) | 22 | 0-22 | 0.0% | 0.4% | -22.00 | -100.0% |
+| Best value: ★ suggestion | 6 | 1-5 | 16.7% | 32.8% | +2.24 | +37.4% |
+| Best value: straight (all suggestions) | 36 | 15-21 | 41.7% | 60.2% | -6.81 | -18.9% |
+| Best value: 2-leg (all suggestions) | 36 | 6-30 | 16.7% | 36.0% | -14.37 | -39.9% |
+| Best value: 3-leg (all suggestions) | 36 | 1-35 | 2.8% | 21.1% | -27.76 | -77.1% |
+| Best value: 4-leg (all suggestions) | 33 | 0-33 | 0.0% | 12.2% | -33.00 | -100.0% |
+| Best value: 5-leg (all suggestions) | 31 | 0-31 | 0.0% | 7.2% | -31.00 | -100.0% |
+| Best value: 6-leg (all suggestions) | 33 | 0-33 | 0.0% | 4.0% | -33.00 | -100.0% |
+| Best value: 11-leg (all suggestions) | 29 | 0-29 | 0.0% | 0.3% | -29.00 | -100.0% |
+| Most likely to hit: ★ suggestion | 6 | 0-6 | 0.0% | 32.5% | -6.00 | -100.0% |
+| Most likely to hit: straight (all suggestions) | 36 | 13-23 | 36.1% | 64.7% | -14.47 | -40.2% |
+| Most likely to hit: 2-leg (all suggestions) | 36 | 4-32 | 11.1% | 39.9% | -23.11 | -64.2% |
+| Most likely to hit: 3-leg (all suggestions) | 36 | 2-34 | 5.6% | 26.6% | -25.21 | -70.0% |
+| Most likely to hit: 4-leg (all suggestions) | 35 | 0-35 | 0.0% | 16.1% | -35.00 | -100.0% |
+| Most likely to hit: 5-leg (all suggestions) | 32 | 0-32 | 0.0% | 9.9% | -32.00 | -100.0% |
+| Most likely to hit: 6-leg (all suggestions) | 34 | 0-34 | 0.0% | 5.7% | -34.00 | -100.0% |
+| Most likely to hit: 11-leg (all suggestions) | 28 | 0-28 | 0.0% | 0.5% | -28.00 | -100.0% |
