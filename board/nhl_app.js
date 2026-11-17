@@ -398,6 +398,7 @@ function boardParlay() {
 
 function boardRecord() {
   const B = $('board'); B.innerHTML = '';
+  if (D.live && (D.live.cal_sections || []).length) { const cw = renderCalibration(D.live.cal_sections); cw.style.marginBottom = '8px'; B.append(cw); }
   const bt = D.backtest || {}; const lv = D.live;
   const fmtp = (x) => x == null ? '—' : (x * 100).toFixed(1) + '%';
   const roi = (x) => x == null ? '—' : sgn(Math.round(x * 1000) / 10) + '%';
@@ -406,8 +407,6 @@ function boardRecord() {
     mk('Live record at DraftKings', ['Group', 'Bets', 'W-L', 'Hit', 'Units', 'ROI'], lv.groups.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), sgn(g.units), roi(g.roi)]),
        `${lv.days.length} slate${lv.days.length > 1 ? 's' : ''} graded. Every priced leg is logged when the board is built and graded at that DraftKings price, 1 unit per leg.`);
   }
-  if (lv && lv.calibration && lv.calibration.length) mk('Do the chances match?', ['Board said', 'Legs', 'Said on average', 'Actually hit', 'Gap'], lv.calibration.map((g) => [g.bucket, g.n, fmtp(g.said), fmtp(g.hit), sgn(Math.round((g.hit - g.said) * 1000) / 10) + ' pts']),
-     'Every graded leg, both sides. If the board\'s chances are right, each row hits about as often as it said; a row well below means those legs are overrated. Buckets under 100 legs are mostly noise.');
   const pz = lv && lv.parlays && lv.parlays.groups.filter((g) => g.bets);
   if (pz && pz.length) mk('Suggested parlays at DraftKings', ['Parlays', 'Count', 'W-L', 'Hit', 'Expected', 'Units', 'ROI'], pz.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), fmtp(g.exp_hit), sgn(g.units), roi(g.roi)]),
      'Each day\'s suggested parlays are saved when the board is built, for both Best value and Most likely to hit and every leg count (up to 6 suggestions each a day; fewer on a slate without enough qualifying legs, and from Nov 15 a leg can repeat in up to 3 suggestions so the 6 fill more often), and graded as whole parlays at DraftKings prices, 1 unit each. A parlay loses if any leg loses; pushed or voided legs drop out. Expected is the chance the board gave the parlays.');

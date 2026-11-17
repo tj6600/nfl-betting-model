@@ -62,8 +62,11 @@ for day, f in logs.items():
     if cp is not None and len(cp): cp = cp.assign(k=key(cp.player))
     for l in L.itertuples():
         r = dict(day=day, id=l.id, kind=l.kind, label=l.label, price=l.price, p=l.p, edge=l.edge, cat=l.cat if isinstance(l.cat, str) else '',
-                 suggested=bool(l.suggested), flagged=bool(l.flagged), result=None, profit=None, clv=None, nv_move=None, close_line=None)
+                 suggested=bool(l.suggested), flagged=bool(l.flagged), result=None, profit=None, clv=None, nv_move=None, close_line=None,
+                 gid=l.gid, market=l.market, side=l.side, line=l.line, pid=l.pid, alt=bool(getattr(l, 'alt', False) == True), pre=True)
         g = G[G.game_id == l.gid]
+        if len(g) and isinstance(g.tip.iloc[0], str):   # a log written after tip-off knows how the game started: not a pick
+            r['pre'] = pd.Timestamp(g.tip.iloc[0]).tz_localize('America/New_York') > pd.to_datetime(st, format='%Y-%m-%dT%H%MZ', utc=True)
         if l.market in ('pts', 'reb', 'ast', 'fg3m', 'pra'):
             pr = P[(P.game_id == l.gid) & (P.pid == l.pid)]
             if len(g):
@@ -144,6 +147,19 @@ import parlays as PZ
 if len(R):
     _g = R[R.result.isin(['win', 'loss'])]
     rep['calibration'] = PZ.calibration(_g.p.tolist(), (_g.result == 'win').astype(int).tolist())
+# calibration by leg type: the side the board favored, logged before tip-off, graded at the logged DraftKings price
+import calib as CAL
+_c = [dict(r, p=float(r['p']), won=r['result'] == 'win', units=r['profit']) for r in rows if r['result'] in ('win', 'loss') and r['pre']]
+_main = [r for r in _c if not r['alt']]
+_side = lambda r: (r['day'], r['gid'], r['market'], r['pid'] if r['pid'] == r['pid'] else 0, abs(r['line']) if r['market'] == 'spread' else r['line'] if r['market'] != 'moneyline' else 0)
+_fav = CAL.favored(_main, _side)
+rep['cal_sections'] = CAL.sections(
+    ('Moneyline picks', [r for r in _fav if r['market'] == 'moneyline'], 'The team the board gave the better chance to win, every game.', True),
+    ('Spreads', [r for r in _fav if r['market'] == 'spread'], 'The side the board favored on each DraftKings spread.', True),
+    ('Totals', [r for r in _fav if r['market'] == 'total'], 'Over or Under, whichever the board favored.', True),
+    *[(k, [r for r in _fav if r['kind'] == k], 'Over or Under on the main DraftKings line, whichever the board favored.', True)
+      for k in ['Points', 'Rebounds', 'Assists', 'Threes', 'Pts+Reb+Ast']],
+    ('Alt lines', [r for r in _c if r['alt']], 'Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).', False))
 rep['parlays'] = PZ.grade(O.DIR, {(r['day'], r['id']): r['result'] for r in rows if r['result']})
 # leg results for the Bank Builder record (bank.py)
 _lr = {}
