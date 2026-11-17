@@ -141,6 +141,230 @@
    "hit": 0.9743589743589743
   }
  ],
+ "cal_sections": [
+  {
+   "name": "Moneyline picks",
+   "note": "The team the board gave the better chance to win, every game (overtime and shootouts count).",
+   "n": 30,
+   "won": 13,
+   "lost": 17,
+   "said": 0.577,
+   "hit": 0.4333,
+   "units": -8.65,
+   "roi": -0.2883,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 22,
+     "won": 11,
+     "lost": 11,
+     "said": 0.5483,
+     "hit": 0.5,
+     "units": -3.42
+    },
+    {
+     "label": "60\u201370%",
+     "n": 7,
+     "won": 2,
+     "lost": 5,
+     "said": 0.6424,
+     "hit": 0.2857,
+     "units": -4.23
+    },
+    {
+     "label": "70\u201380%",
+     "n": 1,
+     "won": 0,
+     "lost": 1,
+     "said": 0.7505,
+     "hit": 0.0,
+     "units": -1.0
+    }
+   ]
+  },
+  {
+   "name": "Puck lines",
+   "note": "The side the board favored on each DraftKings puck line.",
+   "n": 30,
+   "won": 18,
+   "lost": 12,
+   "said": 0.6379,
+   "hit": 0.6,
+   "units": -2.68,
+   "roi": -0.0894,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 6,
+     "won": 4,
+     "lost": 2,
+     "said": 0.5626,
+     "hit": 0.6667,
+     "units": 0.72
+    },
+    {
+     "label": "60\u201370%",
+     "n": 23,
+     "won": 14,
+     "lost": 9,
+     "said": 0.6541,
+     "hit": 0.6087,
+     "units": -2.41
+    },
+    {
+     "label": "70\u201380%",
+     "n": 1,
+     "won": 0,
+     "lost": 1,
+     "said": 0.7175,
+     "hit": 0.0,
+     "units": -1.0
+    }
+   ]
+  },
+  {
+   "name": "Totals",
+   "note": "Over or Under, whichever the board favored.",
+   "n": 30,
+   "won": 16,
+   "lost": 14,
+   "said": 0.5298,
+   "hit": 0.5333,
+   "units": -0.93,
+   "roi": -0.0311,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 30,
+     "won": 16,
+     "lost": 14,
+     "said": 0.5298,
+     "hit": 0.5333,
+     "units": -0.93
+    }
+   ]
+  },
+  {
+   "name": "Shots on goal",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 527,
+   "won": 304,
+   "lost": 223,
+   "said": 0.565,
+   "hit": 0.5769,
+   "units": -18.17,
+   "roi": -0.0345,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 412,
+     "won": 234,
+     "lost": 178,
+     "said": 0.5492,
+     "hit": 0.568,
+     "units": -13.3
+    },
+    {
+     "label": "60\u201370%",
+     "n": 115,
+     "won": 70,
+     "lost": 45,
+     "said": 0.6218,
+     "hit": 0.6087,
+     "units": -4.86
+    }
+   ]
+  },
+  {
+   "name": "Saves",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 43,
+   "won": 23,
+   "lost": 20,
+   "said": 0.5378,
+   "hit": 0.5349,
+   "units": -0.89,
+   "roi": -0.0207,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 41,
+     "won": 23,
+     "lost": 18,
+     "said": 0.5337,
+     "hit": 0.561,
+     "units": 1.11
+    },
+    {
+     "label": "60\u201370%",
+     "n": 2,
+     "won": 0,
+     "lost": 2,
+     "said": 0.6211,
+     "hit": 0.0,
+     "units": -2.0
+    }
+   ]
+  },
+  {
+   "name": "Alt lines",
+   "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
+   "n": 662,
+   "won": 516,
+   "lost": 146,
+   "said": 0.7261,
+   "hit": 0.7795,
+   "units": 7.23,
+   "roi": 0.0109,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 152,
+     "won": 92,
+     "lost": 60,
+     "said": 0.5553,
+     "hit": 0.6053,
+     "units": 1.75
+    },
+    {
+     "label": "60\u201370%",
+     "n": 117,
+     "won": 86,
+     "lost": 31,
+     "said": 0.6485,
+     "hit": 0.735,
+     "units": 6.26
+    },
+    {
+     "label": "70\u201380%",
+     "n": 169,
+     "won": 133,
+     "lost": 36,
+     "said": 0.7545,
+     "hit": 0.787,
+     "units": -4.0
+    },
+    {
+     "label": "80\u201390%",
+     "n": 185,
+     "won": 167,
+     "lost": 18,
+     "said": 0.8477,
+     "hit": 0.9027,
+     "units": 2.84
+    },
+    {
+     "label": "90\u2013100%",
+     "n": 39,
+     "won": 38,
+     "lost": 1,
+     "said": 0.9246,
+     "hit": 0.9744,
+     "units": 0.38
+    }
+   ]
+  }
+ ],
  "parlays": {
   "days": [
    "2026-11-12",
