@@ -211,6 +211,323 @@
    "hit": 1.0
   }
  ],
+ "cal_sections": [
+  {
+   "name": "Moneyline picks",
+   "note": "The team the board gave the better chance to win, every game.",
+   "n": 41,
+   "won": 30,
+   "lost": 11,
+   "said": 0.6929,
+   "hit": 0.7317,
+   "units": 1.1,
+   "roi": 0.0269,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 10,
+     "won": 8,
+     "lost": 2,
+     "said": 0.5604,
+     "hit": 0.8,
+     "units": 3.73
+    },
+    {
+     "label": "60\u201370%",
+     "n": 12,
+     "won": 8,
+     "lost": 4,
+     "said": 0.647,
+     "hit": 0.6667,
+     "units": -0.2
+    },
+    {
+     "label": "70\u201380%",
+     "n": 12,
+     "won": 8,
+     "lost": 4,
+     "said": 0.7488,
+     "hit": 0.6667,
+     "units": -2.05
+    },
+    {
+     "label": "80\u201390%",
+     "n": 7,
+     "won": 6,
+     "lost": 1,
+     "said": 0.8649,
+     "hit": 0.8571,
+     "units": -0.37
+    }
+   ]
+  },
+  {
+   "name": "Spreads",
+   "note": "The side the board favored on each DraftKings spread.",
+   "n": 41,
+   "won": 20,
+   "lost": 21,
+   "said": 0.5236,
+   "hit": 0.4878,
+   "units": -3.17,
+   "roi": -0.0774,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 41,
+     "won": 20,
+     "lost": 21,
+     "said": 0.5236,
+     "hit": 0.4878,
+     "units": -3.17
+    }
+   ]
+  },
+  {
+   "name": "Totals",
+   "note": "Over or Under, whichever the board favored.",
+   "n": 41,
+   "won": 21,
+   "lost": 20,
+   "said": 0.5226,
+   "hit": 0.5122,
+   "units": -1.16,
+   "roi": -0.0283,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 41,
+     "won": 21,
+     "lost": 20,
+     "said": 0.5226,
+     "hit": 0.5122,
+     "units": -1.16
+    }
+   ]
+  },
+  {
+   "name": "Points",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 492,
+   "won": 251,
+   "lost": 241,
+   "said": 0.5372,
+   "hit": 0.5102,
+   "units": -23.1,
+   "roi": -0.0469,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 480,
+     "won": 245,
+     "lost": 235,
+     "said": 0.5353,
+     "hit": 0.5104,
+     "units": -21.95
+    },
+    {
+     "label": "60\u201370%",
+     "n": 12,
+     "won": 6,
+     "lost": 6,
+     "said": 0.6127,
+     "hit": 0.5,
+     "units": -1.15
+    }
+   ]
+  },
+  {
+   "name": "Rebounds",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 459,
+   "won": 234,
+   "lost": 225,
+   "said": 0.5487,
+   "hit": 0.5098,
+   "units": -43.67,
+   "roi": -0.0951,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 429,
+     "won": 220,
+     "lost": 209,
+     "said": 0.5437,
+     "hit": 0.5128,
+     "units": -36.9
+    },
+    {
+     "label": "60\u201370%",
+     "n": 30,
+     "won": 14,
+     "lost": 16,
+     "said": 0.6196,
+     "hit": 0.4667,
+     "units": -6.77
+    }
+   ]
+  },
+  {
+   "name": "Assists",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 361,
+   "won": 195,
+   "lost": 166,
+   "said": 0.5549,
+   "hit": 0.5402,
+   "units": -21.65,
+   "roi": -0.06,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 305,
+     "won": 164,
+     "lost": 141,
+     "said": 0.543,
+     "hit": 0.5377,
+     "units": -15.33
+    },
+    {
+     "label": "60\u201370%",
+     "n": 56,
+     "won": 31,
+     "lost": 25,
+     "said": 0.6198,
+     "hit": 0.5536,
+     "units": -6.32
+    }
+   ]
+  },
+  {
+   "name": "Threes",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 399,
+   "won": 206,
+   "lost": 193,
+   "said": 0.5701,
+   "hit": 0.5163,
+   "units": -51.58,
+   "roi": -0.1293,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 311,
+     "won": 165,
+     "lost": 146,
+     "said": 0.5519,
+     "hit": 0.5305,
+     "units": -26.87
+    },
+    {
+     "label": "60\u201370%",
+     "n": 86,
+     "won": 41,
+     "lost": 45,
+     "said": 0.6326,
+     "hit": 0.4767,
+     "units": -22.71
+    },
+    {
+     "label": "70\u201380%",
+     "n": 2,
+     "won": 0,
+     "lost": 2,
+     "said": 0.7074,
+     "hit": 0.0,
+     "units": -2.0
+    }
+   ]
+  },
+  {
+   "name": "Pts+Reb+Ast",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 389,
+   "won": 201,
+   "lost": 188,
+   "said": 0.5407,
+   "hit": 0.5167,
+   "units": -13.2,
+   "roi": -0.0339,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 377,
+     "won": 197,
+     "lost": 180,
+     "said": 0.5383,
+     "hit": 0.5225,
+     "units": -8.65
+    },
+    {
+     "label": "60\u201370%",
+     "n": 12,
+     "won": 4,
+     "lost": 8,
+     "said": 0.6158,
+     "hit": 0.3333,
+     "units": -4.54
+    }
+   ]
+  },
+  {
+   "name": "Alt lines",
+   "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
+   "n": 1984,
+   "won": 1446,
+   "lost": 538,
+   "said": 0.6874,
+   "hit": 0.7288,
+   "units": -81.97,
+   "roi": -0.0413,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 573,
+     "won": 328,
+     "lost": 245,
+     "said": 0.5481,
+     "hit": 0.5724,
+     "units": -30.43
+    },
+    {
+     "label": "60\u201370%",
+     "n": 475,
+     "won": 330,
+     "lost": 145,
+     "said": 0.6512,
+     "hit": 0.6947,
+     "units": -17.4
+    },
+    {
+     "label": "70\u201380%",
+     "n": 517,
+     "won": 418,
+     "lost": 99,
+     "said": 0.7499,
+     "hit": 0.8085,
+     "units": -15.71
+    },
+    {
+     "label": "80\u201390%",
+     "n": 415,
+     "won": 366,
+     "lost": 49,
+     "said": 0.8413,
+     "hit": 0.8819,
+     "units": -18.54
+    },
+    {
+     "label": "90\u2013100%",
+     "n": 4,
+     "won": 4,
+     "lost": 0,
+     "said": 0.9069,
+     "hit": 1.0,
+     "units": 0.11
+    }
+   ]
+  }
+ ],
  "parlays": {
   "days": [
    "2026-11-11",
