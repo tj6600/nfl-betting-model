@@ -1,0 +1,9 @@
+.tcard { margin-bottom: 16px; }
+.tmatch td b { display: block; font-weight: 600; }
+.tmatch .tsub { display: block; font-size: 12px; }
+.tmatch .ponly { display: none; }
+@media (max-width: 640px) {
+  .tmatch th:nth-child(2), .tmatch td:nth-child(2), .tmatch th:nth-child(3), .tmatch td:nth-child(3), .tmatch th:nth-child(6), .tmatch td:nth-child(6) { display: none; }
+  .tmatch .ponly { display: block; font-size: 13px; margin-top: 2px; }
+  .tmatch td { padding-left: 8px; padding-right: 8px; }
+}

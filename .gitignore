@@ -10,3 +10,4 @@ nhl_data/raw/
 *.aab
 *.apk
 android/build/
+output/tennis_demo.html
