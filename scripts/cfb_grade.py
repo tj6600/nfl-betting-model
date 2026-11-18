@@ -34,6 +34,7 @@ def main(fetch=True):
     for f in sorted(glob.glob(os.path.join(DIR, 'picks', '*.csv'))):
         wk = os.path.basename(f).rsplit('_', 1)[0]
         for r in pd.read_csv(f, dtype={'gid': str}).to_dict('records'):
+            r['bpick'] = str(r.get('bpick')) == 'True'
             first.setdefault((wk, r['id']), r)
     rows, results, wait = [], {}, []
     for (wk, lid), l in first.items():
@@ -62,6 +63,8 @@ def main(fetch=True):
     def groups_of(r, R=None):
         g = []
         if r['pick']: g.append('Board winner picks')
+        if r.get('bpick') is True and r['market'] == 'spread': g.append('Board spread picks')
+        if r.get('bpick') is True and r['market'] == 'total': g.append('Board total picks')
         if r['cat'] == 'Value': g.append('Value spreads (model 3+ points off the line)')
         return g
 
@@ -74,9 +77,7 @@ def main(fetch=True):
             buckets = {}
             for r in rr:
                 for n in groups_of(r): buckets.setdefault(n, []).append(r)
-            for r in fav:
-                if r['market'] == 'spread': buckets.setdefault('Spread side the board favored (every game)', []).append(r)
-            for n in ['Board winner picks', 'Value spreads (model 3+ points off the line)', 'Spread side the board favored (every game)']:
+            for n in ['Board winner picks', 'Board spread picks', 'Board total picks', 'Value spreads (model 3+ points off the line)']:
                 x = buckets.get(n)
                 if not x: continue
                 w = sum(r['won'] for r in x); u = sum(r['units'] for r in x)
@@ -96,7 +97,7 @@ def main(fetch=True):
     wfav = {id(r) for r in CAL.favored(W, fkey)}
     for r in W:
         cal = ('cal_sections', SEC[r['market']][0], True, SEC[r['market']][1]) if id(r) in wfav else None
-        gs = [('groups', n) for n in groups_of(r)] + ([('groups', 'Spread side the board favored (every game)')] if id(r) in wfav and r['market'] == 'spread' else [])
+        gs = [('groups', n) for n in groups_of(r)]
         PD.add_leg(f"{r['week']}|{r['id']}", r['day'], gx(r), r['price'], r['p'], gs, cal)
     byid = {(r['week'], r['id']): r for r in wait}
     PZ.pending(DIR, results, PD, leg_key=lambda wk, L: f"{wk}|{L['id']}", when=when, since=since,

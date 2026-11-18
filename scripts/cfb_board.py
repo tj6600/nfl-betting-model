@@ -61,7 +61,7 @@ def nv(a, b): return imp(a) / (imp(a) + imp(b))
 def ok(x): return x is not None and x == x
 
 
-legs = []
+legs, LEG = [], {}
 
 
 def mk_leg(lid, game, kind, label, price, p_model, p_book, flags, extra):
@@ -69,7 +69,7 @@ def mk_leg(lid, game, kind, label, price, p_model, p_book, flags, extra):
     p = w * p_model + (1 - w) * p_book
     leg = dict(id=lid, game=game, kind=kind, label=label, price=int(price), p=round(float(p), 4), pm=round(float(p_model), 4), pb=round(float(p_book), 4),
                edge=round((p - imp(price)) * 100, 1), ev=round((p * dec(price) - 1) * 100, 1), flags=list(flags))
-    leg.update(extra); legs.append(leg)
+    leg.update(extra); legs.append(leg); LEG[lid] = leg
     return leg
 
 
@@ -114,6 +114,14 @@ for r in S.itertuples():
         row.update(line_total=float(r.total), open_total=float(r.open_total) if ok(r.open_total) else None)
         for side, px, pm, pb, sid in (('Over', r.over, po, b, r.sid_over), ('Under', r.under, 1 - po, 1 - b, r.sid_under)):
             row['legs'].append(mk_leg(f'{r.espn_id}-to-{side}', gm, 'Total', f'{side} {r.total:g} ({r.away} @ {r.home})', px, pm, pb, flags, ex('total', side, float(r.total), sid))['id'])
+    # the board's call on every market (Thomas, 2026-11-18: "just predict the correct winners, spreads and totals"):
+    # spread = the side with the higher blended cover chance; total = the side of the model's projected total
+    sp = [LEG[i] for i in row['legs'] if LEG[i]['market'] == 'spread']
+    if sp:
+        b = max(sp, key=lambda L: L['p']); b['bpick'] = True; row['sp_pick'] = b['id']
+    to = [LEG[i] for i in row['legs'] if LEG[i]['market'] == 'total']
+    if to:
+        b = next(L for L in to if L['side'] == ('Over' if t > L['line'] else 'Under')); b['bpick'] = True; row['to_pick'] = b['id']
     GAMES.append(row)
 gl = {g['id']: g for g in GAMES}
 
@@ -127,6 +135,7 @@ def is_value(L):
 for L in legs:
     g = gl[L['gid']]
     L['pick'] = bool(L['market'] == 'moneyline' and g.get('pick') == L['side'])
+    L['bpick'] = bool(L.get('bpick') or L['pick'])
     L['cat'] = 'Value' if is_value(L) else ''
 pool = sorted([l for l in legs if l['cat'] == 'Value'], key=lambda l: -l['pts'])
 pool += sorted([l for l in legs if l['cat'] != 'Value' and l['kind'] == 'Spread' and not l['flags'] and 1.5 <= l['pts'] < VALUE_PTS and l['price'] >= PZ.MAX_JUICE], key=lambda l: -l['pts'])
@@ -137,7 +146,7 @@ stamp = now.strftime('%Y-%m-%dT%H%MZ')
 if legs and not args.no_log:
     os.makedirs(os.path.join(DIR, 'picks'), exist_ok=True)
     pd.DataFrame([{k: l.get(k) for k in ['id', 'gid', 'game', 'start', 'kind', 'market', 'side', 'team', 'line', 'label', 'price', 'p', 'pm', 'pb', 'edge', 'ev', 'pts', 'cat']}
-                  | {'flagged': bool(l['flags']), 'pick': l['pick']} for l in legs]).to_csv(os.path.join(DIR, 'picks', f'{WEEK}_{stamp}.csv'), index=False)
+                  | {'flagged': bool(l['flags']), 'pick': l['pick'], 'bpick': l['bpick']} for l in legs]).to_csv(os.path.join(DIR, 'picks', f'{WEEK}_{stamp}.csv'), index=False)
     PZ.log(DIR, WEEK, stamp, legs, [l['id'] for l in pool], likely)
     subprocess.run([sys.executable, os.path.join(ROOT, 'scripts', 'cfb_grade.py')], check=False, stdout=subprocess.DEVNULL)
 gr = os.path.join(DIR, 'grade_report.json')
