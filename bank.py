@@ -1,4 +1,4 @@
-"""Bank Builder: small parlays of heavy favorites from all three boards (NFL, NBA, NHL), priced at DraftKings.
+"""Bank Builder: small parlays of heavy favorites from the boards (NFL, college football, NHL; NBA removed), priced at DraftKings.
 
 Thomas, 2026-11-16: "takes a $10 bet and makes it into a $15 or $20 total win ... two or three -400 legs ... any of the
 three sports". Two -400 legs pay about 1.56x, three about 1.95x.
@@ -63,6 +63,12 @@ def legs(now=None, backup=False):
             if pr is None or L.get('flag'): continue
             out.append(dict(sport='NFL', day=day, id=L['id'], label=PZ._name(L), kind=L['kind'], game=L['game'],
                             start=(D.get('starts') or {}).get(L['game']), price=int(pr), p=L['p'], sid=L.get('sid')))
+    D = _data('cfb.html', 'cfb-data')   # college football (added 2026-11-18): one board per football week, game lines only
+    if D:
+        for L in D['legs']:
+            if L.get('flags') or L.get('price') is None: continue
+            out.append(dict(sport='CFB', day=D['week'], id=L['id'], label=L['label'], kind=L['kind'], game=L['game'],
+                            start=L.get('start'), price=int(L['price']), p=L['p'], sid=L.get('sid')))
     for sport, page, tag in [('NHL', 'nhl.html', 'nhl-data')]:   # NBA removed 2026-11-18
         D = _data(page, tag)
         if not D: continue
@@ -136,6 +142,12 @@ def _first_log_ids(sport, day):
     return {(r['id'], r['label']) for r in csv.DictReader(open(fs[0]))}
 
 
+def _week_log_ids(sport, week):
+    """CFB: every leg in any pick log of that week (scripts/cfb_grade.py grades each leg at its first logged price)."""
+    import csv
+    return {(r['id'], r['label']) for f in glob.glob(os.path.join(ROOT, 'odds_log', sport.lower(), 'picks', f'{week}_*.csv')) for r in csv.DictReader(open(f))}
+
+
 def gradable(pool):
     """Legs the graders will see: NBA/NHL legs in that sport's first pick log of the day; NFL legs with a line in the id."""
     from nflmodel import record as REC
@@ -145,7 +157,7 @@ def gradable(pool):
             if REC.RX_G.match(L['id']) or REC.RX_Y.match(L['id']) or REC.RX_M.match(L['id']) or L['id'].startswith('t-'): ok.append(L)
         else:
             k = (L['sport'], L['day'])
-            if k not in cache: cache[k] = _first_log_ids(*k)
+            if k not in cache: cache[k] = _week_log_ids(*k) if L['sport'] == 'CFB' else _first_log_ids(*k)
             if (L['id'], L['label']) in cache[k]: ok.append(L)
     return ok
 
@@ -168,6 +180,7 @@ def results():
     out = {}
     for sport, f in [('NBA', os.path.join(ROOT, 'odds_log', 'nba', 'leg_results.json')),
                      ('NHL', os.path.join(ROOT, 'odds_log', 'nhl', 'leg_results.json')),
+                     ('CFB', os.path.join(ROOT, 'odds_log', 'cfb', 'leg_results.json')),
                      ('NFL', os.path.join(LOG, 'nfl_results.json'))]:
         if os.path.exists(f):
             for day, m in json.load(open(f)).items():
@@ -236,7 +249,7 @@ def pending(rows):
     from nflmodel import record as REC
     since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=4)).strftime('%Y-%m-%d')
     known = {}   # the sport pages' own waiting legs already carry the lookup (NHL ones with the skater's position)
-    for sp in ('nba', 'nhl'):
+    for sp in ('nba', 'nhl', 'cfb'):
         f = os.path.join(ROOT, 'odds_log', sp, 'grade_report.json')
         if os.path.exists(f):
             for L in (json.load(open(f)).get('pending') or {}).get('legs', []): known[(sp.upper(), L[0])] = L[2]
@@ -250,7 +263,9 @@ def pending(rows):
         ck = (L['sport'], L['day'])
         if ck not in csvs:
             fs = sorted(glob.glob(os.path.join(ROOT, 'odds_log', L['sport'].lower(), 'picks', f"{L['day']}_*.csv")))
-            csvs[ck] = {r['id']: r for r in csv.DictReader(open(fs[0]))} if fs else {}
+            csvs[ck] = {}
+            for f in (fs if L['sport'] == 'CFB' else fs[:1]):   # CFB: a leg's first log of the week
+                for r in csv.DictReader(open(f)): csvs[ck].setdefault(r['id'], r)
         r = csvs[ck].get(L['id'])
         return CAL.compact_x(CAL.csv_x(L['sport'], r)) if r else None
     from zoneinfo import ZoneInfo
@@ -281,7 +296,7 @@ def build(log_it=True, now=None):
         log(slips(g), stamp, et.strftime('%Y-%m-%d'))
     rec = grade()
     taken = {}
-    for sport, page, tag, k in [('NFL', 'index.html', 'td-data', 'taken'), ('NHL', 'nhl.html', 'nhl-data', 'dayLabel')]:
+    for sport, page, tag, k in [('NFL', 'index.html', 'td-data', 'taken'), ('CFB', 'cfb.html', 'cfb-data', 'weekLabel'), ('NHL', 'nhl.html', 'nhl-data', 'dayLabel')]:
         D = _data(page, tag)
         if D: taken[sport] = D.get(k)
     D = dict(built=stamp, stake=STAKE, rules=dict(lo=PRICE_LO, hi=PRICE_HI, pmin=P_MIN, juice=JUICE, ret={str(k): v for k, v in RET.items()}, window=WINDOW_H),
@@ -318,7 +333,7 @@ SPORT_CSS = """<style>
 .sportnav a.bell { margin-left: auto; padding: 6px 12px; }
 </style>"""
 # NBA was removed on 2026-11-18 (no edge over DraftKings in 7 days of graded lines); nba.html is now a notice page
-PAGES = [('nfl', 'NFL', 'index.html'), ('nhl', 'NHL', 'nhl.html'), ('bank', 'Bank Builder', 'bank.html')]
+PAGES = [('nfl', 'NFL', 'index.html'), ('cfb', 'College', 'cfb.html'), ('nhl', 'NHL', 'nhl.html'), ('bank', 'Bank Builder', 'bank.html')]
 
 
 # alerts setup page (board/site/alerts.html): push notifications when new boards post (scripts/push_alert.py)

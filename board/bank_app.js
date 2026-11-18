@@ -3,7 +3,7 @@ const D = JSON.parse(document.getElementById('bank-data').textContent);
 // $10 stake comes back as about $15 to $20. Legs whose game has started drop out of suggestions and the DraftKings link.
 const EXTRA = D.backup || [];
 const LEG = Object.fromEntries(D.pool.concat(EXTRA).map((l) => [l.key, l]));
-const SPORTS = ['NFL', 'NHL'];   // NBA removed 2026-11-18
+const SPORTS = ['NFL', 'CFB', 'NHL'];   // NBA removed 2026-11-18; college football added 2026-11-18
 const started = (l) => !l.start || Date.parse(l.start) <= Date.now();
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
 const dec = (a) => a > 0 ? 1 + a / 100 : 1 + 100 / -a;
@@ -180,7 +180,7 @@ let bankStatus = { text: '', cls: '' };
 function bankLive(src) {
   const P = src.pending; if (!P) return src;
   const res = {}; let at = 0;
-  for (const sp of ['nba', 'nhl', 'nfl']) { const st = liveLoad('bank-' + sp); if (st && st.res) { Object.assign(res, st.res); at = Math.max(at, st.at || 0); } }
+  for (const sp of ['nba', 'nhl', 'nfl', 'cfb']) { const st = liveLoad('bank-' + sp); if (st && st.res) { Object.assign(res, st.res); at = Math.max(at, st.at || 0); } }
   if (!Object.keys(res).length) return src;
   const R = JSON.parse(JSON.stringify(src)); let n = 0; const seen = new Set();
   for (const [size, top, sports, p, , legs, day] of P.slips) {
@@ -214,7 +214,7 @@ function bankRefreshBar(root) {
     if (b.getAttribute('aria-busy') === 'true') return;
     b.setAttribute('aria-busy', 'true'); bankStatus = { text: 'Checking finished games on ESPN…', cls: '' }; render();
     let graded = 0, failed = 0, waiting = 0;
-    for (const sp of ['nba', 'nhl', 'nfl']) {
+    for (const sp of ['nba', 'nhl', 'nfl', 'cfb']) {
       const legs = P.legs.filter((L) => L[7] === sp.toUpperCase()); if (!legs.length) continue;
       let msg = '';
       try { graded += await liveCheck(sp, { legs }, (t, c) => { msg = c === 'bad' ? t : msg; }, 'bank-' + sp); } catch (e) { failed += 1; }
@@ -279,7 +279,7 @@ function render() {
     + Object.entries(D.taken).map(([s, t]) => s + ': ' + t).join('; ') + '); check the price on DraftKings before betting.';
   ({ slips: renderSlips, own: renderOwn, record: renderRecord })[tab](root);
 }
-$('lede').textContent = 'Two or three heavy favorites (about -400 at DraftKings) from the NFL and NHL boards, so $10 comes back as about $15 to $20. '
+$('lede').textContent = 'Two or three heavy favorites (about -400 at DraftKings) from the NFL, college football and NHL boards, so $10 comes back as about $15 to $20. '
   + 'Ranked by the model\'s chance that every leg hits. Built ' + new Date(D.built.replace(/T(\d\d)(\d\d)Z/, 'T$1:$2:00Z')).toLocaleString([], { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + '.';
 if (!TABS.some(([k]) => k === tab)) tab = 'slips';
 render();

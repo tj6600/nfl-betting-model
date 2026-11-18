@@ -177,6 +177,6 @@ def csv_x(sport, r):
     ev = str(abs(int(float(r['gid']))))
     line = None if r.get('line') in (None, '') or r['line'] != r['line'] else float(r['line'])
     mk = {'moneyline': 'ml', 'spread': 'sp', 'puckline': 'sp', 'total': 'tot'}.get(r['market'])
-    if mk: return dict(ev=ev, m=mk, sd=r['side'] if mk == 'tot' else ('home' if r['side'] == home else 'away'), ln=line)
+    if mk: return dict(ev=ev, m=mk, sd=r['side'] if mk == 'tot' or r['side'] in ('home', 'away') else ('home' if r['side'] == home else 'away'), ln=line)   # CFB logs side as home/away
     if sport == 'NBA': return dict(ev=ev, m='stat', st=r['market'], sd=r['side'], ln=line, pid=str(int(float(r['pid']))))
     return dict(ev=ev, m='stat', st=r['market'], sd=r['side'], ln=line, nm=player_name(r['label']), wk='G' if r['market'] == 'saves' else None)
