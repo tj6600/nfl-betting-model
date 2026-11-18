@@ -287,7 +287,8 @@ def upcoming(season, week, implied, overrides=None, depth=None):
     last = pg.groupby('pid').tail(1).copy()
     last['h_games'] = last.h_games + 1
     ros = _load_extra('roster', season)
-    ros = ros[(ros.week == week) & (ros.status == 'ACT')][['gsis_id', 'team']].rename(columns={'gsis_id': 'pid'})
+    from .roster import roster_week
+    ros = roster_week(ros, week); ros = ros[ros.status == 'ACT'][['gsis_id', 'team']].rename(columns={'gsis_id': 'pid'})
     last = last.merge(ros, on='pid')
     # fold the latest game into the averages so the features cover every game played so far,
     # relative to the team he's on this week (matters for a player traded since his last game)
@@ -304,7 +305,7 @@ def upcoming(season, week, implied, overrides=None, depth=None):
     core = set(last.pid[has_touch])
     last = last[has_touch | last.pid.isin(on_chart).values]
     if depth is not None:   # listed on the depth chart, ACT, but no touches in our play-by-play history at all
-        ract = _load_extra('roster', season); ract = ract[(ract.week == week) & (ract.status == 'ACT')]
+        ract = roster_week(_load_extra('roster', season), week); ract = ract[ract.status == 'ACT']
         nm = dict(zip(ract.gsis_id, ract.full_name))
         new = depth[depth.pid.isin(set(nm)) & ~depth.pid.isin(set(last.pid))]
         if len(new):

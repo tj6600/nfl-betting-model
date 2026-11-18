@@ -37,7 +37,8 @@ today = pd.Timestamp.now(tz='UTC').tz_localize(None).normalize()
 upcoming = G[(G.game_type == 'REG') & G.result.isna() & (G.gameday >= today - pd.Timedelta(days=1))]
 if upcoming.empty:
     raise SystemExit('No upcoming regular-season games in games.csv.')
-season, week = int(upcoming.season.min()), int(upcoming[upcoming.season == upcoming.season.min()].week.min())
+from nflmodel.model import current_week
+season, week = current_week()   # skips a week whose only game left is tonight (Monday runs)
 target = G[(G.season == season) & (G.week == week)]
 print(f'Pricing {season} week {week}: {len(target)} games')
 

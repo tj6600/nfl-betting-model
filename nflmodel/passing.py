@@ -119,7 +119,9 @@ def current(q, season, week, teams, out_names=(), listed=None):
     Brissett to BAL in week 10 2026): his form comes from his starts for his old team, and new_team marks the move."""
     from .roster import _load as _load_extra
     ros = _load_extra('roster', season)
-    act = ros[(ros.week == week) & (ros.status == 'ACT') & (ros.position == 'QB')][['gsis_id', 'team']].rename(columns={'gsis_id': 'pid', 'team': 'posteam'})
+    from .roster import roster_week
+    ros = roster_week(ros, week)
+    act = ros[(ros.status == 'ACT') & (ros.position == 'QB')][['gsis_id', 'team']].rename(columns={'gsis_id': 'pid', 'team': 'posteam'})
     s = q[q.attempts >= MIN_ATT].copy()
     al = 1 - 0.5 ** (1 / HALF)
     rows = []

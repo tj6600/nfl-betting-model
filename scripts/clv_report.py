@@ -11,7 +11,9 @@ from nflmodel.predict import american_to_decimal
 ROOT = os.path.join(os.path.dirname(__file__), '..')
 PDIR = os.path.join(ROOT, 'odds_log', 'picks')
 
-files = sorted(f for f in os.listdir(PDIR) if f.endswith('.csv')) if os.path.isdir(PDIR) else []
+import re
+# game picks only (<season>_wk<NN>.csv); the _td/_yards/_milestones prop files are graded by td_grade.py
+files = sorted(f for f in os.listdir(PDIR) if re.fullmatch(r'\d{4}_wk\d{2}\.csv', f)) if os.path.isdir(PDIR) else []
 if not files:
     raise SystemExit('No logged picks yet.')
 L = pd.concat([pd.read_csv(os.path.join(PDIR, f)) for f in files], ignore_index=True)
