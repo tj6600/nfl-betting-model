@@ -177,13 +177,14 @@ function renderOwn(root) {
 // Refresh results (Thomas, 2026-11-18): grade open slips' legs from ESPN in the browser (liveCheck in head.html), as on the sport pages.
 const BANK_GROUPS = ['All Bank Builder slips', 'Top slip of each build', '2-leg slips', '3-leg slips', 'Mixed-sport slips'];
 let bankStatus = { text: '', cls: '' };
-function bankLive(src) {
+function bankLive(src, inPeriod) {
   const P = src.pending; if (!P) return src;
   const res = {}; let at = 0;
   for (const sp of ['nba', 'nhl', 'nfl', 'cfb']) { const st = liveLoad('bank-' + sp); if (st && st.res) { Object.assign(res, st.res); at = Math.max(at, st.at || 0); } }
   if (!Object.keys(res).length) return src;
   const R = JSON.parse(JSON.stringify(src)); let n = 0; const seen = new Set();
-  for (const [size, top, sports, p, , legs, day] of P.slips) {
+  for (const [size, top, sports, p, , legs, day, gday] of P.slips) {
+    if (inPeriod && !inPeriod(gday || day)) continue;
     const rs = legs.map(([k, known]) => known || res[k] || null);
     let out, u;
     if (rs.includes('loss')) { out = 'lost'; u = -1; }
@@ -231,13 +232,51 @@ function bankRefreshBar(root) {
   const t = bankStatus.text || (lv && lv.n ? `Includes ${lv.n} slip${lv.n === 1 ? '' : 's'} checked live on ESPN at ${new Date(lv.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}. The overnight grading makes them official.` : '');
   if (t) bar.append(el('p', 'refstatus ' + bankStatus.cls, t));
   root.append(bar);
+  return bar;
+}
+
+// Day / week / month filter, the same menus as the sport pages' Model record (Thomas, 2026-11-18). A slip counts on the day
+// of its last game; bank.py writes the reports to D.record.by_period. Weeks run Monday to Sunday.
+function bankPeriod(bar) {
+  const bp = D.record.by_period || { menu: { day: [], week: [], month: [] }, reports: {} };
+  const st = Object.assign({ kind: 'all', keys: {} }, recLoad('bank'));
+  if (st.kind !== 'all' && !(bp.menu[st.kind] || []).length) st.kind = 'all';
+  let key = null;
+  if (st.kind !== 'all') { const l = bp.menu[st.kind]; let i = l.findIndex((x) => x.key === st.keys[st.kind]); if (i < 0) i = 0; key = l[i].key; st.keys[st.kind] = key; }
+  recSave('bank', st);
+  const redo = () => { recSave('bank', st); render(); };
+  const seg = el('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Time period');
+  for (const [k, lab] of REC_KINDS) {
+    const b = el('button', null, lab); b.type = 'button'; b.setAttribute('aria-pressed', st.kind === k);
+    if (k !== 'all' && !(bp.menu[k] || []).length) { b.disabled = true; b.title = 'Nothing graded yet'; }
+    b.onclick = () => { if (st.kind !== k) { st.kind = k; redo(); } }; seg.append(b);
+  }
+  const r1 = el('div', 'recrow'); r1.append(seg); bar.prepend(r1);
+  if (key) {
+    const l = bp.menu[st.kind], i = l.findIndex((x) => x.key === key);
+    const nav = el('div', 'recnav');
+    const prev = el('button', 'arrow', '‹'); prev.type = 'button'; prev.setAttribute('aria-label', 'Earlier'); prev.disabled = i >= l.length - 1;
+    const next = el('button', 'arrow', '›'); next.type = 'button'; next.setAttribute('aria-label', 'Later'); next.disabled = i <= 0;
+    const sel = el('select'); sel.setAttribute('aria-label', 'Choose the ' + st.kind);
+    l.forEach((x) => { const op = el('option', null, x.label); op.value = x.key; if (x.key === key) op.selected = true; sel.append(op); });
+    sel.onchange = () => { st.keys[st.kind] = sel.value; redo(); };
+    prev.onclick = () => { st.keys[st.kind] = l[i + 1].key; redo(); };
+    next.onclick = () => { st.keys[st.kind] = l[i - 1].key; redo(); };
+    nav.append(prev, sel, next); const r2 = el('div', 'recrow'); r2.append(nav); r1.after(r2);
+    if (st.kind === 'week') r2.after(el('p', 'recsum', 'Weeks run Monday to Sunday. A slip counts on the day of its last game.'));
+    else if (st.kind === 'day') r2.after(el('p', 'recsum', 'A slip counts on the day of its last game.'));
+  }
+  const monday = (d) => { const t = new Date(d + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() - (t.getUTCDay() + 6) % 7); return t.toISOString().slice(0, 10); };
+  const inPeriod = !key ? null : (d) => (key[0] === 'd' ? 'd:' + d : key[0] === 'm' ? 'm:' + d.slice(0, 7) : 'w:' + monday(d)) === key;
+  const sub = key ? bp.reports[key] : null;
+  return { src: sub ? Object.assign({}, D.record, sub) : D.record, inPeriod, label: key ? bp.menu[st.kind].find((x) => x.key === key).label : '' };
 }
 
 function renderRecord(root) {
-  bankRefreshBar(root);
-  const R = bankLive(D.record);
+  const per = bankPeriod(bankRefreshBar(root));
+  const R = bankLive(per.src, per.inPeriod);
   if (!R.groups.length) {
-    root.append(el('div', 'bk-empty', 'No graded slips yet. Every build\'s suggestions are saved and graded at DraftKings prices once their games finish' + (R.open ? ' (' + R.open + ' waiting on results).' : '.')));
+    root.append(el('div', 'bk-empty', per.label ? 'No graded slips for ' + per.label + (R.open ? ' (' + R.open + ' waiting on results).' : '.') : 'No graded slips yet. Every build\'s suggestions are saved and graded at DraftKings prices once their games finish' + (R.open ? ' (' + R.open + ' waiting on results).' : '.')));
   } else {
     const t = el('div', 'tiles'), a = R.groups[0];
     for (const [k, v, s] of [['Slips', a.won + '-' + a.lost, pct(a.hit) + ' hit · expected ' + pct(a.exp_hit)], ['Profit on $' + D.stake + ' each', (a.dollars >= 0 ? '+$' : '-$') + Math.abs(a.dollars).toFixed(2), (a.roi >= 0 ? '+' : '') + (a.roi * 100).toFixed(1) + '% per slip'],
@@ -246,7 +285,7 @@ function renderRecord(root) {
     }
     root.append(t);
     const w = el('div', 'tablewrap'), tb = el('table', 'res');
-    const hr = el('tr'); ['Group', 'W-L', 'Hit', 'Expected', 'Profit ($' + D.stake + ')'].forEach((h) => hr.append(el('td', h === 'Group' ? '' : 'num', h))); hr.style.fontWeight = '700'; tb.append(hr);
+    const hr = el('tr'); ['Group', 'W-L', 'Hit', 'Expected', 'Profit ($' + D.stake + ')'].forEach((h) => hr.append(el('th', h === 'Group' ? null : 'num', h))); tb.append(hr);
     for (const g of R.groups) {
       const r = el('tr'); r.append(el('td', null, g.group)); r.append(el('td', 'num', g.won + '-' + g.lost)); r.append(el('td', 'num', pct(g.hit)));
       r.append(el('td', 'num', pct(g.exp_hit))); r.append(el('td', 'num', (g.dollars >= 0 ? '+$' : '-$') + Math.abs(g.dollars).toFixed(2))); tb.append(r);
