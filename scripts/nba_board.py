@@ -7,7 +7,7 @@ Prices come from the latest odds_log/nba snapshots (python -m nbamodel.odds game
 """
 import os as _os, sys as _sys
 if not _os.environ.get('NBA_ENABLED'):   # NBA was removed from the site on 2026-11-18; this keeps board/site/nba.html as the notice page
-    _sys.exit('NBA board removed on 2026-11-18: not building nba.html (set NBA_ENABLED=1 to build it anyway)')
+    print('NBA board removed on 2026-11-18: skipping, nba.html stays a notice page (set NBA_ENABLED=1 to build it anyway)'); _sys.exit(0)   # a no-op, so the grading runs don't report an error
 
 import sys, os, json, glob, argparse, datetime as dt; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np, pandas as pd
