@@ -333,7 +333,7 @@ SPORT_CSS = """<style>
 .sportnav a.bell { margin-left: auto; padding: 6px 12px; }
 </style>"""
 # NBA was removed on 2026-11-18 (no edge over DraftKings in 7 days of graded lines); nba.html is now a notice page
-PAGES = [('nfl', 'NFL', 'index.html'), ('cfb', 'College', 'cfb.html'), ('nhl', 'NHL', 'nhl.html'), ('bank', 'Bank Builder', 'bank.html')]
+PAGES = [('nfl', 'NFL', 'index.html'), ('cfb', 'College', 'cfb.html'), ('nhl', 'NHL', 'nhl.html'), ('tennis', 'Tennis', 'tennis.html'), ('bank', 'Bank Builder', 'bank.html')]
 
 
 # alerts setup page (board/site/alerts.html): push notifications when new boards post (scripts/push_alert.py)
