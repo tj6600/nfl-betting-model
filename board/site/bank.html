@@ -600,9 +600,9 @@ function refreshButton(o, bar) {
     for (const t of document.querySelectorAll('table.res')) {
       const hr = headRow(t); if (!hr) continue;
       if (!t.offsetParent) { set(hr, 0); continue; }
-      const tr = t.getBoundingClientRect(), hh = hr.getBoundingClientRect().height;
-      const top = hr.getBoundingClientRect().top - (+hr.dataset.shift || 0);
-      const last = t.rows[t.rows.length - 1], lh = last && last !== hr ? last.getBoundingClientRect().height : 0;
+      // measure from layout (offsetTop/offsetHeight), which the shift itself never moves, so it can't feed back into itself
+      const tr = t.getBoundingClientRect(), hh = hr.offsetHeight, top = tr.top + hr.offsetTop;
+      const last = t.rows[t.rows.length - 1], lh = last && last !== hr ? last.offsetHeight : 0;
       set(hr, Math.round(Math.max(0, Math.min(-top, tr.bottom - top - hh - lh))));
     }
   };
