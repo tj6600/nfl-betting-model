@@ -16,7 +16,8 @@ from nflmodel.odds import all_snapshots, TEAMS
 
 today = pd.Timestamp.now(tz='UTC').tz_localize(None).normalize()
 up = G[(G.game_type == 'REG') & G.result.isna() & (pd.to_datetime(G.gameday) >= today - pd.Timedelta(days=1))]
-season = int(up.season.min()); week = int(up[up.season == season].week.min())
+from nflmodel.model import current_week
+season, week = current_week()   # skips a week whose only game left is tonight (Monday runs)
 target = G[(G.season == season) & (G.week == week)]
 
 df = T.training_frame()

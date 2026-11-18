@@ -38,6 +38,17 @@ def _load(kind, y):
     return pd.read_csv(local if os.path.exists(local) else URLS[kind].format(y=y), low_memory=False)
 
 
+def roster_week(ros, week):
+    """Rows of a weekly roster for `week`; before nflverse posts that week (usually Tuesday or Wednesday),
+    the latest earlier week's rows, so Monday's opener run still prices players."""
+    w = ros[ros.week == week]
+    if len(w) or not (ros.week < week).any():
+        return w
+    prev = ros.week[ros.week < week].max()
+    print(f'weekly roster has no week {week} rows yet; using week {prev}')
+    return ros[ros.week == prev]
+
+
 def _key(name):
     return name.str.lower().str.replace(r'[^a-z]', '', regex=True)
 
