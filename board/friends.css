@@ -1,0 +1,43 @@
+/* Friends page (friends_app.js): sign-in card, group switcher, this week's group parlay, leaderboard, history */
+.fcard { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.fcard h2 { font: 700 22px var(--display); letter-spacing: .02em; margin: 0; }
+.fcard h3 { font: 700 16px var(--display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.fstack { display: flex; flex-direction: column; gap: 16px; }
+.frow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.frow .grow { flex: 1 1 auto; }
+.fbtn { font: 600 15px var(--body); border: 0; border-radius: 8px; padding: 10px 16px; background: var(--turf); color: #fff; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; justify-content: center; }
+.fbtn.ghost { background: transparent; color: var(--turf); border: 1px solid var(--line); }
+.fbtn.danger { background: transparent; color: var(--neg); border: 1px solid var(--line); }
+.fbtn:disabled { opacity: .5; cursor: default; }
+.fbtn.google { background: var(--panel); color: var(--ink); border: 1px solid var(--line); font-size: 16px; padding: 12px 18px; }
+.fin { font: inherit; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); min-width: 0; }
+.me { display: flex; align-items: center; gap: 10px; }
+.av { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; background: var(--turf-soft); color: var(--turf); display: inline-flex; align-items: center; justify-content: center; font: 700 15px var(--display); }
+.av.sm { width: 24px; height: 24px; font-size: 12px; }
+.fwho { display: inline-flex; align-items: center; gap: 8px; }
+.ok { color: var(--pos); font-weight: 700; } .bad { color: var(--neg); font-weight: 700; } .wait { color: var(--muted); }
+.mypick { border: 1px dashed var(--turf); border-radius: var(--r); padding: 12px 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--turf-soft); }
+.mypick .big { font: 700 20px var(--display); letter-spacing: .01em; }
+.legs { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; max-height: 60vh; overflow-y: auto; }
+.leg { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 10px 14px; border: 0; border-bottom: 1px solid var(--line); background: var(--panel); color: var(--ink); text-align: left; font: inherit; cursor: pointer; }
+.leg:last-child { border-bottom: 0; }
+.leg:hover { background: var(--turf-soft); }
+.leg[aria-pressed="true"] { background: var(--turf-soft); box-shadow: inset 4px 0 0 var(--turf); }
+.leg .t { font-weight: 600; }
+.leg .s { color: var(--muted); font-size: 13px; grid-column: 1; }
+.leg .pr { font: 700 17px var(--display); grid-row: 1 / span 2; grid-column: 2; align-self: center; text-align: right; }
+.leg .pr small { display: block; font: 500 12px var(--body); color: var(--muted); }
+.sum { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; }
+.sum .tile b { font: 700 22px var(--display); }
+.sum .tile { padding: 10px 12px; }
+.sum .tile span { color: var(--muted); font-size: 13px; }
+.badge { font: 600 11px var(--body); text-transform: uppercase; letter-spacing: .06em; padding: 2px 7px; border-radius: 999px; background: var(--gold-soft); color: var(--gold); }
+.invite { font: 13px/1.4 ui-monospace, Menlo, monospace; word-break: break-all; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.wk { border-top: 1px solid var(--line); padding-top: 12px; }
+.fmsg { margin: 0; font-size: 14px; } .fmsg.bad { color: var(--neg); }
+@media (max-width: 560px) { .frow > .fbtn:not(.so) { flex: 1 1 auto; } .fcard { padding: 12px; } }
+table.ftbl td { white-space: normal; vertical-align: middle; }
+table.ftbl td.num { white-space: nowrap; }
+table.ftbl .fwho { white-space: nowrap; }
+.lc { display: inline-flex; flex-direction: column; } .lc small { color: var(--muted); font-size: 12px; font-weight: 400; }
+@media (max-width: 560px) { table.ftbl td, table.ftbl th { padding-left: 8px; padding-right: 8px; } }

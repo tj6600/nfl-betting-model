@@ -1,0 +1,83 @@
+rules_version = '2';
+// Firestore security rules for the Friends page (board/site/friends.html). Paste this whole file into
+// Firebase console > Firestore Database > Rules, then Publish. See docs/friends-setup.md.
+//
+// What it allows:
+//   users/{uid}            your own name and photo; any signed-in member can look up a profile by id (no listing).
+//   groups/{gid}           the invite link is the group's random id: knowing it lets a signed-in person see the group
+//                          and add only themselves. Members can leave; the owner can rename it or remove members.
+//   groups/{gid}/picks/{week_uid}
+//                          members read the group's picks; you write only your own, only before your leg kicks off.
+//                          The page also checks every pick's save time against the site's own kickoff times.
+// Everything else is denied.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+    function shortText(v, n) { return v is string && v.size() > 0 && v.size() <= n; }
+
+    match /users/{uid} {
+      allow get: if signedIn();
+      allow create, update: if signedIn() && uid == me()
+        && request.resource.data.keys().hasOnly(['name', 'photo', 'updated'])
+        && shortText(request.resource.data.name, 40)
+        && (!('photo' in request.resource.data) || request.resource.data.photo == null
+            || (request.resource.data.photo is string && request.resource.data.photo.size() <= 500
+                && request.resource.data.photo.matches('https://[a-z0-9.-]+[.]googleusercontent[.]com/.*')))
+        && request.resource.data.updated == request.time;
+      allow delete: if signedIn() && uid == me();
+    }
+
+    match /groups/{gid} {
+      function before() { return resource.data; }
+      function after() { return request.resource.data; }
+      function onlyMembersChanged() { return after().diff(before()).affectedKeys().hasOnly(['members']); }
+
+      allow get: if signedIn();
+      allow list: if signedIn() && me() in resource.data.members;
+      allow create: if signedIn()
+        && after().keys().hasOnly(['name', 'owner', 'members', 'created'])
+        && shortText(after().name, 40)
+        && after().owner == me()
+        && after().members == [me()]
+        && after().created == request.time;
+      allow update: if signedIn() && after().members is list && after().members.size() <= 30 && (
+        // join: add yourself, nothing else
+        (onlyMembersChanged() && !(me() in before().members)
+          && after().members.size() == before().members.size() + 1
+          && after().members.hasAll(before().members) && me() in after().members)
+        // leave: take yourself off (the owner deletes the group instead)
+        || (onlyMembersChanged() && me() in before().members && before().owner != me()
+          && after().members.size() == before().members.size() - 1
+          && before().members.hasAll(after().members) && !(me() in after().members))
+        // owner: rename, or remove other members
+        || (before().owner == me()
+          && after().diff(before()).affectedKeys().hasOnly(['name', 'members'])
+          && shortText(after().name, 40)
+          && me() in after().members && before().members.hasAll(after().members))
+      );
+      allow delete: if signedIn() && resource.data.owner == me();
+
+      match /picks/{pickId} {
+        function group() { return get(/databases/$(database)/documents/groups/$(gid)).data; }
+        function member() { return me() in group().members; }
+        function p() { return request.resource.data; }
+
+        allow read: if signedIn() && member();
+        allow create, update: if signedIn() && member()
+          && p().keys().hasOnly(['uid', 'week', 'leg', 'label', 'who', 'game', 'kind', 'price', 'kick', 'at'])
+          && p().uid == me()
+          && p().week is string && p().week.matches('[0-9]{4}_wk[0-9]{2}')
+          && pickId == p().week + '_' + me()
+          && shortText(p().leg, 80) && shortText(p().label, 80) && shortText(p().game, 20)
+          && (p().who == null || (p().who is string && p().who.size() <= 60))
+          && shortText(p().kind, 12)
+          && p().price is int && p().price >= -100000 && p().price <= 100000
+          && p().kick is timestamp && p().kick > request.time
+          && p().at == request.time
+          && (resource == null || resource.data.kick > request.time);
+        allow delete: if signedIn() && resource.data.uid == me() && resource.data.kick > request.time;
+      }
+    }
+  }
+}
