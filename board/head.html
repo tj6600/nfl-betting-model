@@ -451,10 +451,10 @@ function liveSrc(sport, src) {
 }
 
 // ESPN box scores -> a result for each waiting leg whose game is final
-async function liveCheck(sport, P, say) {
+async function liveCheck(sport, P, say, store) {   // store: localStorage name for the results (default: the sport's own)
   const get = async (u) => { const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); };
   const base = ESPN + ESPN_SPORT[sport];
-  const st = liveLoad(sport) || {}; const res = Object.assign({}, st.res || {});
+  const st = liveLoad(store || sport) || {}; const res = Object.assign({}, st.res || {});
   const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
   const want = P.legs.filter((L) => !res[L[0]] && L[1] && L[1] <= todayET);
   if (!want.length) { say('Nothing is waiting on a result right now.', 'ok'); return 0; }
@@ -535,7 +535,7 @@ async function liveCheck(sport, P, say) {
     res[L[0]] = x > 0 ? 'win' : x < 0 ? 'loss' : 'push'; n += 1;
   }
   if (evs.length && failed === evs.length) { say('Could not reach ESPN. Check the connection and try again.', 'bad'); return 0; }
-  liveSave(sport, { res, at: Date.now() });
+  liveSave(store || sport, { res, at: Date.now() });
   const left = want.length - n, fin = Object.keys(box).length;
   say(n ? `Graded ${n} bet${n === 1 ? '' : 's'} from ${fin} finished game${fin === 1 ? '' : 's'}.${left ? ` ${left} still waiting for their games to finish or for the overnight grading.` : ''}`
     : fin ? 'No new results yet.' : 'No games have finished yet. Try again after they end.', n ? 'ok' : '');

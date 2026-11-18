@@ -95,6 +95,27 @@ def results(want):
     return out
 
 
+ESPN_ST = {'Rush': 'rush', 'Rec': 'rec', 'Recs': 'recs', 'Pass': 'pass'}
+
+
+def grade_x(day, i, game, label):
+    """How the page's Refresh results button finds a leg's result on ESPN (calib.Pending): None if it can't."""
+    import calib as CAL
+    s_, w_ = _week(day); away, home = game.split(' @ ')
+    x = dict(wk=[s_, w_, away, home])
+    m = RX_G.match(i)
+    if m:
+        _, mk, side, pt = m.groups()
+        x.update(m=mk, sd=side if mk == 'tot' else ('home' if side == home else 'away'), ln=float(pt) if pt and mk != 'ml' else None)
+        return x
+    x['nm'] = CAL.player_name(label)
+    if i.startswith('t-'): x.update(m='stat', st='td', sd='Over', ln=0.5)
+    elif RX_Y.match(i): y = RX_Y.match(i); x.update(m='stat', st=ESPN_ST[y.group(2)], sd=y.group(3), ln=float(y.group(4)))
+    elif RX_M.match(i): y = RX_M.match(i); x.update(m='stat', st=ESPN_ST[y.group(2)], sd='Over', ln=int(y.group(3)) - 0.5)
+    else: return None
+    return x
+
+
 MKT = {'Game': 'Game lines', 'TD': 'Anytime TDs', 'Rush': 'Yards and receptions', 'Rec': 'Yards and receptions',
        'Recs': 'Yards and receptions', 'Pass': 'Yards and receptions'}
 
@@ -276,22 +297,7 @@ def record():
     since = (pd.Timestamp.now(tz='America/New_York').normalize() - pd.Timedelta(days=3)).strftime('%Y-%m-%d')
     PD = CAL.Pending(push_counts=False)
     wkey = lambda day, i: '%d_wk%02d|%s' % (_week(day) + (i,))
-    ESPN_ST = {'Rush': 'rush', 'Rec': 'rec', 'Recs': 'recs', 'Pass': 'pass'}
-
-    def gx(day, i, game, label):
-        s_, w_ = _week(day); away, home = game.split(' @ ')
-        x = dict(wk=[s_, w_, away, home])
-        m = RX_G.match(i)
-        if m:
-            _, mk, side, pt = m.groups()
-            x.update(m=mk, sd=side if mk == 'tot' else ('home' if side == home else 'away'), ln=float(pt) if pt and mk != 'ml' else None)
-            return x
-        x['nm'] = CAL.player_name(label)
-        if i.startswith('t-'): x.update(m='stat', st='td', sd='Over', ln=0.5)
-        elif RX_Y.match(i): y = RX_Y.match(i); x.update(m='stat', st=ESPN_ST[y.group(2)], sd=y.group(3), ln=float(y.group(4)))
-        elif RX_M.match(i): y = RX_M.match(i); x.update(m='stat', st=ESPN_ST[y.group(2)], sd='Over', ln=int(y.group(3)) - 0.5)
-        else: return None
-        return x
+    gx = grade_x
     for day, ls in picks.items():
         for l in ls:
             d = day_of(day, l['game'])

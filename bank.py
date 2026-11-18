@@ -206,7 +206,7 @@ def grade():
                     out, units = ('push', 0.0) if not live else ('won', math.prod(dec(L['price']) for L in live) - 1)
                 rows.append(dict(day=day, size=int(k), top=i == 0, result=out, units=units, p=s['p'], ret=s['ret'],
                                  sports=sorted({L['sport'] for L in s['legs']}),
-                                 legs=[dict(sport=L['sport'], label=L['label'], price=L['price'], result=r) for L, r in zip(s['legs'], rs)]))
+                                 legs=[dict(sport=L['sport'], label=L['label'], price=L['price'], result=r) for L, r in zip(s['legs'], rs)], _legs=s['legs']))
     groups = []
 
     def grp(name, x):
@@ -225,8 +225,47 @@ def grade():
         for L in r['legs']:
             if L['result'] in ('win', 'loss'): lw[(L['label'], L['price'])] = L['result'] == 'win'
     legrec = dict(n=len(lw), won=sum(lw.values()))
-    done = [r for r in rows if r['result'] in ('won', 'lost', 'push')]
-    return dict(groups=groups, legs=legrec, recent=done[-12:][::-1], open=sum(r['result'] == 'open' for r in rows))
+    done = [{k: v for k, v in r.items() if k != '_legs'} for r in rows if r['result'] in ('won', 'lost', 'push')]
+    return dict(groups=groups, legs=legrec, recent=done[-12:][::-1], open=sum(r['result'] == 'open' for r in rows), pending=pending(rows))
+
+
+def pending(rows):
+    """Slips still open, with what the page's Refresh results button needs to grade their legs from ESPN (Thomas,
+    2026-11-18): legs [key, ET date, ESPN lookup, price, p, [], []] and slips [size, top, sports, p, ret, [[key, result, price, label]], day]."""
+    import calib as CAL, csv
+    from nflmodel import record as REC
+    since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=4)).strftime('%Y-%m-%d')
+    known = {}   # the sport pages' own waiting legs already carry the lookup (NHL ones with the skater's position)
+    for sp in ('nba', 'nhl'):
+        f = os.path.join(ROOT, 'odds_log', sp, 'grade_report.json')
+        if os.path.exists(f):
+            for L in (json.load(open(f)).get('pending') or {}).get('legs', []): known[(sp.upper(), L[0])] = L[2]
+    csvs, legs, slips_ = {}, {}, []
+
+    def x_of(L):
+        if L['sport'] == 'NFL':
+            x = REC.grade_x(L['day'], L['id'], L['game'], L['label']); return CAL.compact_x(x) if x else None
+        k = (L['sport'], f"{L['day']}|{L['id']}")
+        if k in known: return known[k]
+        ck = (L['sport'], L['day'])
+        if ck not in csvs:
+            fs = sorted(glob.glob(os.path.join(ROOT, 'odds_log', L['sport'].lower(), 'picks', f"{L['day']}_*.csv")))
+            csvs[ck] = {r['id']: r for r in csv.DictReader(open(fs[0]))} if fs else {}
+        r = csvs[ck].get(L['id'])
+        return CAL.compact_x(CAL.csv_x(L['sport'], r)) if r else None
+    from zoneinfo import ZoneInfo
+    for r in rows:
+        if r['result'] != 'open' or r['day'] < since: continue
+        ls = []
+        for L, lr in zip(r['_legs'], [x['result'] for x in r['legs']]):
+            key = f"{L['sport']}|{L['day']}|{L['id']}"
+            if lr is None and key not in legs:
+                x = x_of(L)
+                d = _t(L['start']).astimezone(ZoneInfo('America/New_York')).strftime('%Y-%m-%d') if L.get('start') else None
+                if x: legs[key] = [key, d, x, int(L['price']), round(float(L['p']), 4), [], [], L['sport']]
+            ls.append([key, lr, int(L['price']), L['label']])
+        slips_.append([r['size'], r['top'], r['sports'], r['p'], r['ret'], ls, r['day']])
+    return dict(legs=list(legs.values()), slips=slips_)
 
 
 # ---------- page ----------
