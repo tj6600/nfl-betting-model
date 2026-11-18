@@ -797,9 +797,19 @@ function legLabel(L, cls) {
   const pl = L.pid ? D.players.find((x) => x.id === L.pid) : null;
   if (!pl) return el('span', cls, L.label);
   const b = el('button', (cls ? cls + ' ' : '') + 'namebtn', L.label); b.type = 'button'; b.title = 'Game log';
-  b.onclick = (e) => { e.stopPropagation(); openLog(pl, L.stat || L.market); }; return b;
+  b.onclick = (e) => { e.stopPropagation(); openLog(pl, L.stat || L.market, L); }; return b;
 }
-function openLog(p, k) {
+// the side the popup colors for: a parlay leg's own side and line, else the board's lean on the main line.
+// Green = the game supports that side (Thomas, 2026-11-17); no lean -> plain over-the-line coloring.
+function logSide(pr, leg) {
+  if (leg && leg.side && leg.line != null) return { line: Number(leg.line), side: leg.side };
+  if (!pr || pr.line == null) return { line: null, side: null };
+  const b = bestSide(pr);
+  return { line: pr.line, side: b ? (b === pr.under ? 'Under' : 'Over') : null };
+}
+const sideHit = (v, s) => (s.side === 'Under' ? v < s.line : v > s.line);
+const sideNote = (s, stat) => (s.side ? `Green marks games that would have hit tonight's ${s.side} ${s.line}${stat ? ' ' + stat : ''}.` : `Green marks games over tonight's ${stat ? stat + ' ' : ''}line of ${s.line}.`);
+function openLog(p, k, leg) {
   const ov = el('div', 'overlay'); ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
   const pn = el('div', 'logpanel'); pn.setAttribute('role', 'dialog'); pn.setAttribute('aria-label', p.name + ' game log');
   const h = el('div', 'loghead'); const t = el('div'); t.append(el('h2', null, p.name), el('div', 'dim', `${p.team} ${p.pos} · ${p.gp} games this season · ${p.mpg} min lately`));
@@ -810,10 +820,10 @@ function openLog(p, k) {
   if (p.flags.length) pn.append(el('div', 'loghit', p.flags.join('; ')));
   const tw = el('div', 'tablewrap'); const tb = el('table', 'res log');
   const hr = el('tr'); ['Date', 'Opp', 'Min', 'Pts', 'Reb', 'Ast', '3PM', 'PRA'].forEach((c, i) => hr.append(el('th', i > 1 ? 'num' : null, c))); tb.append(hr);
-  const line = p.props[k] && p.props[k].line;
-  p.log.forEach((g) => { const tr = el('tr'); [g.d, g.o, g.m, g.pts, g.reb, g.ast, g.fg3m, g.pra].forEach((v, i) => { const keyc = ['', '', '', 'pts', 'reb', 'ast', 'fg3m', 'pra'][i]; tr.append(el('td', (i > 1 ? 'num' : '') + (keyc === k && line != null ? (v > line ? ' hit' : ' miss') : ''), v)); }); tb.append(tr); });
+  const S = logSide(p.props[k], leg);
+  p.log.forEach((g) => { const tr = el('tr'); [g.d, g.o, g.m, g.pts, g.reb, g.ast, g.fg3m, g.pra].forEach((v, i) => { const keyc = ['', '', '', 'pts', 'reb', 'ast', 'fg3m', 'pra'][i]; tr.append(el('td', (i > 1 ? 'num' : '') + (keyc === k && S.line != null && v != null ? (sideHit(v, S) ? ' hit' : ' miss') : ''), v)); }); tb.append(tr); });
   tw.append(tb); pn.append(tw);
-  pn.append(el('p', 'note logfoot', line != null ? `Green marks games over tonight's ${SL[k].toLowerCase()} line of ${line}.` : 'Last 12 games played.'));
+  pn.append(el('p', 'note logfoot', S.line != null ? sideNote(S, SL[k].toLowerCase()) : 'Last 12 games played.'));
   ov.append(pn); document.body.append(ov);
   x.focus();
   const esc = (e) => { if (e.key === 'Escape') { ov.remove(); document.removeEventListener('keydown', esc); } }; document.addEventListener('keydown', esc);

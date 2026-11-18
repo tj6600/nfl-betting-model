@@ -801,15 +801,25 @@ function legLabel(L, cls) {
   const pl = L.pid ? SRC(L.market).find((x) => x.id === L.pid) : null;
   if (!pl) return el('span', cls, L.label);
   const b = el('button', (cls ? cls + ' ' : '') + 'namebtn', L.label); b.type = 'button'; b.title = 'Game log';
-  b.onclick = (e) => { e.stopPropagation(); openLog(pl, L.market); }; return b;
+  b.onclick = (e) => { e.stopPropagation(); openLog(pl, L.market, L); }; return b;
 }
-function openLog(p, k) {
+// the side the popup colors for: a parlay leg's own side and line, else the board's lean on the main line.
+// Green = the game supports that side (Thomas, 2026-11-17); no lean -> plain over-the-line coloring.
+function logSide(pr, leg) {
+  if (leg && leg.side && leg.line != null) return { line: Number(leg.line), side: leg.side };
+  if (!pr || pr.line == null) return { line: null, side: null };
+  const b = bestSide(pr);
+  return { line: pr.line, side: b ? (b === pr.under ? 'Under' : 'Over') : null };
+}
+const sideHit = (v, s) => (s.side === 'Under' ? v < s.line : v > s.line);
+const sideNote = (s, stat) => (s.side ? `Green marks games that would have hit tonight's ${s.side} ${s.line}${stat ? ' ' + stat : ''}.` : `Green marks games over tonight's ${stat ? stat + ' ' : ''}line of ${s.line}.`);
+function openLog(p, k, leg) {
   const ov = el('div', 'overlay'); ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
   const pn = el('div', 'logpanel'); pn.setAttribute('role', 'dialog'); pn.setAttribute('aria-label', p.name + ' game log');
   const gkp = k === 'saves';
   const h = el('div', 'loghead'); const t = el('div'); t.append(el('h2', null, p.name), el('div', 'dim', gkp ? `${p.team} goalie · ${p.confirmed ? 'confirmed' : 'projected'} starter` : `${p.team} ${p.pos} · ${p.gp} games this season · ${p.toi} min lately`));
   const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Close'); x.onclick = () => ov.remove(); h.append(t, x); pn.append(h);
-  const pr = p[k]; const chips = el('div', 'lchips');
+  const pr = p[k]; const S = logSide(pr, leg); const chips = el('div', 'lchips');
   chips.append(el('span', 'pill likely', `proj ${pr.proj}${pr.line != null ? ' · line ' + pr.line : ''}`));
   if (pr.ch) Object.entries(pr.ch).forEach(([c, v]) => chips.append(el('span', 'pill', `${c} shots: ${pct(v)}`)));
   pn.append(chips);
@@ -818,9 +828,9 @@ function openLog(p, k) {
   const cols = gkp ? [['d', 'Date'], ['o', 'Opp'], ['sa', 'Shots'], ['sv', 'Saves'], ['pct', 'SV%']] : [['d', 'Date'], ['o', 'Opp'], ['toi', 'TOI'], ['sog', 'SOG'], ['g', 'G'], ['a', 'A'], ['blk', 'BLK']];
   const key = gkp ? 'sv' : 'sog';
   const hr = el('tr'); cols.forEach(([, c], i) => hr.append(el('th', i > 1 ? 'num' : null, c))); tb.append(hr);
-  p.log.forEach((g) => { const tr = el('tr'); cols.forEach(([c], i) => { const v = c === 'pct' && g[c] != null ? g[c].toFixed(3).slice(1) : g[c]; tr.append(el('td', (i > 1 ? 'num' : '') + (c === key && pr.line != null && g[c] != null ? (g[c] > pr.line ? ' hit' : ' miss') : ''), v ?? '—')); }); tb.append(tr); });
+  p.log.forEach((g) => { const tr = el('tr'); cols.forEach(([c], i) => { const v = c === 'pct' && g[c] != null ? g[c].toFixed(3).slice(1) : g[c]; tr.append(el('td', (i > 1 ? 'num' : '') + (c === key && S.line != null && g[c] != null ? (sideHit(g[c], S) ? ' hit' : ' miss') : ''), v ?? '—')); }); tb.append(tr); });
   tw.append(tb); pn.append(tw);
-  pn.append(el('p', 'note logfoot', pr.line != null ? `Green marks games over tonight's line of ${pr.line}.` : `Last ${p.log.length} games.`));
+  pn.append(el('p', 'note logfoot', S.line != null ? sideNote(S, '') : `Last ${p.log.length} games.`));
   ov.append(pn); document.body.append(ov);
   x.focus();
   const esc = (e) => { if (e.key === 'Escape') { ov.remove(); document.removeEventListener('keydown', esc); } }; document.addEventListener('keydown', esc);

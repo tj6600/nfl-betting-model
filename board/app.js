@@ -224,8 +224,8 @@ function showLog(pid, ctx) {
     const tr = el('tr'); tr.append(el('td', null, String(r[0])), el('td', null, `${r[2] ? '@' : 'vs'} ${r[1]}`));
     if (r[3] == null) { const td = el('td', 'dim', 'Did not play'); td.colSpan = 6 + (hitFn ? 1 : 0); tr.append(td); }
     else {
-      // the stat the line is on: green when it went over the line, red otherwise (Thomas, 2026-11-16)
-      for (const i of [3, 4, 5, 6, 7, 8]) tr.append(el('td', 'num' + (i === hitCol ? (r[i] > ctx.line ? ' pos' : ' neg') : ''), String(r[i])));
+      // the stat the line is on: green when the game supports the bet's side (Under: below the line), red otherwise (Thomas, 2026-11-17)
+      for (const i of [3, 4, 5, 6, 7, 8]) tr.append(el('td', 'num' + (i === hitCol ? (hitFn(r) ? ' pos' : ' neg') : ''), String(r[i])));
       if (hitFn) { const ok = hitFn(r); tr.append(el('td', ok ? 'pos' : 'neg', ok ? 'Hit' : 'Miss')); }
     }
     tbody.append(tr);
