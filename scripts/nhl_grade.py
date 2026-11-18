@@ -66,46 +66,55 @@ def main():
             rows.append(dict(day=day, kind=l.kind, lean=bool(l.lean), cat=l.cat if isinstance(l.cat, str) else '', pick=bool(getattr(l, 'pick', False)),
                              flagged=bool(l.flagged), price=l.price, p=l.p, edge=l.edge, won=bool(res), units=(dec(l.price) - 1) if res else -1.0,
                              gid=l.gid, market=l.market, line=l.line, pid=l.pid if l.pid == l.pid else 0, alt=bool(alt.loc[l.Index])))
-    R = pd.DataFrame(rows)
-    out = dict(days=sorted(R.day.unique().tolist()) if len(R) else [], groups=[])
-    if len(R):
-        def grp(name, x):
-            if not len(x): return
-            out['groups'].append(dict(group=name, bets=int(len(x)), won=int(x.won.sum()), lost=int((~x.won).sum()), hit=float(x.won.mean()),
-                                      exp_hit=float(x.p.mean()), units=round(float(x.units.sum()), 2), roi=float(x.units.mean())))
-        # leans count only when the board saw an edge (Thomas, 2026-11-16: most logged leans had none, so they weren't real picks)
-        R['plus'] = R.lean & (R.edge > 0)
-        props = R[R.plus & R.kind.isin(['Shots on goal', 'Saves'])]
-        grp('Board winner picks', R[R.pick])
-        grp('Value legs', R[R.cat == 'Value'])
-        grp('Prop leans with an edge (shots + saves)', props)
-        for k in ['Shots on goal', 'Saves', 'Puck line', 'Total']:
-            grp(f'{k} leans with an edge', R[R.plus & (R.kind == k)])
-        last = R.day.max()
-        lp = props[props.day == last]; lw = R[R.pick & (R.day == last)]
-        out['latest_day'] = dict(day=last, props_won=int(lp.won.sum()), props_lost=int((~lp.won).sum()),
-                                 picks_won=int(lw.won.sum()), picks_lost=int((~lw.won).sum()))
     import parlays as PZ
-    if len(R): out['calibration'] = PZ.calibration(R.p.tolist(), R.won.astype(int).tolist())
-    # calibration by leg type: the side the board favored (the board only logs games not yet started), at the logged DraftKings price
     import calib as CAL
-    if len(R):
-        rr = R.to_dict('records')
-        main = [r for r in rr if not r['alt']]
-        fav = CAL.favored(main, lambda r: (r['day'], r['gid'], r['market'], r['pid'], abs(r['line']) if r['market'] == 'puckline' else r['line'] if r['market'] != 'moneyline' else 0))
-        out['cal_sections'] = CAL.sections(
-            ('Moneyline picks', [r for r in fav if r['market'] == 'moneyline'], 'The team the board gave the better chance to win, every game (overtime and shootouts count).', True),
-            ('Puck lines', [r for r in fav if r['market'] == 'puckline'], 'The side the board favored on each DraftKings puck line.', True),
-            ('Totals', [r for r in fav if r['market'] == 'total'], 'Over or Under, whichever the board favored.', True),
-            ('Shots on goal', [r for r in fav if r['market'] == 'sog'], 'Over or Under on the main DraftKings line, whichever the board favored.', True),
-            ('Saves', [r for r in fav if r['market'] == 'saves'], 'Over or Under on the main DraftKings line, whichever the board favored.', True),
-            ('Alt lines', [r for r in rr if r['alt']], 'Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).', False))
-    out['parlays'] = PZ.grade(O.DIR, results)
+    ALL = pd.DataFrame(rows)
+
+    def report(days=None):
+        """The Model record report for these game days (None = every day)."""
+        R = ALL if days is None or not len(ALL) else ALL[ALL.day.isin(days)].copy()
+        out = dict(days=sorted(R.day.unique().tolist()) if len(R) else [], groups=[])
+        if len(R):
+            def grp(name, x):
+                if not len(x): return
+                out['groups'].append(dict(group=name, bets=int(len(x)), won=int(x.won.sum()), lost=int((~x.won).sum()), hit=float(x.won.mean()),
+                                          exp_hit=float(x.p.mean()), units=round(float(x.units.sum()), 2), roi=float(x.units.mean())))
+            # leans count only when the board saw an edge (Thomas, 2026-11-16: most logged leans had none, so they weren't real picks)
+            R['plus'] = R.lean & (R.edge > 0)
+            props = R[R.plus & R.kind.isin(['Shots on goal', 'Saves'])]
+            grp('Board winner picks', R[R.pick])
+            grp('Value legs', R[R.cat == 'Value'])
+            grp('Prop leans with an edge (shots + saves)', props)
+            for k in ['Shots on goal', 'Saves', 'Puck line', 'Total']:
+                grp(f'{k} leans with an edge', R[R.plus & (R.kind == k)])
+            last = R.day.max()
+            lp = props[props.day == last]; lw = R[R.pick & (R.day == last)]
+            out['latest_day'] = dict(day=last, props_won=int(lp.won.sum()), props_lost=int((~lp.won).sum()),
+                                     picks_won=int(lw.won.sum()), picks_lost=int((~lw.won).sum()))
+        if len(R) and days is None: out['calibration'] = PZ.calibration(R.p.tolist(), R.won.astype(int).tolist())
+        # calibration by leg type: the side the board favored (the board only logs games not yet started), at the logged DraftKings price
+        if len(R):
+            rr = R.to_dict('records')
+            main = [r for r in rr if not r['alt']]
+            fav = CAL.favored(main, lambda r: (r['day'], r['gid'], r['market'], r['pid'], abs(r['line']) if r['market'] == 'puckline' else r['line'] if r['market'] != 'moneyline' else 0))
+            out['cal_sections'] = CAL.sections(
+                ('Moneyline picks', [r for r in fav if r['market'] == 'moneyline'], 'The team the board gave the better chance to win, every game (overtime and shootouts count).', True),
+                ('Puck lines', [r for r in fav if r['market'] == 'puckline'], 'The side the board favored on each DraftKings puck line.', True),
+                ('Totals', [r for r in fav if r['market'] == 'total'], 'Over or Under, whichever the board favored.', True),
+                ('Shots on goal', [r for r in fav if r['market'] == 'sog'], 'Over or Under on the main DraftKings line, whichever the board favored.', True),
+                ('Saves', [r for r in fav if r['market'] == 'saves'], 'Over or Under on the main DraftKings line, whichever the board favored.', True),
+                ('Alt lines', [r for r in rr if r['alt']], 'Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).', False))
+        out['parlays'] = PZ.grade(O.DIR, results, dates=days)
+        return out
+
+    out = report()
+    # the Model record's day / week / month menus: the same report for each game day, week and month with graded bets
+    out['by_period'] = CAL.by_period(ALL.day.tolist() if len(ALL) else [], report)
     _lr = {}   # leg results for the Bank Builder record (bank.py)
     for (d, i), r in results.items(): _lr.setdefault(d, {})[i] = r
     json.dump(_lr, open(os.path.join(O.DIR, 'leg_results.json'), 'w'))
     json.dump(out, open(os.path.join(O.DIR, 'grade_report.json'), 'w'), indent=1)
-    print(f"graded {len(R)} legs over {len(out['days'])} days")
+    print(f"graded {len(ALL)} legs over {len(out['days'])} days")
 
 
 if __name__ == '__main__':

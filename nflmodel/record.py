@@ -135,7 +135,7 @@ def moneylines():
             if best is None: continue
             res = float(g.loc[gid, 'result']); m = res if best['side'] == home else -res
             if m == 0: continue   # a tie pushes
-            rows.append(dict(p=best['p'], won=m > 0, units=PZ.dec(best['price']) - 1 if m > 0 else -1.0))
+            rows.append(dict(p=best['p'], won=m > 0, units=PZ.dec(best['price']) - 1 if m > 0 else -1.0, date=str(g.loc[gid, 'gameday'])[:10]))
     return rows
 
 
@@ -168,6 +168,9 @@ def record():
     if bw: os.makedirs(BANK.LOG, exist_ok=True); json.dump(bres, open(bf, 'w'))
     # a parlay log like 2026_wk10thu_* grades with its week's results
     res.update({(d, i): v for d in plogs if d not in picks for (d0, i), v in list(res.items()) if d0 == '%d_wk%02d' % _week(d)})
+    from nflmodel.model import G as _G
+    gday = {(int(x.season), int(x.week), f'{x.away_team} @ {x.home_team}'): str(x.gameday)[:10] for x in _G.itertuples()}
+    day_of = lambda day, game: gday.get(_week(day) + (game,))
     rows = []
     for day, ls in picks.items():
         for l in ls:
@@ -176,20 +179,10 @@ def record():
             if l['kind'] == 'Milestone': continue   # alt lines aren't counted; the main over/under covers the player (Thomas, 2026-11-14)
             if r in ('win', 'loss'):
                 rows.append(dict(cat=l['cat'], mkt=MKT.get(l['kind'], l['kind']), won=r == 'win', p=l['p'],
-                                 units=PZ.dec(l['price']) - 1 if r == 'win' else -1.0))
-    groups = []
-
-    def grp(name, x):
-        if not x: return
-        w = sum(r['won'] for r in x); u = sum(r['units'] for r in x)
-        groups.append(dict(group=name, bets=len(x), won=w, lost=len(x) - w, hit=w / len(x), exp_hit=sum(r['p'] for r in x) / len(x),
-                           units=round(u, 2), roi=u / len(x)))
-    grp('All picks', rows)
-    for mk in dict.fromkeys(MKT.values()): grp(mk, [r for r in rows if r['mkt'] == mk])
-    for c in sorted({r['cat'] for r in rows}): grp(f'{c} picks', [r for r in rows if r['cat'] == c])
-    pick_groups, groups = groups, []
+                                 units=PZ.dec(l['price']) - 1 if r == 'win' else -1.0, date=day_of(day, l['game'])))
     # the legs the parlay suggestions chose, each as a 1-unit straight bet at its DK price (alt lines included)
-    for mode, name in [('value', 'Best value'), ('likely', 'Most likely to hit')]:
+    plegs = {}
+    for mode in ('value', 'likely'):
         star, every = {}, {}
         for day, f in plogs.items():
             m = json.load(open(f)).get(mode)
@@ -200,13 +193,10 @@ def record():
                         r = res.get((day, L['id']))
                         if r not in ('win', 'loss'): continue
                         row = dict(won=r == 'win', p=L['p'], alt=L['id'].startswith('m-'),
-                                   units=PZ.dec(L['price']) - 1 if r == 'win' else -1.0)
+                                   units=PZ.dec(L['price']) - 1 if r == 'win' else -1.0, date=day_of(day, L['game']))
                         every[(day, L['id'])] = row
                         if str(m['best']) == k and i == 0: star[(day, L['id'])] = row
-        grp(f'{name}: ★ suggestion legs', list(star.values()))
-        grp(f'{name}: every suggested leg', list(every.values()))
-        grp(f'{name}: alt-line legs', [r for r in every.values() if r['alt']])
-        grp(f'{name}: main-line legs', [r for r in every.values() if not r['alt']])
+        plegs[mode] = (star, every)
     # calibration by leg type (calib.py): the moneyline pick in every game, then the board's logged picks by market
     import calib as CAL
     try: ml = moneylines()
@@ -216,7 +206,8 @@ def record():
         for l in ls:
             r = res.get((day, l['id']))
             if l['cat'] == 'Check role' or r not in ('win', 'loss'): continue
-            cr.append(dict(kind=l['kind'], id=l['id'], p=l['p'], won=r == 'win', units=PZ.dec(l['price']) - 1 if r == 'win' else -1.0))
+            cr.append(dict(kind=l['kind'], id=l['id'], p=l['p'], won=r == 'win', units=PZ.dec(l['price']) - 1 if r == 'win' else -1.0,
+                           date=day_of(day, l['game'])))
     lg = {}
     for day, f in plogs.items():
         for m in json.load(open(f)).values():
@@ -224,13 +215,55 @@ def record():
                 for sl in slips:
                     for L in sl:
                         r = res.get((day, L['id']))
-                        if r in ('win', 'loss'): lg[(day, L['id'])] = dict(p=L['p'], won=r == 'win', units=PZ.dec(L['price']) - 1 if r == 'win' else -1.0)
-    cal = CAL.sections(
-        ('Moneyline picks', ml, 'The team the board gave the better chance to win, every game, at the first DraftKings price saved before kickoff.', True),
-        ('Spreads and totals', [r for r in cr if r['kind'] == 'Game' and '-ml-' not in r['id']], "The board's categorized spread and total picks.", True),
-        ('Yards and receptions', [r for r in cr if r['kind'] in ('Rush', 'Rec', 'Recs', 'Pass')], "The board's categorized over/under picks on main lines.", True),
-        ('Anytime TDs', [r for r in cr if r['kind'] == 'TD'], "The board's TD picks; a TD is one-sided, so chances run the full range.", False),
-        ('Alt lines', [r for r in cr if r['kind'] == 'Milestone'], "The board's alt-line picks (Likely hit, Value).", False),
-        ('Legs in suggested parlays', list(lg.values()), 'Every leg the Parlay builder suggested, alt lines included, as its own straight bet.', False))
-    return dict(cal=cal, weeks=sorted(picks), graded=sorted({'%d_wk%02d' % _week(d) for (d, _), v in res.items() if v}), picks=pick_groups, legs=groups,
-                parlays=PZ.grade(LOG, {k: v for k, v in res.items() if v}))
+                        if r in ('win', 'loss'): lg[(day, L['id'])] = dict(p=L['p'], won=r == 'win', units=PZ.dec(L['price']) - 1 if r == 'win' else -1.0,
+                                                                           date=day_of(day, L['game']))
+    graded = {k: v for k, v in res.items() if v}
+    slip_day = lambda day, sl: max((day_of(day, L['game']) or '') for L in sl)   # a parlay counts on the day of its last game
+
+    def report(dates=None):
+        """The Model record report for these game days (None = every day)."""
+        keep = (lambda r: True) if dates is None else (lambda r: r.get('date') in dates)
+        groups = []
+
+        def grp(name, x):
+            x = [r for r in x if keep(r)]
+            if not x: return
+            w = sum(r['won'] for r in x); u = sum(r['units'] for r in x)
+            groups.append(dict(group=name, bets=len(x), won=w, lost=len(x) - w, hit=w / len(x), exp_hit=sum(r['p'] for r in x) / len(x),
+                               units=round(u, 2), roi=u / len(x)))
+        grp('All picks', rows)
+        for mk in dict.fromkeys(MKT.values()): grp(mk, [r for r in rows if r['mkt'] == mk])
+        for c in sorted({r['cat'] for r in rows}): grp(f'{c} picks', [r for r in rows if r['cat'] == c])
+        pick_groups, groups = groups, []
+        for mode, name in [('value', 'Best value'), ('likely', 'Most likely to hit')]:
+            star, every = plegs[mode]
+            grp(f'{name}: ★ suggestion legs', list(star.values()))
+            grp(f'{name}: every suggested leg', list(every.values()))
+            grp(f'{name}: alt-line legs', [r for r in every.values() if r['alt']])
+            grp(f'{name}: main-line legs', [r for r in every.values() if not r['alt']])
+        f = lambda xs: [r for r in xs if keep(r)]
+        cal = CAL.sections(
+            ('Moneyline picks', f(ml), 'The team the board gave the better chance to win, every game, at the first DraftKings price saved before kickoff.', True),
+            ('Spreads and totals', f([r for r in cr if r['kind'] == 'Game' and '-ml-' not in r['id']]), "The board's categorized spread and total picks.", True),
+            ('Yards and receptions', f([r for r in cr if r['kind'] in ('Rush', 'Rec', 'Recs', 'Pass')]), "The board's categorized over/under picks on main lines.", True),
+            ('Anytime TDs', f([r for r in cr if r['kind'] == 'TD']), "The board's TD picks; a TD is one-sided, so chances run the full range.", False),
+            ('Alt lines', f([r for r in cr if r['kind'] == 'Milestone']), "The board's alt-line picks (Likely hit, Value).", False),
+            ('Legs in suggested parlays', f(list(lg.values())), 'Every leg the Parlay builder suggested, alt lines included, as its own straight bet.', False))
+        return dict(cal=cal, picks=pick_groups, legs=groups,
+                    parlays=PZ.grade(LOG, graded, dates=dates, when=slip_day if dates is not None else None))
+
+    out = report()
+    out.update(weeks=sorted(picks), graded=sorted({'%d_wk%02d' % _week(d) for (d, _), v in res.items() if v}))
+    # the Model record's day / week / month menus; an NFL week is the NFL's own week (Thursday to Monday)
+    wk = {}
+    for x in _G.itertuples():
+        wk.setdefault((int(x.season), int(x.week)), []).append(str(x.gameday)[:10])
+    wk_of = {d: k for k, ds in wk.items() for d in ds}
+
+    def week_of(d):
+        s_, w_ = wk_of[d]; ds = sorted(wk[(s_, w_)]); a_, b_ = CAL._d(ds[0]), CAL._d(ds[-1])
+        span = f'{CAL._short(a_)} – {b_.day}' if a_.month == b_.month else f'{CAL._short(a_)} – {CAL._short(b_)}'
+        return f'{s_}_wk{w_:02d}', f'Week {w_} · {span}'
+    dates = [r['date'] for r in rows + ml + cr + list(lg.values()) if r.get('date') in wk_of]
+    out['by_period'] = CAL.by_period(dates, report, week_of)
+    return out

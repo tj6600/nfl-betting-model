@@ -255,6 +255,34 @@ table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
 .calaxis span { display: flex; justify-content: space-between; }
 .calsec .calnote { padding: 4px 14px 12px; margin: 0; font-size: 12.5px; color: var(--muted); }
 @media (max-width: 560px) { .calgrid { grid-template-columns: 1fr; } .calrow, .calaxis { grid-template-columns: 54px 1fr 84px; gap: 8px; } }
+
+/* Model record menus (Thomas, 2026-11-18): period picker (all time / day / week / month), section picker, refresh */
+.recbar { min-width: 0; display: flex; flex-direction: column; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; margin-bottom: 16px; }
+.recrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.recrow .grow { flex: 1 1 auto; }
+.recnav { display: flex; gap: 6px; align-items: center; flex: 1 1 260px; min-width: 0; }
+.recnav select { flex: 1 1 auto; min-width: 0; font: 600 15px var(--body); padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+.recnav .arrow { font: 700 18px var(--body); width: 40px; height: 38px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); cursor: pointer; flex: 0 0 auto; }
+.recnav .arrow:disabled { opacity: .35; cursor: default; }
+.recviews { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.recviews .chip { flex: 0 0 auto; padding: 6px 12px; }
+.recviews .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.recsum { font-size: 13px; color: var(--muted); margin: 0; }
+.refbtn { font: 600 14px var(--body); border: 1px solid var(--turf); color: var(--turf); background: transparent; border-radius: 8px; padding: 8px 12px; cursor: pointer; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.refbtn[aria-busy="true"] .ico { animation: recspin 1s linear infinite; }
+@keyframes recspin { to { transform: rotate(360deg); } }
+.refpanel { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.refpanel p { margin: 0; }
+.refpanel .acts2 { display: flex; flex-wrap: wrap; gap: 8px; }
+.refpanel .go { font: 600 14px var(--body); border: 0; background: var(--turf); color: var(--bg); border-radius: 8px; padding: 9px 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+.refpanel .ghost { font: 600 14px var(--body); border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+.refpanel details { font-size: 13px; color: var(--muted); }
+.refpanel details summary { cursor: pointer; color: var(--ink); font-weight: 600; }
+.refpanel details ol { margin: 6px 0; padding-left: 20px; }
+.refpanel input { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); flex: 1 1 200px; min-width: 0; }
+.refstatus { font-weight: 600; }
+.refstatus.bad { color: var(--neg); } .refstatus.ok { color: var(--pos); }
+@media (max-width: 560px) { .recbar { padding: 10px; } .recrow > .seg { flex: 1 1 100%; } .recrow > .seg button { flex: 1 1 0; padding: 9px 4px; } .refbtn { flex: 1 1 100%; justify-content: center; } .recrow .grow { display: none; } }
 </style>
 <script>
 // Model record calibration sections (calib.py), shared by the NFL, NBA and NHL pages
@@ -291,5 +319,167 @@ function renderCalibration(secs, title) {
     grid.append(c);
   }
   wrap.append(grid); return wrap;
+}
+
+// ---- Model record menus (Thomas, 2026-11-18): pick all time, a day, a week or a month, and which sections to show ----
+// src.by_period = { menu: {day|week|month: [{key, label}] newest first}, reports: {key: report} } (calib.by_period).
+// The chosen period's report replaces the all-time fields, so each page's own record code draws it unchanged.
+const REC_KINDS = [['all', 'All time'], ['day', 'Day'], ['week', 'Week'], ['month', 'Month']];
+function recLoad(sport) { try { return JSON.parse(localStorage.getItem('gg-rec-' + sport) || '{}') || {}; } catch (e) { return {}; } }
+function recSave(sport, st) { try { localStorage.setItem('gg-rec-' + sport, JSON.stringify(st)); } catch (e) { /* storage unavailable */ } }
+function recordMenus(o) {
+  // o: {sport, src, views: [[key, label]], rerender, weekNote}; returns {bar, rep, view, show(v), label, empty}
+  const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  const bp = (o.src && o.src.by_period) || { menu: { day: [], week: [], month: [] }, reports: {} };
+  const st = Object.assign({ kind: 'all', keys: {}, view: 'all' }, recLoad(o.sport));
+  if (!o.views.some(([k]) => k === st.view)) st.view = 'all';
+  const list = st.kind === 'all' ? null : (bp.menu[st.kind] || []);
+  if (list && !list.length) st.kind = 'all';
+  let key = null, label = 'All time';
+  if (st.kind !== 'all') {
+    const l = bp.menu[st.kind]; let i = l.findIndex((x) => x.key === st.keys[st.kind]); if (i < 0) i = 0;
+    key = l[i].key; label = l[i].label; st.keys[st.kind] = key;
+  }
+  recSave(o.sport, st);
+  const sub = key ? bp.reports[key] : null;
+  const rep = sub ? Object.assign({}, o.src, sub) : o.src;
+  const redo = () => { recSave(o.sport, st); o.rerender(); };
+  const bar = mk('div', 'recbar');
+  const r1 = mk('div', 'recrow'); const seg = mk('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Time period');
+  for (const [k, lab] of REC_KINDS) {
+    const b = mk('button', null, lab); b.type = 'button'; b.setAttribute('aria-pressed', st.kind === k);
+    const n = k === 'all' ? 1 : (bp.menu[k] || []).length; if (!n) { b.disabled = true; b.title = 'Nothing graded yet'; }
+    b.onclick = () => { if (st.kind !== k) { st.kind = k; redo(); } }; seg.append(b);
+  }
+  r1.append(seg, mk('span', 'grow'), refreshButton(o.sport, bar)); bar.append(r1);
+  if (st.kind !== 'all') {
+    const l = bp.menu[st.kind]; const i = l.findIndex((x) => x.key === key);
+    const nav = mk('div', 'recnav');
+    const prev = mk('button', 'arrow', '‹'); prev.type = 'button'; prev.setAttribute('aria-label', 'Earlier'); prev.disabled = i >= l.length - 1;
+    const next = mk('button', 'arrow', '›'); next.type = 'button'; next.setAttribute('aria-label', 'Later'); next.disabled = i <= 0;
+    const sel = mk('select'); sel.setAttribute('aria-label', 'Choose the ' + st.kind);
+    l.forEach((x) => { const op = mk('option', null, x.label); op.value = x.key; if (x.key === key) op.selected = true; sel.append(op); });
+    sel.onchange = () => { st.keys[st.kind] = sel.value; redo(); };
+    prev.onclick = () => { st.keys[st.kind] = l[i + 1].key; redo(); };
+    next.onclick = () => { st.keys[st.kind] = l[i - 1].key; redo(); };
+    nav.append(prev, sel, next); const r2 = mk('div', 'recrow'); r2.append(nav); bar.append(r2);
+    if (st.kind === 'day' && o.dayNote) bar.append(mk('p', 'recsum', o.dayNote));
+    if (st.kind === 'week' && o.weekNote) bar.append(mk('p', 'recsum', o.weekNote));
+  }
+  const vs = mk('div', 'recviews'); vs.setAttribute('role', 'group'); vs.setAttribute('aria-label', 'Sections');
+  for (const [k, lab] of o.views) {
+    const b = mk('button', 'chip', lab); b.type = 'button'; b.setAttribute('aria-pressed', st.view === k);
+    b.onclick = () => { if (st.view !== k) { st.view = k; redo(); } }; vs.append(b);
+  }
+  bar.append(vs);
+  return { bar, rep, view: st.view, kind: st.kind, label, period: key, show: (v) => st.view === 'all' || st.view === v };
+}
+
+// ---- Refresh results: grade finished games now. A GitHub Actions run (refresh-records.yml) runs the free graders
+// (no odds credits) and pushes; Render redeploys and this page reloads itself when the new page is up.
+// With no key saved, the button opens the workflow on GitHub (tap "Run workflow"). A key, if Thomas adds one, is kept only
+// in this phone's browser storage, never in the site or the repo.
+const GG_REPO = 'tj6600/nfl-betting-model', GG_WF = 'refresh-records.yml';
+const GG_WF_URL = `https://github.com/${GG_REPO}/actions/workflows/${GG_WF}`;
+function ggGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function ggSet(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } }
+function ggHash(t) { let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0; return String(h); }
+async function ggPage() {
+  // the page's version: its ETag or Last-Modified from a HEAD request (no download); the whole page only if neither is sent
+  const u = location.pathname + '?fresh=' + Date.now();
+  try {
+    const h = await fetch(u, { method: 'HEAD', cache: 'no-store' });
+    const v = h.ok && (h.headers.get('etag') || h.headers.get('last-modified'));
+    if (v) return v;
+  } catch (e) { /* fall through */ }
+  const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return ggHash(await r.text());
+}
+const GG_REF = { timer: null, status: '', cls: '', panelOpen: false };
+function refreshButton(sport, bar) {
+  const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  const b = mk('button', 'refbtn'); b.type = 'button'; b.append(mk('span', 'ico', '↻'), mk('span', null, 'Refresh results'));
+  const waiting = () => { const w = JSON.parse(ggGet('gg-ref-wait') || 'null'); return w && Date.now() - w.t < 15 * 60e3 ? w : null; };
+  b.setAttribute('aria-busy', !!waiting());
+  b.onclick = () => { GG_REF.panelOpen = !GG_REF.panelOpen; draw(); };
+  const draw = () => {
+    bar.querySelectorAll('.refpanel').forEach((x) => x.remove());
+    if (!GG_REF.panelOpen) return;
+    const pn = mk('div', 'refpanel'); const tok = ggGet('gg-gh-key');
+    pn.append(mk('p', null, 'Grades every game that has finished and rebuilds the NFL, NBA and NHL records. It uses free stats only, never odds credits. It takes about 3 to 6 minutes, and this page reloads itself when the new results are up.'));
+    const s = mk('p', 'refstatus ' + GG_REF.cls, GG_REF.status); pn.append(s);
+    const acts = mk('div', 'acts2');
+    if (tok) {
+      const go = mk('button', 'go', 'Grade finished games now'); go.type = 'button'; go.onclick = () => ggDispatch(sport, tok, draw); acts.append(go);
+    } else {
+      const go = mk('a', 'go', 'Run it on GitHub'); go.href = GG_WF_URL; go.target = '_blank'; go.rel = 'noopener';
+      go.onclick = () => { ggWait(draw, 'Waiting for the run. On GitHub, tap Run workflow, then come back here.'); }; acts.append(go);
+    }
+    const chk = mk('button', 'ghost', 'Load the latest page'); chk.type = 'button'; chk.onclick = () => location.reload(); acts.append(chk);
+    pn.append(acts);
+    const det = mk('details'); det.append(mk('summary', null, tok ? 'One-tap key saved on this phone' : 'Set up one tap (optional)'));
+    if (tok) {
+      det.append(mk('p', null, 'The key is stored only in this browser. Remove it here if you lose the phone, and delete it on GitHub (Settings, Developer settings, Personal access tokens).'));
+      const rm = mk('button', 'ghost', 'Remove key from this phone'); rm.type = 'button'; rm.onclick = () => { ggSet('gg-gh-key', null); draw(); }; det.append(rm);
+    } else {
+      const ol = mk('ol');
+      ['On GitHub, open Settings, Developer settings, Personal access tokens, Fine-grained tokens, and tap Generate new token.',
+        'Repository access: Only select repositories, then nfl-betting-model. Permissions: Actions, Read and write. Nothing else.',
+        'Copy the token and paste it below. It stays in this phone\'s browser only; it is never put on the website or in the code.'].forEach((x) => ol.append(mk('li', null, x)));
+      det.append(ol);
+      const row = mk('div', 'acts2'); const inp = mk('input'); inp.type = 'password'; inp.placeholder = 'github_pat_…'; inp.autocomplete = 'off';
+      const sv = mk('button', 'ghost', 'Save'); sv.type = 'button';
+      sv.onclick = () => { const v = inp.value.trim(); if (!/^(github_pat_|ghp_)\w+$/.test(v)) { GG_REF.status = 'That does not look like a GitHub token.'; GG_REF.cls = 'bad'; draw(); return; } ggSet('gg-gh-key', v); GG_REF.status = 'Saved. Tap Grade finished games now.'; GG_REF.cls = 'ok'; draw(); };
+      row.append(inp, sv); det.append(row);
+    }
+    pn.append(det); bar.append(pn);
+  };
+  GG_REF.redraw = () => { b.setAttribute('aria-busy', !!waiting()); draw(); };
+  if (waiting() && !GG_REF.timer) { GG_REF.panelOpen = true; ggWait(GG_REF.redraw, null, true); }
+  setTimeout(draw, 0);
+  return b;
+}
+function ggSetStatus(t, c) { GG_REF.status = t; GG_REF.cls = c || ''; if (GG_REF.redraw) GG_REF.redraw(); }
+async function ggWait(draw, msg, resume) {
+  // poll the page itself until a new version is published, for up to 15 minutes
+  let w = JSON.parse(ggGet('gg-ref-wait') || 'null');
+  if (!resume || !w) { let base = null; try { base = await ggPage(); } catch (e) { /* offline */ } w = { t: Date.now(), base }; ggSet('gg-ref-wait', JSON.stringify(w)); }
+  if (msg) ggSetStatus(msg);
+  clearInterval(GG_REF.timer);
+  const tick = async () => {
+    const mins = Math.round((Date.now() - w.t) / 60e3);
+    if (Date.now() - w.t > 15 * 60e3) {
+      clearInterval(GG_REF.timer); GG_REF.timer = null; ggSet('gg-ref-wait', null);
+      ggSetStatus('No new results after 15 minutes. If the run finished, nothing new was ready to grade: the free stats sites can post a game a few hours after it ends.', 'bad'); return;
+    }
+    try {
+      const h = await ggPage();
+      if (w.base && h !== w.base) { clearInterval(GG_REF.timer); ggSet('gg-ref-wait', null); ggSetStatus('New results are in. Reloading…', 'ok'); setTimeout(() => location.reload(), 600); return; }
+      if (!w.base) { w.base = h; ggSet('gg-ref-wait', JSON.stringify(w)); }
+    } catch (e) { /* offline: try again */ }
+    if (!/Reloading|failed/.test(GG_REF.status)) ggSetStatus(`Grading… ${mins ? mins + ' min so far. ' : ''}This page reloads itself when the new results are up.`);
+  };
+  GG_REF.timer = setInterval(tick, 20e3); tick();
+}
+async function ggDispatch(sport, tok, draw) {
+  const H = { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
+  ggSetStatus('Starting the run…');
+  try {
+    const r = await fetch(`https://api.github.com/repos/${GG_REPO}/actions/workflows/${GG_WF}/dispatches`, { method: 'POST', headers: H, body: JSON.stringify({ ref: 'main', inputs: { sport: 'all' } }) });
+    if (r.status === 401 || r.status === 403 || r.status === 404) { ggSetStatus('GitHub refused the key (it may have expired or lack Actions: Read and write). You can still run it on GitHub.', 'bad'); return; }
+    if (!r.ok) { ggSetStatus(`GitHub said ${r.status}. Try again in a minute.`, 'bad'); return; }
+  } catch (e) { ggSetStatus('Could not reach GitHub. Check the connection and try again.', 'bad'); return; }
+  ggWait(draw, 'Run started. Grading takes about 3 to 6 minutes.');
+  // also watch the run itself so a failure shows here instead of a silent 15-minute wait
+  const t0 = Date.now(); const watch = setInterval(async () => {
+    if (Date.now() - t0 > 15 * 60e3) { clearInterval(watch); return; }
+    try {
+      const r = await fetch(`https://api.github.com/repos/${GG_REPO}/actions/workflows/${GG_WF}/runs?per_page=1&event=workflow_dispatch`, { headers: H, cache: 'no-store' });
+      const j = await r.json(); const run = j.workflow_runs && j.workflow_runs[0];
+      if (!run || Date.parse(run.created_at) < t0 - 60e3 || run.status !== 'completed') return;
+      clearInterval(watch);
+      if (run.conclusion !== 'success') { clearInterval(GG_REF.timer); GG_REF.timer = null; ggSet('gg-ref-wait', null); ggSetStatus('The refresh run failed on GitHub. The last results are still shown.', 'bad'); }
+      else if (!/Reloading/.test(GG_REF.status)) ggSetStatus('Grading finished. Waiting for the site to publish the new page (1 to 3 minutes)…');
+    } catch (e) { /* try again */ }
+  }, 30e3);
 }
 </script>

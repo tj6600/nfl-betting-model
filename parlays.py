@@ -222,9 +222,11 @@ def log(dirpath, day, stamp, legs, pool_ids=None, likely=None, no_sgp=(), nfl=Fa
     return f
 
 
-def grade(dirpath, results):
+def grade(dirpath, results, dates=None, when=None):
     """results: {(day, leg_id): 'win'|'loss'|'push'|'void'} for graded legs.
-    Uses the earliest parlay log of each day. Returns a report dict for the Model record tab."""
+    Uses the earliest parlay log of each day. Returns a report dict for the Model record tab.
+    dates: keep only parlays whose date is in this set (the Model record's day/week/month menus); the date is
+    when(day, slip) if given (NFL: the day of the slip's last game), else the log's day."""
     logs = {}
     for f in sorted(glob.glob(os.path.join(dirpath, 'parlays', '*.json'))):
         logs.setdefault(os.path.basename(f).rsplit('_', 1)[0], f)
@@ -240,6 +242,7 @@ def grade(dirpath, results):
                     else:
                         live = [L for L, r in zip(s, res) if r == 'win']
                         out, units = ('push', 0.0) if not live else ('won', math.prod(dec(L['price']) for L in live) - 1)
+                    if dates is not None and (when(day, s) if when else day) not in dates: continue
                     rows.append(dict(day=day, mode=mode, size=int(k), idx=i, best=int(k) == m['best'], result=out, units=units,
                                      p=math.prod(L['p'] for L in s), payout=math.prod(dec(L['price']) for L in s) - 1))
     groups = []
@@ -254,4 +257,4 @@ def grade(dirpath, results):
         grp(f'{name}: ★ suggestion', [r for r in rows if r['mode'] == mode and r['best'] and r['idx'] == 0])
         for k in SIZES:
             grp(f'{name}: {"straight" if k == 1 else f"{k}-leg"} (all suggestions)', [r for r in rows if r['mode'] == mode and r['size'] == k])
-    return dict(days=sorted(logs), groups=groups)
+    return dict(days=sorted({r['day'] for r in rows}) if dates is not None else sorted(logs), groups=groups)
