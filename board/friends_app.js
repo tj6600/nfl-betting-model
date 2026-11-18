@@ -81,6 +81,7 @@ async function boot() {
     S.unsub.forEach((f) => f()); S.unsub = [];
     S.user = u; S.groups = []; S.group = null; S.picks = [];
     if (!u) return render();
+    S.profile = { name: (u.displayName || 'Friend').slice(0, 40), photo: null }; S.names[u.uid] = S.profile;
     try { await saveProfile(); await joinFromLink(); watchGroups(); } catch (e) { say(errText(e)); }
     render();
   });
@@ -90,12 +91,14 @@ async function boot() {
 }
 
 function errText(e) {
-  const c = (e && e.code) || '';
+  const c = (e && e.code) || '', m = String((e && e.message) || e || '');
+  console.error('Friends:', e);
+  if (/database \(default\) does not exist|not-found/.test(m + c)) return 'The Firestore database isn\'t set up yet (Firebase console > Firestore Database > Create database, ID "(default)").';
   if (c.includes('permission-denied')) return 'That isn\'t allowed. If a game already kicked off, that pick is locked.';
   if (c.includes('popup-closed') || c.includes('cancelled-popup')) return '';
   if (c.includes('unauthorized-domain')) return 'This site isn\'t on the sign-in allow list yet (Firebase Authorized domains).';
   if (c.includes('network') || c.includes('unavailable')) return 'No connection. Try again in a moment.';
-  return 'Something went wrong' + (c ? ` (${c})` : '') + '. Try again.';
+  return 'Something went wrong' + (c ? ` (${c})` : '') + (m ? `: ${m.slice(0, 160)}` : '') + '. Try again.';
 }
 
 async function signIn() {
