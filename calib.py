@@ -157,10 +157,26 @@ class Pending:
         parlays are [day, [[leg key, result, price]], [group idx], p]; days maps each day to its menu keys."""
         need = {k for pz in self.parlays for k, r, _ in pz['l'] if r is None}
         legs = [L for L in self.legs.values() if L['g'] or L['c'] or L['k'] in need]
-        X = lambda x: [x.get('ev'), x.get('m'), x.get('st'), x.get('sd'), x.get('ln'), x.get('pid') or x.get('nm'), x.get('wk')]
+        X = compact_x
         days = {}
         for L in legs: days[L['d']] = L['per']
         for pz in self.parlays: days[pz['d']] = pz['per']
         return dict(push=self.push, g=self.g, c=self.c, per=self.per, days={d: v for d, v in days.items() if d},
                     legs=[[L['k'], L['d'], X(L['x']), L['pr'], L['p'], L['g'], L['c']] for L in legs],
                     parlays=[[pz['d'], pz['l'], pz['g'], pz['p']] for pz in self.parlays])
+
+
+def compact_x(x):
+    """A leg's ESPN lookup as the page reads it: [event id, market, stat, side, line, player id or name, NFL week / NHL position]."""
+    return [x.get('ev'), x.get('m'), x.get('st'), x.get('sd'), x.get('ln'), x.get('pid') or x.get('nm'), x.get('wk')]
+
+
+def csv_x(sport, r):
+    """ESPN lookup for a row of an NBA or NHL pick log (odds_log/<sport>/picks/*.csv), as the graders build it."""
+    away, home = str(r['game']).split(' @ ')
+    ev = str(abs(int(float(r['gid']))))
+    line = None if r.get('line') in (None, '') or r['line'] != r['line'] else float(r['line'])
+    mk = {'moneyline': 'ml', 'spread': 'sp', 'puckline': 'sp', 'total': 'tot'}.get(r['market'])
+    if mk: return dict(ev=ev, m=mk, sd=r['side'] if mk == 'tot' else ('home' if r['side'] == home else 'away'), ln=line)
+    if sport == 'NBA': return dict(ev=ev, m='stat', st=r['market'], sd=r['side'], ln=line, pid=str(int(float(r['pid']))))
+    return dict(ev=ev, m='stat', st=r['market'], sd=r['side'], ln=line, nm=player_name(r['label']), wk='G' if r['market'] == 'saves' else None)

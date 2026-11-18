@@ -174,8 +174,68 @@ function renderOwn(root) {
   root.append(box);
 }
 
+// Refresh results (Thomas, 2026-11-18): grade open slips' legs from ESPN in the browser (liveCheck in head.html), as on the sport pages.
+const BANK_GROUPS = ['All Bank Builder slips', 'Top slip of each build', '2-leg slips', '3-leg slips', 'Mixed-sport slips'];
+let bankStatus = { text: '', cls: '' };
+function bankLive(src) {
+  const P = src.pending; if (!P) return src;
+  const res = {}; let at = 0;
+  for (const sp of ['nba', 'nhl', 'nfl']) { const st = liveLoad('bank-' + sp); if (st && st.res) { Object.assign(res, st.res); at = Math.max(at, st.at || 0); } }
+  if (!Object.keys(res).length) return src;
+  const R = JSON.parse(JSON.stringify(src)); let n = 0; const seen = new Set();
+  for (const [size, top, sports, p, , legs, day] of P.slips) {
+    const rs = legs.map(([k, known]) => known || res[k] || null);
+    let out, u;
+    if (rs.includes('loss')) { out = 'lost'; u = -1; }
+    else if (rs.includes(null)) continue;
+    else { const live = legs.filter((_, i) => rs[i] === 'win'); out = live.length ? 'won' : 'push'; u = live.reduce((a, [, , pr]) => a * recDec(pr), 1) - 1; }
+    n += 1; R.open = Math.max(0, (R.open || 0) - 1);
+    R.recent.unshift({ day, size, result: out, units: u, live: true, legs: legs.map(([k, , price, label], i) => ({ sport: k.split('|')[0], label, price, result: rs[i] })) });
+    legs.forEach(([k, , price, label], i) => { const key = label + '|' + price; if (!seen.has(key) && (rs[i] === 'win' || rs[i] === 'loss') && !legs[i][1]) { seen.add(key); R.legs.n += 1; if (rs[i] === 'win') R.legs.won += 1; } });
+    if (out === 'push') continue;
+    const names = ['All Bank Builder slips'].concat(top ? ['Top slip of each build'] : [], [size + '-leg slips'], sports.length > 1 ? ['Mixed-sport slips'] : []);
+    for (const nm of names) {
+      let g = R.groups.find((x) => x.group === nm);
+      if (!g) { g = { group: nm, bets: 0, won: 0, lost: 0, hit: 0, exp_hit: 0, units: 0, roi: 0, dollars: 0 }; R.groups.push(g); }
+      g.exp_hit = (g.exp_hit * g.bets + p) / (g.bets + 1); g.bets += 1; if (out === 'won') g.won += 1; else g.lost += 1;
+      g.hit = g.won / g.bets; g._u = (g._u ?? g.units) + u; g.units = Math.round(g._u * 100) / 100; g.roi = g._u / g.bets; g.dollars = Math.round(g._u * D.stake * 100) / 100;
+    }
+  }
+  R.groups.sort((a, b) => BANK_GROUPS.indexOf(a.group) - BANK_GROUPS.indexOf(b.group));
+  R.recent = R.recent.slice(0, 15); R._live = { n, at };
+  return R;
+}
+function bankRefreshBar(root) {
+  const bar = el('div', 'recbar'), row = el('div', 'recrow');
+  const b = el('button', 'refbtn'); b.type = 'button'; b.append(el('span', 'ico', '↻'), el('span', null, 'Refresh results'));
+  const P = D.record.pending;
+  if (!P) { b.disabled = true; b.title = 'Available after the next board build'; }
+  b.onclick = async () => {
+    if (b.getAttribute('aria-busy') === 'true') return;
+    b.setAttribute('aria-busy', 'true'); bankStatus = { text: 'Checking finished games on ESPN…', cls: '' }; render();
+    let graded = 0, failed = 0, waiting = 0;
+    for (const sp of ['nba', 'nhl', 'nfl']) {
+      const legs = P.legs.filter((L) => L[7] === sp.toUpperCase()); if (!legs.length) continue;
+      let msg = '';
+      try { graded += await liveCheck(sp, { legs }, (t, c) => { msg = c === 'bad' ? t : msg; }, 'bank-' + sp); } catch (e) { failed += 1; }
+      if (msg) failed += 1;
+      const st = liveLoad('bank-' + sp) || { res: {} }; waiting += legs.filter((L) => !(st.res || {})[L[0]]).length;
+    }
+    bankStatus = failed && !graded ? { text: 'Could not reach ESPN. Check the connection and try again.', cls: 'bad' }
+      : { text: graded ? `Graded ${graded} leg${graded === 1 ? '' : 's'}.${waiting ? ` ${waiting} still waiting for their games to finish or for the overnight grading.` : ''}` : (P.legs.length ? 'No new results yet.' : 'No open slips to check.'), cls: graded ? 'ok' : '' };
+    render();
+  };
+  if (bankStatus.text === 'Checking finished games on ESPN…') b.setAttribute('aria-busy', 'true');
+  row.append(b); bar.append(row);
+  const lv = bankLive(D.record)._live;
+  const t = bankStatus.text || (lv && lv.n ? `Includes ${lv.n} slip${lv.n === 1 ? '' : 's'} checked live on ESPN at ${new Date(lv.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}. The overnight grading makes them official.` : '');
+  if (t) bar.append(el('p', 'refstatus ' + bankStatus.cls, t));
+  root.append(bar);
+}
+
 function renderRecord(root) {
-  const R = D.record;
+  bankRefreshBar(root);
+  const R = bankLive(D.record);
   if (!R.groups.length) {
     root.append(el('div', 'bk-empty', 'No graded slips yet. Every build\'s suggestions are saved and graded at DraftKings prices once their games finish' + (R.open ? ' (' + R.open + ' waiting on results).' : '.')));
   } else {
@@ -201,7 +261,7 @@ function renderRecord(root) {
       const r = el('div', 'bk-row'); r.style.cursor = 'default'; r.style.gridTemplateColumns = 'auto minmax(0, 1fr) auto';
       r.append(el('span', s.result === 'won' ? 'res-w' : s.result === 'lost' ? 'res-l' : 'count', s.result === 'won' ? 'W' : s.result === 'lost' ? 'L' : 'P'));
       const n = el('div'); n.append(el('b', null, s.legs.map((x) => x.label).join(' + ')));
-      n.append(el('small', null, s.day + ' · ' + s.legs.map((x) => x.sport + ' ' + fmt(x.price) + (x.result === 'win' ? ' ✓' : x.result === 'loss' ? ' ✗' : '')).join(' · '))); r.append(n);
+      n.append(el('small', null, s.day + (s.live ? ' · checked live' : '') + ' · ' + s.legs.map((x) => x.sport + ' ' + fmt(x.price) + (x.result === 'win' ? ' ✓' : x.result === 'loss' ? ' ✗' : '')).join(' · '))); r.append(n);
       r.append(el('span', 'num', s.units == null ? '' : (s.units >= 0 ? '+$' : '-$') + Math.abs(s.units * D.stake).toFixed(2))); l.append(r);
     }
     root.append(l);
