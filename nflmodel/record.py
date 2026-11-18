@@ -265,5 +265,64 @@ def record():
         span = f'{CAL._short(a_)} – {b_.day}' if a_.month == b_.month else f'{CAL._short(a_)} – {CAL._short(b_)}'
         return f'{s_}_wk{w_:02d}', f'Week {w_} · {span}'
     dates = [r['date'] for r in rows + ml + cr + list(lg.values()) if r.get('date') in wk_of]
+    for day, f in plogs.items():   # a graded parlay counts on the day of its last game, which may have no other graded bet
+        for m in json.load(open(f)).values():
+            for slips in m['slips'].values():
+                for sl in slips:
+                    rs = [graded.get((day, L['id'])) for L in sl]
+                    if ('loss' in rs or all(rs)) and slip_day(day, sl) in wk_of: dates.append(slip_day(day, sl))
     out['by_period'] = CAL.by_period(dates, report, week_of)
+    # bets still waiting on a final score, for the page's Refresh results button (calib.Pending; graded from ESPN box scores)
+    since = (pd.Timestamp.now(tz='America/New_York').normalize() - pd.Timedelta(days=3)).strftime('%Y-%m-%d')
+    PD = CAL.Pending(push_counts=False)
+    wkey = lambda day, i: '%d_wk%02d|%s' % (_week(day) + (i,))
+    ESPN_ST = {'Rush': 'rush', 'Rec': 'rec', 'Recs': 'recs', 'Pass': 'pass'}
+
+    def gx(day, i, game, label):
+        s_, w_ = _week(day); away, home = game.split(' @ ')
+        x = dict(wk=[s_, w_, away, home])
+        m = RX_G.match(i)
+        if m:
+            _, mk, side, pt = m.groups()
+            x.update(m=mk, sd=side if mk == 'tot' else ('home' if side == home else 'away'), ln=float(pt) if pt and mk != 'ml' else None)
+            return x
+        x['nm'] = CAL.player_name(label)
+        if i.startswith('t-'): x.update(m='stat', st='td', sd='Over', ln=0.5)
+        elif RX_Y.match(i): y = RX_Y.match(i); x.update(m='stat', st=ESPN_ST[y.group(2)], sd=y.group(3), ln=float(y.group(4)))
+        elif RX_M.match(i): y = RX_M.match(i); x.update(m='stat', st=ESPN_ST[y.group(2)], sd='Over', ln=int(y.group(3)) - 0.5)
+        else: return None
+        return x
+    for day, ls in picks.items():
+        for l in ls:
+            d = day_of(day, l['game'])
+            if res.get((day, l['id'])) or not d or d < since: continue
+            x = gx(day, l['id'], l['game'], l['label'])
+            if x is None: continue
+            g = [] if l['cat'] == 'Check role' or l['kind'] == 'Milestone' else \
+                [('picks', 'All picks'), ('picks', MKT.get(l['kind'], l['kind'])), ('picks', f"{l['cat']} picks")]
+            cal = None
+            if l['cat'] != 'Check role':
+                if l['kind'] == 'Game' and '-ml-' not in l['id']: cal = ('cal', 'Spreads and totals', True, "The board's categorized spread and total picks.")
+                elif l['kind'] in ('Rush', 'Rec', 'Recs', 'Pass'): cal = ('cal', 'Yards and receptions', True, "The board's categorized over/under picks on main lines.")
+                elif l['kind'] == 'TD': cal = ('cal', 'Anytime TDs', False, "The board's TD picks; a TD is one-sided, so chances run the full range.")
+                elif l['kind'] == 'Milestone': cal = ('cal', 'Alt lines', False, "The board's alt-line picks (Likely hit, Value).")
+            PD.add_leg(wkey(day, l['id']), d, x, l['price'], l['p'], g, cal, week_of=week_of)
+    LGN = 'Every leg the Parlay builder suggested, alt lines included, as its own straight bet.'
+    for day, f in plogs.items():
+        for mode, m in json.load(open(f)).items():
+            name = {'value': 'Best value', 'likely': 'Most likely to hit'}[mode]
+            for k, slips in m['slips'].items():
+                for i, sl in enumerate(slips):
+                    for L in sl:
+                        d = day_of(day, L['game'])
+                        if res.get((day, L['id'])) or not d or d < since: continue
+                        x = gx(day, L['id'], L['game'], L['label'])
+                        if x is None: continue
+                        g = [('legs', f'{name}: every suggested leg'), ('legs', f"{name}: {'alt' if L['id'].startswith('m-') else 'main'}-line legs")]
+                        if str(m['best']) == k and i == 0: g.append(('legs', f'{name}: ★ suggestion legs'))
+                        PD.add_leg(wkey(day, L['id']), d, x, L['price'], L['p'], g, ('cal', 'Legs in suggested parlays', False, LGN), week_of=week_of)
+    PZ.pending(LOG, graded, PD, leg_key=lambda day, L: wkey(day, L['id']), when=slip_day, since=since, week_of=week_of,
+               add_leg=lambda day, L: PD.add_leg(wkey(day, L['id']), day_of(day, L['game']), gx(day, L['id'], L['game'], L['label']), L['price'], L['p'], week_of=week_of)
+               if gx(day, L['id'], L['game'], L['label']) else None)
+    out['pending'] = PD.out()
     return out

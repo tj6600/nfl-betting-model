@@ -63,7 +63,7 @@ for day, f in logs.items():
     for l in L.itertuples():
         r = dict(day=day, id=l.id, kind=l.kind, label=l.label, price=l.price, p=l.p, edge=l.edge, cat=l.cat if isinstance(l.cat, str) else '',
                  suggested=bool(l.suggested), flagged=bool(l.flagged), result=None, profit=None, clv=None, nv_move=None, close_line=None,
-                 gid=l.gid, market=l.market, side=l.side, line=l.line, pid=l.pid, alt=bool(getattr(l, 'alt', False) == True), pre=True)
+                 gid=l.gid, game=l.game, market=l.market, side=l.side, line=l.line, pid=l.pid, alt=bool(getattr(l, 'alt', False) == True), pre=True)
         g = G[G.game_id == l.gid]
         if len(g) and isinstance(g.tip.iloc[0], str):   # a log written after tip-off knows how the game started: not a pick
             r['pre'] = pd.Timestamp(g.tip.iloc[0]).tz_localize('America/New_York') > pd.to_datetime(st, format='%Y-%m-%dT%H%MZ', utc=True)
@@ -174,6 +174,43 @@ def report(days=None):
 rep = report()
 # the Model record's day / week / month menus: the same report for each slate day, week and month with graded bets
 rep['by_period'] = CAL.by_period([r['day'] for r in rows if r['result'] in ('win', 'loss', 'push')], report)
+# bets still waiting on a result: the page's Refresh results button grades them from ESPN box scores (calib.Pending)
+import datetime as _dt
+_since = (pd.Timestamp.now(tz='America/New_York').normalize() - pd.Timedelta(days=3)).strftime('%Y-%m-%d')
+PD = CAL.Pending(push_counts=True)
+_KIND = ['Points', 'Rebounds', 'Assists', 'Threes', 'Pts+Reb+Ast']
+_NOTE = {'moneyline': ('Moneyline picks', 'The team the board gave the better chance to win, every game.'),
+         'spread': ('Spreads', 'The side the board favored on each DraftKings spread.'), 'total': ('Totals', 'Over or Under, whichever the board favored.')}
+
+
+def _grade_x(r):
+    away, home = str(r['game']).split(' @ ')
+    if r['market'] in ('moneyline', 'spread', 'total'):
+        return dict(ev=str(r['gid']), m={'moneyline': 'ml', 'spread': 'sp', 'total': 'tot'}[r['market']],
+                    sd=r['side'] if r['market'] == 'total' else ('home' if r['side'] == home else 'away'), ln=None if r['line'] != r['line'] else float(r['line']))
+    return dict(ev=str(r['gid']), m='stat', st=r['market'], sd=r['side'], ln=float(r['line']), pid=str(int(r['pid'])))
+
+
+_side = lambda r: (r['day'], r['gid'], r['market'], r['pid'] if r['pid'] == r['pid'] else 0, abs(r['line']) if r['market'] == 'spread' else r['line'] if r['market'] != 'moneyline' else 0)
+_wait = [r for r in rows if r['result'] is None and r['day'] >= _since]
+_wfav = {id(r) for r in CAL.favored([r for r in _wait if r['pre'] and not r['alt']], _side)}
+for r in _wait:
+    g = [('by_kind', r['kind'])] if r['cat'] == 'Value' else []
+    if r['cat'] == 'Value': g.append(('groups', 'Value legs'))
+    if r['suggested']: g.append(('groups', 'Suggested-parlay legs'))
+    if not r['flagged'] and r['edge'] >= 0: g.append(('groups', 'All +edge legs'))
+    if r['edge'] < 0: g.append(('groups', 'Negative-edge legs (control)'))
+    cal = None
+    if r['pre'] and r['alt']:
+        cal = ('cal_sections', 'Alt lines', False, 'Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).')
+    elif r['pre'] and id(r) in _wfav:
+        if r['market'] in _NOTE: cal = ('cal_sections', _NOTE[r['market']][0], True, _NOTE[r['market']][1])
+        elif r['kind'] in _KIND: cal = ('cal_sections', r['kind'], True, 'Over or Under on the main DraftKings line, whichever the board favored.')
+    PD.add_leg(f"{r['day']}|{r['id']}", r['day'], _grade_x(r), r['price'], r['p'], g, cal)
+_byid = {(r['day'], r['id']): r for r in rows}
+PZ.pending(O.DIR, _res, PD, since=_since,
+           add_leg=lambda day, L: PD.add_leg(f"{day}|{L['id']}", day, _grade_x(_byid[(day, L['id'])]), L['price'], L['p']) if (day, L['id']) in _byid else None)
+rep['pending'] = PD.out()
 # leg results for the Bank Builder record (bank.py)
 _lr = {}
 for r in rows:
