@@ -15,6 +15,7 @@
 .bk-leg .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 14px; }
 .sp { font: 700 11px var(--body); letter-spacing: .06em; padding: 3px 7px; border-radius: 6px; background: var(--turf-soft); color: var(--turf); }
 .sp.NBA { background: var(--gold-soft); color: var(--gold); }
+.sp.CFB { background: var(--gold-soft); color: var(--gold); }
 .sp.NHL { background: var(--risk-soft); color: var(--risk); }
 .ok { color: var(--pos); font-weight: 700; }
 .bk-actions { display: flex; gap: 8px; flex-wrap: wrap; }
