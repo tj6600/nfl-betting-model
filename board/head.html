@@ -45,8 +45,12 @@ ul.notes { margin: 0; padding: 10px 18px 14px 34px; line-height: 1.5; font-size:
 table.res { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
 table.res td { padding: 7px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 table.res td.num { text-align: right; }
-/* column names follow the reader down long tables (stickyHeads in the script below) */
+/* column names follow the reader down long tables, and the first column stays put when a table scrolls sideways (stickyHeads below) */
 table.res th.stuck { position: relative; z-index: 3; box-shadow: 0 1px 0 var(--line), 0 4px 6px -4px rgba(0,0,0,.25); }
+table.res tr > :first-child, table.res tr > th.stuck:first-child { position: sticky; left: 0; z-index: 2; }
+table.res tr > th.stuck:first-child { z-index: 4; }
+.tablewrap.xs table.res tr > :first-child { background-color: var(--stick-bg); box-shadow: 1px 0 0 var(--line), 4px 0 6px -4px rgba(0,0,0,.25); }
+.tablewrap.xs table.res tr.hl > td:first-child { background-image: linear-gradient(var(--turf-soft), var(--turf-soft)); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { font: 600 14px var(--body); border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 12px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline; }
 .chip b { font-family: var(--display); font-size: 16px; }
@@ -558,7 +562,8 @@ function refreshButton(o, bar) {
   };
   return b;
 }
-// Keep each table's column-name row in view while scrolling through its rows (page or popup).
+// Keep each table's column-name row in view while scrolling through its rows (page or popup), and its first column in view
+// when the table scrolls sideways (CSS sticky, with a solid background added here once it has moved).
 // .tablewrap scrolls sideways, which stops CSS position: sticky from working, so the row is shifted in JS.
 (function stickyHeads() {
   let queued = false;
@@ -573,6 +578,11 @@ function refreshButton(o, bar) {
   };
   const update = () => {
     queued = false;
+    for (const w of document.querySelectorAll('.tablewrap')) {   // first column: give it a solid background once the table scrolls sideways
+      const on = w.scrollLeft > 0;
+      if (on && !w.classList.contains('xs')) w.style.setProperty('--stick-bg', bgOf(w) || getComputedStyle(document.body).backgroundColor);
+      w.classList.toggle('xs', on);
+    }
     for (const t of document.querySelectorAll('table.res')) {
       const hr = headRow(t); if (!hr) continue;
       if (!t.offsetParent) { set(hr, 0); continue; }

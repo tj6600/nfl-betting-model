@@ -217,9 +217,20 @@ def grade():
                 else:
                     live = [L for L, r in zip(s['legs'], rs) if r == 'win']
                     out, units = ('push', 0.0) if not live else ('won', math.prod(dec(L['price']) for L in live) - 1)
-                rows.append(dict(day=day, size=int(k), top=i == 0, result=out, units=units, p=s['p'], ret=s['ret'],
+                rows.append(dict(day=day, gday=max(str(L['day'])[:10] for L in s['legs']), size=int(k), top=i == 0, result=out, units=units, p=s['p'], ret=s['ret'],
                                  sports=sorted({L['sport'] for L in s['legs']}),
                                  legs=[dict(sport=L['sport'], label=L['label'], price=L['price'], result=r) for L, r in zip(s['legs'], rs)], _legs=s['legs']))
+    out = report(rows)
+    # day / week / month menus like the sport pages' Model record (Thomas, 2026-11-18): a slip counts on the day of its last game
+    import calib as CAL
+    out['by_period'] = CAL.by_period([r['gday'] for r in rows if r['result'] in ('won', 'lost', 'push')],
+                                     lambda ds: report([r for r in rows if r['gday'] in ds]))
+    out['pending'] = pending(rows)
+    return out
+
+
+def report(rows):
+    """Slip groups, leg record and latest graded slips for these rows (all of them, or one day / week / month)."""
     groups = []
 
     def grp(name, x):
@@ -239,12 +250,12 @@ def grade():
             if L['result'] in ('win', 'loss'): lw[(L['label'], L['price'])] = L['result'] == 'win'
     legrec = dict(n=len(lw), won=sum(lw.values()))
     done = [{k: v for k, v in r.items() if k != '_legs'} for r in rows if r['result'] in ('won', 'lost', 'push')]
-    return dict(groups=groups, legs=legrec, recent=done[-12:][::-1], open=sum(r['result'] == 'open' for r in rows), pending=pending(rows))
+    return dict(groups=groups, legs=legrec, recent=done[-12:][::-1], open=sum(r['result'] == 'open' for r in rows))
 
 
 def pending(rows):
     """Slips still open, with what the page's Refresh results button needs to grade their legs from ESPN (Thomas,
-    2026-11-18): legs [key, ET date, ESPN lookup, price, p, [], []] and slips [size, top, sports, p, ret, [[key, result, price, label]], day]."""
+    2026-11-18): legs [key, ET date, ESPN lookup, price, p, [], []] and slips [size, top, sports, p, ret, [[key, result, price, label]], day, last game day]."""
     import calib as CAL, csv
     from nflmodel import record as REC
     since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=4)).strftime('%Y-%m-%d')
@@ -279,7 +290,7 @@ def pending(rows):
                 d = _t(L['start']).astimezone(ZoneInfo('America/New_York')).strftime('%Y-%m-%d') if L.get('start') else None
                 if x: legs[key] = [key, d, x, int(L['price']), round(float(L['p']), 4), [], [], L['sport']]
             ls.append([key, lr, int(L['price']), L['label']])
-        slips_.append([r['size'], r['top'], r['sports'], r['p'], r['ret'], ls, r['day']])
+        slips_.append([r['size'], r['top'], r['sports'], r['p'], r['ret'], ls, r['day'], r['gday']])
     return dict(legs=list(legs.values()), slips=slips_)
 
 
