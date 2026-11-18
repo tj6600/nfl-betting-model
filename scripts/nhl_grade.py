@@ -23,7 +23,7 @@ def main():
     for f in sorted(glob.glob(os.path.join(O.DIR, 'picks', '*.csv'))):
         day = os.path.basename(f)[:10]
         logs.setdefault(day, f)
-    rows, results = [], {}
+    rows, results, wait = [], {}, []
     for day, f in logs.items():
         L = pd.read_csv(f)
         # the lean is the side of each bet with the bigger edge (both sides are logged)
@@ -32,12 +32,13 @@ def main():
         L['key'] = L['key'] + alt.map({True: '|alt', False: ''})
         L['lean'] = (L.edge == L.groupby('key').edge.transform('max')) & ~alt   # alt rungs are parlay legs, not leans
         g = games[games.game_date == day]
-        if not len(g):
-            continue
         for l in L.itertuples():
             home, away = l.game.split(' @ ')[1], l.game.split(' @ ')[0]
-            m = g[(g.home == home) & (g.away == away)]
-            if not len(m):
+            m = g[(g.home == home) & (g.away == away)] if len(g) else g
+            if not len(m):   # no final score yet: the page's Refresh results button can grade it from ESPN
+                wait.append(dict(day=day, id=l.id, kind=l.kind, lean=bool(l.lean), cat=l.cat if isinstance(l.cat, str) else '', pick=bool(getattr(l, 'pick', False)),
+                                 price=l.price, p=l.p, edge=l.edge, gid=l.gid, game=l.game, market=l.market, side=l.side, line=l.line,
+                                 pid=l.pid if l.pid == l.pid else 0, label=l.label, alt=bool(alt.loc[l.Index])))
                 continue
             m = m.iloc[0]
             res = None
@@ -110,6 +111,39 @@ def main():
     out = report()
     # the Model record's day / week / month menus: the same report for each game day, week and month with graded bets
     out['by_period'] = CAL.by_period(ALL.day.tolist() if len(ALL) else [], report)
+    # bets still waiting on a result, for the page's Refresh results button (calib.Pending; graded from ESPN box scores)
+    since = (pd.Timestamp.now(tz='America/New_York').normalize() - pd.Timedelta(days=3)).strftime('%Y-%m-%d')
+    PD = CAL.Pending(push_counts=False)
+    POS = sk.drop_duplicates('player_id', keep='last').set_index('player_id').position.to_dict()
+    W = [r for r in wait if r['day'] >= since]
+
+    def gx(r):
+        away, home = r['game'].split(' @ ')
+        if r['market'] in ('moneyline', 'puckline', 'total'):
+            return dict(ev=str(abs(int(r['gid']))), m={'moneyline': 'ml', 'puckline': 'sp', 'total': 'tot'}[r['market']],
+                        sd=r['side'] if r['market'] == 'total' else ('home' if r['side'] == home else 'away'), ln=None if r['line'] != r['line'] else float(r['line']))
+        return dict(ev=str(abs(int(r['gid']))), m='stat', st=r['market'], sd=r['side'], ln=float(r['line']), nm=CAL.player_name(r['label']),
+                    wk='G' if r['market'] == 'saves' else 'D' if POS.get(int(r['pid'])) == 'D' else 'F')   # ESPN splits forwards and defensemen
+    fkey = lambda r: (r['day'], r['gid'], r['market'], r['pid'], abs(r['line']) if r['market'] == 'puckline' else r['line'] if r['market'] != 'moneyline' else 0)
+    wfav = {id(r) for r in CAL.favored([r for r in W if not r['alt']], fkey)}
+    SEC = {'moneyline': ('Moneyline picks', 'The team the board gave the better chance to win, every game (overtime and shootouts count).'),
+           'puckline': ('Puck lines', 'The side the board favored on each DraftKings puck line.'), 'total': ('Totals', 'Over or Under, whichever the board favored.'),
+           'sog': ('Shots on goal', 'Over or Under on the main DraftKings line, whichever the board favored.'),
+           'saves': ('Saves', 'Over or Under on the main DraftKings line, whichever the board favored.')}
+    for r in W:
+        plus = r['lean'] and r['edge'] > 0
+        g = []
+        if r['pick']: g.append(('groups', 'Board winner picks'))
+        if r['cat'] == 'Value': g.append(('groups', 'Value legs'))
+        if plus and r['kind'] in ('Shots on goal', 'Saves'): g.append(('groups', 'Prop leans with an edge (shots + saves)'))
+        if plus and r['kind'] in ('Shots on goal', 'Saves', 'Puck line', 'Total'): g.append(('groups', f"{r['kind']} leans with an edge"))
+        cal = ('cal_sections', 'Alt lines', False, 'Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).') if r['alt'] else \
+            ('cal_sections',) + SEC[r['market']][:1] + (True,) + SEC[r['market']][1:] if id(r) in wfav and r['market'] in SEC else None
+        PD.add_leg(f"{r['day']}|{r['id']}", r['day'], gx(r), r['price'], r['p'], g, cal)
+    byid = {(r['day'], r['id']): r for r in wait}
+    PZ.pending(O.DIR, results, PD, since=since,
+               add_leg=lambda day, L: PD.add_leg(f"{day}|{L['id']}", day, gx(byid[(day, L['id'])]), L['price'], L['p']) if (day, L['id']) in byid else None)
+    out['pending'] = PD.out()
     _lr = {}   # leg results for the Bank Builder record (bank.py)
     for (d, i), r in results.items(): _lr.setdefault(d, {})[i] = r
     json.dump(_lr, open(os.path.join(O.DIR, 'leg_results.json'), 'w'))

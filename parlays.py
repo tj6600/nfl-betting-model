@@ -258,3 +258,28 @@ def grade(dirpath, results, dates=None, when=None):
         for k in SIZES:
             grp(f'{name}: {"straight" if k == 1 else f"{k}-leg"} (all suggestions)', [r for r in rows if r['mode'] == mode and r['size'] == k])
     return dict(days=sorted({r['day'] for r in rows}) if dates is not None else sorted(logs), groups=groups)
+
+
+def pending(dirpath, results, PD, leg_key=lambda day, L: f"{day}|{L['id']}", when=None, add_leg=None, week_of=None, since=None):
+    """Add each suggested parlay that is still waiting on a leg to PD (calib.Pending), with the record groups grade() puts
+    it in. leg_key names a leg as the page's waiting legs do; add_leg(day, L) registers a waiting leg the page must grade."""
+    import calib as CAL
+    logs = {}
+    for f in sorted(glob.glob(os.path.join(dirpath, 'parlays', '*.json'))):
+        logs.setdefault(os.path.basename(f).rsplit('_', 1)[0], f)
+    for day, f in logs.items():
+        S = json.load(open(f))
+        for mode, m in S.items():
+            name = {'value': 'Best value', 'likely': 'Most likely to hit'}[mode]
+            for k, slips in m['slips'].items():
+                for i, s in enumerate(slips):
+                    res = [results.get((day, L['id'])) for L in s]
+                    if 'loss' in res or all(r is not None for r in res): continue
+                    d = when(day, s) if when else day
+                    if since and (not d or d < since): continue
+                    for L, r in zip(s, res):
+                        if r is None and add_leg: add_leg(day, L)
+                    g = [('parlays.groups', f'{name}: {"straight" if int(k) == 1 else f"{k}-leg"} (all suggestions)')]
+                    if int(k) == m['best'] and i == 0: g.append(('parlays.groups', f'{name}: ★ suggestion'))
+                    PD.add_parlay(d, [(leg_key(day, L), r, L['price']) for L, r in zip(s, res)], g, math.prod(L['p'] for L in s),
+                                  **({'week_of': week_of} if week_of else {}))

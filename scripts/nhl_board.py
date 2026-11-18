@@ -287,6 +287,9 @@ if 'games' in bt:
     small['pl'] = dict(n=gb['puck_line']['n'], ll=gb['puck_line']['logloss'], b0=gb['puck_line']['model']['ev>=0.00'])
     small['totals'] = {k: dict(n=v['n'], ll=v['logloss']) for k, v in gb.get('totals_close', {}).items()}
     small['winners'] = gb.get('winner_accuracy', {})
+if legs and not args.no_log:   # today's legs were just logged: grade again so the page lists them as waiting (Refresh results)
+    import subprocess
+    subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'nhl_grade.py')], check=False, stdout=subprocess.DEVNULL)
 gr = os.path.join(O.DIR, 'grade_report.json')
 LIVE = json.load(open(gr)) if os.path.exists(gr) else None
 

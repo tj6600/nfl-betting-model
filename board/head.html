@@ -271,17 +271,8 @@ table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
 .refbtn { font: 600 14px var(--body); border: 1px solid var(--turf); color: var(--turf); background: transparent; border-radius: 8px; padding: 8px 12px; cursor: pointer; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
 .refbtn[aria-busy="true"] .ico { animation: recspin 1s linear infinite; }
 @keyframes recspin { to { transform: rotate(360deg); } }
-.refpanel { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
-.refpanel p { margin: 0; }
-.refpanel .acts2 { display: flex; flex-wrap: wrap; gap: 8px; }
-.refpanel .go { font: 600 14px var(--body); border: 0; background: var(--turf); color: var(--bg); border-radius: 8px; padding: 9px 14px; cursor: pointer; text-decoration: none; display: inline-block; }
-.refpanel .ghost { font: 600 14px var(--body); border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
-.refpanel details { font-size: 13px; color: var(--muted); }
-.refpanel details summary { cursor: pointer; color: var(--ink); font-weight: 600; }
-.refpanel details ol { margin: 6px 0; padding-left: 20px; }
-.refpanel input { font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); flex: 1 1 200px; min-width: 0; }
-.refstatus { font-weight: 600; }
-.refstatus.bad { color: var(--neg); } .refstatus.ok { color: var(--pos); }
+.refstatus { font-size: 13px; color: var(--muted); margin: 0; }
+.refstatus.bad { color: var(--neg); font-weight: 600; } .refstatus.ok { color: var(--pos); font-weight: 600; }
 @media (max-width: 560px) { .recbar { padding: 10px; } .recrow > .seg { flex: 1 1 100%; } .recrow > .seg button { flex: 1 1 0; padding: 9px 4px; } .refbtn { flex: 1 1 100%; justify-content: center; } .recrow .grow { display: none; } }
 </style>
 <script>
@@ -330,6 +321,7 @@ function recSave(sport, st) { try { localStorage.setItem('gg-rec-' + sport, JSON
 function recordMenus(o) {
   // o: {sport, src, views: [[key, label]], rerender, weekNote}; returns {bar, rep, view, show(v), label, empty}
   const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  o = Object.assign({}, o, { src: liveSrc(o.sport, o.src), raw: o.src });
   const bp = (o.src && o.src.by_period) || { menu: { day: [], week: [], month: [] }, reports: {} };
   const st = Object.assign({ kind: 'all', keys: {}, view: 'all' }, recLoad(o.sport));
   if (!o.views.some(([k]) => k === st.view)) st.view = 'all';
@@ -351,7 +343,10 @@ function recordMenus(o) {
     const n = k === 'all' ? 1 : (bp.menu[k] || []).length; if (!n) { b.disabled = true; b.title = 'Nothing graded yet'; }
     b.onclick = () => { if (st.kind !== k) { st.kind = k; redo(); } }; seg.append(b);
   }
-  r1.append(seg, mk('span', 'grow'), refreshButton(o.sport, bar)); bar.append(r1);
+  r1.append(seg, mk('span', 'grow'), refreshButton({ sport: o.sport, src: o.raw, rerender: o.rerender }, bar)); bar.append(r1);
+  const lv = o.src && o.src._live;
+  const stx = REC_STATUS.text || (lv ? `Includes ${lv.legs} bet${lv.legs === 1 ? '' : 's'}${lv.parlays ? ` and ${lv.parlays} parlay${lv.parlays === 1 ? '' : 's'}` : ''} checked live on ESPN at ${new Date(lv.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}. The overnight grading makes them official.` : '');
+  if (stx) bar.append(mk('p', 'refstatus ' + (REC_STATUS.text ? REC_STATUS.cls : ''), stx));
   if (st.kind !== 'all') {
     const l = bp.menu[st.kind]; const i = l.findIndex((x) => x.key === key);
     const nav = mk('div', 'recnav');
@@ -375,111 +370,191 @@ function recordMenus(o) {
   return { bar, rep, view: st.view, kind: st.kind, label, period: key, show: (v) => st.view === 'all' || st.view === v };
 }
 
-// ---- Refresh results: grade finished games now. A GitHub Actions run (refresh-records.yml) runs the free graders
-// (no odds credits) and pushes; Render redeploys and this page reloads itself when the new page is up.
-// With no key saved, the button opens the workflow on GitHub (tap "Run workflow"). A key, if Thomas adds one, is kept only
-// in this phone's browser storage, never in the site or the repo.
-const GG_REPO = 'tj6600/nfl-betting-model', GG_WF = 'refresh-records.yml';
-const GG_WF_URL = `https://github.com/${GG_REPO}/actions/workflows/${GG_WF}`;
-function ggGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-function ggSet(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } }
-function ggHash(t) { let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0; return String(h); }
-async function ggPage() {
-  // the page's version: its ETag or Last-Modified from a HEAD request (no download); the whole page only if neither is sent
-  const u = location.pathname + '?fresh=' + Date.now();
-  try {
-    const h = await fetch(u, { method: 'HEAD', cache: 'no-store' });
-    const v = h.ok && (h.headers.get('etag') || h.headers.get('last-modified'));
-    if (v) return v;
-  } catch (e) { /* fall through */ }
-  const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return ggHash(await r.text());
+// ---- Refresh results (Thomas, 2026-11-18): the page grades the bets still waiting on a result itself, from ESPN's free
+// scoreboard and box scores (no odds credits, no keys), and adds them to the record. src.pending (calib.Pending) lists each
+// waiting leg with the groups, chance-check sections and day/week/month reports it belongs to. The next grading run
+// (2:43 AM, 8:13 AM) makes the results official and they drop out of the waiting list.
+const ESPN = 'https://site.api.espn.com/apis/site/v2/sports/';
+const ESPN_SPORT = { nba: 'basketball/nba', nhl: 'hockey/nhl', nfl: 'football/nfl' };
+const NFL_ESPN_ABBR = { LA: 'LAR', WAS: 'WSH' };
+const REC_PICK = [[0, .6], [.6, .7], [.7, .8], [.8, .9], [.9, 1.01]];
+const REC_ALL = [[0, .1], [.1, .2], [.2, .3], [.3, .4], [.4, .5], [.5, .6], [.6, .7], [.7, .8], [.8, .9], [.9, 1.01]];
+const recDec = (a) => a > 0 ? 1 + a / 100 : 1 + 100 / -a;
+const recNorm = (n) => String(n || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]/g, '').replace(/(jr|sr|ii|iii|iv)$/, '');
+function liveLoad(sport) { try { return JSON.parse(localStorage.getItem('gg-live-' + sport) || 'null'); } catch (e) { return null; } }
+function liveSave(sport, v) { try { localStorage.setItem('gg-live-' + sport, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+
+// the record with the live results added (a copy; the page's own data is untouched)
+function liveSrc(sport, src) {
+  const P = src && src.pending, st = liveLoad(sport);
+  if (!P || !st || !st.res) return src;
+  const res = st.res;
+  if (!P.legs.some((L) => res[L[0]]) ) return src;
+  const R = JSON.parse(JSON.stringify(src));
+  const bp = R.by_period = R.by_period || { menu: { day: [], week: [], month: [] }, reports: {} };
+  const kindOf = { d: 'day', w: 'week', m: 'month' };
+  const rep = (key) => {
+    if (!bp.reports[key]) {
+      bp.reports[key] = { days: [], groups: [], by_kind: [], cal_sections: [], cal: [], picks: [], legs: [], parlays: { days: [], groups: [] } };
+      const l = bp.menu[kindOf[key[0]]]; l.push({ key, label: P.per[key] || key }); l.sort((a, b) => (a.key < b.key ? 1 : -1));
+    }
+    return bp.reports[key];
+  };
+  const targets = (day) => [R].concat(((P.days || {})[day] || []).map(rep));
+  const arr = (T, path) => { const ps = path.split('.'); let o = T; for (let i = 0; i < ps.length - 1; i++) o = o[ps[i]] = o[ps[i]] || {}; return o[ps.at(-1)] = o[ps.at(-1)] || []; };
+  const addGroup = (T, path, name, r, p, u, pushCounts) => {
+    if (r === 'push' && !pushCounts) return;
+    const A = arr(T, path); let g = A.find((x) => x.group === name);
+    if (!g) { g = { group: name, bets: 0, won: 0, lost: 0, hit: 0, exp_hit: 0, units: 0, roi: 0 }; A.push(g); }
+    g.exp_hit = ((g.exp_hit || 0) * g.bets + p) / (g.bets + 1); g.bets += 1;
+    if (r === 'win') g.won += 1; else if (r === 'loss') g.lost += 1;
+    g.hit = g.won / Math.max(1, g.won + g.lost); g._u = (g._u ?? g.units) + u; g.units = Math.round(g._u * 100) / 100; g.roi = g._u / g.bets; g.live = (g.live || 0) + 1;
+  };
+  const addCal = (T, [path, name, picked, note], p, won, u) => {
+    const A = arr(T, path); let c = A.find((x) => x.name === name);
+    if (!c) { c = { name, note, n: 0, won: 0, lost: 0, said: 0, hit: 0, units: 0, roi: 0, buckets: [] }; A.push(c); }
+    const upd = (o) => { o.said = (o.said * o.n + p) / (o.n + 1); o.n += 1; if (won) o.won += 1; else o.lost += 1; o.hit = o.won / o.n; o._u = (o._u ?? o.units) + u; o.units = Math.round(o._u * 100) / 100; };
+    upd(c); c.roi = c._u / c.n;
+    const [lo, hi] = (picked ? REC_PICK : REC_ALL).find(([a, b]) => a <= p && p < b) || [0.9, 1.01];
+    const label = `${picked && lo === 0 ? 50 : Math.round(lo * 100)}–${Math.min(100, Math.round(hi * 100))}%`;
+    let k = c.buckets.find((x) => x.label === label);
+    if (!k) { k = { label, n: 0, won: 0, lost: 0, said: 0, hit: 0, units: 0 }; c.buckets.push(k); c.buckets.sort((a, b) => parseInt(a.label) - parseInt(b.label)); }
+    upd(k);
+  };
+  let nl = 0, np = 0;
+  for (const [key, day, , price, p, gs, cs] of P.legs) {
+    const r = res[key]; if (!r || r === 'void') continue;
+    const u = r === 'win' ? Math.round((recDec(price) - 1) * 1000) / 1000 : r === 'loss' ? -1 : 0; nl += 1;   // the graders round a win's profit to 3 places
+    for (const T of targets(day)) {
+      if (T.days && !T.days.includes(day) && T !== R) T.days.push(day);
+      for (const gi of gs) addGroup(T, P.g[gi][0], P.g[gi][1], r, p, u, P.push);
+      if (r !== 'push') for (const ci of cs) addCal(T, P.c[ci], p, r === 'win', u);
+    }
+  }
+  for (const [day, legs, gs, p] of P.parlays) {
+    const rs = legs.map(([k, known]) => known || res[k] || null);
+    let r, u;
+    if (rs.includes('loss')) { r = 'loss'; u = -1; }
+    else if (rs.includes(null)) continue;
+    else {
+      const live = legs.filter((_, i) => rs[i] === 'win'); if (!live.length) continue;   // every leg pushed or voided
+      r = 'win'; u = live.reduce((a, [, , pr]) => a * recDec(pr), 1) - 1;
+    }
+    np += 1;
+    for (const T of targets(day)) {
+      if (T.parlays && T.parlays.days && !T.parlays.days.includes(day) && T !== R) T.parlays.days.push(day);
+      for (const gi of gs) addGroup(T, P.g[gi][0], P.g[gi][1], r, p, u, false);
+    }
+  }
+  R._live = { legs: nl, parlays: np, at: st.at };
+  return R;
 }
-const GG_REF = { timer: null, status: '', cls: '', panelOpen: false };
-function refreshButton(sport, bar) {
+
+// ESPN box scores -> a result for each waiting leg whose game is final
+async function liveCheck(sport, P, say) {
+  const get = async (u) => { const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); };
+  const base = ESPN + ESPN_SPORT[sport];
+  const st = liveLoad(sport) || {}; const res = Object.assign({}, st.res || {});
+  const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+  const want = P.legs.filter((L) => !res[L[0]] && L[1] && L[1] <= todayET);
+  if (!want.length) { say('Nothing is waiting on a result right now.', 'ok'); return 0; }
+  // which ESPN games to read
+  const evOf = new Map();
+  if (sport === 'nfl') {
+    const weeks = [...new Set(want.map((L) => L[2][6].slice(0, 2).join('-')))];
+    for (const w of weeks) {
+      const [se, wk] = w.split('-');
+      const sb = await get(`${base}/scoreboard?seasontype=2&week=${wk}&dates=${se}`);
+      for (const e of sb.events || []) {
+        const c = e.competitions[0].competitors; const h = c.find((x) => x.homeAway === 'home').team.abbreviation, a = c.find((x) => x.homeAway === 'away').team.abbreviation;
+        evOf.set(`${w}|${a}|${h}`, e.id);
+      }
+    }
+    for (const L of want) { const [se, wk, a, h] = L[2][6]; L._ev = evOf.get(`${se}-${wk}|${NFL_ESPN_ABBR[a] || a}|${NFL_ESPN_ABBR[h] || h}`); }
+  } else for (const L of want) L._ev = L[2][0];
+  const evs = [...new Set(want.map((L) => L._ev).filter(Boolean))];
+  say(`Checking ${evs.length} game${evs.length === 1 ? '' : 's'} on ESPN…`);
+  const box = {}; let failed = 0;
+  await Promise.all(evs.map(async (id) => {
+    try {
+      const d = await get(`${base}/summary?event=${id}`);
+      const comp = d.header.competitions[0];
+      if (!comp.status.type.completed) return;
+      const sc = {}; comp.competitors.forEach((c) => { sc[c.homeAway] = Number(c.score); });
+      const byId = {}, byName = {}, byCat = {};
+      for (const t of (d.boxscore && d.boxscore.players) || []) {
+        let goalie = 0;
+        for (const cat of t.statistics || []) {
+          const keys = cat.keys || [];
+          for (const a of cat.athletes || []) {
+            const v = {}; keys.forEach((k, i) => { v[k] = a.stats ? a.stats[i] : undefined; });
+            const rec = byId[a.athlete.id] = byId[a.athlete.id] || { dnp: false, s: {} };
+            if (a.didNotPlay || !a.stats || !a.stats.length) rec.dnp = true;
+            const n = (x) => { const y = parseFloat(String(x).split(/[-/]/)[0]); return isNaN(y) ? 0 : y; };
+            if (sport === 'nba') Object.assign(rec.s, { min: n(v.minutes), pts: n(v.points), reb: n(v.rebounds), ast: n(v.assists), fg3m: n(v['threePointFieldGoalsMade-threePointFieldGoalsAttempted']) });
+            if (sport === 'nhl') { if (cat.name === 'goalies') { rec.s.saves = n(v.saves); rec.s.starter = goalie === 0; goalie += 1; } else rec.s.sog = n(v.shotsTotal); }
+            if (sport === 'nfl') {
+              if (cat.name === 'passing') rec.s.pass = n(v.passingYards);
+              if (cat.name === 'rushing') { rec.s.rush = n(v.rushingYards); rec.s.td = (rec.s.td || 0) + n(v.rushingTouchdowns); }
+              if (cat.name === 'receiving') { rec.s.rec = n(v.receivingYards); rec.s.recs = n(v.receptions); rec.s.td = (rec.s.td || 0) + n(v.receivingTouchdowns); }
+            }
+            if (sport === 'nhl') { const t = String(a.athlete.displayName).split(' '); (byCat[{ goalies: 'G', defenses: 'D' }[cat.name] || 'F'] ||= []).push({ f: recNorm(t[0]), l: recNorm(t.at(-1)), rec }); }
+            const nk = recNorm(a.athlete.displayName);   // two players with one name (VAN's two Elias Petterssons): leave the bet waiting
+            if (byName[nk] && byName[nk] !== rec) byName[nk] = 'twice'; else byName[nk] = rec;
+          }
+        }
+      }
+      box[id] = { sc, byId, byName, byCat };
+    } catch (e) { failed += 1; /* this game's box score didn't load: it stays waiting */ }
+  }));
+  let n = 0;
+  for (const L of want) {
+    const b = box[L._ev]; if (!b) continue;
+    const [, m, stat, sd, ln, who] = L[2]; let x;
+    const hm = b.sc.home - b.sc.away;
+    if (m === 'ml') x = sd === 'home' ? hm : -hm;
+    else if (m === 'sp') x = (sd === 'home' ? hm : -hm) + ln;
+    else if (m === 'tot') x = (b.sc.home + b.sc.away - ln) * (sd === 'Over' ? 1 : -1);
+    else {
+      let p = (sport === 'nba' ? b.byId[who] : null) || b.byName[recNorm(who)];
+      if (sport === 'nhl') {   // match within the player's group (forward, defenseman, goalie) by first and last name
+        const t = String(who).split(' '), f = recNorm(t[0]), l = recNorm(t.at(-1));
+        const c = L[2][6] ? (b.byCat[L[2][6]] || []).filter((x) => x.f === f && x.l === l) : [];
+        if (c.length) p = c.length === 1 ? c[0].rec : 'twice';
+      }
+      if (p === 'twice') continue;
+      if (!p && sport !== 'nba') continue;   // name not in ESPN's box score: leave it for the grading run rather than guess void
+      let v = p && !p.dnp ? (stat === 'pra' ? p.s.pts + p.s.reb + p.s.ast : p.s[stat]) : undefined;
+      if (sport === 'nba' && p && !(p.s.min > 0)) v = undefined;
+      if (sport === 'nhl' && stat === 'saves' && p && !p.s.starter) v = undefined;
+      if (stat === 'td' && p && v === undefined) v = 0;   // listed in the box score with no touches: an anytime TD loses
+      if (v === undefined && sport === 'nfl') continue;   // no line for this stat in ESPN's box: leave it for the grading run
+      if (v === undefined) { res[L[0]] = 'void'; n += 1; continue; }
+      x = (v - ln) * (sd === 'Over' ? 1 : -1);
+    }
+    res[L[0]] = x > 0 ? 'win' : x < 0 ? 'loss' : 'push'; n += 1;
+  }
+  if (evs.length && failed === evs.length) { say('Could not reach ESPN. Check the connection and try again.', 'bad'); return 0; }
+  liveSave(sport, { res, at: Date.now() });
+  const left = want.length - n, fin = Object.keys(box).length;
+  say(n ? `Graded ${n} bet${n === 1 ? '' : 's'} from ${fin} finished game${fin === 1 ? '' : 's'}.${left ? ` ${left} still waiting for their games to finish or for the overnight grading.` : ''}`
+    : fin ? 'No new results yet.' : 'No games have finished yet. Try again after they end.', n ? 'ok' : '');
+  return n;
+}
+
+function refreshButton(o, bar) {
   const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
   const b = mk('button', 'refbtn'); b.type = 'button'; b.append(mk('span', 'ico', '↻'), mk('span', null, 'Refresh results'));
-  const waiting = () => { const w = JSON.parse(ggGet('gg-ref-wait') || 'null'); return w && Date.now() - w.t < 15 * 60e3 ? w : null; };
-  b.setAttribute('aria-busy', !!waiting());
-  b.onclick = () => { GG_REF.panelOpen = !GG_REF.panelOpen; draw(); };
-  const draw = () => {
-    bar.querySelectorAll('.refpanel').forEach((x) => x.remove());
-    if (!GG_REF.panelOpen) return;
-    const pn = mk('div', 'refpanel'); const tok = ggGet('gg-gh-key');
-    pn.append(mk('p', null, 'Grades every game that has finished and rebuilds the NFL, NBA and NHL records. It uses free stats only, never odds credits. It takes about 3 to 6 minutes, and this page reloads itself when the new results are up.'));
-    const s = mk('p', 'refstatus ' + GG_REF.cls, GG_REF.status); pn.append(s);
-    const acts = mk('div', 'acts2');
-    if (tok) {
-      const go = mk('button', 'go', 'Grade finished games now'); go.type = 'button'; go.onclick = () => ggDispatch(sport, tok, draw); acts.append(go);
-    } else {
-      const go = mk('a', 'go', 'Run it on GitHub'); go.href = GG_WF_URL; go.target = '_blank'; go.rel = 'noopener';
-      go.onclick = () => { ggWait(draw, 'Waiting for the run. On GitHub, tap Run workflow, then come back here.'); }; acts.append(go);
-    }
-    const chk = mk('button', 'ghost', 'Load the latest page'); chk.type = 'button'; chk.onclick = () => location.reload(); acts.append(chk);
-    pn.append(acts);
-    const det = mk('details'); det.append(mk('summary', null, tok ? 'One-tap key saved on this phone' : 'Set up one tap (optional)'));
-    if (tok) {
-      det.append(mk('p', null, 'The key is stored only in this browser. Remove it here if you lose the phone, and delete it on GitHub (Settings, Developer settings, Personal access tokens).'));
-      const rm = mk('button', 'ghost', 'Remove key from this phone'); rm.type = 'button'; rm.onclick = () => { ggSet('gg-gh-key', null); draw(); }; det.append(rm);
-    } else {
-      const ol = mk('ol');
-      ['On GitHub, open Settings, Developer settings, Personal access tokens, Fine-grained tokens, and tap Generate new token.',
-        'Repository access: Only select repositories, then nfl-betting-model. Permissions: Actions, Read and write. Nothing else.',
-        'Copy the token and paste it below. It stays in this phone\'s browser only; it is never put on the website or in the code.'].forEach((x) => ol.append(mk('li', null, x)));
-      det.append(ol);
-      const row = mk('div', 'acts2'); const inp = mk('input'); inp.type = 'password'; inp.placeholder = 'github_pat_…'; inp.autocomplete = 'off';
-      const sv = mk('button', 'ghost', 'Save'); sv.type = 'button';
-      sv.onclick = () => { const v = inp.value.trim(); if (!/^(github_pat_|ghp_)\w+$/.test(v)) { GG_REF.status = 'That does not look like a GitHub token.'; GG_REF.cls = 'bad'; draw(); return; } ggSet('gg-gh-key', v); GG_REF.status = 'Saved. Tap Grade finished games now.'; GG_REF.cls = 'ok'; draw(); };
-      row.append(inp, sv); det.append(row);
-    }
-    pn.append(det); bar.append(pn);
+  const P = o.src && o.src.pending;
+  if (!P) { b.disabled = true; b.title = 'Available after the next grading run'; }
+  b.onclick = async () => {
+    if (b.getAttribute('aria-busy') === 'true') return;
+    b.setAttribute('aria-busy', 'true');
+    const say = (t, c) => { REC_STATUS.text = t; REC_STATUS.cls = c || ''; let s = bar.querySelector('.refstatus'); if (!s) { s = mk('p'); bar.children[0].after(s); } s.textContent = t; s.className = 'refstatus ' + (c || ''); };
+    try { await liveCheck(o.sport, P, say); } catch (e) { say('Could not reach ESPN. Check the connection and try again.', 'bad'); }
+    b.setAttribute('aria-busy', 'false'); o.rerender();
   };
-  GG_REF.redraw = () => { b.setAttribute('aria-busy', !!waiting()); draw(); };
-  if (waiting() && !GG_REF.timer) { GG_REF.panelOpen = true; ggWait(GG_REF.redraw, null, true); }
-  setTimeout(draw, 0);
   return b;
 }
-function ggSetStatus(t, c) { GG_REF.status = t; GG_REF.cls = c || ''; if (GG_REF.redraw) GG_REF.redraw(); }
-async function ggWait(draw, msg, resume) {
-  // poll the page itself until a new version is published, for up to 15 minutes
-  let w = JSON.parse(ggGet('gg-ref-wait') || 'null');
-  if (!resume || !w) { let base = null; try { base = await ggPage(); } catch (e) { /* offline */ } w = { t: Date.now(), base }; ggSet('gg-ref-wait', JSON.stringify(w)); }
-  if (msg) ggSetStatus(msg);
-  clearInterval(GG_REF.timer);
-  const tick = async () => {
-    const mins = Math.round((Date.now() - w.t) / 60e3);
-    if (Date.now() - w.t > 15 * 60e3) {
-      clearInterval(GG_REF.timer); GG_REF.timer = null; ggSet('gg-ref-wait', null);
-      ggSetStatus('No new results after 15 minutes. If the run finished, nothing new was ready to grade: the free stats sites can post a game a few hours after it ends.', 'bad'); return;
-    }
-    try {
-      const h = await ggPage();
-      if (w.base && h !== w.base) { clearInterval(GG_REF.timer); ggSet('gg-ref-wait', null); ggSetStatus('New results are in. Reloading…', 'ok'); setTimeout(() => location.reload(), 600); return; }
-      if (!w.base) { w.base = h; ggSet('gg-ref-wait', JSON.stringify(w)); }
-    } catch (e) { /* offline: try again */ }
-    if (!/Reloading|failed/.test(GG_REF.status)) ggSetStatus(`Grading… ${mins ? mins + ' min so far. ' : ''}This page reloads itself when the new results are up.`);
-  };
-  GG_REF.timer = setInterval(tick, 20e3); tick();
-}
-async function ggDispatch(sport, tok, draw) {
-  const H = { Authorization: 'Bearer ' + tok, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
-  ggSetStatus('Starting the run…');
-  try {
-    const r = await fetch(`https://api.github.com/repos/${GG_REPO}/actions/workflows/${GG_WF}/dispatches`, { method: 'POST', headers: H, body: JSON.stringify({ ref: 'main', inputs: { sport: 'all' } }) });
-    if (r.status === 401 || r.status === 403 || r.status === 404) { ggSetStatus('GitHub refused the key (it may have expired or lack Actions: Read and write). You can still run it on GitHub.', 'bad'); return; }
-    if (!r.ok) { ggSetStatus(`GitHub said ${r.status}. Try again in a minute.`, 'bad'); return; }
-  } catch (e) { ggSetStatus('Could not reach GitHub. Check the connection and try again.', 'bad'); return; }
-  ggWait(draw, 'Run started. Grading takes about 3 to 6 minutes.');
-  // also watch the run itself so a failure shows here instead of a silent 15-minute wait
-  const t0 = Date.now(); const watch = setInterval(async () => {
-    if (Date.now() - t0 > 15 * 60e3) { clearInterval(watch); return; }
-    try {
-      const r = await fetch(`https://api.github.com/repos/${GG_REPO}/actions/workflows/${GG_WF}/runs?per_page=1&event=workflow_dispatch`, { headers: H, cache: 'no-store' });
-      const j = await r.json(); const run = j.workflow_runs && j.workflow_runs[0];
-      if (!run || Date.parse(run.created_at) < t0 - 60e3 || run.status !== 'completed') return;
-      clearInterval(watch);
-      if (run.conclusion !== 'success') { clearInterval(GG_REF.timer); GG_REF.timer = null; ggSet('gg-ref-wait', null); ggSetStatus('The refresh run failed on GitHub. The last results are still shown.', 'bad'); }
-      else if (!/Reloading/.test(GG_REF.status)) ggSetStatus('Grading finished. Waiting for the site to publish the new page (1 to 3 minutes)…');
-    } catch (e) { /* try again */ }
-  }, 30e3);
-}
+const REC_STATUS = { text: '', cls: '' };
 </script>

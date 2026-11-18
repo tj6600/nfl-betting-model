@@ -262,6 +262,9 @@ pb = os.path.join(D.DIR, 'backtest_props.json')
 if os.path.exists(pb):
     bt['props'] = json.load(open(pb))
 
+if legs and not args.no_log:   # today's legs were just logged: grade again so the page lists them as waiting (Refresh results)
+    import subprocess
+    subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'nba_grade.py')], check=False, stdout=subprocess.DEVNULL)
 gr = os.path.join(O.DIR, 'grade_report.json')
 LIVE = json.load(open(gr)) if os.path.exists(gr) else None
 DATA = dict(live=LIVE, injuries=INJURY is not None, day=day, dayLabel=pd.Timestamp(day).strftime('%A, %B %-d'), taken=taken.strftime('%A %-I:%M %p ET') if taken is not None else None,

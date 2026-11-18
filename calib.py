@@ -95,3 +95,72 @@ def by_period(dates, build, week_of=monday_week):
     """build(set_of_dates) -> the report for those days. Returns {'menu': ..., 'reports': {key: report}} for the page."""
     menu, groups = periods(dates, week_of)
     return dict(menu=menu, reports={k: build(v) for k, v in groups.items()})
+
+
+# ---------- bets still waiting on a result, for the Refresh results button (Thomas, 2026-11-18) ----------
+# The page grades these itself from ESPN's free scoreboard and box scores, then adds each result to the record groups,
+# chance-check sections and day/week/month reports listed here. The next grading run makes them official.
+import re as _re
+NAME_RX = _re.compile(r'^(.*?) (?:(?:Over|Under) [\d.]+ |\d+\+ |anytime TD)')
+
+
+def player_name(label):
+    m = NAME_RX.match(str(label)); return m.group(1) if m else None
+
+
+def period_keys(day, week_of=monday_week):
+    """[[key, label], ...] of the day, week and month menus a game day belongs to."""
+    d = _d(day); wk, wl = week_of(str(day)[:10])
+    return [['d:' + str(day)[:10], f'{WEEKDAYS[d.weekday()]} {_short(d)}'], ['w:' + wk, wl], ['m:' + str(day)[:7], f'{MONTHS_LONG[d.month - 1]} {d.year}']]
+
+
+class Pending:
+    """Collects waiting legs and parlays in a compact form for the page (calib.Pending().add_leg(...); .out())."""
+    def __init__(self, push_counts=False):
+        self.g, self.c, self.per, self.legs, self.parlays, self.push = [], [], {}, {}, [], push_counts
+
+    def _gi(self, path, name):
+        x = [path, name]
+        if x not in self.g: self.g.append(x)
+        return self.g.index(x)
+
+    def _ci(self, path, name, picked, note):
+        for i, c in enumerate(self.c):
+            if c[:2] == [path, name]: return i
+        self.c.append([path, name, bool(picked), note]); return len(self.c) - 1
+
+    def _pk(self, day, week_of):
+        ks = []
+        for k, lab in period_keys(day, week_of): self.per[k] = lab; ks.append(k)
+        return ks
+
+    def add_leg(self, key, day, grade, price, p, groups=(), cal=None, week_of=monday_week):
+        """grade: how the page finds the result (ev/wk/t/m/st/sd/ln/pid/nm); groups: [(path, name)];
+        cal: (path, section, picked, note) or None."""
+        L = self.legs.get(key)
+        if L is None:
+            L = self.legs[key] = dict(k=key, d=str(day)[:10] if day else None, x=grade, pr=int(price), p=round(float(p), 4), g=[], c=[],
+                                      per=self._pk(day, week_of) if day else [])
+        for path, name in groups:
+            i = self._gi(path, name)
+            if i not in L['g']: L['g'].append(i)
+        if cal and self._ci(*cal) not in L['c']: L['c'].append(self._ci(*cal))
+        return L
+
+    def add_parlay(self, day, legs, groups, p, week_of=monday_week):
+        """legs: [(leg key, known result or None, DK price)]; a parlay waits while no leg lost and some leg has no result."""
+        self.parlays.append(dict(d=str(day)[:10] if day else None, l=[[k, r, int(pr)] for k, r, pr in legs], g=sorted({self._gi(*x) for x in groups}),
+                                 p=round(float(p), 5), per=self._pk(day, week_of) if day else []))
+
+    def out(self):
+        """Compact for the page: legs are [key, day, x, price, p, [group idx], [cal idx]]; x is [ev, m, st, side, line, who, week];
+        parlays are [day, [[leg key, result, price]], [group idx], p]; days maps each day to its menu keys."""
+        need = {k for pz in self.parlays for k, r, _ in pz['l'] if r is None}
+        legs = [L for L in self.legs.values() if L['g'] or L['c'] or L['k'] in need]
+        X = lambda x: [x.get('ev'), x.get('m'), x.get('st'), x.get('sd'), x.get('ln'), x.get('pid') or x.get('nm'), x.get('wk')]
+        days = {}
+        for L in legs: days[L['d']] = L['per']
+        for pz in self.parlays: days[pz['d']] = pz['per']
+        return dict(push=self.push, g=self.g, c=self.c, per=self.per, days={d: v for d, v in days.items() if d},
+                    legs=[[L['k'], L['d'], X(L['x']), L['pr'], L['p'], L['g'], L['c']] for L in legs],
+                    parlays=[[pz['d'], pz['l'], pz['g'], pz['p']] for pz in self.parlays])
