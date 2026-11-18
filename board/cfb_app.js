@@ -277,7 +277,7 @@ function bar() {
   $('bar').style.display = show ? '' : 'none'; $('legend').style.display = 'none';
   if (!show) return;
   const pos = $('pos'); pos.innerHTML = '';
-  [['all', 'All games'], ['value', 'Value spreads'], ['top25', 'Top 25'], ['likely', 'Picks 70%+']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', state.filt === k); b.onclick = () => { state.filt = k; render(); }; pos.append(b); });
+  [['all', 'All games'], ['likely', 'Winners 70%+'], ['top25', 'Top 25'], ['value', 'Value spreads']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', state.filt === k); b.onclick = () => { state.filt = k; render(); }; pos.append(b); });
   $('sort').style.display = 'none';
   const q = $('q'); q.placeholder = 'Search a team'; q.setAttribute('aria-label', 'Search a team');
   q.oninput = (e) => { state.q = e.target.value.toLowerCase(); boardGames(); };
@@ -307,6 +307,11 @@ function boardGames() {
     [[pickName ? `${pickName} ${pct(g.pick_p)}` : '—', 'Pick to win'], [lineTxt(g, g.line), 'DK spread'], [lineTxt(g, g.model_line), 'Model spread'],
      [g.line_total ?? '—', 'DK total'], [g.model_total, 'Model total']].forEach(([v, k]) => { const d = el('div'); d.append(el('b', null, v), el('span', null, k)); pj.append(d); });
     c.append(pj);
+    const picks = [];
+    if (g.pick) picks.push(`${g[g.pick + '_name']} to win (${pct(g.pick_p)})`);
+    if (g.sp_pick) picks.push(`${LEG[g.sp_pick].label} (${pct(LEG[g.sp_pick].p)})`);
+    if (g.to_pick) picks.push(LEG[g.to_pick].label.replace(/ \(.*\)$/, '') + ` (model ${g.model_total})`);
+    if (picks.length) { const pk = el('div', 'outs picks'); pk.append(el('b', null, 'Board picks: '), document.createTextNode(picks.join(' · '))); c.append(pk); }
     const notes = [];
     if (g.diff != null) {
       const side = g.diff > 0 ? g.home_name : g.away_name, pts = Math.abs(g.diff);
@@ -325,7 +330,9 @@ function boardGames() {
       const hr = el('tr'); ['Bet', 'DK', 'Chance', 'Edge', ''].forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr);
       g.legs.map((id) => LEG[id]).forEach((L) => {
         const tr = el('tr'); if (L.cat === 'Value') tr.className = 'hl';
+        if (L.bpick) tr.classList.add('bp');
         const lab = el('td'); lab.append(document.createTextNode(`${L.kind}: ${L.kind === 'Total' ? L.label.replace(/ \(.*\)$/, '') : L.label}`));
+        if (L.bpick) lab.append(document.createTextNode(' '), el('span', 'pill pk', 'Pick'));
         if (L.cat === 'Value') lab.append(document.createTextNode(' '), el('span', 'pill value', 'Value'));
         tr.append(lab, el('td', 'num', fmt(L.price)), el('td', 'num', pct(L.p)), el('td', 'num ' + (L.edge > 0 ? 'pos' : 'neg'), sgn(L.edge)));
         const td = el('td', 'num'); td.append(addBtn(L.id)); tr.append(td); t.append(tr);
@@ -336,7 +343,7 @@ function boardGames() {
   });
   B.append(wrap);
   const w = D.weights;
-  $('foot').textContent = `Chances: spreads are ${w.Spread * 100}% model and ${100 - w.Spread * 100}% DraftKings no-vig, moneylines ${w.Moneyline * 100}% model, totals DraftKings only (the model's totals did worse than DraftKings in testing). Value = a spread where the model's line is ${D.value_pts}+ points better than DraftKings' line now. Home field is worth ${D.hfa} points in the ratings. Scores through ${D.through}. Lines from DraftKings via ESPN.`;
+  $('foot').textContent = `Board picks: the winner and spread side with the higher chance, and the total side of the model's projected score. In testing (2026 weeks 4-11) the winner pick was right about 72% of the time; spread and total picks are close to coin flips at DraftKings' lines (about 47% and 46% against closing lines; spread picks hit 52.5% against the opener), so the parlay builder's Most likely to hit mode leans on winners. Chances: spreads are ${w.Spread * 100}% model and ${100 - w.Spread * 100}% DraftKings no-vig, moneylines ${w.Moneyline * 100}% model, totals DraftKings only (the model's totals did worse than DraftKings in testing). Value = a spread where the model's line is ${D.value_pts}+ points better than DraftKings' line now. Home field is worth ${D.hfa} points in the ratings. Scores through ${D.through}. Lines from DraftKings via ESPN.`;
 }
 
 function legLabel(L, cls) { return el('span', cls, L.label); }
