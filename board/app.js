@@ -371,12 +371,16 @@ function renderTest() {
 }
 // ---- model record: picks and suggested parlays, graded at DraftKings once the games are final (nflmodel/record.py) ----
 function renderRecord() {
-  const R = D.record, wk = (d) => `week ${+d.split('_wk')[1]}`;
-  document.getElementById('lede').textContent = `How the board's picks and suggested parlays have done, graded at DraftKings' own line and price once each game is final. ` +
+  const M = recordMenus({ sport: 'nfl', src: D.record, rerender: renderRecord,
+    views: [['all', 'Everything'], ['bets', 'Picks'], ['parlays', 'Parlays'], ['chance', 'Chance check'], ['tests', 'Backtests']],
+    dayNote: 'A day shows the games played that day. A parlay counts on the day of its last game.',
+    weekNote: 'NFL weeks run Thursday to Monday.' });
+  const R = M.rep, wk = (d) => `week ${+d.split('_wk')[1]}`;
+  document.getElementById('lede').textContent = (M.period ? `Showing ${M.label}. ` : '') + `How the board's picks and suggested parlays have done, graded at DraftKings' own line and price once each game is final. ` +
     (R.graded.length ? `Graded so far: ${R.graded.map(wk).join(', ')}.` : `Nothing is graded yet: the ${R.weeks.map(wk).join(', ')} picks and parlays are saved and grade after the games, when the board is rebuilt on Monday.`);
   for (const id of ['cats', 'games', 'legend']) document.getElementById(id).replaceChildren();
   document.querySelector('.bar').style.display = 'none';
-  const board = document.getElementById('board'); board.replaceChildren(); board.className = 'cols';
+  const board = document.getElementById('board'); board.replaceChildren(); board.className = 'cols'; board.append(M.bar);
   const sg = (u) => `${u > 0 ? '+' : ''}${u.toFixed(2)}`;
   const mk = (title, sub, rows) => {
     const c = el('section', 'col'); const h = el('div', 'colhead'); h.append(el('h2', null, title), el('span', null, sub)); c.append(h);
@@ -391,7 +395,9 @@ function renderRecord() {
     }
     tb.append(tbody); wrap.append(tb); c.append(wrap); return c;
   };
-  const tileRows = R.picks.slice(0, 1).concat(R.parlays.groups.filter((g) => /★/.test(g.group)), (R.legs || []).filter((g) => /★/.test(g.group)));
+  const nBets = R.picks.length + R.parlays.groups.length + (R.legs || []).length + (R.cal || []).length;
+  if (M.period && !nBets) board.append(el('div', 'empty', `Nothing graded for ${M.label} yet.`));
+  const tileRows = (M.show('bets') ? R.picks.slice(0, 1) : []).concat(M.show('parlays') ? R.parlays.groups.filter((g) => /★/.test(g.group)).concat((R.legs || []).filter((g) => /★/.test(g.group))) : []);
   if (tileRows.length) {
     const tiles = el('div', 'tiles');
     for (const r of tileRows) {
@@ -401,10 +407,11 @@ function renderRecord() {
     }
     board.append(tiles);
   }
-  if ((R.cal || []).length) board.append(renderCalibration(R.cal));
-  if (R.picks.length) board.append(mk('Board picks', '1 unit each at DraftKings', R.picks));
-  if (R.parlays.groups.length) board.append(mk('Suggested parlays', 'every suggestion at each size (up to 6 a week), 1 unit each', R.parlays.groups));
-  if ((R.legs || []).length) board.append(mk('Legs in suggested parlays', 'each leg the suggestions chose, as a 1-unit straight bet at DraftKings', R.legs));
+  if ((R.cal || []).length && M.show('chance')) board.append(renderCalibration(R.cal));
+  if (R.picks.length && M.show('bets')) board.append(mk('Board picks', '1 unit each at DraftKings', R.picks));
+  if (R.parlays.groups.length && M.show('parlays')) board.append(mk('Suggested parlays', 'every suggestion at each size (up to 6 a week), 1 unit each', R.parlays.groups));
+  if ((R.legs || []).length && M.show('parlays')) board.append(mk('Legs in suggested parlays', 'each leg the suggestions chose, as a 1-unit straight bet at DraftKings', R.legs));
+  if (M.show('tests')) {
   const bt = el('section', 'col'); const bh = el('div', 'colhead'); bh.append(el('h2', null, 'Backtests'), el('span', null, 'before live tracking')); bt.append(bh);
   const ul = el('ul', 'notes');
   ['Game spreads against closing lines, 2023–25: 48–51% depending on the model version. Break-even at -110 is 52.4%, so no edge at the close.',
@@ -412,6 +419,7 @@ function renderRecord() {
     'Passing yards projections miss by about 53–57 yards a game, about 4 yards better than the season average or last 5 games.',
     D.blind ? `Props blind test on week ${D.blind.week}: see the Week ${D.blind.week} test tab.` : null].filter(Boolean).forEach((x) => ul.append(el('li', null, x)));
   bt.append(ul); board.append(bt);
+  }
   document.getElementById('foot').textContent = 'Picks are the board\'s categorized bets (Value, TD value, Optimal, Secure and the rest) on main over/under lines, game lines and TDs; alt lines aren\'t counted, since the main line already covers the player. They are saved the first time each week\'s board is built. Games that had already kicked off when the board was built are left out, so the record never counts a pick made after the fact. Suggested parlays are the Parlay builder\'s 6 suggestions at each leg count for the whole week and every market, in both Build for modes; ★ is the size it recommended. Legs in suggested parlays grades every leg those suggestions picked, alt lines included, as its own 1-unit straight bet; ★ legs are the ones in the recommended parlay. A parlay loses if any leg loses; push and void legs drop out, as at DraftKings. A player who doesn\'t play voids his yards bet; an anytime TD with no touches counts as a loss. Grading uses free nflverse scores and stats, so it costs no odds credits. These are tracking picks, not bets.';
 }
 // ---- parlay builder ----

@@ -398,18 +398,24 @@ function boardParlay() {
 
 function boardRecord() {
   const B = $('board'); B.innerHTML = '';
-  if (D.live && (D.live.cal_sections || []).length) { const cw = renderCalibration(D.live.cal_sections); cw.style.marginBottom = '8px'; B.append(cw); }
-  const bt = D.backtest || {}; const lv = D.live;
+  const M = recordMenus({ sport: 'nhl', src: D.live, rerender: boardRecord,
+    views: [['all', 'Everything'], ['bets', 'Bets'], ['parlays', 'Parlays'], ['chance', 'Chance check'], ['tests', 'Backtests']] });
+  B.append(M.bar);
+  const LV = M.rep;
+  if (LV && (LV.cal_sections || []).length && M.show('chance')) { const cw = renderCalibration(LV.cal_sections); cw.style.marginBottom = '8px'; B.append(cw); }
+  const bt = D.backtest || {}; const lv = LV;
   const fmtp = (x) => x == null ? '—' : (x * 100).toFixed(1) + '%';
   const roi = (x) => x == null ? '—' : sgn(Math.round(x * 1000) / 10) + '%';
   const mk = (title, head, rows, note) => { const c = el('div', 'col'); c.style.marginTop = '16px'; const h = el('div', 'colhead'); h.append(el('h2', null, title)); c.append(h); const tw = el('div', 'tablewrap'); const t = el('table', 'res'); const hr = el('tr'); head.forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr); rows.forEach((r) => { const tr = el('tr'); r.forEach((x, i) => tr.append(el('td', i ? 'num' : null, String(x)))); t.append(tr); }); tw.append(t); c.append(tw); if (note) c.append(el('p', 'note logfoot', note)); B.append(c); };
-  if (lv && lv.groups && lv.groups.length) {
+  if (M.period && !(lv && lv.groups && lv.groups.length) && !(lv && lv.parlays && lv.parlays.groups.some((g) => g.bets))) B.append(el('div', 'empty', `Nothing graded for ${M.label} yet.`));
+  if (lv && lv.groups && lv.groups.length && M.show('bets')) {
     mk('Live record at DraftKings', ['Group', 'Bets', 'W-L', 'Hit', 'Units', 'ROI'], lv.groups.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), sgn(g.units), roi(g.roi)]),
        `${lv.days.length} slate${lv.days.length > 1 ? 's' : ''} graded. Every priced leg is logged when the board is built and graded at that DraftKings price, 1 unit per leg.`);
   }
   const pz = lv && lv.parlays && lv.parlays.groups.filter((g) => g.bets);
-  if (pz && pz.length) mk('Suggested parlays at DraftKings', ['Parlays', 'Count', 'W-L', 'Hit', 'Expected', 'Units', 'ROI'], pz.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), fmtp(g.exp_hit), sgn(g.units), roi(g.roi)]),
+  if (pz && pz.length && M.show('parlays')) mk('Suggested parlays at DraftKings', ['Parlays', 'Count', 'W-L', 'Hit', 'Expected', 'Units', 'ROI'], pz.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), fmtp(g.exp_hit), sgn(g.units), roi(g.roi)]),
      'Each day\'s suggested parlays are saved when the board is built, for both Best value and Most likely to hit and every leg count (up to 6 suggestions each a day; fewer on a slate without enough qualifying legs, and from Nov 15 a leg can repeat in up to 3 suggestions so the 6 fill more often), and graded as whole parlays at DraftKings prices, 1 unit each. A parlay loses if any leg loses; pushed or voided legs drop out. Expected is the chance the board gave the parlays.');
+  if (!M.show('tests')) { $('foot').textContent = 'Every priced leg is graded at the DraftKings price the board showed, 1 unit per leg. Grading uses free box scores, so it costs no odds credits.'; return; }
   if (bt.winners) {
     const rows = []; Object.entries(bt.winners).forEach(([se, r]) => { [['model', 'Model'], ['blend', 'Board pick (blend)'], ['draftkings', 'DraftKings favorite']].forEach(([k, l]) => rows.push([`${se.slice(0, 4)}-${se.slice(6)}`, l, r.games, fmtp(r[k].all), r[k].conf60 ? `${fmtp(r[k].conf60[1])} (${r[k].conf60[0]})` : '—'])); });
     mk('Picking winners', ['Season', 'Picker', 'Games', 'Correct', 'When 60%+ sure (games)'], rows, 'Hockey is close to a coin flip: even DraftKings\' favorite wins only about 55-62% of the time. When the board is 60%+ sure, its pick wins about two times in three.');
@@ -424,7 +430,7 @@ function boardRecord() {
   if (bt.pl) gr.push(['Puck line (2025-26)', bt.pl.n, `${bt.pl.ll.model.toFixed(4)} / ${bt.pl.ll.market.toFixed(4)} / ${bt.pl.ll.blend_50.toFixed(4)}`, `model picks: ${roi(bt.pl.b0.roi)}`]);
   Object.entries(bt.totals || {}).forEach(([se, r]) => gr.push([`Totals at close (${se.slice(0, 4)}-${se.slice(6)})`, r.n, `${r.ll.model.toFixed(4)} / ${r.ll.market.toFixed(4)} / ${r.ll.blend_50.toFixed(4)}`, 'DraftKings better']));
   if (gr.length) mk('Other markets', ['Market', 'Lines', 'Log loss: model / DK / blend', 'Betting result'], gr, 'Models are fit only on earlier seasons. Saves and game lines have not shown a reliable edge, so the board leans on DraftKings for them.');
-  if (!B.children.length) B.append(el('div', 'empty', 'No backtest yet.'));
+  if (B.children.length <= 1) B.append(el('div', 'empty', 'No backtest yet.'));
   $('foot').textContent = 'Backtests: scripts/nhl_props_backtest.py and scripts/nhl_game_backtest.py.';
 }
 

@@ -1,0 +1,36 @@
+# "Refresh results" on the Model record tabs (GoonerGamble site). Grades every finished NFL/NBA/NHL game with free data
+# and rebuilds the pages on epa-model; Render redeploys from that push. Uses no Odds API credits: the job has no odds key,
+# and scripts/refresh_records.sh runs only graders and --no-log page builds.
+# This file lives on main because GitHub only lets you run a workflow by hand from the default branch.
+name: Refresh records
+on:
+  workflow_dispatch:
+    inputs:
+      sport:
+        description: Which records to refresh
+        type: choice
+        options: [all, nba, nhl, nfl]
+        default: all
+permissions:
+  contents: write
+concurrency:
+  group: refresh-records
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: epa-model
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: pip install --quiet -r requirements.txt
+      - name: Grade and rebuild (free data only)
+        env:
+          SPORT: ${{ inputs.sport || 'all' }}
+        run: bash scripts/refresh_records.sh "$SPORT"

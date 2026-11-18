@@ -45,3 +45,53 @@ def sections(*specs):
 
 
 def dec(a): return 1 + a / 100 if a > 0 else 1 + 100 / -a
+
+
+# ---------- day / week / month menus on the Model record tabs (Thomas, 2026-11-18) ----------
+MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+MAX_DAYS = 31    # the Day menu lists the latest 31 game days, so the page stays small
+
+
+def _d(s):
+    import datetime as dt
+    return dt.date.fromisoformat(str(s)[:10])
+
+
+def _short(d): return f'{MONTHS[d.month - 1]} {d.day}'
+
+
+def monday_week(day):
+    """(key, label) of the Monday-to-Sunday week holding day ('YYYY-MM-DD')."""
+    import datetime as dt
+    d = _d(day); a = d - dt.timedelta(days=d.weekday()); b = a + dt.timedelta(days=6)
+    return a.isoformat(), f'{_short(a)} – {b.day}' if a.month == b.month else f'{_short(a)} – {_short(b)}'
+
+
+def periods(dates, week_of=monday_week):
+    """dates: the game days (YYYY-MM-DD) with graded bets. Returns (menu, groups):
+    menu = {'day': [{key, label}], 'week': [...], 'month': [...]}, newest first;
+    groups = {key: set of dates in that period}. Keys look like d:2026-11-17, w:<week key>, m:2026-11."""
+    ds = sorted({str(x)[:10] for x in dates if x})
+    menu, groups = {'day': [], 'week': [], 'month': []}, {}
+    for s in ds[::-1][:MAX_DAYS]:
+        d = _d(s); k = 'd:' + s
+        menu['day'].append(dict(key=k, label=f'{WEEKDAYS[d.weekday()]} {_short(d)}')); groups[k] = {s}
+    wk = {}
+    for s in ds:
+        k, lab = week_of(s); wk.setdefault('w:' + k, [lab, set()])[1].add(s)
+    for k in sorted(wk, reverse=True):
+        menu['week'].append(dict(key=k, label=wk[k][0])); groups[k] = wk[k][1]
+    mo = {}
+    for s in ds: mo.setdefault('m:' + s[:7], set()).add(s)
+    for k in sorted(mo, reverse=True):
+        y, m = int(k[2:6]), int(k[7:9])
+        menu['month'].append(dict(key=k, label=f'{MONTHS_LONG[m - 1]} {y}')); groups[k] = mo[k]
+    return menu, groups
+
+
+def by_period(dates, build, week_of=monday_week):
+    """build(set_of_dates) -> the report for those days. Returns {'menu': ..., 'reports': {key: report}} for the page."""
+    menu, groups = periods(dates, week_of)
+    return dict(menu=menu, reports={k: build(v) for k, v in groups.items()})

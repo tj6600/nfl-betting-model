@@ -384,12 +384,16 @@ function boardParlay() {
 
 function boardRecord() {
   const B = $('board'); B.innerHTML = '';
-  if (D.live && (D.live.cal_sections || []).length) { const cw = renderCalibration(D.live.cal_sections); cw.style.marginBottom = '8px'; B.append(cw); }
+  const M = recordMenus({ sport: 'nba', src: D.live, rerender: boardRecord,
+    views: [['all', 'Everything'], ['bets', 'Bets'], ['parlays', 'Parlays'], ['chance', 'Chance check'], ['tests', 'Backtests']] });
+  B.append(M.bar);
+  const LV = M.rep;
+  if (LV && (LV.cal_sections || []).length && M.show('chance')) { const cw = renderCalibration(LV.cal_sections); cw.style.marginBottom = '8px'; B.append(cw); }
   const bt = D.backtest;
-  const lv = D.live;
+  const lv = LV;
   const fmtp = (x) => x == null ? '—' : (x * 100).toFixed(1) + '%';
   const liveRows = lv ? lv.groups.concat(lv.by_kind || []).filter((g) => g.bets || g.clv_n) : [];
-  if (liveRows.length) {
+  if (liveRows.length && M.show('bets')) {
     const c = el('div', 'col'); const h = el('div', 'colhead'); h.append(el('h2', null, 'Live record at DraftKings'), el('span', null, `${lv.days.length} slate${lv.days.length > 1 ? 's' : ''} logged`)); c.append(h);
     const tw = el('div', 'tablewrap'); const t = el('table', 'res'); const hr = el('tr');
     ['Group', 'Bets', 'W-L', 'Hit', 'Expected', 'Units', 'ROI', 'Beat close', 'Lost to close'].forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr);
@@ -400,7 +404,8 @@ function boardRecord() {
     c.style.marginBottom = '16px'; B.append(c);
   }
   const pz = lv && lv.parlays && lv.parlays.groups.filter((g) => g.bets);
-  if (pz && pz.length) {
+  if (M.period && !liveRows.length && !(pz && pz.length)) B.append(el('div', 'empty', `Nothing graded for ${M.label} yet.`));
+  if (pz && pz.length && M.show('parlays')) {
     const c = el('div', 'col'); const h = el('div', 'colhead'); h.append(el('h2', null, 'Suggested parlays at DraftKings'), el('span', null, `${lv.parlays.days.length} slate${lv.parlays.days.length > 1 ? 's' : ''} logged`)); c.append(h);
     const tw = el('div', 'tablewrap'); const t = el('table', 'res'); const hr = el('tr');
     ['Parlays', 'Count', 'W-L', 'Hit', 'Expected', 'Units', 'ROI'].forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr);
@@ -408,6 +413,7 @@ function boardRecord() {
     tw.append(t); c.append(tw); c.append(el('p', 'note logfoot', 'Each day\'s suggested parlays are saved when the board is built, for both Best value and Most likely to hit and every leg count (up to 6 suggestions each a day; fewer on a slate without enough qualifying legs, and from Nov 15 a leg can repeat in up to 3 suggestions so the 6 fill more often), and graded as whole parlays at DraftKings prices, 1 unit each. A parlay loses if any leg loses; pushed or voided legs drop out. Expected is the chance the board gave the parlays.'));
     c.style.marginBottom = '16px'; B.append(c);
   }
+  if (!M.show('tests')) { $('foot').textContent = 'Every priced leg is graded at the DraftKings price the board showed, 1 unit per leg. Grading uses free box scores, so it costs no odds credits.'; return; }
   if (!bt.rows) { B.append(el('div', 'empty', 'No backtest yet.')); return; }
   const tiles = el('div', 'tiles');
   const r0 = bt.rows[0];
