@@ -5,6 +5,10 @@
 --update first adds newly finished games to nba_data/ (hoopR raw JSON; no pyarrow needed).
 Prices come from the latest odds_log/nba snapshots (python -m nbamodel.odds games / props).
 """
+import os as _os, sys as _sys
+if not _os.environ.get('NBA_ENABLED'):   # NBA was removed from the site on 2026-11-18; this keeps board/site/nba.html as the notice page
+    _sys.exit('NBA board removed on 2026-11-18: not building nba.html (set NBA_ENABLED=1 to build it anyway)')
+
 import sys, os, json, glob, argparse, datetime as dt; sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import numpy as np, pandas as pd
 from nbamodel import data as D, games as M, props as PR, odds as O, injuries as INJ
