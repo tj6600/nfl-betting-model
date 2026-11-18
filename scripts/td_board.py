@@ -450,15 +450,16 @@ open(os.path.join(B, 'site', 'index.html'), 'w').write(
     '<meta name="robots" content="noindex, nofollow">\n' + BANK.APP_HEAD + head + SPORT_CSS + '\n</head>\n<body>\n' + sport_nav('nfl') + body + '</body>\n</html>\n')
 print('wrote board/touchdown-board.html', len(out), 'TD players,', len(yards), 'yards props,', len(D.get('milestones', [])), 'milestone ladders,', len(legs), 'parlay legs')
 
-# NBA page placeholder until the NBA pipeline writes board/site/nba.html (never overwrites a real NBA page)
+# NBA was removed on 2026-11-18 (no edge over DraftKings): nba.html stays as a short notice so old links and the app still open
 nba = os.path.join(B, 'site', 'nba.html')
-if not os.path.exists(nba) or 'nba-placeholder' in open(nba).read():
-    open(nba, 'w').write(
+open(nba, 'w').write(
         '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        '<meta name="robots" content="noindex, nofollow">\n' + BANK.APP_HEAD + head.replace('<title>NFL Props Board</title>', '<title>NBA Props Board</title>') + SPORT_CSS
+        '<meta name="robots" content="noindex, nofollow">\n' + BANK.APP_HEAD + head.replace('<title>NFL Props Board</title>', '<title>NBA removed</title>') + SPORT_CSS
         + '\n</head>\n<body>\n' + sport_nav('nba')
-        + '<div class="wrap nba-placeholder"><header><span class="eyebrow">NBA</span><h1>NBA Props Board</h1>'
-        + '<p class="lede">The NBA model is being built: game picks, player points, rebounds and assists, and the same parlay builder as the NFL board, priced at DraftKings. This page fills in once it is ready.</p></header></div>\n</body>\n</html>\n')
+        + '<div class="wrap nba-removed"><header><span class="eyebrow">NBA</span><h1>NBA is off the board</h1>'
+        + '<p class="lede">The NBA board was removed on November 18, 2026. Over a week of graded DraftKings lines, its picks hit about as often as '
+        + 'DraftKings\' own odds said and lost the juice, and its value picks lost more, so it wasn\'t worth betting. '
+        + '<a href="index.html">NFL</a> and <a href="nhl.html">NHL</a> are still updated.</p></header></div>\n</body>\n</html>\n')
 
 # Bank Builder page (bank.py): heavy-favorite slips from all three boards, rebuilt whenever a board builds
 import bank as BANK

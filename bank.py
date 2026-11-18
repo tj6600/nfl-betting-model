@@ -63,7 +63,7 @@ def legs(now=None, backup=False):
             if pr is None or L.get('flag'): continue
             out.append(dict(sport='NFL', day=day, id=L['id'], label=PZ._name(L), kind=L['kind'], game=L['game'],
                             start=(D.get('starts') or {}).get(L['game']), price=int(pr), p=L['p'], sid=L.get('sid')))
-    for sport, page, tag in [('NBA', 'nba.html', 'nba-data'), ('NHL', 'nhl.html', 'nhl-data')]:
+    for sport, page, tag in [('NHL', 'nhl.html', 'nhl-data')]:   # NBA removed 2026-11-18
         D = _data(page, tag)
         if not D: continue
         st = {g['game']: g.get('start') for g in D.get('games', [])}
@@ -281,7 +281,7 @@ def build(log_it=True, now=None):
         log(slips(g), stamp, et.strftime('%Y-%m-%d'))
     rec = grade()
     taken = {}
-    for sport, page, tag, k in [('NFL', 'index.html', 'td-data', 'taken'), ('NBA', 'nba.html', 'nba-data', 'taken'), ('NHL', 'nhl.html', 'nhl-data', 'dayLabel')]:
+    for sport, page, tag, k in [('NFL', 'index.html', 'td-data', 'taken'), ('NHL', 'nhl.html', 'nhl-data', 'dayLabel')]:
         D = _data(page, tag)
         if D: taken[sport] = D.get(k)
     D = dict(built=stamp, stake=STAKE, rules=dict(lo=PRICE_LO, hi=PRICE_HI, pmin=P_MIN, juice=JUICE, ret={str(k): v for k, v in RET.items()}, window=WINDOW_H),
@@ -317,7 +317,8 @@ SPORT_CSS = """<style>
 .sportnav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .sportnav a.bell { margin-left: auto; padding: 6px 12px; }
 </style>"""
-PAGES = [('nfl', 'NFL', 'index.html'), ('nba', 'NBA', 'nba.html'), ('nhl', 'NHL', 'nhl.html'), ('bank', 'Bank Builder', 'bank.html')]
+# NBA was removed on 2026-11-18 (no edge over DraftKings in 7 days of graded lines); nba.html is now a notice page
+PAGES = [('nfl', 'NFL', 'index.html'), ('nhl', 'NHL', 'nhl.html'), ('bank', 'Bank Builder', 'bank.html')]
 
 
 # alerts setup page (board/site/alerts.html): push notifications when new boards post (scripts/push_alert.py)
