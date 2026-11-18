@@ -45,6 +45,8 @@ ul.notes { margin: 0; padding: 10px 18px 14px 34px; line-height: 1.5; font-size:
 table.res { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
 table.res td { padding: 7px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
 table.res td.num { text-align: right; }
+/* column names follow the reader down long tables (stickyHeads in the script below) */
+table.res th.stuck { position: relative; z-index: 3; box-shadow: 0 1px 0 var(--line), 0 4px 6px -4px rgba(0,0,0,.25); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip { font: 600 14px var(--body); border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 12px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline; }
 .chip b { font-family: var(--display); font-size: 16px; }
@@ -556,5 +558,35 @@ function refreshButton(o, bar) {
   };
   return b;
 }
+// Keep each table's column-name row in view while scrolling through its rows (page or popup).
+// .tablewrap scrolls sideways, which stops CSS position: sticky from working, so the row is shifted in JS.
+(function stickyHeads() {
+  let queued = false;
+  const bgOf = (n) => { for (; n && n.nodeType === 1; n = n.parentElement) { const c = getComputedStyle(n).backgroundColor; if (c && c !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(c)) return c; } return ''; };
+  const headRow = (t) => (t.tHead && t.tHead.rows[0]) || Array.from(t.rows).find((r) => r.cells.length && Array.from(r.cells).every((c) => c.tagName === 'TH'));
+  const set = (hr, s) => {
+    if ((+hr.dataset.shift || 0) === s) return;
+    hr.dataset.shift = s;
+    let bg = '';
+    if (s) bg = bgOf(hr.closest('table').parentElement);
+    for (const c of hr.cells) { c.style.transform = s ? `translateY(${s}px)` : ''; c.classList.toggle('stuck', !!s); c.style.background = s ? bg : ''; }
+  };
+  const update = () => {
+    queued = false;
+    for (const t of document.querySelectorAll('table.res')) {
+      const hr = headRow(t); if (!hr) continue;
+      if (!t.offsetParent) { set(hr, 0); continue; }
+      const tr = t.getBoundingClientRect(), hh = hr.getBoundingClientRect().height;
+      const top = hr.getBoundingClientRect().top - (+hr.dataset.shift || 0);
+      const last = t.rows[t.rows.length - 1], lh = last && last !== hr ? last.getBoundingClientRect().height : 0;
+      set(hr, Math.round(Math.max(0, Math.min(-top, tr.bottom - top - hh - lh))));
+    }
+  };
+  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+  document.addEventListener('scroll', queue, { capture: true, passive: true });
+  addEventListener('resize', queue);
+  const go = () => new MutationObserver(queue).observe(document.body, { childList: true, subtree: true });
+  if (document.body) go(); else document.addEventListener('DOMContentLoaded', go);
+})();
 const REC_STATUS = { text: '', cls: '' };
 </script>
