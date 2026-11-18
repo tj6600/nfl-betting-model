@@ -6,5 +6,6 @@ window.GG_FIREBASE = {
   projectId: "betting-model-b434b",
   storageBucket: "betting-model-b434b.firebasestorage.app",
   messagingSenderId: "558482509386",
-  appId: "1:558482509386:web:1eb4d0cd82ed7aece560b3"
+  appId: "1:558482509386:web:1eb4d0cd82ed7aece560b3",
+  databaseId: "default"   // the Firestore database was created with the ID "default" (not "(default)")
 };
