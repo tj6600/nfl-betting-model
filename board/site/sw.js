@@ -1,8 +1,8 @@
 // Service worker for the installed app (Android, iPhone, Play Store wrapper).
 // Network first: every open shows the newest board the scheduled runs pushed. The cached copy is only used
 // when the phone is offline, so the app never shows a stale board while it has a connection.
-const CACHE = 'gooner-v3';
-const SHELL = ['/', '/index.html', '/nba.html', '/nhl.html', '/cfb.html', '/tennis.html', '/bank.html', '/icons/icon-192.png', '/offline.html', '/alerts.html'];
+const CACHE = 'gooner-v4';
+const SHELL = ['/', '/index.html', '/nba.html', '/nhl.html', '/cfb.html', '/tennis.html', '/bank.html', '/icons/icon-192.png', '/offline.html', '/alerts.html', '/friends.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).catch(() => {}).then(() => self.skipWaiting()));

@@ -1,0 +1,45 @@
+# Friends page (friends.py, Thomas 2026-11-18): after every NFL board push, save the week's legs that haven't kicked off
+# (so friends can pick them), grade finished legs from the free nflverse data, and rebuild board/site/friends.html.
+# The schedule grades the weekend's games even when no board is pushed. No Odds API key, no odds credits, no secrets:
+# sign-in and picks live in Firebase, which the page talks to directly.
+name: Friends
+on:
+  push:
+    branches: [epa-model]
+    paths: ['board/site/index.html', 'friends.py', 'board/friends_app.js', 'board/friends_body.html', 'board/friends.css']
+  schedule:
+    - cron: '17 9 * * 1,2,5'    # Mon/Tue/Fri ~4-5 AM ET: after Sunday, Monday and Thursday night games
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: friends
+  cancel-in-progress: false
+jobs:
+  friends:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: epa-model
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --quiet -r requirements.txt
+      - name: Build the Friends page and commit it
+        run: |
+          set -u
+          python scripts/friends_board.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add board/site/friends.html board/site/group odds_log/friends
+          if git diff --cached --quiet; then echo "Friends page unchanged."; exit 0; fi
+          git commit -q -m "Friends: $(TZ=America/New_York date +%F)"
+          for i in 1 2 3 4; do
+            git push origin HEAD:epa-model && exit 0
+            git pull --rebase -q origin epa-model || { git rebase --abort; git fetch -q origin epa-model; git reset -q --hard origin/epa-model; python scripts/friends_board.py --no-grade; git add board/site/friends.html board/site/group odds_log/friends; git commit -q -m "Friends: $(TZ=America/New_York date +%F) (page refresh)" || exit 0; }
+            sleep $((i * 5))
+          done
+          exit 1
