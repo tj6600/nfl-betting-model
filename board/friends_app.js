@@ -75,7 +75,7 @@ async function boot() {
   }
   const [A, Au, Fs] = await Promise.all([import(SDK + 'firebase-app.js'), import(SDK + 'firebase-auth.js'), import(SDK + 'firebase-firestore.js')]);
   const app = A.initializeApp(cfg);
-  F = { ...Au, ...Fs, auth: Au.getAuth(app), db: Fs.getFirestore(app) };
+  F = { ...Au, ...Fs, auth: Au.getAuth(app), db: cfg.databaseId ? Fs.getFirestore(app, cfg.databaseId) : Fs.getFirestore(app) };
   F.getRedirectResult(F.auth).catch(() => {});
   F.onAuthStateChanged(F.auth, async (u) => {
     S.unsub.forEach((f) => f()); S.unsub = [];
