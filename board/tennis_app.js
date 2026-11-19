@@ -271,6 +271,13 @@ function boardParlay() {
       dk.append(a, el('span', 'dim', sids.length === legs.length ? 'Loads these legs into your DraftKings betslip. Sign in, check the prices, and place it.' : 'The other legs have no DraftKings link (match started, or none on this pull); add them by hand.'));
     } else dk.append(el('span', 'dim', 'No DraftKings link for these legs yet: links come with the next odds pull.'));
     sl.append(dk);
+    // Share (Thomas, 2026-11-19): a compact card of the slip for a screenshot or a text (board/site/share.js)
+    const shr = el('div', 'dkrow'), shb = el('button', 'lnk sugb', 'Share slip'); shb.type = 'button';
+    shb.onclick = () => window.shareSlip && window.shareSlip({ title: `Tennis · ${legs.length === 1 ? 'straight bet' : legs.length + '-leg parlay'}`,
+      legs: legs.map((l) => ({ label: l.label, sub: l.game, odds: fmt(l.price), tag: FL.has(l.id) ? '⚠ next-best' : '' })),
+      odds: fmt(toAm(d)), chance: pct(p), pays: '$' + (10 * d).toFixed(2),
+      warn: FL.size ? `⚠ ${FL.size} next-best leg${FL.size === 1 ? '' : 's'}, below the usual bar` : '' });
+    shr.append(shb, el('span', 'dim', 'A compact card of this slip to screenshot or send to a friend.')); sl.append(shr);
     const games = {}; legs.forEach((l) => { games[l.game] = (games[l.game] || 0) + 1; });
     const warns = [];
     Object.entries(games).filter(([, n]) => n > 1).forEach(([g, n]) => {

@@ -85,6 +85,14 @@ function dkLink(legs) {
   a.href = 'https://sportsbook.draftkings.com/?outcomes=' + sids.map(encodeURIComponent).join('+'); a.target = '_blank'; a.rel = 'noopener';
   return a;
 }
+// Share (Thomas, 2026-11-19): a compact card of the slip for a screenshot or a text (board/site/share.js)
+function shareBtn(legs, title) {
+  const b = el('button', 'btn', 'Share slip'); b.type = 'button';
+  b.onclick = () => { const s = sum(legs), bk = legs.filter((l) => l.backup).length;
+    if (window.shareSlip) window.shareSlip({ title, legs: legs.map((l) => ({ label: l.label, sub: l.sport + ' · ' + l.game + ' · ' + when(l.start), odds: fmt(l.price), tag: l.backup ? '⚠ next-best' : '' })),
+      odds: fmt(toAm(s.r)), chance: pct(s.p), pays: money(10 * s.r), warn: bk ? `⚠ ${bk} next-best pick${bk === 1 ? '' : 's'}: lower hit chance` : '' }); };
+  return b;
+}
 function legRow(l) {
   const r = el('div', 'bk-leg');
   r.append(el('span', 'sp ' + l.sport, l.sport));
@@ -128,6 +136,7 @@ function renderSlips(root) {
       s.forEach((l) => c.append(legRow(l)));
       const act = el('div', 'bk-actions'); const a = dkLink(s); if (a) act.append(a);
       const e = el('button', 'btn', 'Edit this slip'); e.onclick = () => { own = s.map((l) => l.key); saveOwn(); go('own'); }; act.append(e);
+      act.append(shareBtn(s, 'Bank Builder · ' + k + '-leg slip'));
       c.append(act); g.append(c);
     });
     root.append(g);
@@ -169,6 +178,7 @@ function renderOwn(root) {
     const tg = D.rules.ret[String(sel.length)];
     if (!tg || r < tg[0] || r > tg[1]) box.append(el('p', 'note', 'Outside the Bank Builder target (about $15 on $10 for 2 legs, $20 for 3): this slip returns ' + money(10 * r) + ' on $10.'));
     const act = el('div', 'bk-actions'); const a = dkLink(sel); if (a) act.append(a);
+    act.append(shareBtn(sel, 'Bank Builder · ' + sel.length + '-leg slip'));
     const c = el('button', 'btn', 'Clear'); c.onclick = () => { own = []; saveOwn(); render(); }; act.append(c); box.append(act);
   } else box.append(el('p', 'note', 'Tick 2 or 3 legs above to see the payout and hit chance.'));
   root.append(box);
