@@ -221,9 +221,11 @@ def grade():
                                  sports=sorted({L['sport'] for L in s['legs']}),
                                  legs=[dict(sport=L['sport'], label=L['label'], price=L['price'], result=r) for L, r in zip(s['legs'], rs)], _legs=s['legs']))
     out = report(rows)
-    # day / week / month menus like the sport pages' Model record (Thomas, 2026-11-18): a slip counts on the day of its last game
+    # day / week / month menus like the sport pages' Model record (Thomas, 2026-11-18): a slip counts on the day of its last game.
+    # Days whose slips are all still waiting are listed too (Thomas, 2026-11-19: Wednesday was missing until the morning
+    # grading), so the day shows "waiting on results" and the Refresh results button can grade it from ESPN.
     import calib as CAL
-    out['by_period'] = CAL.by_period([r['gday'] for r in rows if r['result'] in ('won', 'lost', 'push')],
+    out['by_period'] = CAL.by_period([r['gday'] for r in rows if r['result'] in ('won', 'lost', 'push', 'open')],
                                      lambda ds: report([r for r in rows if r['gday'] in ds]))
     out['pending'] = pending(rows)
     return out
