@@ -6,6 +6,29 @@ const LEG = Object.fromEntries(D.legs.map((l) => [l.id, l]));
 const TABS = [['games', 'Games'], ['parlay', 'Parlay builder'], ['ratings', 'Team ratings'], ['record', 'Model record']];
 const state = { tab: 'games', game: 'all', filt: 'all', q: '', pmin: 0.25, pq: '' };
 const GAME = Object.fromEntries((D.games || []).map((g) => [g.id, g]));
+// "Line changed?" (board/site/lines.js, Thomas 2026-11-19): the user enters DraftKings' new spread, total or price and the
+// leg is re-priced here from the ratings model's normal margin and total (cfbmodel/model.py SD_MARGIN, SD_TOTAL).
+// Moneylines: price only.
+const CSD = D.sd || { m: 15.5, t: 14.0 };
+function cfbModel(L, line) {
+  if (L.market === 'spread') return LineEdit.dist.normal(0, CSD.m, -line);   // more points = likelier to cover
+  if (L.market === 'total') { const o = LineEdit.dist.normal(0, CSD.t, line); return L.side === 'Under' ? 1 - o : o; }
+  return null;
+}
+function patchCfb() {
+  for (const g of D.games) {
+    if (!g._o) g._o = { line: g.line, diff: g.diff, line_total: g.line_total };
+    const ls = g.legs.map((id) => LEG[id]).filter(Boolean), h = ls.find((L) => L.market === 'spread' && L.side === 'home'), t = ls.find((L) => L.market === 'total');
+    if (h && g._o.line != null) { g.line = h.line; if (g._o.diff != null) g.diff = Math.round((g._o.diff + h.line - g._o.line) * 10) / 10;
+      ls.filter((L) => L.market === 'spread').forEach((L) => { L.pts = L.side === 'home' ? g.diff : -g.diff; }); }
+    if (t) g.line_total = t.line;
+  }
+}
+LineEdit.setup({ sport: 'cfb', stamp: [D.week, D.built].join('|'), legs: D.legs, model: cfbModel, name: (L) => L.label,
+  signed: (L) => L.market === 'spread', weight: (L) => (D.weights[L.kind] != null ? D.weights[L.kind] : 0.5),
+  sibling: (L) => D.legs.find((x) => x.id !== L.id && x.gid === L.gid && x.market === L.market) || null,
+  onChange: () => { patchCfb(); render(); } });
+patchCfb();
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
 const fmt = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
 const pct = (p) => p == null ? '—' : p < 0.01 ? (p * 100).toFixed(2) + '%' : Math.round(p * 100) + '%';
@@ -267,9 +290,10 @@ function boardParlay() {
   const legs = slip.map((id) => LEG[id]).filter(Boolean);
   if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : mode === 'likely' ? 'Add legs from the list. No leg is 55%+ to hit at -200 or longer on this slate.' : 'Add legs from the list. No leg meets the value rule on this slate.'));
   const box = el('div', 'slipl'), FL = fillers(legs);
-  legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); if (FL.has(L.id)) { const m = el('small', null, L.alt ? '⚠ Alt line, added to fill the slip' : '⚠ Next-best leg, below the usual bar'); m.style.color = 'var(--gold)'; n.append(m); } const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
+  legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); if (FL.has(L.id)) { const m = el('small', null, L.alt ? '⚠ Alt line, added to fill the slip' : '⚠ Next-best leg, below the usual bar'); m.style.color = 'var(--gold)'; n.append(m); } { const t = LineEdit.tag(L); if (t) n.append(t); n.append(LineEdit.btn(L)); } const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
   if (legs.length) {
     sl.append(box);
+    { const bn = LineEdit.banner(); if (bn) sl.append(bn); }
     const p = legs.reduce((a, l) => a * l.p, 1), d = legs.reduce((a, l) => a * dec(l.price), 1), ev = p * d - 1;
     const st = el('div', 'stats pad');
     [[pct(p), 'Hit chance'], [fmt(toAm(d)), 'Payout'], [sgn(Math.round(ev * 100)) + '%', 'Expected value']].forEach(([v, k]) => { const s = el('div', 'stat'); s.append(el('b', null, v), el('span', null, k)); st.append(s); });
@@ -286,7 +310,7 @@ function boardParlay() {
     // Share (Thomas, 2026-11-19): a compact card of the slip for a screenshot or a text (board/site/share.js)
     const shr = el('div', 'dkrow'), shb = el('button', 'lnk sugb', 'Share slip'); shb.type = 'button';
     shb.onclick = () => window.shareSlip && window.shareSlip({ title: `College football · ${legs.length === 1 ? 'straight bet' : legs.length + '-leg parlay'}`,
-      legs: legs.map((l) => ({ label: l.label, sub: l.game, odds: fmt(l.price), tag: FL.has(l.id) ? '⚠ ' + fillTag(l) : '' })),
+      legs: legs.map((l) => ({ label: l.label, sub: l.game, odds: fmt(l.price), tag: [FL.has(l.id) ? '⚠ ' + fillTag(l) : '', LineEdit.shareTag(l)].filter(Boolean).join(' · ') })),
       odds: fmt(toAm(d)), chance: pct(p), pays: '$' + (10 * d).toFixed(2),
       warn: FL.size ? `⚠ ${fillWords(legs.filter((l) => FL.has(l.id)))} added to fill the slip` : '' });
     shr.append(shb, el('span', 'dim', 'A compact card of this slip to screenshot or send to a friend.')); sl.append(shr);
@@ -399,10 +423,11 @@ function boardGames() {
         const tr = el('tr'); if (L.cat === 'Value') tr.className = 'hl';
         if (L.bpick) tr.classList.add('bp');
         const lab = el('td'); lab.append(document.createTextNode(`${L.kind}: ${L.kind === 'Total' ? L.label.replace(/ \(.*\)$/, '') : L.label}`));
+        { const tg = LineEdit.tag(L); if (tg) lab.append(tg); }
         if (L.bpick) lab.append(document.createTextNode(' '), el('span', 'pill pk', 'Pick'));
         if (L.cat === 'Value') lab.append(document.createTextNode(' '), el('span', 'pill value', 'Value'));
         tr.append(lab, el('td', 'num', fmt(L.price)), el('td', 'num', pct(L.p)), el('td', 'num ' + (L.edge > 0 ? 'pos' : 'neg'), sgn(L.edge)));
-        const td = el('td', 'num'); td.append(addBtn(L.id)); tr.append(td); t.append(tr);
+        const td = el('td', 'num lecell'); td.append(addBtn(L.id), LineEdit.btn(L)); tr.append(td); t.append(tr);
       });
       tw.append(t); c.append(tw);
     } else c.append(el('div', 'outs', 'DraftKings lines not posted yet.'));

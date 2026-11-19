@@ -155,6 +155,17 @@ class Spread:
         return np.array([m * np.quantile(self._r(bi), q) for m, bi in zip(mu, b)])
 
 
+DIST_FILE = 'yard_dists.json'   # odds_log/picks/: the outcome spreads, for the page's "line changed?" editor
+
+
+def dist_json(spread, n=201):
+    """A Spread (this module's or passing.py's) as plain JSON: bucket edges and n quantiles of actual/expected per
+    bucket, so the board page can price any line in the browser (board/site/lines.js) the way p_over does here."""
+    q = np.linspace(0, 1, n)
+    return dict(edges=[float(e) for e in spread.EDGES],
+                r={int(i): [round(float(v), 4) for v in np.quantile(r, q)] for i, r in spread.r.items()})
+
+
 def fit(kind, tr):
     y = tr[STATS[kind]['y']].values
     X = design(tr, kind); b = ridge(X, y)
