@@ -1,18 +1,247 @@
 {
- "days": [],
- "groups": [],
+ "days": [
+  "2026-11-18"
+ ],
+ "groups": [
+  {
+   "group": "Board picks (every match)",
+   "bets": 1,
+   "won": 0,
+   "lost": 1,
+   "hit": 0.0,
+   "exp_hit": 0.515,
+   "units": null,
+   "roi": null
+  },
+  {
+   "group": "Board picks, main draw",
+   "bets": 1,
+   "won": 0,
+   "lost": 1,
+   "hit": 0.0,
+   "exp_hit": 0.515,
+   "units": null,
+   "roi": null
+  }
+ ],
+ "cal_sections": [
+  {
+   "name": "Board picks",
+   "note": "The player the board gave the better chance, every match.",
+   "n": 1,
+   "won": 0,
+   "lost": 1,
+   "said": 0.515,
+   "hit": 0.0,
+   "units": 0.0,
+   "roi": 0.0,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 1,
+     "won": 0,
+     "lost": 1,
+     "said": 0.515,
+     "hit": 0.0,
+     "units": 0.0
+    }
+   ]
+  }
+ ],
  "parlays": {
   "days": [
-   "2026-11-18"
+   "2026-11-18",
+   "2026-11-19"
   ],
   "groups": []
  },
  "by_period": {
   "menu": {
-   "day": [],
-   "week": [],
-   "month": []
+   "day": [
+    {
+     "key": "d:2026-11-18",
+     "label": "Wed Nov 18"
+    }
+   ],
+   "week": [
+    {
+     "key": "w:2026-11-16",
+     "label": "Nov 16 \u2013 22"
+    }
+   ],
+   "month": [
+    {
+     "key": "m:2026-11",
+     "label": "November 2026"
+    }
+   ]
   },
-  "reports": {}
+  "reports": {
+   "d:2026-11-18": {
+    "days": [
+     "2026-11-18"
+    ],
+    "groups": [
+     {
+      "group": "Board picks (every match)",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "exp_hit": 0.515,
+      "units": null,
+      "roi": null
+     },
+     {
+      "group": "Board picks, main draw",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "exp_hit": 0.515,
+      "units": null,
+      "roi": null
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Board picks",
+      "note": "The player the board gave the better chance, every match.",
+      "n": 1,
+      "won": 0,
+      "lost": 1,
+      "said": 0.515,
+      "hit": 0.0,
+      "units": 0.0,
+      "roi": 0.0,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 1,
+        "won": 0,
+        "lost": 1,
+        "said": 0.515,
+        "hit": 0.0,
+        "units": 0.0
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [],
+     "groups": []
+    }
+   },
+   "w:2026-11-16": {
+    "days": [
+     "2026-11-18"
+    ],
+    "groups": [
+     {
+      "group": "Board picks (every match)",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "exp_hit": 0.515,
+      "units": null,
+      "roi": null
+     },
+     {
+      "group": "Board picks, main draw",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "exp_hit": 0.515,
+      "units": null,
+      "roi": null
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Board picks",
+      "note": "The player the board gave the better chance, every match.",
+      "n": 1,
+      "won": 0,
+      "lost": 1,
+      "said": 0.515,
+      "hit": 0.0,
+      "units": 0.0,
+      "roi": 0.0,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 1,
+        "won": 0,
+        "lost": 1,
+        "said": 0.515,
+        "hit": 0.0,
+        "units": 0.0
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [],
+     "groups": []
+    }
+   },
+   "m:2026-11": {
+    "days": [
+     "2026-11-18"
+    ],
+    "groups": [
+     {
+      "group": "Board picks (every match)",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "exp_hit": 0.515,
+      "units": null,
+      "roi": null
+     },
+     {
+      "group": "Board picks, main draw",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "exp_hit": 0.515,
+      "units": null,
+      "roi": null
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Board picks",
+      "note": "The player the board gave the better chance, every match.",
+      "n": 1,
+      "won": 0,
+      "lost": 1,
+      "said": 0.515,
+      "hit": 0.0,
+      "units": 0.0,
+      "roi": 0.0,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 1,
+        "won": 0,
+        "lost": 1,
+        "said": 0.515,
+        "hit": 0.0,
+        "units": 0.0
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [],
+     "groups": []
+    }
+   }
+  }
  }
 }
