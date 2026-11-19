@@ -881,6 +881,13 @@ function renderParlay() {
       dk.append(a, el('span', 'dim', sids.length === m.ls.length ? 'Loads these legs into your DraftKings betslip. Sign in, check the prices, and place it.' : 'The other legs have no DraftKings link (game started, old alt line, or none on this pull); add them by hand.'));
     } else dk.append(el('span', 'dim', 'No DraftKings link for these legs yet: links come with the next odds pull.'));
     sl.append(dk);
+    // Share (Thomas, 2026-11-19): a compact card of the slip for a screenshot or a text (board/site/share.js)
+    const shr = el('div', 'dkrow'), shb = el('button', 'lnk sugb', 'Share slip'); shb.type = 'button';
+    shb.onclick = () => window.shareSlip && window.shareSlip({ title: `NFL · ${m.ls.length === 1 ? 'straight bet' : m.ls.length + '-leg parlay'}`,
+      legs: m.ls.map((l) => ({ label: legName(l), sub: l.game, odds: fmtOdds(l.offers.DraftKings), tag: FL.has(l.id) ? '⚠ next-best' : '' })),
+      odds: fmtOdds(amer(m.d)), chance: pct1(m.p), pays: '$' + (10 * m.d).toFixed(2),
+      warn: FL.size ? `⚠ ${FL.size} next-best leg${FL.size === 1 ? '' : 's'}, below the usual bar` : '' });
+    shr.append(shb, el('span', 'dim', 'A compact card of this slip to screenshot or send to a friend.')); sl.append(shr);
     if (m.book) {
       const pl = el('div', 'placeat'); pl.append(el('b', null, `Place at ${m.book}: ${fmtOdds(amer(m.dBook))}`),
         el('span', null, 'Every leg priced at DraftKings\' current number. DraftKings may boost or trim the payout on its slip; if so, enter what it shows below.'));
