@@ -607,11 +607,25 @@ function many(pool, size, n, pick) {
 }
 // next-best legs: every other DraftKings leg in scope, not yet started, ranked like the mode (chance for Most likely to hit,
 // edge for Best value), with unflagged legs priced -500 or longer and 40%+ to hit ahead of the rest
+// fill order (Thomas, 2026-11-19): alt-line rungs that are 60%+ to hit and priced -500 or longer go first (likeliest first, since
+// they hit more often than next-best main lines), then the next-best legs. Boards with no alt lines saved go straight to next-best.
+const FILL_ALT_P = 0.6, FILL_ALT_MIN = -500;
+const fillTag = (L) => (L.alt ? 'alt line' : 'next-best');
+const HAS_ALT = LEGS.some((l) => l.alt);
+// "2 alt lines and 1 next-best leg" for the warnings and the share card
+function fillWords(ls) {
+  const a = ls.filter((l) => l.alt).length, b = ls.length - a, w = [];
+  if (a) w.push(`${a} alt line${a === 1 ? '' : 's'}`); if (b) w.push(`${b} next-best leg${b === 1 ? '' : 's'}`);
+  return w.join(' and ');
+}
+const fillHow = () => (HAS_ALT ? 'likely alt lines first (60%+ to hit), then next-best legs' : 'the next-best legs');
 function fillPool() {
   const by = PS.mode === 'likely' ? (a, b) => b.p - a.p || b.edge - a.edge : (a, b) => b.edge - a.edge || b.p - a.p;
   const ls = LEGS.filter((l) => inScope(l) && l.offers.DraftKings != null && kindOk(l) && !started(l.game));
   const ok = (l) => !l.flag && l.offers.DraftKings >= ALT_MIN_PRICE && l.p >= 0.4;
-  return ls.filter(ok).sort(by).concat(ls.filter((l) => !ok(l)).sort(by));
+  const alt = ls.filter((l) => l.alt && !l.flag && l.p >= FILL_ALT_P && l.offers.DraftKings >= FILL_ALT_MIN).sort((a, b) => b.p - a.p || b.edge - a.edge);
+  const rest = ls.filter((l) => !alt.includes(l));
+  return alt.concat(rest.filter(ok).sort(by), rest.filter((l) => !ok(l)).sort(by));
 }
 // relax: 0 = usual rules; 1 = next-best legs fill in after the usual ones; 2 = also any number of legs per game, team and market;
 // 3 = also more than one leg per player (still one per market); 4 = as many legs as the scope has (shorter than asked if it runs out)
@@ -833,10 +847,10 @@ function renderParlay() {
     for (const k of SUG_SIZES) sel.append(new Option((k === 1 ? '1 · straight bet' : `${k} legs`) + (k === SG.best ? ' ★' : '') + (SG.sizes.includes(k) ? '' : ' ⚠'), k));
     sel.value = SG.size;
     sel.onchange = () => { const k = +sel.value; SS.size = k; try { localStorage.setItem('props-legs', k); } catch (e) {} SS.idx = -1; const s2 = slipsFor(k).slips; if (s2.length) { SS.idx = 0; slip = s2[0].slice(); PS.price = ''; PS.note = ''; saveSlip(); } renderParlay(); };
-    lc.append(sel, el('span', 'dim sugbest', (SG.best == null ? `No leg meets the usual bar for ${scopeName()}` : SG.best === 1 ? `★ No parlay is worth it for ${scopeName()}: take a straight bet` : `★ ${SG.best} legs is best for ${scopeName()}`) + '. ⚠ = needs next-best legs.')); sl.append(lc);
+    lc.append(sel, el('span', 'dim sugbest', (SG.best == null ? `No leg meets the usual bar for ${scopeName()}` : SG.best === 1 ? `★ No parlay is worth it for ${scopeName()}: take a straight bet` : `★ ${SG.best} legs is best for ${scopeName()}`) + '. ⚠ = needs alt lines or next-best legs.')); sl.append(lc);
     const got = SG.slips.length ? SG.slips[0].length : 0, fw = [];
     if (SG.fill >= 4) fw.push(`Only ${nLegs(got)} can go in one slip for ${scopeName()}, so this parlay has ${got}, not ${nLegs(SG.size)}.`);
-    else if (SG.fill) fw.push(`Not enough legs meet the usual bar for ${nLegs(SG.size)}, so this parlay is filled with the next-best legs (marked ⚠ below)${SG.fill >= 2 ? ', with more legs from the same game, team or player than usual' : ''}. Expect a lower hit chance and value.`);
+    else if (SG.fill) fw.push(`Not enough legs meet the usual bar for ${nLegs(SG.size)}, so this parlay is filled with ${fillHow()} (marked ⚠ below)${HAS_ALT ? '' : '. No alt lines are on this board yet'}${SG.fill >= 2 ? ', with more legs from the same game, team or player than usual' : ''}. Expect a lower hit chance and value.`);
     if (fw.length) { const ul = el('ul', 'warns'); ul.style.paddingTop = '8px'; ul.style.paddingBottom = '0'; fw.forEach((x) => ul.append(el('li', 'warn', '⚠ ' + x))); sl.append(ul); }
   }
   if (SG.slips.length) {
@@ -865,7 +879,7 @@ function renderParlay() {
       const nm = l.pid && LOGS[l.pid] ? el('button', 'namebtn', legName(l)) : el('b', null, legName(l));
       if (nm.tagName === 'BUTTON') { nm.type = 'button'; nm.title = 'Season game log'; nm.onclick = () => showLog(l.pid, logCtx(l)); }
       left.append(nm, el('small', null, `${l.game} · ${PBOOKS.filter((b) => l.offers[b] != null).map((b) => `${ABBR[b]} ${fmtOdds(l.offers[b])}`).join(' · ')}`));
-      if (FL.has(l.id)) { const fm = el('small', null, '⚠ Next-best leg, below the usual bar'); fm.style.color = 'var(--gold)'; left.append(fm); }
+      if (FL.has(l.id)) { const fm = el('small', null, l.alt ? '⚠ Alt line, added to fill the slip' : '⚠ Next-best leg, below the usual bar'); fm.style.color = 'var(--gold)'; left.append(fm); }
       if (SWAP_OF[l.id]) left.append(el('small', 'dim', `Safer alt for ${SWAP_OF[l.id].label} (${pct(SWAP_OF[l.id].p)}, under 60%)`));
       const right = el('span', 'num ' + (l.ev >= 0 ? 'pos' : 'neg'), `${pct(l.p)} · ${pts(l.edge)} · EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`);
       const x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Remove ' + legName(l)); x.onclick = () => { slip = slip.filter((i) => i !== l.id); SS.idx = -1; saveSlip(); renderParlay(); };
@@ -884,9 +898,9 @@ function renderParlay() {
     // Share (Thomas, 2026-11-19): a compact card of the slip for a screenshot or a text (board/site/share.js)
     const shr = el('div', 'dkrow'), shb = el('button', 'lnk sugb', 'Share slip'); shb.type = 'button';
     shb.onclick = () => window.shareSlip && window.shareSlip({ title: `NFL · ${m.ls.length === 1 ? 'straight bet' : m.ls.length + '-leg parlay'}`,
-      legs: m.ls.map((l) => ({ label: legName(l), sub: l.game, odds: fmtOdds(l.offers.DraftKings), tag: FL.has(l.id) ? '⚠ next-best' : '' })),
+      legs: m.ls.map((l) => ({ label: legName(l), sub: l.game, odds: fmtOdds(l.offers.DraftKings), tag: FL.has(l.id) ? '⚠ ' + fillTag(l) : '' })),
       odds: fmtOdds(amer(m.d)), chance: pct1(m.p), pays: '$' + (10 * m.d).toFixed(2),
-      warn: FL.size ? `⚠ ${FL.size} next-best leg${FL.size === 1 ? '' : 's'}, below the usual bar` : '' });
+      warn: FL.size ? `⚠ ${fillWords(m.ls.filter((l) => FL.has(l.id)))} added to fill the slip` : '' });
     shr.append(shb, el('span', 'dim', 'A compact card of this slip to screenshot or send to a friend.')); sl.append(shr);
     if (m.book) {
       const pl = el('div', 'placeat'); pl.append(el('b', null, `Place at ${m.book}: ${fmtOdds(amer(m.dBook))}`),
@@ -908,7 +922,9 @@ function renderParlay() {
       if (drops[0].ev > evBest + 0.005) { const t = el('p', 'note', `Tip: dropping ${legName(drops[0].l)} raises the EV to ${(drops[0].ev * 100).toFixed(0)}%.`); t.style.padding = '0 14px'; sl.append(t); }
     }
     const wl = el('ul', 'warns');
-    if (FL.size) wl.append(el('li', 'warn', `Next-best legs, added to reach ${nLegs(SG.size)}: ${m.ls.filter((l) => FL.has(l.id)).map(legName).join(', ')}. They miss the usual bar for ${PS.mode === 'likely' ? 'Most likely to hit' : 'Best value'}.`));
+    { const fa = m.ls.filter((l) => FL.has(l.id) && l.alt), fb = m.ls.filter((l) => FL.has(l.id) && !l.alt);
+      if (fa.length) wl.append(el('li', 'warn', `Alt lines, added to reach ${nLegs(SG.size)}: ${fa.map(legName).join(', ')}. Likelier to hit, but they pay less and aren't the board's usual picks.`));
+      if (fb.length) wl.append(el('li', 'warn', `Next-best legs, added to reach ${nLegs(SG.size)}: ${fb.map(legName).join(', ')}. They miss the usual bar for ${PS.mode === 'likely' ? 'Most likely to hit' : 'Best value'}.`)); }
     for (const [k, t] of warnings(slip)) wl.append(el('li', k, t)); if (wl.children.length) sl.append(wl);
   }
   board.append(pick, sl);

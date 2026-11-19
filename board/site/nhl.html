@@ -756,11 +756,25 @@ const sideKey = (L) => `${L.game}|${L.market}|${L.pid && L.kind !== 'Winner' ? L
 const usualPool = (size) => (mode === 'likely' && size >= ALT_FIRST_SIZE ? dedupe(ALT_FIRST.concat(POOL)) : POOL).filter((L) => kindOk(L) && !started(L.game));
 // next-best legs (Thomas, 2026-11-19): every other leg not yet started, ranked like the mode (chance for Most likely to hit, edge for
 // Best value), with legs that carry no flags, are priced no shorter than ALT_MIN_PRICE and are 40%+ to hit ahead of the rest
+// fill order (Thomas, 2026-11-19): alt-line rungs that are 60%+ to hit and priced -500 or longer go first (likeliest first, since
+// they hit more often than next-best main lines), then the next-best legs. Boards with no alt lines saved go straight to next-best.
+const FILL_ALT_P = 0.6, FILL_ALT_MIN = -500;
+const fillTag = (L) => (L.alt ? 'alt line' : 'next-best');
+const HAS_ALT = D.legs.some((L) => L.alt);
+// "2 alt lines and 1 next-best leg" for the warnings and the share card
+function fillWords(ls) {
+  const a = ls.filter((l) => l.alt).length, b = ls.length - a, w = [];
+  if (a) w.push(`${a} alt line${a === 1 ? '' : 's'}`); if (b) w.push(`${b} next-best leg${b === 1 ? '' : 's'}`);
+  return w.join(' and ');
+}
+const fillHow = () => (HAS_ALT ? 'likely alt lines first (60%+ to hit), then next-best legs' : 'the next-best legs');
 function fillPool() {
   const by = mode === 'likely' ? (a, b) => b.p - a.p || b.edge - a.edge : (a, b) => b.edge - a.edge || b.p - a.p;
   const ls = D.legs.filter((L) => kindOk(L) && !started(L.game));
   const ok = (L) => !L.flags.length && L.price >= ALT_MIN_PRICE && L.p >= 0.4;
-  return ls.filter(ok).sort(by).concat(ls.filter((L) => !ok(L)).sort(by));
+  const alt = ls.filter((L) => L.alt && !L.flags.length && L.p >= FILL_ALT_P && L.price >= FILL_ALT_MIN).sort((a, b) => b.p - a.p || b.edge - a.edge);
+  const rest = ls.filter((L) => !alt.includes(L));
+  return alt.concat(rest.filter(ok).sort(by), rest.filter((L) => !ok(L)).sort(by));
 }
 // relax: 0 = usual rules; 1 = next-best legs fill in after the usual ones; 2 = also any number of legs per game and market;
 // 3 = also more than one leg per player; 4 = as many legs as the slate has (a shorter slip than asked when it runs out)
@@ -832,7 +846,7 @@ function fillWarn() {
   const t = [];
   const got = SLIPS.length ? SLIPS[0].length : 0;
   if (FILL >= 4) t.push(`Only ${got} leg${got === 1 ? '' : 's'} can go in one slip on this slate, so this parlay has ${got}, not ${nLegs(legCount)}.`);
-  else if (FILL) t.push(`Not enough legs meet the usual bar for ${nLegs(legCount)}, so this parlay is filled with the next-best legs (marked ⚠ below)${FILL >= 2 ? ', with more legs from the same game, market or player than usual' : ''}. Expect a lower hit chance and value.`);
+  else if (FILL) t.push(`Not enough legs meet the usual bar for ${nLegs(legCount)}, so this parlay is filled with ${fillHow()} (marked ⚠ below)${HAS_ALT ? '' : '. No alt lines are on this board yet'}${FILL >= 2 ? ', with more legs from the same game, market or player than usual' : ''}. Expect a lower hit chance and value.`);
   if (legCount > MAX_LEGS) t.push(`${nLegs(legCount)} is past the usual ${MAX_LEGS}-leg cap: every extra leg multiplies the chance of a miss.`);
   if (!t.length) return null;
   const ul = el('ul', 'warns'); ul.style.paddingTop = '8px'; ul.style.paddingBottom = '0'; t.forEach((x) => ul.append(el('li', 'warn', '⚠ ' + x))); return ul;
@@ -1048,7 +1062,7 @@ function boardParlay() {
     for (let k = 1; k <= MAX_PICK; k++) sel.append(new Option(sizeOpt(k), k));
     sel.value = legCount; sel.onchange = () => { setSize(+sel.value); if (SLIPS.length) loadSug(0); else { sugIdx = -1; render(); } };
     lc.append(sel);
-    lc.append(el('span', 'dim sugbest', (BEST == null ? 'No leg meets the usual bar tonight' : BEST === 1 ? '★ No parlay is worth it tonight: take a straight bet' : `★ ${BEST} legs is best tonight`) + '. ⚠ = needs next-best legs.'));
+    lc.append(el('span', 'dim sugbest', (BEST == null ? 'No leg meets the usual bar tonight' : BEST === 1 ? '★ No parlay is worth it tonight: take a straight bet' : `★ ${BEST} legs is best tonight`) + '. ⚠ = needs alt lines or next-best legs.'));
     sl.append(lc);
     const fw = fillWarn(); if (fw) sl.append(fw);
   }
@@ -1079,7 +1093,7 @@ function boardParlay() {
   const legs = slip.map((id) => LEG[id]).filter(Boolean);
   if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : mode === 'likely' ? 'Add legs from the list. No leg is 55%+ to hit at -200 or longer on this slate.' : 'Add legs from the list. No leg meets the value rule on this slate.'));
   const box = el('div', 'slipl'), FL = fillers(legs);
-  legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); if (FL.has(L.id)) { const m = el('small', null, '⚠ Next-best leg, below the usual bar'); m.style.color = 'var(--gold)'; n.append(m); } const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
+  legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); if (FL.has(L.id)) { const m = el('small', null, L.alt ? '⚠ Alt line, added to fill the slip' : '⚠ Next-best leg, below the usual bar'); m.style.color = 'var(--gold)'; n.append(m); } const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
   if (legs.length) {
     sl.append(box);
     const p = legs.reduce((a, l) => a * l.p, 1), d = legs.reduce((a, l) => a * dec(l.price), 1), ev = p * d - 1;
@@ -1098,9 +1112,9 @@ function boardParlay() {
     // Share (Thomas, 2026-11-19): a compact card of the slip for a screenshot or a text (board/site/share.js)
     const shr = el('div', 'dkrow'), shb = el('button', 'lnk sugb', 'Share slip'); shb.type = 'button';
     shb.onclick = () => window.shareSlip && window.shareSlip({ title: `NHL · ${legs.length === 1 ? 'straight bet' : legs.length + '-leg parlay'}`,
-      legs: legs.map((l) => ({ label: l.label, sub: l.game, odds: fmt(l.price), tag: FL.has(l.id) ? '⚠ next-best' : '' })),
+      legs: legs.map((l) => ({ label: l.label, sub: l.game, odds: fmt(l.price), tag: FL.has(l.id) ? '⚠ ' + fillTag(l) : '' })),
       odds: fmt(toAm(d)), chance: pct(p), pays: '$' + (10 * d).toFixed(2),
-      warn: FL.size ? `⚠ ${FL.size} next-best leg${FL.size === 1 ? '' : 's'}, below the usual bar` : '' });
+      warn: FL.size ? `⚠ ${fillWords(legs.filter((l) => FL.has(l.id)))} added to fill the slip` : '' });
     shr.append(shb, el('span', 'dim', 'A compact card of this slip to screenshot or send to a friend.')); sl.append(shr);
     const games = {}; legs.forEach((l) => { games[l.game] = (games[l.game] || 0) + 1; });
     const warns = [];
@@ -1110,7 +1124,9 @@ function boardParlay() {
       else warns.push(['warn', `${n} legs from ${g}: DraftKings prices same-game legs together, so the real payout differs and the legs are not independent.`]);
     });
     legs.filter((l) => started(l.game)).forEach((l) => warns.push(['bad', `${l.game} has started: DraftKings has pulled its pregame lines, so ${l.label} won't load. Swap it out.`]));
-    if (FL.size) warns.push(['warn', `Next-best legs, added to reach ${nLegs(legCount)}: ${legs.filter((l) => FL.has(l.id)).map((l) => l.label).join(', ')}. They miss the usual bar for ${mode === 'likely' ? 'Most likely to hit' : 'Best value'}.`]);
+    { const fa = legs.filter((l) => FL.has(l.id) && l.alt), fb = legs.filter((l) => FL.has(l.id) && !l.alt);
+      if (fa.length) warns.push(['warn', `Alt lines, added to reach ${nLegs(legCount)}: ${fa.map((l) => l.label).join(', ')}. Likelier to hit, but they pay less and aren't the board's usual picks.`]);
+      if (fb.length) warns.push(['warn', `Next-best legs, added to reach ${nLegs(legCount)}: ${fb.map((l) => l.label).join(', ')}. They miss the usual bar for ${mode === 'likely' ? 'Most likely to hit' : 'Best value'}.`]); }
     legs.filter((l) => l.edge < 0).forEach((l) => warns.push(['bad', `${l.label} has negative edge.`]));
     legs.filter((l) => l.flags.length).forEach((l) => warns.push(['warn', `${l.label}: ${l.flags.join('; ')}.`]));
     const good = ev > 0 && !warns.some((w) => w[0] === 'bad');
