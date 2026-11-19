@@ -1,0 +1,47 @@
+{
+"seasons": [
+"2025",
+"2026"
+],
+"games": 1279,
+"rho": {
+"mar:fav|tot|g": 0.032,
+"saves:G|mar|tm": 0.218,
+"saves:G|saves:G|opp": -0.102,
+"saves:G|sog:D|opp": 0.203,
+"saves:G|sog:D|tm": -0.028,
+"saves:G|sog:F|opp": 0.202,
+"saves:G|sog:F|tm": -0.009,
+"saves:G|tot|g": -0.07,
+"sog:D|mar|tm": -0.037,
+"sog:D|sog:D|opp": -0.0,
+"sog:D|sog:D|tm": 0.032,
+"sog:D|sog:F|opp": 0.001,
+"sog:D|sog:F|tm": 0.018,
+"sog:D|tot|g": 0.024,
+"sog:F|mar|tm": 0.035,
+"sog:F|sog:F|opp": -0.004,
+"sog:F|sog:F|tm": 0.012,
+"sog:F|tot|g": 0.049
+},
+"n": {
+"mar:fav|tot|g": 1279,
+"saves:G|mar|tm": 2516,
+"saves:G|saves:G|opp": 1238,
+"saves:G|sog:D|opp": 14758,
+"saves:G|sog:D|tm": 14761,
+"saves:G|sog:F|opp": 24116,
+"saves:G|sog:F|tm": 24099,
+"saves:G|tot|g": 2516,
+"sog:D|mar|tm": 15004,
+"sog:D|sog:D|opp": 44024,
+"sog:D|sog:D|tm": 36802,
+"sog:D|sog:F|opp": 143709,
+"sog:D|sog:F|tm": 143681,
+"sog:D|tot|g": 15004,
+"sog:F|mar|tm": 24502,
+"sog:F|sog:F|opp": 117314,
+"sog:F|sog:F|tm": 107184,
+"sog:F|tot|g": 24502
+}
+}
