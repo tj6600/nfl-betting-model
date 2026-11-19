@@ -1199,7 +1199,11 @@ const scopeName = () => (state.game !== 'all' ? state.game : state.win !== 'all'
 // 55%+ and 3+ pts edge first, then near-value (52%+, 1.5+ pts). One leg per player or market, one game line per game,
 // at most 2 legs per team in a single game. Across games: 1 leg per game (3 for slips over 6 legs). No leg is reused
 // across suggestions, so each one is different.
-const SUG_SIZES = [1, 2, 3, 4, 5, 6, 11];
+// Legs picker (Thomas, 2026-11-19): any size from 1 to 12 from a menu. A size the usual rules can't fill is still built, with the
+// next-best legs (relax levels in buildSlips); those legs are marked and warned about. ★ marks the best size among the usual ones.
+const MAX_PICK = 12;
+const SUG_SIZES = Array.from({ length: MAX_PICK }, (_, i) => i + 1);
+const nLegs = (k) => `${k} leg${k === 1 ? '' : 's'}`;
 const sizeName = (k) => (k === 1 ? 'Straight' : String(k));
 const SS = { size: null, idx: -1 };
 try { SS.size = +localStorage.getItem('props-legs') || null; } catch (e) {}
@@ -1255,23 +1259,40 @@ function many(pool, size, n, pick) {
   }
   return out;
 }
-function buildSlips(size, n = 6) {
-  const pool = sugPool(size);
+// next-best legs: every other DraftKings leg in scope, not yet started, ranked like the mode (chance for Most likely to hit,
+// edge for Best value), with unflagged legs priced -500 or longer and 40%+ to hit ahead of the rest
+function fillPool() {
+  const by = PS.mode === 'likely' ? (a, b) => b.p - a.p || b.edge - a.edge : (a, b) => b.edge - a.edge || b.p - a.p;
+  const ls = LEGS.filter((l) => inScope(l) && l.offers.DraftKings != null && kindOk(l) && !started(l.game));
+  const ok = (l) => !l.flag && l.offers.DraftKings >= ALT_MIN_PRICE && l.p >= 0.4;
+  return ls.filter(ok).sort(by).concat(ls.filter((l) => !ok(l)).sort(by));
+}
+// relax: 0 = usual rules; 1 = next-best legs fill in after the usual ones; 2 = also any number of legs per game, team and market;
+// 3 = also more than one leg per player (still one per market); 4 = as many legs as the scope has (shorter than asked if it runs out)
+function buildSlips(size, n = 6, relax = 0) {
+  let pool = sugPool(size);
+  if (relax) pool = dedupe(pool.concat(fillPool()));
   const nG = new Set(pool.map((l) => l.game)).size, one = state.game !== 'all' || nG === 1;   // a window can hold just one game
   // across games: 1 leg per game, more only when the scope has too few games to fill the slip (max 3 per game)
-  const perGame = one ? size : Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / nG)));
+  const perGame = one || relax >= 2 ? size : Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / nG)));
   return many(pool, size, n, (pool, size, allowed, cap) => {
+    if (relax >= 2) cap = size;
     const pick = [], g = {}, gl = {}, team = {}, fm = {};
     for (const l of pool) {
       if (!allowed(l) || (g[l.game] || 0) >= perGame || (fm[fam(l)] || 0) >= cap) continue;
-      if (pick.some((x) => x.key === l.key || (x.kind !== 'Game' && l.kind !== 'Game' && x.who === l.who))) continue;
+      if (pick.some((x) => x.key === l.key || (relax < 3 && x.kind !== 'Game' && l.kind !== 'Game' && x.who === l.who))) continue;
       if (l.kind === 'Game') { if (gl[l.game]) continue; gl[l.game] = 1; }
-      else if (one && size <= 3) { const t = l.team || ''; if ((team[t] || 0) >= 2) continue; team[t] = (team[t] || 0) + 1; }
+      else if (one && size <= 3 && relax < 2) { const t = l.team || ''; if ((team[t] || 0) >= 2) continue; team[t] = (team[t] || 0) + 1; }
       pick.push(l); g[l.game] = (g[l.game] || 0) + 1; fm[fam(l)] = (fm[fam(l)] || 0) + 1;
       if (pick.length >= size) return pick;
     }
-    return null;
+    return relax >= 4 && pick.length ? pick : null;
   });
+}
+// the first relax level that builds at least one slip of k legs, and which level it was
+function slipsFor(k) {
+  for (let r = 0; r <= 4; r++) { const s = buildSlips(k, 6, r); if (s.length) return { slips: s, fill: r }; }
+  return { slips: [], fill: 0 };
 }
 // Kelly bankroll growth of a slip at DraftKings, each leg's chance cut 2 points for model error
 function growth(ids) {
@@ -1280,12 +1301,14 @@ function growth(ids) {
   return p * Math.log(1 + f * b) + (1 - p) * Math.log(1 - f);
 }
 function sugState() {
-  const sizes = SUG_SIZES.filter((k) => buildSlips(k, 1).length);
+  const top = {}; SUG_SIZES.forEach((k) => { const t = buildSlips(k, 1)[0]; if (t) top[k] = growth(t); });   // each size's top slip, built once
+  const sizes = SUG_SIZES.filter((k) => k in top);
   // best parlay size by growth; when no parlay has positive growth (or none can be built), suggest a straight bet
-  const ps = sizes.filter((k) => k > 1 && growth(buildSlips(k, 1)[0]) > 0);
-  const best = ps.length ? ps.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), ps[0]) : sizes.includes(1) ? 1 : null;
-  const size = sizes.includes(SS.size) ? SS.size : best;
-  return { sizes, best, size, slips: size ? buildSlips(size) : [] };
+  const ps = sizes.filter((k) => k > 1 && top[k] > 0);
+  const best = ps.length ? ps.reduce((a, k) => (top[k] > top[a] ? k : a), ps[0]) : sizes.includes(1) ? 1 : null;
+  const size = SS.size >= 1 && SS.size <= MAX_PICK ? SS.size : best || 1;
+  const { slips, fill } = slipsFor(size);
+  return { sizes, best, size, slips, fill };
 }
 function renderWins() {
   const box = document.getElementById('cats'); box.replaceChildren();
@@ -1458,12 +1481,19 @@ function renderParlay() {
     md.append(seg, el('span', 'dim sugbest', (PS.mode === 'likely' ? 'Highest-chance legs that still pay more than they risk on average (edge 1+ pt, 55%+ chance, no flags). Slips of 3+ legs start with alternate lines that are 70%+ likely, cost at most 3 pts of juice and are priced -500 or longer.' : 'Biggest edge first (edge 3+ pts, 55%+ chance), then near-value legs.') + mk));
     sl.append(md);
   }
-  if (SG.sizes.length) {
+  if (LEGS.length) {
     const lc = el('div', 'sugnav'); lc.append(el('b', null, 'Legs'));
-    const seg = el('div', 'seg');
-    SG.sizes.forEach((k) => { const b = el('button', null, k === SG.best ? `${sizeName(k)} ★` : sizeName(k)); b.type = 'button'; b.setAttribute('aria-pressed', k === SG.size);
-      b.onclick = () => { SS.size = k; try { localStorage.setItem('props-legs', k); } catch (e) {} SS.idx = -1; const s2 = buildSlips(k); if (s2.length) { SS.idx = 0; slip = s2[0].slice(); PS.price = ''; PS.note = ''; saveSlip(); } renderParlay(); }; seg.append(b); });
-    lc.append(seg, el('span', 'dim sugbest', SG.best === 1 ? `★ No parlay is worth it for ${scopeName()}: take a straight bet` : `★ ${SG.best} legs is best for ${scopeName()}`)); sl.append(lc);
+    const sel = el('select', 'legsel'); sel.setAttribute('aria-label', 'Number of legs');
+    for (const k of SUG_SIZES) sel.append(new Option((k === 1 ? '1 · straight bet' : `${k} legs`) + (k === SG.best ? ' ★' : '') + (SG.sizes.includes(k) ? '' : ' ⚠'), k));
+    sel.value = SG.size;
+    sel.onchange = () => { const k = +sel.value; SS.size = k; try { localStorage.setItem('props-legs', k); } catch (e) {} SS.idx = -1; const s2 = slipsFor(k).slips; if (s2.length) { SS.idx = 0; slip = s2[0].slice(); PS.price = ''; PS.note = ''; saveSlip(); } renderParlay(); };
+    lc.append(sel, el('span', 'dim sugbest', (SG.best == null ? `No leg meets the usual bar for ${scopeName()}` : SG.best === 1 ? `★ No parlay is worth it for ${scopeName()}: take a straight bet` : `★ ${SG.best} legs is best for ${scopeName()}`) + '. ⚠ = needs next-best legs.')); sl.append(lc);
+    const got = SG.slips.length ? SG.slips[0].length : 0, fw = [];
+    if (SG.fill >= 4) fw.push(`Only ${nLegs(got)} can go in one slip for ${scopeName()}, so this parlay has ${got}, not ${nLegs(SG.size)}.`);
+    else if (SG.fill) fw.push(`Not enough legs meet the usual bar for ${nLegs(SG.size)}, so this parlay is filled with the next-best legs (marked ⚠ below)${SG.fill >= 2 ? ', with more legs from the same game, team or player than usual' : ''}. Expect a lower hit chance and value.`);
+    if (fw.length) { const ul = el('ul', 'warns'); ul.style.paddingTop = '8px'; ul.style.paddingBottom = '0'; fw.forEach((x) => ul.append(el('li', 'warn', '⚠ ' + x))); sl.append(ul); }
+  }
+  if (SG.slips.length) {
     const nav = el('div', 'sugnav');
     const prev = el('button', 'lnk', '‹'); prev.type = 'button'; prev.setAttribute('aria-label', 'Previous suggestion'); prev.onclick = () => loadSug(SS.idx < 0 ? SG.slips.length - 1 : SS.idx - 1);
     const next = el('button', 'lnk', '›'); next.type = 'button'; next.setAttribute('aria-label', 'Next suggestion'); next.onclick = () => loadSug(SS.idx + 1);
@@ -1483,11 +1513,13 @@ function renderParlay() {
   else {
     const m = parlayMath(slip, PS.price && Number(PS.price) && Math.abs(Number(PS.price)) >= 100 ? Number(PS.price) : null);
     const lsx = el('div', 'books slipl');
+    const usual = new Set(sugPool(SG.size).map((l) => l.id)), FL = new Set(SS.idx >= 0 && SG.fill ? slip.filter((i) => !usual.has(i)) : []);
     for (const l of m.ls) {
       const r = el('div'); const left = el('span');
       const nm = l.pid && LOGS[l.pid] ? el('button', 'namebtn', legName(l)) : el('b', null, legName(l));
       if (nm.tagName === 'BUTTON') { nm.type = 'button'; nm.title = 'Season game log'; nm.onclick = () => showLog(l.pid, logCtx(l)); }
       left.append(nm, el('small', null, `${l.game} · ${PBOOKS.filter((b) => l.offers[b] != null).map((b) => `${ABBR[b]} ${fmtOdds(l.offers[b])}`).join(' · ')}`));
+      if (FL.has(l.id)) { const fm = el('small', null, '⚠ Next-best leg, below the usual bar'); fm.style.color = 'var(--gold)'; left.append(fm); }
       if (SWAP_OF[l.id]) left.append(el('small', 'dim', `Safer alt for ${SWAP_OF[l.id].label} (${pct(SWAP_OF[l.id].p)}, under 60%)`));
       const right = el('span', 'num ' + (l.ev >= 0 ? 'pos' : 'neg'), `${pct(l.p)} · ${pts(l.edge)} · EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`);
       const x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Remove ' + legName(l)); x.onclick = () => { slip = slip.filter((i) => i !== l.id); SS.idx = -1; saveSlip(); renderParlay(); };
@@ -1522,7 +1554,9 @@ function renderParlay() {
       const evBest = parlayMath(slip, null).ev;
       if (drops[0].ev > evBest + 0.005) { const t = el('p', 'note', `Tip: dropping ${legName(drops[0].l)} raises the EV to ${(drops[0].ev * 100).toFixed(0)}%.`); t.style.padding = '0 14px'; sl.append(t); }
     }
-    const wl = el('ul', 'warns'); for (const [k, t] of warnings(slip)) wl.append(el('li', k, t)); if (wl.children.length) sl.append(wl);
+    const wl = el('ul', 'warns');
+    if (FL.size) wl.append(el('li', 'warn', `Next-best legs, added to reach ${nLegs(SG.size)}: ${m.ls.filter((l) => FL.has(l.id)).map(legName).join(', ')}. They miss the usual bar for ${PS.mode === 'likely' ? 'Most likely to hit' : 'Best value'}.`));
+    for (const [k, t] of warnings(slip)) wl.append(el('li', k, t)); if (wl.children.length) sl.append(wl);
   }
   board.append(pick, sl);
   document.getElementById('foot').textContent = 'Legs are ranked by edge: our chance minus the break-even chance the price implies. EV alone favors long shots, because a small overestimate of a 5% chance turns into a huge EV at +2500; edge in percentage points does not, so it rewards legs that are both likely and underpriced. Each leg\'s chance blends our model with the books\' own chance, 50/50 for normal prices and leaning more on the books for long shots (down to 20% model below about a 12% book chance), since the model is least reliable in the tails. Game lines are blended too, because on past closing lines the spread model showed no edge by itself. Only DraftKings is used: each leg is DraftKings\' own number and price, and the parlay is priced at DraftKings. The parlay chance multiplies the legs, which assumes they are independent, so legs from the same game are flagged. EV uses that book\'s price unless you enter the parlay price your app shows (books sometimes boost or trim parlay payouts). None of these leg types has been graded against real lines yet, so treat the EV as the model\'s opinion, not a promise. Tracking only, not betting advice.';
