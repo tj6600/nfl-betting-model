@@ -50,6 +50,17 @@ def _data(page, tag):
 def _t(s): return dt.datetime.fromisoformat(s.replace('Z', '+00:00')) if s else None
 
 
+def _gday(L):
+    """ET calendar date (YYYY-MM-DD) of a leg's game. NFL/CFB legs carry a week key like '2026_wk12' as their day
+    (2026-11-19: that crashed the Day/Week/Month menus), so use the kickoff time; NHL days are already dates."""
+    d = str(L.get('day') or '')[:10]
+    if re.fullmatch(r'\d{4}-\d{2}-\d{2}', d): return d
+    t = _t(L.get('start'))
+    if t is None: return None
+    from zoneinfo import ZoneInfo
+    return t.astimezone(ZoneInfo('America/New_York')).date().isoformat()
+
+
 def legs(now=None, backup=False):
     """Every eligible leg from the three boards, normalized: sport, day (the grader's key), id, label, game, start, price, p, dk, edge, sid."""
     now = now or dt.datetime.now(dt.timezone.utc)
@@ -217,7 +228,7 @@ def grade():
                 else:
                     live = [L for L, r in zip(s['legs'], rs) if r == 'win']
                     out, units = ('push', 0.0) if not live else ('won', math.prod(dec(L['price']) for L in live) - 1)
-                rows.append(dict(day=day, gday=max(str(L['day'])[:10] for L in s['legs']), size=int(k), top=i == 0, result=out, units=units, p=s['p'], ret=s['ret'],
+                rows.append(dict(day=day, gday=max((g for g in map(_gday, s['legs']) if g), default=day), size=int(k), top=i == 0, result=out, units=units, p=s['p'], ret=s['ret'],
                                  sports=sorted({L['sport'] for L in s['legs']}),
                                  legs=[dict(sport=L['sport'], label=L['label'], price=L['price'], result=r) for L, r in zip(s['legs'], rs)], _legs=s['legs']))
     out = report(rows)
