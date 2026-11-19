@@ -329,6 +329,40 @@ for pid, hg in H[H.pid.isin(pids)].groupby('pid'):
             g = teamg[teamg.week == w].iloc[0]; at = g.away_team == team
             rows.append([int(w), g.home_team if at else g.away_team, bool(at), None, None, None, None, None, None])
     logs[pid] = dict(name=hg.full_name.iloc[-1], pos=hg.position.iloc[-1], team=team, g=rows)
+# QBs: the play-by-play log above has only rushing/receiving, so QB logs are rebuilt from nflverse weekly stats with
+# passing columns (L['p'] per row: completions, attempts, gross passing yds, pass TDs, INTs; the same yards passing
+# props grade on). Thomas, 2026-11-19: a QB passing prop's log showed rushing and graded the line as receiving yds.
+from nflmodel import passing as PS_
+_pass_pids = {l['pid'] for l in legs if l.get('pid') and (l['kind'] == 'Pass' or 'pass yds' in l['label'])} \
+    | {y['pid'] for y in D.get('yards', []) if y.get('market') == 'pass'} | {m['pid'] for m in D.get('milestones', []) if m.get('market') == 'pass'}
+try:
+    _src = os.path.join(PS_.CACHE, f'stats_player_week_{season}.csv')
+    QS = pd.read_csv(_src if os.path.exists(_src) else PS_.URL.format(y=season), low_memory=False,
+                     usecols=lambda c: c in ['player_id', 'player_display_name', 'position', 'season_type', 'week', 'game_id', 'team', 'completions',
+                                             'attempts', 'passing_yards', 'passing_tds', 'passing_interceptions', 'carries', 'rushing_yards',
+                                             'rushing_tds', 'targets', 'receptions', 'receiving_yards', 'receiving_tds'])
+    QS = QS[(QS.season_type == 'REG') & (QS.position == 'QB')].fillna(0)
+except Exception as e:   # stats file unreachable: keep the play-by-play logs
+    print('QB passing logs skipped:', e); QS = pd.DataFrame(columns=['player_id'])
+_qb_pids = _pass_pids | {pid for pid, L in logs.items() if L['pos'] == 'QB'}
+for pid, qg in QS[QS.player_id.isin(_qb_pids)].groupby('player_id'):
+    qg = qg.sort_values('week'); team = qg.team.iloc[-1]; byw = {r.week: r for r in qg.itertuples()}
+    teamg = GS[(GS.home_team == team) | (GS.away_team == team)]
+    rows, prow = [], []
+    for w in sorted(set(teamg.week) | set(byw)):
+        r = byw.get(w)
+        if r is not None and (r.attempts > 0 or r.carries > 0):
+            home, away = r.game_id.split('_')[3], r.game_id.split('_')[2]
+            opp = away if r.team == home else home
+            rows.append([int(w), opp, r.team != home, int(r.carries), round(r.rushing_yards), int(r.targets), int(r.receptions),
+                         round(r.receiving_yards), int(r.rushing_tds + r.receiving_tds)])
+            prow.append([int(r.completions), int(r.attempts), round(r.passing_yards), int(r.passing_tds), int(r.passing_interceptions)])
+        else:
+            g = teamg[teamg.week == w]
+            if g.empty: continue
+            g = g.iloc[0]; at = g.away_team == team
+            rows.append([int(w), g.home_team if at else g.away_team, bool(at), None, None, None, None, None, None]); prow.append(None)
+    logs[pid] = dict(name=qg.player_display_name.iloc[-1], pos='QB', team=team, g=rows, p=prow)
 # team changes: compare what the old and new offenses give his position (volume per game, recency-weighted),
 # and his own production before and after. Display only: as a model input it did not improve 2024-25 backtests.
 HA = T.history().sort_values(['pid', 'gameday'])

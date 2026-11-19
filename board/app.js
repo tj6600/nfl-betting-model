@@ -202,36 +202,48 @@ function showLog(pid, ctx) {
   if (L.move) pn.append(movePanel(L));
   const played = L.g.filter((r) => r[3] != null); const n = played.length || 1;
   const sum = (i) => played.reduce((a, r) => a + r[i], 0);
-  const st = stats([[String(played.length), `games played${L.g.length > played.length ? ` (${L.g.length - played.length} missed)` : ''}`], [(sum(3) / n).toFixed(1), 'carries a game'], [(sum(4) / n).toFixed(0), 'rush yds a game'],
+  // QBs (L.p: completions, attempts, pass yds, pass TDs, INTs per game) show passing first (Thomas, 2026-11-19)
+  const qb = !!L.p; const P = (r) => L.p[L.g.indexOf(r)];
+  const psum = (j) => played.reduce((a, r) => a + P(r)[j], 0);
+  const gp = `games played${L.g.length > played.length ? ` (${L.g.length - played.length} missed)` : ''}`;
+  const st = stats(qb ? [[String(played.length), gp], [`${(psum(0) / n).toFixed(0)}/${(psum(1) / n).toFixed(0)}`, 'completions / attempts a game'], [(psum(2) / n).toFixed(0), 'pass yds a game'],
+    [String(psum(3)), `pass TDs (${(psum(3) / n).toFixed(1)} a game)`], [String(psum(4)), 'interceptions'], [(sum(4) / n).toFixed(0), 'rush yds a game']]
+    : [[String(played.length), gp], [(sum(3) / n).toFixed(1), 'carries a game'], [(sum(4) / n).toFixed(0), 'rush yds a game'],
     [(sum(5) / n).toFixed(1), 'targets a game'], [(sum(7) / n).toFixed(0), 'rec yds a game'], [String(sum(8)), `TDs (${(sum(8) / n).toFixed(2)} a game)`]]);
   st.classList.add('pad'); pn.append(st);
+  // columns: [header, class, value of a played row]
+  const cols = qb ? [['C/Att', 'num', (r) => `${P(r)[0]}/${P(r)[1]}`], ['Pass yds', 'num', (r) => P(r)[2], 'pass'], ['Pass TD', 'num', (r) => P(r)[3]], ['Int', 'num', (r) => P(r)[4]],
+    ['Rush yds', 'num', (r) => r[4], 'rush']]
+    : [['Car', 'num', (r) => r[3]], ['Rush yds', 'num', (r) => r[4], 'rush'], ['Tgt', 'num', (r) => r[5]], ['Rec', 'num', (r) => r[6], 'recs'], ['Rec yds', 'num', (r) => r[7], 'rec'], ['TD', 'num', (r) => r[8]]];
   // how this bet would have done in each game this season
-  let hitFn = null; let hitLabel = ''; let hitCol = -1;
+  let hitFn = null; let hitLabel = ''; let hitCol = null;
+  const UNIT = { rush: 'rushing yds', recs: 'receptions', rec: 'receiving yds', pass: 'passing yds' };
   if (ctx && ctx.kind === 'td') { hitFn = (r) => r[8] > 0; hitLabel = 'Scored'; }
   else if (ctx && ctx.line != null) {
-    const i = ctx.kind === 'rush' ? 4 : ctx.kind === 'recs' ? 6 : 7; const over = ctx.side !== 'Under'; hitCol = i;
-    hitFn = (r) => (over ? r[i] > ctx.line : r[i] < ctx.line); hitLabel = `${over ? 'Over' : 'Under'} ${ctx.line}`;
+    const v = ctx.kind === 'pass' ? (r) => P(r)[2] : ctx.kind === 'rush' ? (r) => r[4] : ctx.kind === 'recs' ? (r) => r[6] : (r) => r[7];
+    const ok = ctx.kind !== 'pass' || qb; const over = ctx.side !== 'Under'; hitCol = cols.find((c) => c[3] === ctx.kind) || null;
+    if (ok) { hitFn = (r) => (over ? v(r) > ctx.line : v(r) < ctx.line); hitLabel = `${over ? 'Over' : 'Under'} ${ctx.line}`; }
   }
   if (hitFn) {
     const h = played.filter(hitFn).length;
-    pn.append(el('p', 'loghit', `${ctx.kind === 'td' ? 'Scored a TD' : `${hitLabel} ${ctx.kind === 'rush' ? 'rushing yds' : ctx.kind === 'recs' ? 'receptions' : 'receiving yds'} hit`} in ${h} of ${played.length} games this season (${played.length ? Math.round(100 * h / played.length) : 0}%).`));
+    pn.append(el('p', 'loghit', `${ctx.kind === 'td' ? 'Scored a TD' : `${hitLabel} ${UNIT[ctx.kind] || 'receiving yds'} hit`} in ${h} of ${played.length} games this season (${played.length ? Math.round(100 * h / played.length) : 0}%).`));
   }
   const wrap = el('div', 'tablewrap'); const tb = el('table', 'res');
   const th = el('thead'); const hr = el('tr');
-  for (const [tx, c] of [['Wk'], ['Opp'], ['Car', 'num'], ['Rush yds', 'num'], ['Tgt', 'num'], ['Rec', 'num'], ['Rec yds', 'num'], ['TD', 'num']].concat(hitFn ? [[hitLabel]] : [])) hr.append(el('th', c || null, tx));
+  for (const [tx, c] of [['Wk'], ['Opp']].concat(cols).concat(hitFn ? [[hitLabel]] : [])) hr.append(el('th', c || null, tx));
   th.append(hr); tb.append(th); const tbody = el('tbody');
   for (const r of L.g) {
     const tr = el('tr'); tr.append(el('td', null, String(r[0])), el('td', null, `${r[2] ? '@' : 'vs'} ${r[1]}`));
-    if (r[3] == null) { const td = el('td', 'dim', 'Did not play'); td.colSpan = 6 + (hitFn ? 1 : 0); tr.append(td); }
+    if (r[3] == null) { const td = el('td', 'dim', 'Did not play'); td.colSpan = cols.length + (hitFn ? 1 : 0); tr.append(td); }
     else {
       // the stat the line is on: green when the game supports the bet's side (Under: below the line), red otherwise (Thomas, 2026-11-17)
-      for (const i of [3, 4, 5, 6, 7, 8]) tr.append(el('td', 'num' + (i === hitCol ? (hitFn(r) ? ' pos' : ' neg') : ''), String(r[i])));
+      for (const c of cols) tr.append(el('td', 'num' + (c === hitCol && hitFn ? (hitFn(r) ? ' pos' : ' neg') : ''), String(c[2](r))));
       if (hitFn) { const ok = hitFn(r); tr.append(el('td', ok ? 'pos' : 'neg', ok ? 'Hit' : 'Miss')); }
     }
     tbody.append(tr);
   }
   tb.append(tbody); wrap.append(tb); pn.append(wrap);
-  pn.append(el('p', 'note logfoot', `${L.move ? 'Scheme fit compares how many targets and carries each offense has given his position lately (recency-weighted, nudged toward league average). As a model input it did not improve 2024-25 backtests, so it is shown for judgment only. ' : ''}From play-by-play data. Past games show his range, not a forecast: role changes, injuries and the opponent matter, and the model weighs his recent games more.`));
+  pn.append(el('p', 'note logfoot', `${L.move ? 'Scheme fit compares how many targets and carries each offense has given his position lately (recency-weighted, nudged toward league average). As a model input it did not improve 2024-25 backtests, so it is shown for judgment only. ' : ''}${qb ? 'From nflverse weekly stats (gross passing yards, the stat passing props grade on).' : 'From play-by-play data.'} Past games show his range, not a forecast: role changes, injuries and the opponent matter, and the model weighs his recent games more.`));
   ov.append(pn); document.body.append(ov); x.focus();
 }
 function tdDetail(p) {
@@ -295,7 +307,7 @@ function ydDetail(p) {
     bk.append(r);
   }
   c.append(bk);
-  const lb = pass ? null : logButton(p.pid, { kind: p.market, line: p.line, side: p.lean }); if (lb) a.append(lb);
+  const lb = logButton(p.pid, { kind: p.market, line: p.line, side: p.lean }); if (lb) a.append(lb);
   d.append(a, b, c); return d;
 }
 // ---- milestones ----
@@ -475,9 +487,9 @@ const saveSlip = () => { try { localStorage.setItem(PK, JSON.stringify(slip)); }
 // game-log context for a leg (which stat and line to check each game against)
 const logCtx = (l) => {
   if (l.kind === 'TD') return { kind: 'td' };
-  if (l.kind === 'Game' || l.kind === 'Pass') return null;
+  if (l.kind === 'Game') return null;
   const num = Number((l.label.match(/[\d.]+/) || [])[0]);
-  return { kind: /rush/.test(l.label) ? 'rush' : /receptions/.test(l.label) ? 'recs' : 'rec', line: l.alt ? num - 0.5 : num, side: l.alt ? 'Over' : l.sl };
+  return { kind: /pass/.test(l.label) ? 'pass' : /rush/.test(l.label) ? 'rush' : /receptions/.test(l.label) ? 'recs' : 'rec', line: l.alt ? num - 0.5 : num, side: l.alt ? 'Over' : l.sl };
 };
 const legName = (l) => (l.kind === 'Game' ? (/^(Over|Under)/.test(l.label) ? `${l.game} ${l.label}` : l.label) : `${l.who} ${l.label}`);
 // a parlay sits at one book: price it at DraftKings and at FanDuel, keep the better payout (DraftKings on a tie)
@@ -727,7 +739,7 @@ function renderParlay() {
       nm.type = 'button'; nm.title = 'Season game log';
       nm.onclick = () => { const c = g.sides.find((x) => x.id === PS.sel[g.grp]) || g.sides.find((x) => slip.includes(x.id)) || g.sides.reduce((a, b) => (b.edge > a.edge ? b : a));
         const num = Number((c.label.match(/[\d.]+/) || [])[0]);
-        showLog(l0.pid, l0.kind === 'TD' ? { kind: 'td' } : l0.kind === 'Game' || l0.kind === 'Pass' || /pass/.test(c.label) ? null : { kind: /rush/.test(c.label) ? 'rush' : /receptions/.test(c.label) ? 'recs' : 'rec', line: l0.kind === 'Milestone' ? num - 0.5 : num, side: l0.kind === 'Milestone' ? 'Over' : c.sl }); };
+        showLog(l0.pid, l0.kind === 'TD' ? { kind: 'td' } : l0.kind === 'Game' ? null : { kind: /pass/.test(c.label) ? 'pass' : /rush/.test(c.label) ? 'rush' : /receptions/.test(c.label) ? 'recs' : 'rec', line: l0.kind === 'Milestone' ? num - 0.5 : num, side: l0.kind === 'Milestone' ? 'Over' : c.sl }); };
     }
     const mv = l0.pid && LOGS[l0.pid] && LOGS[l0.pid].move;
     w.append(nm, el('span', 's', `${kindName} · ${l0.game}${cat ? ' · ' + cat : ''}${g.flag ? ' · ' + g.flag : ''}${mv ? ` · new team (from ${mv.frm})` : ''}`));
