@@ -3,6 +3,35 @@ const D = JSON.parse(document.getElementById('nhl-data').textContent);
 const STARTS = {}; (D.games || []).forEach((g) => { if (g.start) STARTS[g.game] = g.start; });
 const started = (game) => !!STARTS[game] && Date.parse(STARTS[game]) <= Date.now();
 const LEG = Object.fromEntries(D.legs.map((l) => [l.id, l]));
+// "Line changed?" (board/site/lines.js, Thomas 2026-11-19): the user enters DraftKings' new line or price and the leg is
+// re-priced here: shots and saves from the props model's negative binomial around the player's projection, totals from the
+// game model's total-goals chances. Moneylines, puck lines (always 1.5) and alt rungs: price only.
+const P_BY = Object.fromEntries(D.players.map((p) => [p.id, p])), G_BY = Object.fromEntries(D.goalies.map((p) => [p.id, p])), GM_BY = Object.fromEntries(D.games.map((g) => [g.id, g]));
+function nbSize(k, pr) {   // the model's NB size; older pages without D.nb: fit it to the board's own numbers
+  if (D.nb && D.nb[k]) return D.nb[k];
+  if (k === 'saves' && pr.hi > pr.proj) { const sd = (pr.hi - pr.proj) / 1.28, v = sd * sd - pr.proj; return v > 0 ? pr.proj * pr.proj / v : 50; }
+  if (pr.ch && pr.ch['3+'] != null) { let best = 8, err = 9; for (let r = 0.5; r < 400; r *= 1.05) { const e = Math.abs(LineEdit.dist.nb(pr.proj, r, 2.5) - pr.ch['3+']); if (e < err) { err = e; best = r; } } return best; }
+  return 8;
+}
+function nhlModel(L, line) {
+  if (L.alt) return null;
+  if (L.kind === 'Total') { const g = GM_BY[L.gid]; if (!g) return null; const o = g.tpmf ? LineEdit.dist.pmf(g.tpmf, line) : LineEdit.dist.poisson(g.total, line); return L.side === 'Under' ? 1 - o : o; }
+  const k = L.kind === 'Shots on goal' ? 'sog' : L.kind === 'Saves' ? 'saves' : null, pl = k && (k === 'sog' ? P_BY : G_BY)[L.pid];
+  if (!pl || !pl[k]) return null;
+  const o = LineEdit.dist.nb(pl[k].proj, nbSize(k, pl[k]), line); return L.side === 'Under' ? 1 - o : o;
+}
+function patchNhl() {
+  for (const [k, src] of [['sog', D.players], ['saves', D.goalies]]) for (const p of src) {
+    const pr = p[k]; if (!pr) continue; p.edited = false;
+    for (const sd of ['over', 'under']) { const x = pr[sd], L = x && LEG[x.id]; if (!L) continue; Object.assign(x, { price: L.price, p: L.p, edge: L.edge, ev: L.ev }); pr.line = L.line; if (L.edited) p.edited = true; }
+  }
+  for (const g of D.games) { const t = g.legs.map((id) => LEG[id]).find((L) => L && L.market === 'total'); if (t) g.line_total = t.line; }
+}
+LineEdit.setup({ sport: 'nhl', stamp: [D.day, D.propsTaken].join('|'), legs: D.legs, model: nhlModel, name: (L) => L.label,
+  weight: (L) => (D.weights[L.kind] != null ? D.weights[L.kind] : 0.5),
+  sibling: (L) => D.legs.find((x) => x.id !== L.id && !x.alt && x.gid === L.gid && x.market === L.market && x.pid === L.pid) || null,
+  onChange: () => { patchNhl(); render(); } });
+patchNhl();
 const STATS = [['sog', 'Shots on goal'], ['saves', 'Goalie saves']];
 const SRC = (k) => (k === 'saves' ? D.goalies : D.players);
 const SL = Object.fromEntries(STATS);
@@ -269,6 +298,7 @@ function boardProps(k) {
       price.append(sd, el('span', 'o', fmt(best.price)), el('span', 'e ' + (best.edge > 0 ? 'pos' : 'neg'), `${pct(best.p)} · edge ${sgn(best.edge)}`));
       const L = LEG[best.id];
       if (L && L.cat === 'Value') price.append(el('span', 'pill value', 'Value'));
+      if (L) { price.append(LineEdit.btn(L)); if (p.edited) price.append(el('span', 'le-tag', '✎ your line')); }
     } else {
       price.append(el('span', 'o dim', pr.proj.toFixed(1)), el('span', 'e dim', pr.ch ? `3+ shots ${pct(pr.ch['3+'])}` : `proj saves`));
     }
@@ -298,8 +328,9 @@ function boardGames() {
       const hr = el('tr'); ['Bet', 'DK', 'Chance', 'Edge', ''].forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr);
       g.legs.map((id) => LEG[id]).forEach((L) => {
         const tr = el('tr'); if (L.cat === 'Value') tr.className = 'hl';
-        tr.append(el('td', null, `${L.kind}: ${L.label}`), el('td', 'num', fmt(L.price)), el('td', 'num', pct(L.p)), el('td', 'num ' + (L.edge > 0 ? 'pos' : 'neg'), sgn(L.edge)));
-        const td = el('td', 'num'); td.append(addBtn(L.id)); tr.append(td); t.append(tr);
+        const lab = el('td', null, `${L.kind}: ${L.label}`); { const tg = LineEdit.tag(L); if (tg) lab.append(tg); }
+        tr.append(lab, el('td', 'num', fmt(L.price)), el('td', 'num', pct(L.p)), el('td', 'num ' + (L.edge > 0 ? 'pos' : 'neg'), sgn(L.edge)));
+        const td = el('td', 'num lecell'); td.append(addBtn(L.id), LineEdit.btn(L)); tr.append(td); t.append(tr);
       });
       tw.append(t); c.append(tw);
     } else c.append(el('div', 'outs', 'DraftKings lines not posted yet.'));
@@ -422,9 +453,10 @@ function boardParlay() {
   const legs = slip.map((id) => LEG[id]).filter(Boolean);
   if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : mode === 'likely' ? 'Add legs from the list. No leg is 55%+ to hit at -200 or longer on this slate.' : 'Add legs from the list. No leg meets the value rule on this slate.'));
   const box = el('div', 'slipl'), FL = fillers(legs);
-  legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); if (FL.has(L.id)) { const m = el('small', null, L.alt ? '⚠ Alt line, added to fill the slip' : '⚠ Next-best leg, below the usual bar'); m.style.color = 'var(--gold)'; n.append(m); } const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
+  legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); if (FL.has(L.id)) { const m = el('small', null, L.alt ? '⚠ Alt line, added to fill the slip' : '⚠ Next-best leg, below the usual bar'); m.style.color = 'var(--gold)'; n.append(m); } { const t = LineEdit.tag(L); if (t) n.append(t); n.append(LineEdit.btn(L)); } const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
   if (legs.length) {
     sl.append(box);
+    { const bn = LineEdit.banner(); if (bn) sl.append(bn); }
     const pInd = legs.reduce((a, l) => a * l.p, 1), sim = simOf(legs), p = sim ? sim.p : pInd, d = legs.reduce((a, l) => a * dec(l.price), 1), ev = p * d - 1;
     const simd = sim && sim.groups.length, sgOf = Object.fromEntries(((sim && sim.groups) || []).map((x) => [x.game, x]));
     const st = el('div', 'stats pad');
@@ -442,7 +474,7 @@ function boardParlay() {
     // Share (Thomas, 2026-11-19): a compact card of the slip for a screenshot or a text (board/site/share.js)
     const shr = el('div', 'dkrow'), shb = el('button', 'lnk sugb', 'Share slip'); shb.type = 'button';
     shb.onclick = () => window.shareSlip && window.shareSlip({ title: `NHL · ${legs.length === 1 ? 'straight bet' : legs.length + '-leg parlay'}`,
-      legs: legs.map((l) => ({ label: l.label, sub: l.game, odds: fmt(l.price), tag: FL.has(l.id) ? '⚠ ' + fillTag(l) : '' })),
+      legs: legs.map((l) => ({ label: l.label, sub: l.game, odds: fmt(l.price), tag: [FL.has(l.id) ? '⚠ ' + fillTag(l) : '', LineEdit.shareTag(l)].filter(Boolean).join(' · ') })),
       odds: fmt(toAm(d)), chance: pct(p), pays: '$' + (10 * d).toFixed(2),
       warn: FL.size ? `⚠ ${fillWords(legs.filter((l) => FL.has(l.id)))} added to fill the slip` : '' });
     shr.append(shb, el('span', 'dim', 'A compact card of this slip to screenshot or send to a friend.')); sl.append(shr);

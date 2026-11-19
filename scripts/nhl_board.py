@@ -99,7 +99,8 @@ for r in slate.itertuples():
                xg_home=round(lh, 2), xg_away=round(la, 2), total=round(sum(t * p for t, p in tp.items()), 2),
                p_home=round(pr['home_win'], 3), gk_home=nh.get('goalie'), gk_away=na.get('goalie'),
                gk_home_ok=nh.get('confirmed', False), gk_away_ok=na.get('confirmed', False),
-               out_home=nh.get('outs', []), out_away=na.get('outs', []), legs=[])
+               out_home=nh.get('outs', []), out_away=na.get('outs', []), legs=[],
+               tpmf=[round(float(tp.get(k, 0.0)), 5) for k in range(max(tp) + 1)])   # total-goals chances, for the page's line editor
     ex = lambda market, side, line: dict(gid=g, market=market, side=side, line=line)
     if r.ml_home == r.ml_home and r.ml_away == r.ml_away and r.ml_home and r.ml_away:
         b = nv(r.ml_home, r.ml_away)
@@ -295,6 +296,7 @@ LIVE = json.load(open(gr)) if os.path.exists(gr) else None
 
 DATA = dict(day=str(day), dayLabel=pd.Timestamp(day).strftime('%A, %B %-d'), book=BOOK, through=games.game_date.max(),
             propsTaken=os.path.basename(pfile)[len(f'props_{day}_'):-5] if pfile else None, injuries=INJ is not None,
+            nb=dict(sog=round(float(sm.r), 4), saves=round(float(vm.r), 4)),   # negative binomial sizes, for the line editor (board/site/lines.js)
             games=G, players=players, goalies=goalies, legs=legs, pool=[l['id'] for l in pool], backtest=small, live=LIVE, weights=W)
 
 
