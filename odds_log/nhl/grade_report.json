@@ -5,58 +5,59 @@
   "2026-11-14",
   "2026-11-15",
   "2026-11-16",
-  "2026-11-17"
+  "2026-11-17",
+  "2026-11-18"
  ],
  "groups": [
   {
    "group": "Board winner picks",
-   "bets": 41,
+   "bets": 44,
    "won": 18,
-   "lost": 23,
-   "hit": 0.43902439024390244,
-   "exp_hit": 0.5705829268292681,
-   "units": -11.29,
-   "roi": -0.2754404229951868
+   "lost": 26,
+   "hit": 0.4090909090909091,
+   "exp_hit": 0.5683749999999999,
+   "units": -14.29,
+   "roi": -0.3248422123364241
   },
   {
    "group": "Value legs",
-   "bets": 16,
+   "bets": 17,
    "won": 8,
-   "lost": 8,
-   "hit": 0.5,
-   "exp_hit": 0.5962000000000001,
-   "units": -1.27,
-   "roi": -0.07952724358974363
+   "lost": 9,
+   "hit": 0.47058823529411764,
+   "exp_hit": 0.5921647058823529,
+   "units": -2.27,
+   "roi": -0.13367269984917046
   },
   {
    "group": "Prop leans with an edge (shots + saves)",
-   "bets": 149,
-   "won": 68,
-   "lost": 81,
-   "hit": 0.4563758389261745,
-   "exp_hit": 0.5456255033557047,
-   "units": -18.61,
-   "roi": -0.12490835608474968
+   "bets": 161,
+   "won": 72,
+   "lost": 89,
+   "hit": 0.4472049689440994,
+   "exp_hit": 0.5443552795031056,
+   "units": -23.4,
+   "roi": -0.14531274079383744
   },
   {
    "group": "Shots on goal leans with an edge",
-   "bets": 121,
-   "won": 55,
-   "lost": 66,
-   "hit": 0.45454545454545453,
-   "exp_hit": 0.5414652892561984,
-   "units": -14.95,
-   "roi": -0.1235513069654287
+   "bets": 130,
+   "won": 58,
+   "lost": 72,
+   "hit": 0.4461538461538462,
+   "exp_hit": 0.5399153846153846,
+   "units": -18.6,
+   "roi": -0.14310215054914083
   },
   {
    "group": "Saves leans with an edge",
-   "bets": 28,
-   "won": 13,
-   "lost": 15,
-   "hit": 0.4642857142857143,
-   "exp_hit": 0.5636035714285714,
-   "units": -3.66,
-   "roi": -0.1307727469218152
+   "bets": 31,
+   "won": 14,
+   "lost": 17,
+   "hit": 0.45161290322580644,
+   "exp_hit": 0.5629741935483871,
+   "units": -4.79,
+   "roi": -0.1545829579490168
   },
   {
    "group": "Puck line leans with an edge",
@@ -80,88 +81,88 @@
   }
  ],
  "latest_day": {
-  "day": "2026-11-17",
-  "props_won": 18,
-  "props_lost": 18,
-  "picks_won": 5,
-  "picks_lost": 6
+  "day": "2026-11-18",
+  "props_won": 4,
+  "props_lost": 8,
+  "picks_won": 0,
+  "picks_lost": 3
  },
  "calibration": [
   {
    "bucket": "0-45%",
-   "n": 506,
-   "said": 0.4042490118577075,
-   "hit": 0.4031620553359684
+   "n": 540,
+   "said": 0.404252962962963,
+   "hit": 0.4074074074074074
   },
   {
    "bucket": "45-50%",
-   "n": 396,
-   "said": 0.47378459595959593,
-   "hit": 0.5075757575757576
+   "n": 430,
+   "said": 0.4740188372093023,
+   "hit": 0.5023255813953489
   },
   {
    "bucket": "50-55%",
-   "n": 500,
-   "said": 0.5260644,
-   "hit": 0.504
+   "n": 550,
+   "said": 0.5257832727272727,
+   "hit": 0.5127272727272727
   },
   {
    "bucket": "55-60%",
-   "n": 434,
-   "said": 0.5745700460829494,
-   "hit": 0.5737327188940092
+   "n": 468,
+   "said": 0.5744309829059829,
+   "hit": 0.5662393162393162
   },
   {
    "bucket": "60-65%",
-   "n": 256,
-   "said": 0.62065703125,
-   "hit": 0.66796875
+   "n": 283,
+   "said": 0.620860070671378,
+   "hit": 0.6713780918727915
   },
   {
    "bucket": "65-70%",
-   "n": 130,
-   "said": 0.6732161538461539,
-   "hit": 0.6846153846153846
+   "n": 135,
+   "said": 0.6735437037037036,
+   "hit": 0.6888888888888889
   },
   {
    "bucket": "70-80%",
-   "n": 281,
-   "said": 0.7552530249110321,
-   "hit": 0.7935943060498221
+   "n": 308,
+   "said": 0.7554084415584416,
+   "hit": 0.7922077922077922
   },
   {
    "bucket": "80-90%",
-   "n": 287,
-   "said": 0.8479965156794426,
-   "hit": 0.8745644599303136
+   "n": 323,
+   "said": 0.8469291021671828,
+   "hit": 0.8699690402476781
   },
   {
    "bucket": "90-100%",
-   "n": 65,
-   "said": 0.9240169230769232,
-   "hit": 0.9538461538461539
+   "n": 73,
+   "said": 0.9240054794520548,
+   "hit": 0.9452054794520548
   }
  ],
  "cal_sections": [
   {
    "name": "Moneyline picks",
    "note": "The team the board gave the better chance to win, every game (overtime and shootouts count).",
-   "n": 41,
+   "n": 44,
    "won": 18,
-   "lost": 23,
-   "said": 0.5706,
-   "hit": 0.439,
-   "units": -11.29,
-   "roi": -0.2754,
+   "lost": 26,
+   "said": 0.5684,
+   "hit": 0.4091,
+   "units": -14.29,
+   "roi": -0.3248,
    "buckets": [
     {
      "label": "50\u201360%",
-     "n": 31,
+     "n": 34,
      "won": 14,
-     "lost": 17,
-     "said": 0.5453,
-     "hit": 0.4516,
-     "units": -7.17
+     "lost": 20,
+     "said": 0.5447,
+     "hit": 0.4118,
+     "units": -10.17
     },
     {
      "label": "60\u201370%",
@@ -186,13 +187,13 @@
   {
    "name": "Puck lines",
    "note": "The side the board favored on each DraftKings puck line.",
-   "n": 41,
-   "won": 25,
-   "lost": 16,
-   "said": 0.6423,
-   "hit": 0.6098,
-   "units": -3.59,
-   "roi": -0.0876,
+   "n": 44,
+   "won": 27,
+   "lost": 17,
+   "said": 0.6445,
+   "hit": 0.6136,
+   "units": -3.68,
+   "roi": -0.0837,
    "buckets": [
     {
      "label": "50\u201360%",
@@ -205,96 +206,96 @@
     },
     {
      "label": "60\u201370%",
-     "n": 33,
-     "won": 21,
+     "n": 34,
+     "won": 22,
      "lost": 12,
-     "said": 0.6567,
-     "hit": 0.6364,
-     "units": -2.32
+     "said": 0.6556,
+     "hit": 0.6471,
+     "units": -1.76
     },
     {
      "label": "70\u201380%",
-     "n": 1,
-     "won": 0,
-     "lost": 1,
-     "said": 0.7175,
-     "hit": 0.0,
-     "units": -1.0
+     "n": 3,
+     "won": 1,
+     "lost": 2,
+     "said": 0.7073,
+     "hit": 0.3333,
+     "units": -1.65
     }
    ]
   },
   {
    "name": "Totals",
    "note": "Over or Under, whichever the board favored.",
-   "n": 41,
-   "won": 20,
+   "n": 44,
+   "won": 23,
    "lost": 21,
-   "said": 0.5308,
-   "hit": 0.4878,
-   "units": -4.6,
-   "roi": -0.1122,
+   "said": 0.5312,
+   "hit": 0.5227,
+   "units": -2.31,
+   "roi": -0.0524,
    "buckets": [
     {
      "label": "50\u201360%",
-     "n": 41,
-     "won": 20,
+     "n": 44,
+     "won": 23,
      "lost": 21,
-     "said": 0.5308,
-     "hit": 0.4878,
-     "units": -4.6
+     "said": 0.5312,
+     "hit": 0.5227,
+     "units": -2.31
     }
    ]
   },
   {
    "name": "Shots on goal",
    "note": "Over or Under on the main DraftKings line, whichever the board favored.",
-   "n": 717,
-   "won": 402,
-   "lost": 315,
-   "said": 0.5644,
-   "hit": 0.5607,
-   "units": -44.11,
-   "roi": -0.0615,
+   "n": 770,
+   "won": 431,
+   "lost": 339,
+   "said": 0.564,
+   "hit": 0.5597,
+   "units": -48.06,
+   "roi": -0.0624,
    "buckets": [
     {
      "label": "50\u201360%",
-     "n": 564,
-     "won": 304,
-     "lost": 260,
-     "said": 0.5488,
-     "hit": 0.539,
-     "units": -44.88
+     "n": 606,
+     "won": 325,
+     "lost": 281,
+     "said": 0.5482,
+     "hit": 0.5363,
+     "units": -50.4
     },
     {
      "label": "60\u201370%",
-     "n": 153,
-     "won": 98,
-     "lost": 55,
-     "said": 0.6223,
-     "hit": 0.6405,
-     "units": 0.77
+     "n": 164,
+     "won": 106,
+     "lost": 58,
+     "said": 0.622,
+     "hit": 0.6463,
+     "units": 2.34
     }
    ]
   },
   {
    "name": "Saves",
    "note": "Over or Under on the main DraftKings line, whichever the board favored.",
-   "n": 62,
-   "won": 32,
-   "lost": 30,
+   "n": 68,
+   "won": 35,
+   "lost": 33,
    "said": 0.5425,
-   "hit": 0.5161,
-   "units": -3.33,
-   "roi": -0.0537,
+   "hit": 0.5147,
+   "units": -3.82,
+   "roi": -0.0562,
    "buckets": [
     {
      "label": "50\u201360%",
-     "n": 59,
-     "won": 32,
-     "lost": 27,
-     "said": 0.5384,
-     "hit": 0.5424,
-     "units": -0.33
+     "n": 65,
+     "won": 35,
+     "lost": 30,
+     "said": 0.5388,
+     "hit": 0.5385,
+     "units": -0.82
     },
     {
      "label": "60\u201370%",
@@ -310,58 +311,58 @@
   {
    "name": "Alt lines",
    "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
-   "n": 1051,
-   "won": 800,
-   "lost": 251,
-   "said": 0.7275,
-   "hit": 0.7612,
-   "units": -21.44,
-   "roi": -0.0204,
+   "n": 1170,
+   "won": 890,
+   "lost": 280,
+   "said": 0.7269,
+   "hit": 0.7607,
+   "units": -23.1,
+   "roi": -0.0197,
    "buckets": [
     {
      "label": "50\u201360%",
-     "n": 232,
-     "won": 127,
-     "lost": 105,
-     "said": 0.5539,
-     "hit": 0.5474,
-     "units": -20.6
+     "n": 262,
+     "won": 146,
+     "lost": 116,
+     "said": 0.5531,
+     "hit": 0.5573,
+     "units": -18.74
     },
     {
      "label": "60\u201370%",
-     "n": 188,
-     "won": 137,
-     "lost": 51,
-     "said": 0.6485,
-     "hit": 0.7287,
-     "units": 7.61
+     "n": 208,
+     "won": 151,
+     "lost": 57,
+     "said": 0.6477,
+     "hit": 0.726,
+     "units": 7.78
     },
     {
      "label": "70\u201380%",
-     "n": 279,
-     "won": 223,
-     "lost": 56,
-     "said": 0.7554,
+     "n": 304,
+     "won": 243,
+     "lost": 61,
+     "said": 0.7559,
      "hit": 0.7993,
-     "units": -2.75
+     "units": -3.5
     },
     {
      "label": "80\u201390%",
-     "n": 287,
-     "won": 251,
-     "lost": 36,
-     "said": 0.848,
-     "hit": 0.8746,
-     "units": -4.98
+     "n": 323,
+     "won": 281,
+     "lost": 42,
+     "said": 0.8469,
+     "hit": 0.87,
+     "units": -7.16
     },
     {
      "label": "90\u2013100%",
-     "n": 65,
-     "won": 62,
-     "lost": 3,
+     "n": 73,
+     "won": 69,
+     "lost": 4,
      "said": 0.924,
-     "hit": 0.9538,
-     "units": -0.72
+     "hit": 0.9452,
+     "units": -1.47
     }
    ]
   }
@@ -379,33 +380,33 @@
   "groups": [
    {
     "group": "Best value: \u2605 suggestion",
-    "bets": 6,
+    "bets": 7,
     "won": 2,
-    "lost": 4,
-    "hit": 0.3333333333333333,
-    "exp_hit": 0.36200378833333335,
-    "units": 0.43,
-    "roi": 0.07222985347985349
+    "lost": 5,
+    "hit": 0.2857142857142857,
+    "exp_hit": 0.35255725857142856,
+    "units": -0.57,
+    "roi": -0.0809458398744113
    },
    {
     "group": "Best value: straight (all suggestions)",
-    "bets": 29,
+    "bets": 31,
     "won": 13,
-    "lost": 16,
-    "hit": 0.4482758620689655,
-    "exp_hit": 0.5912862068965518,
-    "units": -5.49,
-    "roi": -0.1892432280363315
+    "lost": 18,
+    "hit": 0.41935483870967744,
+    "exp_hit": 0.5882483870967742,
+    "units": -7.49,
+    "roi": -0.24155011655011657
    },
    {
     "group": "Best value: 2-leg (all suggestions)",
-    "bets": 25,
+    "bets": 26,
     "won": 7,
-    "lost": 18,
-    "hit": 0.28,
-    "exp_hit": 0.35493161440000004,
-    "units": -4.31,
-    "roi": -0.1723819420526191
+    "lost": 19,
+    "hit": 0.2692307692307692,
+    "exp_hit": 0.3526603246153846,
+    "units": -5.31,
+    "roi": -0.20421340581982608
    },
    {
     "group": "Best value: 3-leg (all suggestions)",
@@ -449,43 +450,43 @@
    },
    {
     "group": "Most likely to hit: \u2605 suggestion",
-    "bets": 6,
-    "won": 3,
+    "bets": 7,
+    "won": 4,
     "lost": 3,
-    "hit": 0.5,
-    "exp_hit": 0.5285526334853626,
-    "units": -1.34,
-    "roi": -0.22393895091263513
+    "hit": 0.5714285714285714,
+    "exp_hit": 0.5453308287017393,
+    "units": -0.77,
+    "roi": -0.11031501914960562
    },
    {
     "group": "Most likely to hit: straight (all suggestions)",
-    "bets": 29,
-    "won": 14,
-    "lost": 15,
-    "hit": 0.4827586206896552,
-    "exp_hit": 0.6475655172413792,
-    "units": -6.94,
-    "roi": -0.23920000553394385
+    "bets": 35,
+    "won": 18,
+    "lost": 17,
+    "hit": 0.5142857142857142,
+    "exp_hit": 0.64476,
+    "units": -6.57,
+    "roi": -0.18785231567186456
    },
    {
     "group": "Most likely to hit: 2-leg (all suggestions)",
-    "bets": 26,
-    "won": 10,
-    "lost": 16,
-    "hit": 0.38461538461538464,
-    "exp_hit": 0.39040526461538455,
-    "units": 0.32,
-    "roi": 0.012122159681064951
+    "bets": 32,
+    "won": 13,
+    "lost": 19,
+    "hit": 0.40625,
+    "exp_hit": 0.38707944906249997,
+    "units": 1.76,
+    "roi": 0.0549979026009102
    },
    {
     "group": "Most likely to hit: 3-leg (all suggestions)",
-    "bets": 25,
-    "won": 10,
-    "lost": 15,
-    "hit": 0.4,
-    "exp_hit": 0.28771888138152,
-    "units": 12.14,
-    "roi": 0.4855094735604743
+    "bets": 31,
+    "won": 11,
+    "lost": 20,
+    "hit": 0.3548387096774194,
+    "exp_hit": 0.27250485264174196,
+    "units": 10.64,
+    "roi": 0.34317648301770354
    },
    {
     "group": "Most likely to hit: 4-leg (all suggestions)",
@@ -533,6 +534,10 @@
   "menu": {
    "day": [
     {
+     "key": "d:2026-11-18",
+     "label": "Wed Nov 18"
+    },
+    {
      "key": "d:2026-11-17",
      "label": "Tue Nov 17"
     },
@@ -575,6 +580,335 @@
    ]
   },
   "reports": {
+   "d:2026-11-18": {
+    "days": [
+     "2026-11-18"
+    ],
+    "groups": [
+     {
+      "group": "Board winner picks",
+      "bets": 3,
+      "won": 0,
+      "lost": 3,
+      "hit": 0.0,
+      "exp_hit": 0.5382,
+      "units": -3.0,
+      "roi": -1.0
+     },
+     {
+      "group": "Value legs",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "exp_hit": 0.5276,
+      "units": -1.0,
+      "roi": -1.0
+     },
+     {
+      "group": "Prop leans with an edge (shots + saves)",
+      "bets": 12,
+      "won": 4,
+      "lost": 8,
+      "hit": 0.3333333333333333,
+      "exp_hit": 0.5285833333333333,
+      "units": -4.78,
+      "roi": -0.3986671842650103
+     },
+     {
+      "group": "Shots on goal leans with an edge",
+      "bets": 9,
+      "won": 3,
+      "lost": 6,
+      "hit": 0.3333333333333333,
+      "exp_hit": 0.5190777777777777,
+      "units": -3.65,
+      "roi": -0.40595238095238095
+     },
+     {
+      "group": "Saves leans with an edge",
+      "bets": 3,
+      "won": 1,
+      "lost": 2,
+      "hit": 0.3333333333333333,
+      "exp_hit": 0.5571,
+      "units": -1.13,
+      "roi": -0.3768115942028986
+     }
+    ],
+    "latest_day": {
+     "day": "2026-11-18",
+     "props_won": 4,
+     "props_lost": 8,
+     "picks_won": 0,
+     "picks_lost": 3
+    },
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game (overtime and shootouts count).",
+      "n": 3,
+      "won": 0,
+      "lost": 3,
+      "said": 0.5382,
+      "hit": 0.0,
+      "units": -3.0,
+      "roi": -1.0,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 3,
+        "won": 0,
+        "lost": 3,
+        "said": 0.5382,
+        "hit": 0.0,
+        "units": -3.0
+       }
+      ]
+     },
+     {
+      "name": "Puck lines",
+      "note": "The side the board favored on each DraftKings puck line.",
+      "n": 3,
+      "won": 2,
+      "lost": 1,
+      "said": 0.6743,
+      "hit": 0.6667,
+      "units": -0.09,
+      "roi": -0.0312,
+      "buckets": [
+       {
+        "label": "60\u201370%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.6186,
+        "hit": 1.0,
+        "units": 0.56
+       },
+       {
+        "label": "70\u201380%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.7022,
+        "hit": 0.5,
+        "units": -0.65
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever the board favored.",
+      "n": 3,
+      "won": 3,
+      "lost": 0,
+      "said": 0.5363,
+      "hit": 1.0,
+      "units": 2.29,
+      "roi": 0.7641,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 3,
+        "won": 3,
+        "lost": 0,
+        "said": 0.5363,
+        "hit": 1.0,
+        "units": 2.29
+       }
+      ]
+     },
+     {
+      "name": "Shots on goal",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 53,
+      "won": 29,
+      "lost": 24,
+      "said": 0.5574,
+      "hit": 0.5472,
+      "units": -3.95,
+      "roi": -0.0745,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 42,
+        "won": 21,
+        "lost": 21,
+        "said": 0.5413,
+        "hit": 0.5,
+        "units": -5.52
+       },
+       {
+        "label": "60\u201370%",
+        "n": 11,
+        "won": 8,
+        "lost": 3,
+        "said": 0.6187,
+        "hit": 0.7273,
+        "units": 1.57
+       }
+      ]
+     },
+     {
+      "name": "Saves",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 6,
+      "won": 3,
+      "lost": 3,
+      "said": 0.5427,
+      "hit": 0.5,
+      "units": -0.49,
+      "roi": -0.0819,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 6,
+        "won": 3,
+        "lost": 3,
+        "said": 0.5427,
+        "hit": 0.5,
+        "units": -0.49
+       }
+      ]
+     },
+     {
+      "name": "Alt lines",
+      "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
+      "n": 119,
+      "won": 90,
+      "lost": 29,
+      "said": 0.7211,
+      "hit": 0.7563,
+      "units": -1.66,
+      "roi": -0.0139,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 30,
+        "won": 19,
+        "lost": 11,
+        "said": 0.5468,
+        "hit": 0.6333,
+        "units": 1.85
+       },
+       {
+        "label": "60\u201370%",
+        "n": 20,
+        "won": 14,
+        "lost": 6,
+        "said": 0.6401,
+        "hit": 0.7,
+        "units": 0.17
+       },
+       {
+        "label": "70\u201380%",
+        "n": 25,
+        "won": 20,
+        "lost": 5,
+        "said": 0.7614,
+        "hit": 0.8,
+        "units": -0.75
+       },
+       {
+        "label": "80\u201390%",
+        "n": 36,
+        "won": 30,
+        "lost": 6,
+        "said": 0.8384,
+        "hit": 0.8333,
+        "units": -2.19
+       },
+       {
+        "label": "90\u2013100%",
+        "n": 8,
+        "won": 7,
+        "lost": 1,
+        "said": 0.9239,
+        "hit": 0.875,
+        "units": -0.75
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-18"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.29587807999999993,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 2,
+       "won": 0,
+       "lost": 2,
+       "hit": 0.0,
+       "exp_hit": 0.5442,
+       "units": -2.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.29587807999999993,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: \u2605 suggestion",
+       "bets": 1,
+       "won": 1,
+       "lost": 0,
+       "hit": 1.0,
+       "exp_hit": 0.646,
+       "units": 0.57,
+       "roi": 0.5714285714285714
+      },
+      {
+       "group": "Most likely to hit: straight (all suggestions)",
+       "bets": 6,
+       "won": 4,
+       "lost": 2,
+       "hit": 0.6666666666666666,
+       "exp_hit": 0.6312,
+       "units": 0.36,
+       "roi": 0.060328185328185326
+      },
+      {
+       "group": "Most likely to hit: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 3,
+       "lost": 3,
+       "hit": 0.5,
+       "exp_hit": 0.3726675816666667,
+       "units": 1.44,
+       "roi": 0.24079278858690625
+      },
+      {
+       "group": "Most likely to hit: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.209113066226,
+       "units": -1.5,
+       "roi": -0.24987764424384137
+      }
+     ]
+    }
+   },
    "d:2026-11-17": {
     "days": [
      "2026-11-17"
@@ -2663,87 +2997,88 @@
    "w:2026-11-16": {
     "days": [
      "2026-11-16",
-     "2026-11-17"
+     "2026-11-17",
+     "2026-11-18"
     ],
     "groups": [
      {
       "group": "Board winner picks",
-      "bets": 11,
+      "bets": 14,
       "won": 5,
-      "lost": 6,
-      "hit": 0.45454545454545453,
-      "exp_hit": 0.5531909090909091,
-      "units": -2.64,
-      "roi": -0.2403817200565168
+      "lost": 9,
+      "hit": 0.35714285714285715,
+      "exp_hit": 0.5499785714285713,
+      "units": -5.64,
+      "roi": -0.40315706575869176
      },
      {
       "group": "Value legs",
-      "bets": 7,
+      "bets": 8,
       "won": 3,
-      "lost": 4,
-      "hit": 0.42857142857142855,
-      "exp_hit": 0.5733857142857143,
-      "units": -1.13,
-      "roi": -0.16190476190476197
+      "lost": 5,
+      "hit": 0.375,
+      "exp_hit": 0.5676625,
+      "units": -2.13,
+      "roi": -0.2666666666666667
      },
      {
       "group": "Prop leans with an edge (shots + saves)",
-      "bets": 40,
-      "won": 19,
-      "lost": 21,
-      "hit": 0.475,
-      "exp_hit": 0.5372025,
-      "units": -2.95,
-      "roi": -0.07378036364074596
+      "bets": 52,
+      "won": 23,
+      "lost": 29,
+      "hit": 0.4423076923076923,
+      "exp_hit": 0.5352134615384615,
+      "units": -7.74,
+      "roi": -0.1487542453232685
      },
      {
       "group": "Shots on goal leans with an edge",
-      "bets": 28,
-      "won": 14,
-      "lost": 14,
-      "hit": 0.5,
-      "exp_hit": 0.5275928571428572,
-      "units": -0.4,
-      "roi": -0.0142285961719995
+      "bets": 37,
+      "won": 17,
+      "lost": 20,
+      "hit": 0.4594594594594595,
+      "exp_hit": 0.5255216216216215,
+      "units": -4.05,
+      "roi": -0.1095127600374977
      },
      {
       "group": "Saves leans with an edge",
-      "bets": 12,
-      "won": 5,
-      "lost": 7,
-      "hit": 0.4166666666666667,
-      "exp_hit": 0.5596249999999999,
-      "units": -2.55,
-      "roi": -0.21273448773448775
+      "bets": 15,
+      "won": 6,
+      "lost": 9,
+      "hit": 0.4,
+      "exp_hit": 0.55912,
+      "units": -3.68,
+      "roi": -0.24554990902816992
      }
     ],
     "latest_day": {
-     "day": "2026-11-17",
-     "props_won": 18,
-     "props_lost": 18,
-     "picks_won": 5,
-     "picks_lost": 6
+     "day": "2026-11-18",
+     "props_won": 4,
+     "props_lost": 8,
+     "picks_won": 0,
+     "picks_lost": 3
     },
     "cal_sections": [
      {
       "name": "Moneyline picks",
       "note": "The team the board gave the better chance to win, every game (overtime and shootouts count).",
-      "n": 11,
+      "n": 14,
       "won": 5,
-      "lost": 6,
-      "said": 0.5532,
-      "hit": 0.4545,
-      "units": -2.64,
-      "roi": -0.2404,
+      "lost": 9,
+      "said": 0.55,
+      "hit": 0.3571,
+      "units": -5.64,
+      "roi": -0.4032,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 9,
+        "n": 12,
         "won": 3,
-        "lost": 6,
+        "lost": 9,
         "said": 0.5381,
-        "hit": 0.3333,
-        "units": -3.75
+        "hit": 0.25,
+        "units": -6.75
        },
        {
         "label": "60\u201370%",
@@ -2759,13 +3094,13 @@
      {
       "name": "Puck lines",
       "note": "The side the board favored on each DraftKings puck line.",
-      "n": 11,
-      "won": 7,
-      "lost": 4,
-      "said": 0.6544,
-      "hit": 0.6364,
-      "units": -0.91,
-      "roi": -0.0827,
+      "n": 14,
+      "won": 9,
+      "lost": 5,
+      "said": 0.6586,
+      "hit": 0.6429,
+      "units": -1.0,
+      "roi": -0.0716,
       "buckets": [
        {
         "label": "50\u201360%",
@@ -2778,87 +3113,96 @@
        },
        {
         "label": "60\u201370%",
-        "n": 10,
-        "won": 7,
+        "n": 11,
+        "won": 8,
         "lost": 3,
-        "said": 0.6627,
-        "hit": 0.7,
-        "units": 0.09
+        "said": 0.6587,
+        "hit": 0.7273,
+        "units": 0.65
+       },
+       {
+        "label": "70\u201380%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.7022,
+        "hit": 0.5,
+        "units": -0.65
        }
       ]
      },
      {
       "name": "Totals",
       "note": "Over or Under, whichever the board favored.",
-      "n": 11,
-      "won": 4,
+      "n": 14,
+      "won": 7,
       "lost": 7,
-      "said": 0.5334,
-      "hit": 0.3636,
-      "units": -3.67,
-      "roi": -0.3333,
+      "said": 0.5341,
+      "hit": 0.5,
+      "units": -1.37,
+      "roi": -0.0981,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 11,
-        "won": 4,
+        "n": 14,
+        "won": 7,
         "lost": 7,
-        "said": 0.5334,
-        "hit": 0.3636,
-        "units": -3.67
+        "said": 0.5341,
+        "hit": 0.5,
+        "units": -1.37
        }
       ]
      },
      {
       "name": "Shots on goal",
       "note": "Over or Under on the main DraftKings line, whichever the board favored.",
-      "n": 223,
-      "won": 119,
-      "lost": 104,
-      "said": 0.5649,
-      "hit": 0.5336,
-      "units": -24.39,
-      "roi": -0.1094,
+      "n": 276,
+      "won": 148,
+      "lost": 128,
+      "said": 0.5635,
+      "hit": 0.5362,
+      "units": -28.34,
+      "roi": -0.1027,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 176,
-        "won": 86,
-        "lost": 90,
-        "said": 0.5491,
-        "hit": 0.4886,
-        "units": -28.8
+        "n": 218,
+        "won": 107,
+        "lost": 111,
+        "said": 0.5476,
+        "hit": 0.4908,
+        "units": -34.32
        },
        {
         "label": "60\u201370%",
-        "n": 47,
-        "won": 33,
-        "lost": 14,
-        "said": 0.6241,
-        "hit": 0.7021,
-        "units": 4.41
+        "n": 58,
+        "won": 41,
+        "lost": 17,
+        "said": 0.6231,
+        "hit": 0.7069,
+        "units": 5.98
        }
       ]
      },
      {
       "name": "Saves",
       "note": "Over or Under on the main DraftKings line, whichever the board favored.",
-      "n": 22,
-      "won": 9,
-      "lost": 13,
-      "said": 0.5474,
-      "hit": 0.4091,
-      "units": -5.44,
-      "roi": -0.2472,
+      "n": 28,
+      "won": 12,
+      "lost": 16,
+      "said": 0.5464,
+      "hit": 0.4286,
+      "units": -5.93,
+      "roi": -0.2118,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 21,
-        "won": 9,
-        "lost": 12,
-        "said": 0.5439,
-        "hit": 0.4286,
-        "units": -4.44
+        "n": 27,
+        "won": 12,
+        "lost": 15,
+        "said": 0.5436,
+        "hit": 0.4444,
+        "units": -4.93
        },
        {
         "label": "60\u201370%",
@@ -2874,58 +3218,58 @@
      {
       "name": "Alt lines",
       "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
-      "n": 453,
-      "won": 334,
-      "lost": 119,
-      "said": 0.7275,
-      "hit": 0.7373,
-      "units": -26.07,
-      "roi": -0.0575,
+      "n": 572,
+      "won": 424,
+      "lost": 148,
+      "said": 0.7262,
+      "hit": 0.7413,
+      "units": -27.72,
+      "roi": -0.0485,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 98,
-        "won": 46,
-        "lost": 52,
-        "said": 0.5516,
-        "hit": 0.4694,
-        "units": -21.8
+        "n": 128,
+        "won": 65,
+        "lost": 63,
+        "said": 0.5505,
+        "hit": 0.5078,
+        "units": -19.95
        },
        {
         "label": "60\u201370%",
-        "n": 82,
-        "won": 61,
-        "lost": 21,
-        "said": 0.6481,
-        "hit": 0.7439,
-        "units": 4.82
+        "n": 102,
+        "won": 75,
+        "lost": 27,
+        "said": 0.6465,
+        "hit": 0.7353,
+        "units": 4.99
        },
        {
         "label": "70\u201380%",
-        "n": 123,
-        "won": 99,
-        "lost": 24,
-        "said": 0.7571,
-        "hit": 0.8049,
-        "units": -0.66
+        "n": 148,
+        "won": 119,
+        "lost": 29,
+        "said": 0.7578,
+        "hit": 0.8041,
+        "units": -1.41
        },
        {
         "label": "80\u201390%",
-        "n": 122,
-        "won": 102,
-        "lost": 20,
-        "said": 0.8476,
-        "hit": 0.8361,
-        "units": -7.4
+        "n": 158,
+        "won": 132,
+        "lost": 26,
+        "said": 0.8455,
+        "hit": 0.8354,
+        "units": -9.59
        },
        {
         "label": "90\u2013100%",
-        "n": 28,
-        "won": 26,
-        "lost": 2,
-        "said": 0.923,
-        "hit": 0.9286,
-        "units": -1.03
+        "n": 36,
+        "won": 33,
+        "lost": 3,
+        "said": 0.9232,
+        "hit": 0.9167,
+        "units": -1.78
        }
       ]
      }
@@ -2933,38 +3277,39 @@
     "parlays": {
      "days": [
       "2026-11-16",
-      "2026-11-17"
+      "2026-11-17",
+      "2026-11-18"
      ],
      "groups": [
       {
        "group": "Best value: \u2605 suggestion",
-       "bets": 2,
+       "bets": 3,
        "won": 0,
-       "lost": 2,
+       "lost": 3,
        "hit": 0.0,
-       "exp_hit": 0.374958345,
-       "units": -2.0,
+       "exp_hit": 0.3485982566666666,
+       "units": -3.0,
        "roi": -1.0
       },
       {
        "group": "Best value: straight (all suggestions)",
-       "bets": 8,
+       "bets": 10,
        "won": 3,
-       "lost": 5,
-       "hit": 0.375,
-       "exp_hit": 0.56975,
-       "units": -2.13,
-       "roi": -0.2666666666666667
+       "lost": 7,
+       "hit": 0.3,
+       "exp_hit": 0.56464,
+       "units": -4.13,
+       "roi": -0.4133333333333334
       },
       {
        "group": "Best value: 2-leg (all suggestions)",
-       "bets": 7,
+       "bets": 8,
        "won": 1,
-       "lost": 6,
-       "hit": 0.14285714285714285,
-       "exp_hit": 0.3258963442857143,
-       "units": -4.1,
-       "roi": -0.5855379188712523
+       "lost": 7,
+       "hit": 0.125,
+       "exp_hit": 0.32214406125,
+       "units": -5.1,
+       "roi": -0.6373456790123457
       },
       {
        "group": "Best value: 3-leg (all suggestions)",
@@ -2978,43 +3323,43 @@
       },
       {
        "group": "Most likely to hit: \u2605 suggestion",
-       "bets": 2,
-       "won": 1,
+       "bets": 3,
+       "won": 2,
        "lost": 1,
-       "hit": 0.5,
-       "exp_hit": 0.6633,
-       "units": -0.49,
-       "roi": -0.2474747474747474
+       "hit": 0.6666666666666666,
+       "exp_hit": 0.6575333333333333,
+       "units": 0.08,
+       "roi": 0.02549302549302553
       },
       {
        "group": "Most likely to hit: straight (all suggestions)",
-       "bets": 7,
-       "won": 6,
-       "lost": 1,
-       "hit": 0.8571428571428571,
-       "exp_hit": 0.6536571428571428,
-       "units": 2.28,
-       "roi": 0.3255877203245624
+       "bets": 13,
+       "won": 10,
+       "lost": 3,
+       "hit": 0.7692307692307693,
+       "exp_hit": 0.6432923076923077,
+       "units": 2.64,
+       "roi": 0.20316024263392685
       },
       {
        "group": "Most likely to hit: 2-leg (all suggestions)",
-       "bets": 6,
-       "won": 4,
-       "lost": 2,
-       "hit": 0.6666666666666666,
-       "exp_hit": 0.40412567166666663,
-       "units": 3.73,
-       "roi": 0.6219929004407562
+       "bets": 12,
+       "won": 7,
+       "lost": 5,
+       "hit": 0.5833333333333334,
+       "exp_hit": 0.3883966266666667,
+       "units": 5.18,
+       "roi": 0.43139284451383125
       },
       {
        "group": "Most likely to hit: 3-leg (all suggestions)",
-       "bets": 9,
-       "won": 4,
-       "lost": 5,
-       "hit": 0.4444444444444444,
-       "exp_hit": 0.31732885329166666,
-       "units": 5.78,
-       "roi": 0.6419392178407775
+       "bets": 15,
+       "won": 5,
+       "lost": 10,
+       "hit": 0.3333333333333333,
+       "exp_hit": 0.2740425384654,
+       "units": 4.28,
+       "roi": 0.2852124730069299
       }
      ]
     }
@@ -3497,58 +3842,59 @@
      "2026-11-14",
      "2026-11-15",
      "2026-11-16",
-     "2026-11-17"
+     "2026-11-17",
+     "2026-11-18"
     ],
     "groups": [
      {
       "group": "Board winner picks",
-      "bets": 41,
+      "bets": 44,
       "won": 18,
-      "lost": 23,
-      "hit": 0.43902439024390244,
-      "exp_hit": 0.5705829268292681,
-      "units": -11.29,
-      "roi": -0.2754404229951868
+      "lost": 26,
+      "hit": 0.4090909090909091,
+      "exp_hit": 0.5683749999999999,
+      "units": -14.29,
+      "roi": -0.3248422123364241
      },
      {
       "group": "Value legs",
-      "bets": 16,
+      "bets": 17,
       "won": 8,
-      "lost": 8,
-      "hit": 0.5,
-      "exp_hit": 0.5962000000000001,
-      "units": -1.27,
-      "roi": -0.07952724358974363
+      "lost": 9,
+      "hit": 0.47058823529411764,
+      "exp_hit": 0.5921647058823529,
+      "units": -2.27,
+      "roi": -0.13367269984917046
      },
      {
       "group": "Prop leans with an edge (shots + saves)",
-      "bets": 149,
-      "won": 68,
-      "lost": 81,
-      "hit": 0.4563758389261745,
-      "exp_hit": 0.5456255033557047,
-      "units": -18.61,
-      "roi": -0.12490835608474968
+      "bets": 161,
+      "won": 72,
+      "lost": 89,
+      "hit": 0.4472049689440994,
+      "exp_hit": 0.5443552795031056,
+      "units": -23.4,
+      "roi": -0.14531274079383744
      },
      {
       "group": "Shots on goal leans with an edge",
-      "bets": 121,
-      "won": 55,
-      "lost": 66,
-      "hit": 0.45454545454545453,
-      "exp_hit": 0.5414652892561984,
-      "units": -14.95,
-      "roi": -0.1235513069654287
+      "bets": 130,
+      "won": 58,
+      "lost": 72,
+      "hit": 0.4461538461538462,
+      "exp_hit": 0.5399153846153846,
+      "units": -18.6,
+      "roi": -0.14310215054914083
      },
      {
       "group": "Saves leans with an edge",
-      "bets": 28,
-      "won": 13,
-      "lost": 15,
-      "hit": 0.4642857142857143,
-      "exp_hit": 0.5636035714285714,
-      "units": -3.66,
-      "roi": -0.1307727469218152
+      "bets": 31,
+      "won": 14,
+      "lost": 17,
+      "hit": 0.45161290322580644,
+      "exp_hit": 0.5629741935483871,
+      "units": -4.79,
+      "roi": -0.1545829579490168
      },
      {
       "group": "Puck line leans with an edge",
@@ -3572,32 +3918,32 @@
      }
     ],
     "latest_day": {
-     "day": "2026-11-17",
-     "props_won": 18,
-     "props_lost": 18,
-     "picks_won": 5,
-     "picks_lost": 6
+     "day": "2026-11-18",
+     "props_won": 4,
+     "props_lost": 8,
+     "picks_won": 0,
+     "picks_lost": 3
     },
     "cal_sections": [
      {
       "name": "Moneyline picks",
       "note": "The team the board gave the better chance to win, every game (overtime and shootouts count).",
-      "n": 41,
+      "n": 44,
       "won": 18,
-      "lost": 23,
-      "said": 0.5706,
-      "hit": 0.439,
-      "units": -11.29,
-      "roi": -0.2754,
+      "lost": 26,
+      "said": 0.5684,
+      "hit": 0.4091,
+      "units": -14.29,
+      "roi": -0.3248,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 31,
+        "n": 34,
         "won": 14,
-        "lost": 17,
-        "said": 0.5453,
-        "hit": 0.4516,
-        "units": -7.17
+        "lost": 20,
+        "said": 0.5447,
+        "hit": 0.4118,
+        "units": -10.17
        },
        {
         "label": "60\u201370%",
@@ -3622,13 +3968,13 @@
      {
       "name": "Puck lines",
       "note": "The side the board favored on each DraftKings puck line.",
-      "n": 41,
-      "won": 25,
-      "lost": 16,
-      "said": 0.6423,
-      "hit": 0.6098,
-      "units": -3.59,
-      "roi": -0.0876,
+      "n": 44,
+      "won": 27,
+      "lost": 17,
+      "said": 0.6445,
+      "hit": 0.6136,
+      "units": -3.68,
+      "roi": -0.0837,
       "buckets": [
        {
         "label": "50\u201360%",
@@ -3641,96 +3987,96 @@
        },
        {
         "label": "60\u201370%",
-        "n": 33,
-        "won": 21,
+        "n": 34,
+        "won": 22,
         "lost": 12,
-        "said": 0.6567,
-        "hit": 0.6364,
-        "units": -2.32
+        "said": 0.6556,
+        "hit": 0.6471,
+        "units": -1.76
        },
        {
         "label": "70\u201380%",
-        "n": 1,
-        "won": 0,
-        "lost": 1,
-        "said": 0.7175,
-        "hit": 0.0,
-        "units": -1.0
+        "n": 3,
+        "won": 1,
+        "lost": 2,
+        "said": 0.7073,
+        "hit": 0.3333,
+        "units": -1.65
        }
       ]
      },
      {
       "name": "Totals",
       "note": "Over or Under, whichever the board favored.",
-      "n": 41,
-      "won": 20,
+      "n": 44,
+      "won": 23,
       "lost": 21,
-      "said": 0.5308,
-      "hit": 0.4878,
-      "units": -4.6,
-      "roi": -0.1122,
+      "said": 0.5312,
+      "hit": 0.5227,
+      "units": -2.31,
+      "roi": -0.0524,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 41,
-        "won": 20,
+        "n": 44,
+        "won": 23,
         "lost": 21,
-        "said": 0.5308,
-        "hit": 0.4878,
-        "units": -4.6
+        "said": 0.5312,
+        "hit": 0.5227,
+        "units": -2.31
        }
       ]
      },
      {
       "name": "Shots on goal",
       "note": "Over or Under on the main DraftKings line, whichever the board favored.",
-      "n": 717,
-      "won": 402,
-      "lost": 315,
-      "said": 0.5644,
-      "hit": 0.5607,
-      "units": -44.11,
-      "roi": -0.0615,
+      "n": 770,
+      "won": 431,
+      "lost": 339,
+      "said": 0.564,
+      "hit": 0.5597,
+      "units": -48.06,
+      "roi": -0.0624,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 564,
-        "won": 304,
-        "lost": 260,
-        "said": 0.5488,
-        "hit": 0.539,
-        "units": -44.88
+        "n": 606,
+        "won": 325,
+        "lost": 281,
+        "said": 0.5482,
+        "hit": 0.5363,
+        "units": -50.4
        },
        {
         "label": "60\u201370%",
-        "n": 153,
-        "won": 98,
-        "lost": 55,
-        "said": 0.6223,
-        "hit": 0.6405,
-        "units": 0.77
+        "n": 164,
+        "won": 106,
+        "lost": 58,
+        "said": 0.622,
+        "hit": 0.6463,
+        "units": 2.34
        }
       ]
      },
      {
       "name": "Saves",
       "note": "Over or Under on the main DraftKings line, whichever the board favored.",
-      "n": 62,
-      "won": 32,
-      "lost": 30,
+      "n": 68,
+      "won": 35,
+      "lost": 33,
       "said": 0.5425,
-      "hit": 0.5161,
-      "units": -3.33,
-      "roi": -0.0537,
+      "hit": 0.5147,
+      "units": -3.82,
+      "roi": -0.0562,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 59,
-        "won": 32,
-        "lost": 27,
-        "said": 0.5384,
-        "hit": 0.5424,
-        "units": -0.33
+        "n": 65,
+        "won": 35,
+        "lost": 30,
+        "said": 0.5388,
+        "hit": 0.5385,
+        "units": -0.82
        },
        {
         "label": "60\u201370%",
@@ -3746,58 +4092,58 @@
      {
       "name": "Alt lines",
       "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
-      "n": 1051,
-      "won": 800,
-      "lost": 251,
-      "said": 0.7275,
-      "hit": 0.7612,
-      "units": -21.44,
-      "roi": -0.0204,
+      "n": 1170,
+      "won": 890,
+      "lost": 280,
+      "said": 0.7269,
+      "hit": 0.7607,
+      "units": -23.1,
+      "roi": -0.0197,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 232,
-        "won": 127,
-        "lost": 105,
-        "said": 0.5539,
-        "hit": 0.5474,
-        "units": -20.6
+        "n": 262,
+        "won": 146,
+        "lost": 116,
+        "said": 0.5531,
+        "hit": 0.5573,
+        "units": -18.74
        },
        {
         "label": "60\u201370%",
-        "n": 188,
-        "won": 137,
-        "lost": 51,
-        "said": 0.6485,
-        "hit": 0.7287,
-        "units": 7.61
+        "n": 208,
+        "won": 151,
+        "lost": 57,
+        "said": 0.6477,
+        "hit": 0.726,
+        "units": 7.78
        },
        {
         "label": "70\u201380%",
-        "n": 279,
-        "won": 223,
-        "lost": 56,
-        "said": 0.7554,
+        "n": 304,
+        "won": 243,
+        "lost": 61,
+        "said": 0.7559,
         "hit": 0.7993,
-        "units": -2.75
+        "units": -3.5
        },
        {
         "label": "80\u201390%",
-        "n": 287,
-        "won": 251,
-        "lost": 36,
-        "said": 0.848,
-        "hit": 0.8746,
-        "units": -4.98
+        "n": 323,
+        "won": 281,
+        "lost": 42,
+        "said": 0.8469,
+        "hit": 0.87,
+        "units": -7.16
        },
        {
         "label": "90\u2013100%",
-        "n": 65,
-        "won": 62,
-        "lost": 3,
+        "n": 73,
+        "won": 69,
+        "lost": 4,
         "said": 0.924,
-        "hit": 0.9538,
-        "units": -0.72
+        "hit": 0.9452,
+        "units": -1.47
        }
       ]
      }
@@ -3809,38 +4155,39 @@
       "2026-11-14",
       "2026-11-15",
       "2026-11-16",
-      "2026-11-17"
+      "2026-11-17",
+      "2026-11-18"
      ],
      "groups": [
       {
        "group": "Best value: \u2605 suggestion",
-       "bets": 6,
+       "bets": 7,
        "won": 2,
-       "lost": 4,
-       "hit": 0.3333333333333333,
-       "exp_hit": 0.36200378833333335,
-       "units": 0.43,
-       "roi": 0.07222985347985349
+       "lost": 5,
+       "hit": 0.2857142857142857,
+       "exp_hit": 0.35255725857142856,
+       "units": -0.57,
+       "roi": -0.0809458398744113
       },
       {
        "group": "Best value: straight (all suggestions)",
-       "bets": 29,
+       "bets": 31,
        "won": 13,
-       "lost": 16,
-       "hit": 0.4482758620689655,
-       "exp_hit": 0.5912862068965518,
-       "units": -5.49,
-       "roi": -0.1892432280363315
+       "lost": 18,
+       "hit": 0.41935483870967744,
+       "exp_hit": 0.5882483870967742,
+       "units": -7.49,
+       "roi": -0.24155011655011657
       },
       {
        "group": "Best value: 2-leg (all suggestions)",
-       "bets": 25,
+       "bets": 26,
        "won": 7,
-       "lost": 18,
-       "hit": 0.28,
-       "exp_hit": 0.35493161440000004,
-       "units": -4.31,
-       "roi": -0.1723819420526191
+       "lost": 19,
+       "hit": 0.2692307692307692,
+       "exp_hit": 0.3526603246153846,
+       "units": -5.31,
+       "roi": -0.20421340581982608
       },
       {
        "group": "Best value: 3-leg (all suggestions)",
@@ -3884,43 +4231,43 @@
       },
       {
        "group": "Most likely to hit: \u2605 suggestion",
-       "bets": 6,
-       "won": 3,
+       "bets": 7,
+       "won": 4,
        "lost": 3,
-       "hit": 0.5,
-       "exp_hit": 0.5285526334853626,
-       "units": -1.34,
-       "roi": -0.22393895091263513
+       "hit": 0.5714285714285714,
+       "exp_hit": 0.5453308287017393,
+       "units": -0.77,
+       "roi": -0.11031501914960562
       },
       {
        "group": "Most likely to hit: straight (all suggestions)",
-       "bets": 29,
-       "won": 14,
-       "lost": 15,
-       "hit": 0.4827586206896552,
-       "exp_hit": 0.6475655172413792,
-       "units": -6.94,
-       "roi": -0.23920000553394385
+       "bets": 35,
+       "won": 18,
+       "lost": 17,
+       "hit": 0.5142857142857142,
+       "exp_hit": 0.64476,
+       "units": -6.57,
+       "roi": -0.18785231567186456
       },
       {
        "group": "Most likely to hit: 2-leg (all suggestions)",
-       "bets": 26,
-       "won": 10,
-       "lost": 16,
-       "hit": 0.38461538461538464,
-       "exp_hit": 0.39040526461538455,
-       "units": 0.32,
-       "roi": 0.012122159681064951
+       "bets": 32,
+       "won": 13,
+       "lost": 19,
+       "hit": 0.40625,
+       "exp_hit": 0.38707944906249997,
+       "units": 1.76,
+       "roi": 0.0549979026009102
       },
       {
        "group": "Most likely to hit: 3-leg (all suggestions)",
-       "bets": 25,
-       "won": 10,
-       "lost": 15,
-       "hit": 0.4,
-       "exp_hit": 0.28771888138152,
-       "units": 12.14,
-       "roi": 0.4855094735604743
+       "bets": 31,
+       "won": 11,
+       "lost": 20,
+       "hit": 0.3548387096774194,
+       "exp_hit": 0.27250485264174196,
+       "units": 10.64,
+       "roi": 0.34317648301770354
       },
       {
        "group": "Most likely to hit: 4-leg (all suggestions)",
@@ -3969,4181 +4316,11 @@
  },
  "pending": {
   "push": false,
-  "g": [
-   [
-    "groups",
-    "Board winner picks"
-   ],
-   [
-    "groups",
-    "Prop leans with an edge (shots + saves)"
-   ],
-   [
-    "groups",
-    "Shots on goal leans with an edge"
-   ],
-   [
-    "groups",
-    "Value legs"
-   ],
-   [
-    "groups",
-    "Saves leans with an edge"
-   ],
-   [
-    "parlays.groups",
-    "Best value: straight (all suggestions)"
-   ],
-   [
-    "parlays.groups",
-    "Best value: 2-leg (all suggestions)"
-   ],
-   [
-    "parlays.groups",
-    "Best value: \u2605 suggestion"
-   ],
-   [
-    "parlays.groups",
-    "Most likely to hit: straight (all suggestions)"
-   ],
-   [
-    "parlays.groups",
-    "Most likely to hit: \u2605 suggestion"
-   ],
-   [
-    "parlays.groups",
-    "Most likely to hit: 2-leg (all suggestions)"
-   ],
-   [
-    "parlays.groups",
-    "Most likely to hit: 3-leg (all suggestions)"
-   ]
-  ],
-  "c": [
-   [
-    "cal_sections",
-    "Moneyline picks",
-    true,
-    "The team the board gave the better chance to win, every game (overtime and shootouts count)."
-   ],
-   [
-    "cal_sections",
-    "Puck lines",
-    true,
-    "The side the board favored on each DraftKings puck line."
-   ],
-   [
-    "cal_sections",
-    "Totals",
-    true,
-    "Over or Under, whichever the board favored."
-   ],
-   [
-    "cal_sections",
-    "Shots on goal",
-    true,
-    "Over or Under on the main DraftKings line, whichever the board favored."
-   ],
-   [
-    "cal_sections",
-    "Alt lines",
-    false,
-    "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range)."
-   ],
-   [
-    "cal_sections",
-    "Saves",
-    true,
-    "Over or Under on the main DraftKings line, whichever the board favored."
-   ]
-  ],
-  "per": {
-   "d:2026-11-18": "Wed Nov 18",
-   "w:2026-11-16": "Nov 16 \u2013 22",
-   "m:2026-11": "November 2026"
-  },
-  "days": {
-   "2026-11-18": [
-    "d:2026-11-18",
-    "w:2026-11-16",
-    "m:2026-11"
-   ]
-  },
-  "legs": [
-   [
-    "2026-11-18|-401892739-ml-DET",
-    "2026-11-18",
-    [
-     "401892739",
-     "ml",
-     null,
-     "home",
-     null,
-     null,
-     null
-    ],
-    -110,
-    0.5165,
-    [
-     0
-    ],
-    [
-     0
-    ]
-   ],
-   [
-    "2026-11-18|-401892739-pl-BOS",
-    "2026-11-18",
-    [
-     "401892739",
-     "sp",
-     null,
-     "away",
-     1.5,
-     null,
-     null
-    ],
-    -285,
-    0.7024,
-    [],
-    [
-     1
-    ]
-   ],
-   [
-    "2026-11-18|-401892739-to-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "tot",
-     null,
-     "Under",
-     6.5,
-     null,
-     null
-    ],
-    -142,
-    0.5584,
-    [],
-    [
-     2
-    ]
-   ],
-   [
-    "2026-11-18|-401892740-ml-NJD",
-    "2026-11-18",
-    [
-     "401892740",
-     "ml",
-     null,
-     "home",
-     null,
-     null,
-     null
-    ],
-    -170,
-    0.5919,
-    [
-     0
-    ],
-    [
-     0
-    ]
-   ],
-   [
-    "2026-11-18|-401892740-pl-MTL",
-    "2026-11-18",
-    [
-     "401892740",
-     "sp",
-     null,
-     "away",
-     1.5,
-     null,
-     null
-    ],
-    -180,
-    0.6186,
-    [],
-    [
-     1
-    ]
-   ],
-   [
-    "2026-11-18|-401892740-to-Under",
-    "2026-11-18",
-    [
-     "401892740",
-     "tot",
-     null,
-     "Under",
-     6.5,
-     null,
-     null
-    ],
-    -135,
-    0.5416,
-    [],
-    [
-     2
-    ]
-   ],
-   [
-    "2026-11-18|-401892741-ml-COL",
-    "2026-11-18",
-    [
-     "401892741",
-     "ml",
-     null,
-     "away",
-     null,
-     null,
-     null
-    ],
-    -110,
-    0.5062,
-    [
-     0
-    ],
-    [
-     0
-    ]
-   ],
-   [
-    "2026-11-18|-401892741-pl-COL",
-    "2026-11-18",
-    [
-     "401892741",
-     "sp",
-     null,
-     "away",
-     1.5,
-     null,
-     null
-    ],
-    -265,
-    0.7019,
-    [],
-    [
-     1
-    ]
-   ],
-   [
-    "2026-11-18|-401892741-to-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "tot",
-     null,
-     "Under",
-     6.5,
-     null,
-     null
-    ],
-    -118,
-    0.509,
-    [],
-    [
-     2
-    ]
-   ],
-   [
-    "2026-11-18|8479343-sog-Over",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     2.5,
-     "Clayton Keller",
-     "F"
-    ],
-    -160,
-    0.545,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8479343-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Clayton Keller",
-     "F"
-    ],
-    -2500,
-    0.9159,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479343-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Clayton Keller",
-     "F"
-    ],
-    -450,
-    0.758,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479343-sog-alt3",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     2.5,
-     "Clayton Keller",
-     "F"
-    ],
-    -160,
-    0.5477,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8476389-sog-Over",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Vincent Trocheck",
-     "F"
-    ],
-    -190,
-    0.6104,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8476389-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Vincent Trocheck",
-     "F"
-    ],
-    -900,
-    0.8569,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8476389-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Vincent Trocheck",
-     "F"
-    ],
-    -190,
-    0.6138,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480855-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Jack McBain",
-     "F"
-    ],
-    -175,
-    0.6174,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8480855-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Jack McBain",
-     "F"
-    ],
-    -330,
-    0.7152,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480849-sog-Over",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Barrett Hayton",
-     "F"
-    ],
-    -185,
-    0.5622,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8480849-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Barrett Hayton",
-     "F"
-    ],
-    135,
-    0.4378,
-    [
-     1,
-     2
-    ],
-    []
-   ],
-   [
-    "2026-11-18|8480849-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Barrett Hayton",
-     "F"
-    ],
-    -800,
-    0.8275,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480849-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Barrett Hayton",
-     "F"
-    ],
-    -185,
-    0.5664,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479619-sog-Over",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Michael Carcone",
-     "F"
-    ],
-    -115,
-    0.5046,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8479619-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Michael Carcone",
-     "F"
-    ],
-    -450,
-    0.7923,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479619-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Michael Carcone",
-     "F"
-    ],
-    -110,
-    0.5041,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479977-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Kailer Yamamoto",
-     "F"
-    ],
-    -120,
-    0.5608,
-    [
-     1,
-     2
-    ],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8479977-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Kailer Yamamoto",
-     "F"
-    ],
-    -500,
-    0.7576,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478474-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Lawson Crouse",
-     "F"
-    ],
-    -120,
-    0.5011,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8478474-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Lawson Crouse",
-     "F"
-    ],
-    -475,
-    0.7942,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478474-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Lawson Crouse",
-     "F"
-    ],
-    -110,
-    0.5011,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8475314-sog-Over",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Anders Lee",
-     "F"
-    ],
-    -135,
-    0.5503,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8475314-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Anders Lee",
-     "F"
-    ],
-    -550,
-    0.8202,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8475314-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Anders Lee",
-     "F"
-    ],
-    -135,
-    0.554,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8483431-sog-Over",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Logan Cooley",
-     "F"
-    ],
-    -185,
-    0.5863,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8483431-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Logan Cooley",
-     "F"
-    ],
-    -900,
-    0.8463,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8483431-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Logan Cooley",
-     "F"
-    ],
-    -185,
-    0.5905,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8477346-sog-Over",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "MacKenzie Weegar",
-     "D"
-    ],
-    -150,
-    0.5465,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8477346-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "MacKenzie Weegar",
-     "D"
-    ],
-    -700,
-    0.8253,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8477346-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "MacKenzie Weegar",
-     "D"
-    ],
-    -150,
-    0.5507,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479410-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     2.5,
-     "Mikhail Sergachev",
-     "D"
-    ],
-    -170,
-    0.6066,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8479410-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Mikhail Sergachev",
-     "D"
-    ],
-    -1000,
-    0.8654,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479410-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Mikhail Sergachev",
-     "D"
-    ],
-    -225,
-    0.6399,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8475754-sog-Over",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Brock Nelson",
-     "F"
-    ],
-    -165,
-    0.5523,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8475754-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Brock Nelson",
-     "F"
-    ],
-    -700,
-    0.8228,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8475754-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Brock Nelson",
-     "F"
-    ],
-    -165,
-    0.557,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8486171-sog-Over",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "T.J. Hughes",
-     "F"
-    ],
-    -175,
-    0.5702,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8486171-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "T.J. Hughes",
-     "F"
-    ],
-    -750,
-    0.8319,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8486171-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "T.J. Hughes",
-     "F"
-    ],
-    -175,
-    0.5734,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8477476-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     2.5,
-     "Artturi Lehkonen",
-     "F"
-    ],
-    -175,
-    0.646,
-    [
-     1,
-     2
-    ],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8477476-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Artturi Lehkonen",
-     "F"
-    ],
-    -1000,
-    0.8476,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8477476-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Artturi Lehkonen",
-     "F"
-    ],
-    -220,
-    0.6031,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8475768-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Jaden Schwartz",
-     "F"
-    ],
-    -125,
-    0.5488,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8475768-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Jaden Schwartz",
-     "F"
-    ],
-    -475,
-    0.7646,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480039-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     2.5,
-     "Martin Necas",
-     "F"
-    ],
-    -140,
-    0.5707,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8480039-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Martin Necas",
-     "F"
-    ],
-    -1400,
-    0.8833,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480039-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Martin Necas",
-     "F"
-    ],
-    -270,
-    0.6712,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8475172-sog-Over",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     2.5,
-     "Nazem Kadri",
-     "F"
-    ],
-    -155,
-    0.5125,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8475172-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     2.5,
-     "Nazem Kadri",
-     "F"
-    ],
-    115,
-    0.4875,
-    [
-     1,
-     2
-    ],
-    []
-   ],
-   [
-    "2026-11-18|8475172-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Nazem Kadri",
-     "F"
-    ],
-    -2000,
-    0.9027,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8475172-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Nazem Kadri",
-     "F"
-    ],
-    -425,
-    0.7321,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8475172-sog-alt3",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     2.5,
-     "Nazem Kadri",
-     "F"
-    ],
-    -155,
-    0.516,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8476455-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Gabriel Landeskog",
-     "F"
-    ],
-    -115,
-    0.507,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8476455-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Gabriel Landeskog",
-     "F"
-    ],
-    -500,
-    0.7909,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478038-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Devon Toews",
-     "D"
-    ],
-    100,
-    0.5276,
-    [
-     3,
-     1,
-     2
-    ],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8478038-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Devon Toews",
-     "D"
-    ],
-    -650,
-    0.7812,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8484258-sog-Over",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Sam Malinski",
-     "D"
-    ],
-    -165,
-    0.5256,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8484258-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Sam Malinski",
-     "D"
-    ],
-    125,
-    0.4744,
-    [
-     1,
-     2
-    ],
-    []
-   ],
-   [
-    "2026-11-18|8484258-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Sam Malinski",
-     "D"
-    ],
-    -750,
-    0.8083,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8484258-sog-alt2",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Sam Malinski",
-     "D"
-    ],
-    -165,
-    0.5276,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8470613-sog-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Brent Burns",
-     "D"
-    ],
-    -125,
-    0.5432,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8470613-sog-alt1",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Brent Burns",
-     "D"
-    ],
-    -475,
-    0.7686,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480002-sog-Over",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Nico Hischier",
-     "F"
-    ],
-    -180,
-    0.6299,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8480002-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Nico Hischier",
-     "F"
-    ],
-    -750,
-    0.8614,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480002-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Nico Hischier",
-     "F"
-    ],
-    -180,
-    0.6349,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8477015-sog-Under",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Connor Brown",
-     "F"
-    ],
-    -130,
-    0.5208,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8477015-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Connor Brown",
-     "F"
-    ],
-    -450,
-    0.7828,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478542-sog-Over",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Evan Rodrigues",
-     "F"
-    ],
-    -130,
-    0.5592,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8478542-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Evan Rodrigues",
-     "F"
-    ],
-    -525,
-    0.8246,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478542-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Evan Rodrigues",
-     "F"
-    ],
-    -130,
-    0.5635,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478414-sog-Under",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Under",
-     3.5,
-     "Timo Meier",
-     "F"
-    ],
-    -145,
-    0.5721,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8478414-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Timo Meier",
-     "F"
-    ],
-    -3500,
-    0.9337,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478414-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Timo Meier",
-     "F"
-    ],
-    -650,
-    0.8155,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478414-sog-alt3",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     2.5,
-     "Timo Meier",
-     "F"
-    ],
-    -210,
-    0.6266,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479407-sog-Over",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Jesper Bratt",
-     "F"
-    ],
-    -170,
-    0.6096,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8479407-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Jesper Bratt",
-     "F"
-    ],
-    -750,
-    0.8543,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479407-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Jesper Bratt",
-     "F"
-    ],
-    -165,
-    0.6102,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8482146-sog-Over",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Luke Evangelista",
-     "F"
-    ],
-    -165,
-    0.5993,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8482146-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Luke Evangelista",
-     "F"
-    ],
-    -700,
-    0.8479,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8482146-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Luke Evangelista",
-     "F"
-    ],
-    -165,
-    0.604,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481721-sog-Under",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Under",
-     2.5,
-     "Arseny Gritsyuk",
-     "F"
-    ],
-    -175,
-    0.6199,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8481721-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Arseny Gritsyuk",
-     "F"
-    ],
-    -1000,
-    0.8599,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481721-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Arseny Gritsyuk",
-     "F"
-    ],
-    -220,
-    0.6264,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481559-sog-Over",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     3.5,
-     "Jack Hughes",
-     "F"
-    ],
-    -110,
-    0.5007,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8481559-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Jack Hughes",
-     "F"
-    ],
-    -5000,
-    0.9463,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481559-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Jack Hughes",
-     "F"
-    ],
-    -750,
-    0.85,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481559-sog-alt3",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     2.5,
-     "Jack Hughes",
-     "F"
-    ],
-    -255,
-    0.6901,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481559-sog-alt4",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     3.5,
-     "Jack Hughes",
-     "F"
-    ],
-    -110,
-    0.5028,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8476462-sog-Under",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Under",
-     2.5,
-     "Dougie Hamilton",
-     "D"
-    ],
-    -180,
-    0.6058,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8476462-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Dougie Hamilton",
-     "D"
-    ],
-    -1000,
-    0.8681,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8476462-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Dougie Hamilton",
-     "D"
-    ],
-    -215,
-    0.6408,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8482684-sog-Under",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Under",
-     2.5,
-     "Luke Hughes",
-     "D"
-    ],
-    -185,
-    0.6221,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8482684-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Luke Hughes",
-     "D"
-    ],
-    -900,
-    0.8581,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8482684-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Luke Hughes",
-     "D"
-    ],
-    -205,
-    0.6243,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481540-sog-Over",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     2.5,
-     "Cole Caufield",
-     "F"
-    ],
-    -140,
-    0.5334,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8481540-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Cole Caufield",
-     "F"
-    ],
-    -2500,
-    0.917,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481540-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Cole Caufield",
-     "F"
-    ],
-    -425,
-    0.7567,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481540-sog-alt3",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     2.5,
-     "Cole Caufield",
-     "F"
-    ],
-    -140,
-    0.5363,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480018-sog-Over",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Nick Suzuki",
-     "F"
-    ],
-    -160,
-    0.6258,
-    [
-     1,
-     2
-    ],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8480018-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Nick Suzuki",
-     "F"
-    ],
-    -700,
-    0.8609,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480018-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Nick Suzuki",
-     "F"
-    ],
-    -160,
-    0.6285,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481618-sog-Under",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Alex Newhook",
-     "F"
-    ],
-    -170,
-    0.5864,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8481618-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Alex Newhook",
-     "F"
-    ],
-    -330,
-    0.7357,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8483515-sog-Over",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Juraj Slafkovsk\u00fd",
-     "F"
-    ],
-    -160,
-    0.6123,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8483515-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Juraj Slafkovsk\u00fd",
-     "F"
-    ],
-    -700,
-    0.8548,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8483515-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Juraj Slafkovsk\u00fd",
-     "F"
-    ],
-    -160,
-    0.615,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480074-sog-Under",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Alexandre Texier",
-     "F"
-    ],
-    -135,
-    0.541,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8480074-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Alexandre Texier",
-     "F"
-    ],
-    -425,
-    0.769,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8483457-sog-Over",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Lane Hutson",
-     "D"
-    ],
-    -125,
-    0.5064,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8483457-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Lane Hutson",
-     "D"
-    ],
-    -550,
-    0.8007,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8483457-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Lane Hutson",
-     "D"
-    ],
-    -125,
-    0.5111,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480865-sog-Over",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Noah Dobson",
-     "D"
-    ],
-    -130,
-    0.5165,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8480865-sog-alt1",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Noah Dobson",
-     "D"
-    ],
-    -575,
-    0.8065,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480865-sog-alt2",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Noah Dobson",
-     "D"
-    ],
-    -135,
-    0.5252,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8482078-sog-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Under",
-     2.5,
-     "Lucas Raymond",
-     "F"
-    ],
-    -125,
-    0.5076,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8482078-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Lucas Raymond",
-     "F"
-    ],
-    -1400,
-    0.9003,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8482078-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Lucas Raymond",
-     "F"
-    ],
-    -310,
-    0.723,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8484794-sog-Over",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Michael Brandsegg-Nyg\u00e5rd",
-     "F"
-    ],
-    -125,
-    0.526,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8484794-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Michael Brandsegg-Nyg\u00e5rd",
-     "F"
-    ],
-    -550,
-    0.8122,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8484794-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Michael Brandsegg-Nyg\u00e5rd",
-     "F"
-    ],
-    -130,
-    0.5352,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478042-sog-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Under",
-     2.5,
-     "Viktor Arvidsson",
-     "F"
-    ],
-    -115,
-    0.519,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8478042-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Viktor Arvidsson",
-     "F"
-    ],
-    -1600,
-    0.8971,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478042-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Viktor Arvidsson",
-     "F"
-    ],
-    -330,
-    0.7117,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8484471-sog-Over",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Emmitt Finnie",
-     "F"
-    ],
-    -175,
-    0.564,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8484471-sog-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Emmitt Finnie",
-     "F"
-    ],
-    130,
-    0.436,
-    [
-     1,
-     2
-    ],
-    []
-   ],
-   [
-    "2026-11-18|8484471-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Emmitt Finnie",
-     "F"
-    ],
-    -800,
-    0.8314,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8484471-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Emmitt Finnie",
-     "F"
-    ],
-    -175,
-    0.5671,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8483464-sog-Over",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Marco Kasper",
-     "F"
-    ],
-    -160,
-    0.5242,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8483464-sog-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Marco Kasper",
-     "F"
-    ],
-    120,
-    0.4758,
-    [
-     1,
-     2
-    ],
-    []
-   ],
-   [
-    "2026-11-18|8483464-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Marco Kasper",
-     "F"
-    ],
-    -700,
-    0.8066,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8483464-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Marco Kasper",
-     "F"
-    ],
-    -160,
-    0.5269,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479337-sog-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Under",
-     3.5,
-     "Alex DeBrincat",
-     "F"
-    ],
-    -140,
-    0.5538,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8479337-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Alex DeBrincat",
-     "F"
-    ],
-    -5000,
-    0.9402,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479337-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Alex DeBrincat",
-     "F"
-    ],
-    -700,
-    0.8273,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479337-sog-alt3",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     2.5,
-     "Alex DeBrincat",
-     "F"
-    ],
-    -225,
-    0.6459,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481542-sog-Over",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Moritz Seider",
-     "D"
-    ],
-    -185,
-    0.5951,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8481542-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Moritz Seider",
-     "D"
-    ],
-    -800,
-    0.8457,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8481542-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Moritz Seider",
-     "D"
-    ],
-    -180,
-    0.5964,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8475753-sog-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Justin Faulk",
-     "D"
-    ],
-    -115,
-    0.5276,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8475753-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Justin Faulk",
-     "D"
-    ],
-    -500,
-    0.7776,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8482175-sog-Over",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "JJ Peterka",
-     "F"
-    ],
-    -180,
-    0.5875,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8482175-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "JJ Peterka",
-     "F"
-    ],
-    -900,
-    0.8489,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8482175-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "JJ Peterka",
-     "F"
-    ],
-    -180,
-    0.5924,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478401-sog-Over",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Pavel Zacha",
-     "F"
-    ],
-    -120,
-    0.5034,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8478401-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Pavel Zacha",
-     "F"
-    ],
-    -500,
-    0.7942,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478401-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Pavel Zacha",
-     "F"
-    ],
-    -120,
-    0.5057,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8477496-sog-Over",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Elias Lindholm",
-     "F"
-    ],
-    -125,
-    0.5171,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8477496-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Elias Lindholm",
-     "F"
-    ],
-    -525,
-    0.8042,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8477496-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Elias Lindholm",
-     "F"
-    ],
-    -120,
-    0.517,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479987-sog-Over",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Morgan Geekie",
-     "F"
-    ],
-    -135,
-    0.5456,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8479987-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Morgan Geekie",
-     "F"
-    ],
-    -550,
-    0.8176,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479987-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "Morgan Geekie",
-     "F"
-    ],
-    -135,
-    0.5493,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8477956-sog-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Under",
-     3.5,
-     "David Pastrnak",
-     "F"
-    ],
-    -135,
-    0.5631,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8477956-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "David Pastrnak",
-     "F"
-    ],
-    -4000,
-    0.9352,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8477956-sog-alt2",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     1.5,
-     "David Pastrnak",
-     "F"
-    ],
-    -700,
-    0.819,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8477956-sog-alt3",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     2.5,
-     "David Pastrnak",
-     "F"
-    ],
-    -235,
-    0.6373,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8483489-sog-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Fraser Minten",
-     "F"
-    ],
-    -130,
-    0.5309,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8483489-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Fraser Minten",
-     "F"
-    ],
-    -425,
-    0.7743,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8479325-sog-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Under",
-     1.5,
-     "Charlie McAvoy",
-     "D"
-    ],
-    -115,
-    0.5201,
-    [],
-    [
-     3
-    ]
-   ],
-   [
-    "2026-11-18|8479325-sog-alt1",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "sog",
-     "Over",
-     0.5,
-     "Charlie McAvoy",
-     "D"
-    ],
-    -525,
-    0.7841,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8482657-sv-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "saves",
-     "Under",
-     25.5,
-     "Sebastian Cossa",
-     "G"
-    ],
-    -125,
-    0.584,
-    [
-     1,
-     4
-    ],
-    [
-     5
-    ]
-   ],
-   [
-    "2026-11-18|8482657-saves-alt20",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "saves",
-     "Over",
-     19.5,
-     "Sebastian Cossa",
-     "G"
-    ],
-    -750,
-    0.7673,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8482657-saves-alt22",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "saves",
-     "Over",
-     21.5,
-     "Sebastian Cossa",
-     "G"
-    ],
-    -370,
-    0.6627,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8482657-saves-alt24",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "saves",
-     "Over",
-     23.5,
-     "Sebastian Cossa",
-     "G"
-    ],
-    -200,
-    0.5448,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478406-sv-Under",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "saves",
-     "Under",
-     25.5,
-     "Mackenzie Blackwood",
-     "G"
-    ],
-    -115,
-    0.5249,
-    [],
-    [
-     5
-    ]
-   ],
-   [
-    "2026-11-18|8478406-saves-alt20",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "saves",
-     "Over",
-     19.5,
-     "Mackenzie Blackwood",
-     "G"
-    ],
-    -800,
-    0.8108,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478406-saves-alt22",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "saves",
-     "Over",
-     21.5,
-     "Mackenzie Blackwood",
-     "G"
-    ],
-    -390,
-    0.7152,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8478406-saves-alt24",
-    "2026-11-18",
-    [
-     "401892741",
-     "stat",
-     "saves",
-     "Over",
-     23.5,
-     "Mackenzie Blackwood",
-     "G"
-    ],
-    -205,
-    0.5997,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8476945-sv-Over",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "saves",
-     "Over",
-     21.5,
-     "Connor Hellebuyck",
-     "G"
-    ],
-    -130,
-    0.5029,
-    [],
-    [
-     5
-    ]
-   ],
-   [
-    "2026-11-18|8476945-saves-alt20",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "saves",
-     "Over",
-     19.5,
-     "Connor Hellebuyck",
-     "G"
-    ],
-    -245,
-    0.6401,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8476945-saves-alt22",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "saves",
-     "Over",
-     21.5,
-     "Connor Hellebuyck",
-     "G"
-    ],
-    -130,
-    0.5072,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8484170-sv-Under",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "saves",
-     "Under",
-     27.5,
-     "Jacob Fowler",
-     "G"
-    ],
-    -115,
-    0.5393,
-    [
-     1,
-     4
-    ],
-    [
-     5
-    ]
-   ],
-   [
-    "2026-11-18|8484170-saves-alt20",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "saves",
-     "Over",
-     19.5,
-     "Jacob Fowler",
-     "G"
-    ],
-    -1800,
-    0.8641,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8484170-saves-alt22",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "saves",
-     "Over",
-     21.5,
-     "Jacob Fowler",
-     "G"
-    ],
-    -750,
-    0.7889,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8484170-saves-alt24",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "saves",
-     "Over",
-     23.5,
-     "Jacob Fowler",
-     "G"
-    ],
-    -370,
-    0.6921,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8484170-saves-alt26",
-    "2026-11-18",
-    [
-     "401892740",
-     "stat",
-     "saves",
-     "Over",
-     25.5,
-     "Jacob Fowler",
-     "G"
-    ],
-    -200,
-    0.5797,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480193-sv-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "saves",
-     "Under",
-     23.5,
-     "Daniil Tarasov",
-     "G"
-    ],
-    -135,
-    0.5571,
-    [],
-    [
-     5
-    ]
-   ],
-   [
-    "2026-11-18|8480193-saves-alt20",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "saves",
-     "Over",
-     19.5,
-     "Daniil Tarasov",
-     "G"
-    ],
-    -360,
-    0.7029,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480193-saves-alt22",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "saves",
-     "Over",
-     21.5,
-     "Daniil Tarasov",
-     "G"
-    ],
-    -185,
-    0.5779,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480280-sv-Under",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "saves",
-     "Under",
-     25.5,
-     "Jeremy Swayman",
-     "G"
-    ],
-    -115,
-    0.548,
-    [
-     1,
-     4
-    ],
-    [
-     5
-    ]
-   ],
-   [
-    "2026-11-18|8480280-saves-alt20",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "saves",
-     "Over",
-     19.5,
-     "Jeremy Swayman",
-     "G"
-    ],
-    -900,
-    0.7973,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480280-saves-alt22",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "saves",
-     "Over",
-     21.5,
-     "Jeremy Swayman",
-     "G"
-    ],
-    -400,
-    0.6942,
-    [],
-    [
-     4
-    ]
-   ],
-   [
-    "2026-11-18|8480280-saves-alt24",
-    "2026-11-18",
-    [
-     "401892739",
-     "stat",
-     "saves",
-     "Over",
-     23.5,
-     "Jeremy Swayman",
-     "G"
-    ],
-    -210,
-    0.5769,
-    [],
-    [
-     4
-    ]
-   ]
-  ],
-  "parlays": [
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8478038-sog-Under",
-      null,
-      100
-     ]
-    ],
-    [
-     5
-    ],
-    0.5276
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8479977-sog-Under",
-      null,
-      -120
-     ]
-    ],
-    [
-     5
-    ],
-    0.5608
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8478038-sog-Under",
-      null,
-      100
-     ],
-     [
-      "2026-11-18|8479977-sog-Under",
-      null,
-      -120
-     ]
-    ],
-    [
-     6,
-     7
-    ],
-    0.29588
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8477476-sog-Under",
-      null,
-      -175
-     ]
-    ],
-    [
-     8,
-     9
-    ],
-    0.646
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8480002-sog-alt2",
-      null,
-      -180
-     ]
-    ],
-    [
-     8
-    ],
-    0.6349
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8480002-sog-Over",
-      null,
-      -180
-     ]
-    ],
-    [
-     8
-    ],
-    0.6299
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8480018-sog-alt2",
-      null,
-      -160
-     ]
-    ],
-    [
-     8
-    ],
-    0.6285
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8480018-sog-Over",
-      null,
-      -160
-     ]
-    ],
-    [
-     8
-    ],
-    0.6258
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8482684-sog-Under",
-      null,
-      -185
-     ]
-    ],
-    [
-     8
-    ],
-    0.6221
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8477476-sog-Under",
-      null,
-      -175
-     ],
-     [
-      "2026-11-18|-401892740-pl-MTL",
-      null,
-      -180
-     ]
-    ],
-    [
-     10
-    ],
-    0.39962
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8480002-sog-alt2",
-      null,
-      -180
-     ],
-     [
-      "2026-11-18|8482657-sv-Under",
-      null,
-      -125
-     ]
-    ],
-    [
-     10
-    ],
-    0.37078
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8480002-sog-Over",
-      null,
-      -180
-     ],
-     [
-      "2026-11-18|-401892739-to-Under",
-      null,
-      -142
-     ]
-    ],
-    [
-     10
-    ],
-    0.35174
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8480018-sog-alt2",
-      null,
-      -160
-     ],
-     [
-      "2026-11-18|8480193-sv-Under",
-      null,
-      -135
-     ]
-    ],
-    [
-     10
-    ],
-    0.35014
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8480018-sog-Over",
-      null,
-      -160
-     ],
-     [
-      "2026-11-18|8480855-sog-Under",
-      null,
-      -175
-     ]
-    ],
-    [
-     10
-    ],
-    0.38637
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8482684-sog-Under",
-      null,
-      -185
-     ],
-     [
-      "2026-11-18|8479410-sog-Under",
-      null,
-      -170
-     ]
-    ],
-    [
-     10
-    ],
-    0.37737
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8477476-sog-Under",
-      null,
-      -175
-     ],
-     [
-      "2026-11-18|8480002-sog-alt2",
-      null,
-      -180
-     ],
-     [
-      "2026-11-18|-401892739-to-Under",
-      null,
-      -142
-     ]
-    ],
-    [
-     11
-    ],
-    0.22903
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8480002-sog-Over",
-      null,
-      -180
-     ],
-     [
-      "2026-11-18|8480855-sog-Under",
-      null,
-      -175
-     ],
-     [
-      "2026-11-18|8480193-sv-Under",
-      null,
-      -135
-     ]
-    ],
-    [
-     11
-    ],
-    0.21666
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8480018-sog-alt2",
-      null,
-      -160
-     ],
-     [
-      "2026-11-18|8479410-sog-Under",
-      null,
-      -170
-     ],
-     [
-      "2026-11-18|8477956-sog-Under",
-      null,
-      -135
-     ]
-    ],
-    [
-     11
-    ],
-    0.21468
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8480018-sog-Over",
-      null,
-      -160
-     ],
-     [
-      "2026-11-18|8482657-sv-Under",
-      null,
-      -125
-     ],
-     [
-      "2026-11-18|8479337-sog-Under",
-      null,
-      -140
-     ]
-    ],
-    [
-     11
-    ],
-    0.2024
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8482684-sog-Under",
-      null,
-      -185
-     ],
-     [
-      "2026-11-18|8480039-sog-Under",
-      null,
-      -140
-     ],
-     [
-      "2026-11-18|-401892739-to-Under",
-      null,
-      -142
-     ]
-    ],
-    [
-     11
-    ],
-    0.19825
-   ],
-   [
-    "2026-11-18",
-    [
-     [
-      "2026-11-18|8481721-sog-Under",
-      null,
-      -175
-     ],
-     [
-      "2026-11-18|8479977-sog-Under",
-      null,
-      -120
-     ],
-     [
-      "2026-11-18|8480193-sv-Under",
-      null,
-      -135
-     ]
-    ],
-    [
-     11
-    ],
-    0.19367
-   ]
-  ]
+  "g": [],
+  "c": [],
+  "per": {},
+  "days": {},
+  "legs": [],
+  "parlays": []
  }
 }
