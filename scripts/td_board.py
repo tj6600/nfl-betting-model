@@ -304,6 +304,11 @@ for l in LEGS.values():
              ev=round(pp * d - 1, 4), edge=round(pp - 1 / d, 4))
     legs.append(l)
 D['legs'] = legs
+# for the "line changed?" editor (board/site/lines.js): the game model's spread and total sd, and the yards
+# model's outcome spreads (written by scripts/yards_picks.py), so the page can re-price a line DraftKings moved
+D['gsd'] = dict(m=round(SDM, 2), t=round(SDT, 2))
+_ydf = os.path.join(ROOT, 'odds_log', 'picks', 'yard_dists.json')
+if os.path.exists(_ydf): D['ydist'] = json.load(open(_ydf))
 # kickoff (UTC) per game: the page drops legs from games that have started (DraftKings pulls pregame lines at kickoff)
 _wk = G[(G.season == season) & (G.week == week)]
 D['starts'] = {f'{g.away_team} @ {g.home_team}': pd.Timestamp(f'{g.gameday.date()} {g.gametime if isinstance(g.gametime, str) else "00:00"}').tz_localize('America/New_York').tz_convert('UTC').strftime('%Y-%m-%dT%H:%M:%SZ')

@@ -6,6 +6,19 @@ const LEG = Object.fromEntries(D.legs.map((l) => [l.id, l]));
 const TABS = [['games', 'Matches'], ['parlay', 'Parlay builder'], ['ratings', 'Player ratings'], ['record', 'Model record']];
 const state = { tab: 'games', game: 'all', filt: 'all', q: '', pmin: 0.25, pq: '', rtour: 'atp' };
 const GAME = Object.fromEntries((D.matches || []).map((g) => [g.id, g]));
+// "Price changed?" (board/site/lines.js, Thomas 2026-11-19): match winners have no line, so the user enters DraftKings' new
+// price and the leg's chance (Elo model blended with the new no-vig price), edge and EV are recomputed here.
+function patchTennis() {
+  for (const m of D.matches) {
+    for (const L of m.legs.map((id) => LEG[id]).filter(Boolean)) { if (L.side === 'p1') m.dk1 = L.price; else m.dk2 = L.price; if (L.side === m.pick) m.pick_p = L.p; }
+  }
+}
+LineEdit.setup({ sport: 'tennis', stamp: [D.day, D.built].join('|'), legs: D.legs, name: (L) => L.label, lineOf: () => null,
+  bar: (r) => r.p >= 0.55 && r.edge >= 0 && r.price >= -200, barText: '55%+ to hit, fair price or better, -200 or longer',
+  inSlip: (L) => slip.includes(L.id), swap: (a, b) => { slip = slip.map((i) => (i === a ? b : i)); sugIdx = -1; saveSlip(); render(); },
+  sibling: (L) => D.legs.find((x) => x.id !== L.id && x.gid === L.gid) || null,
+  weight: () => D.w_model, onChange: () => { patchTennis(); render(); } });
+patchTennis();
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
 const fmt = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
 const pct = (p) => p == null ? '—' : p < 0.01 ? (p * 100).toFixed(2) + '%' : Math.round(p * 100) + '%';
@@ -269,9 +282,10 @@ function boardParlay() {
   const legs = slip.map((id) => LEG[id]).filter(Boolean);
   if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : mode === 'likely' ? (D.legs.length ? 'Add legs from the list. No leg is 55%+ to hit at -200 or longer on this slate.' : 'No DraftKings prices on this board yet, so there are no legs to add.') : (D.legs.length ? 'Add legs from the list. No leg meets the value rule on this slate.' : 'No DraftKings prices on this board yet, so there are no legs to add.')));
   const box = el('div', 'slipl'), FL = fillers(legs);
-  legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); if (FL.has(L.id)) { const m = el('small', null, L.alt ? '⚠ Alt line, added to fill the slip' : '⚠ Next-best leg, below the usual bar'); m.style.color = 'var(--gold)'; n.append(m); } const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
+  legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); if (FL.has(L.id)) { const m = el('small', null, L.alt ? '⚠ Alt line, added to fill the slip' : '⚠ Next-best leg, below the usual bar'); m.style.color = 'var(--gold)'; n.append(m); } { const t = LineEdit.tag(L); if (t) n.append(t); n.append(LineEdit.btn(L)); } const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
   if (legs.length) {
     sl.append(box);
+    { const bn = LineEdit.banner(); if (bn) sl.append(bn); }
     const p = legs.reduce((a, l) => a * l.p, 1), d = legs.reduce((a, l) => a * dec(l.price), 1), ev = p * d - 1;
     const st = el('div', 'stats pad');
     [[pct(p), 'Hit chance'], [fmt(toAm(d)), 'Payout'], [sgn(Math.round(ev * 100)) + '%', 'Expected value']].forEach(([v, k]) => { const s = el('div', 'stat'); s.append(el('b', null, v), el('span', null, k)); st.append(s); });
@@ -288,7 +302,7 @@ function boardParlay() {
     // Share (Thomas, 2026-11-19): a compact card of the slip for a screenshot or a text (board/site/share.js)
     const shr = el('div', 'dkrow'), shb = el('button', 'lnk sugb', 'Share slip'); shb.type = 'button';
     shb.onclick = () => window.shareSlip && window.shareSlip({ title: `Tennis · ${legs.length === 1 ? 'straight bet' : legs.length + '-leg parlay'}`,
-      legs: legs.map((l) => ({ label: l.label, sub: l.game, odds: fmt(l.price), tag: FL.has(l.id) ? '⚠ ' + fillTag(l) : '' })),
+      legs: legs.map((l) => ({ label: l.label, sub: l.game, odds: fmt(l.price), tag: [FL.has(l.id) ? '⚠ ' + fillTag(l) : '', LineEdit.shareTag(l)].filter(Boolean).join(' · ') })),
       odds: fmt(toAm(d)), chance: pct(p), pays: '$' + (10 * d).toFixed(2),
       warn: FL.size ? `⚠ ${fillWords(legs.filter((l) => FL.has(l.id)))} added to fill the slip` : '' });
     shr.append(shb, el('span', 'dim', 'A compact card of this slip to screenshot or send to a friend.')); sl.append(shr);
@@ -394,7 +408,8 @@ function boardGames() {
       if (L && L.cat === 'Value') pk.append(document.createTextNode(' '), el('span', 'pill value', 'Value'));
       tr.append(who, pk, el('td', 'num', pct(pmPick)), el('td', 'num', L ? fmt(L.price) : '—'), el('td', 'num', pct(m.pick_p)),
         el('td', 'num ' + (L ? (L.edge > 0 ? 'pos' : 'neg') : ''), L ? sgn(L.edge) : '—'));
-      const td = el('td', 'num'); if (L) td.append(addBtn(L.id)); tr.append(td);
+      const td = el('td', 'num lecell'); if (L) td.append(addBtn(L.id), LineEdit.btn(L)); tr.append(td);
+      if (L) { const tg = LineEdit.tag(L); if (tg) who.append(tg); }
       t.append(tr);
       const O = m.legs.map((id) => LEG[id]).find((l) => l.side !== m.pick);
       if (O && (O.cat === 'Value' || slip.includes(O.id))) {
@@ -403,7 +418,8 @@ function boardGames() {
         po2.append(el('span', 'dim', ` · model ${pct(O.pm)} · edge ${sgn(O.edge)}`)); a.append(po2);
         const b = el('td'); b.append(document.createTextNode(O.who)); if (O.cat === 'Value') b.append(document.createTextNode(' '), el('span', 'pill value', 'Value'));
         tr2.append(a, b, el('td', 'num', pct(O.pm)), el('td', 'num', fmt(O.price)), el('td', 'num', pct(O.p)), el('td', 'num ' + (O.edge > 0 ? 'pos' : 'neg'), sgn(O.edge)));
-        const td2 = el('td', 'num'); td2.append(addBtn(O.id)); tr2.append(td2); t.append(tr2);
+        const td2 = el('td', 'num lecell'); td2.append(addBtn(O.id), LineEdit.btn(O)); tr2.append(td2); t.append(tr2);
+      { const tg = LineEdit.tag(O); if (tg) a.append(tg); }
       }
     });
     tw.append(t); c.append(tw); B.append(c);

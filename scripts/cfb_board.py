@@ -165,6 +165,7 @@ RAT = [dict(rank=i + 1, team=names.get(t, (t, t))[1], abbr=names.get(t, (t, t))[
 
 DATA = dict(week=WEEK, weekLabel=(f'Week {int(S.week.mode().iloc[0])}' if stype == 2 and len(S) else 'Bowl season') + f' · {today:%B %-d}', book=BOOK,
             through=str(pd.to_datetime(G[G.home_pts.notna()].start, utc=True).max().tz_convert(ET).date()), built=stamp,
+            sd=dict(m=M.SD_MARGIN, t=M.SD_TOTAL),   # margin/total sd, for the page's line editor (board/site/lines.js)
             games=GAMES, legs=legs, pool=[l['id'] for l in pool], live=LIVE, backtest=BT, weights=W, value_pts=VALUE_PTS, hfa=round(float(R.home), 1),
             ratings=RAT)
 

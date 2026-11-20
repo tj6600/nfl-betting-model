@@ -258,6 +258,7 @@ function tdDetail(p) {
   if (!p.books.length) bk.append(el('span', 'dim', 'No book is offering this player yet.'));
   p.books.forEach((x, i) => { const r = el('div', i === 0 ? 'best' : null); r.append(el('span', null, x.b), el('span', null, fmtOdds(x.p))); bk.append(r); });
   c.append(bk);
+  { const L = LEG['t-' + p.id]; if (L) { const e = el('div', 'lerow'); e.append(LineEdit.btn(L, true)); const t = LineEdit.tag(L); if (t) e.append(t); c.append(e); } }
   if (p.books.length) {
     const fair = p.model / 100; const need = fair >= .5 ? -Math.round(100 * fair / (1 - fair)) : Math.round(100 * (1 - fair) / fair);
     const t = el('p', 'note', `The model's fair price is ${fmtOdds(need)}. Any price longer than that is value if the model is right.`); t.style.marginTop = '8px'; c.append(t);
@@ -280,6 +281,7 @@ function ydRow(p) {
   const sd = el('span', 'side ' + p.lean.toLowerCase(), `${p.lean} ${s.line}`);
   pr.append(sd, el('span', 'e', `${fmtOdds(s.price)} · ${pct(s.p)}`),
     el('span', 'e ' + (s.ev >= 0 ? 'pos' : 'neg'), `EV ${s.ev > 0 ? '+' : ''}${(s.ev * 100).toFixed(0)}%`));
+  if (p.edited) pr.append(el('span', 'le-tag', '✎ your line'));
   return rowShell(p, [who(p), m, pr], ydDetail);
 }
 function ydDetail(p) {
@@ -295,6 +297,8 @@ function ydDetail(p) {
     const r = el('div', side === p.lean ? 'best' : null);
     r.append(el('span', null, `${side} ${s.line} (${s.book})`), el('span', null, `model ${pct(s.model)} · books ${pct(s.mkt)} · used ${pct(s.p)}`));
     ch.append(r);
+    const L = s.leg && LEG[s.leg];
+    if (L) { const e = el('div', 'lerow'); e.append(LineEdit.btn(L, true)); const t = LineEdit.tag(L); if (t) e.append(t); ch.append(e); }
   }
   b.append(ch);
   if (p.note) { const n = el('p', 'note', p.note); n.style.marginTop = '8px'; b.append(n); }
@@ -429,6 +433,7 @@ function renderRecord() {
   ['Game spreads against closing lines, 2023–25: 48–51% depending on the model version. Break-even at -110 is 52.4%, so no edge at the close.',
     'Game spreads against opening lines, 2019–20 (about 430 games): 53.8%, and the lines tended to move toward the picks. This is why game picks are made from Monday openers.',
     'Passing yards projections miss by about 53–57 yards a game, about 4 yards better than the season average or last 5 games.',
+    'Game simulation for same-game parlays (fit on 2021–23, tested on 32,640 random same-game parlays from every 2024–25 game): where the simulation and multiplying the legs disagreed by 30%+, legs that tend to hit together hit 8.9% of the time (simulated 7.9%, multiplied 5.4%) and legs that work against each other 3.9% (simulated 3.4%, multiplied 5.7%). On real DraftKings props from 2025 weeks 7 and 12: 24.0% hit vs 22.8% simulated and 14.7% multiplied, and 6.9% vs 7.1% and 15.1%.',
     D.blind ? `Props blind test on week ${D.blind.week}: see the Week ${D.blind.week} test tab.` : null].filter(Boolean).forEach((x) => ul.append(el('li', null, x)));
   bt.append(ul); board.append(bt);
   }
@@ -438,6 +443,48 @@ function renderRecord() {
 const LEGS = D.legs || []; const LEG = Object.fromEntries(LEGS.map((l) => [l.id, l]));
 const dec = (a) => (a > 0 ? 1 + a / 100 : 1 + 100 / -a);
 const amer = (d) => (d >= 2 ? Math.round((d - 1) * 100) : -Math.round(100 / (d - 1)));
+// "Line changed?" (board/site/lines.js, Thomas 2026-11-19): the user enters DraftKings' new line or price on a leg and the
+// leg is re-priced here: yards/receptions from the yards model's outcome spread around the player's projection (log-normal
+// through his median and middle half when the page has no stored spread), spreads and totals from the game model's normal
+// margin/total. TDs, moneylines and alt rungs have fixed numbers, so only their price can change.
+const KIND_MKT = { Rush: 'rush', Rec: 'rec', Recs: 'recs', Pass: 'pass' };
+const YD_BY = Object.fromEntries(YD.map((p) => [p.pid + '-' + p.market, p]));
+const numIn = (s) => { const m = String(s).match(/[+-]?\d+(\.\d+)?/); return m ? Number(m[0]) : null; };
+const isSpread = (l) => l.kind === 'Game' && /-spread$/.test(l.key), isTotal = (l) => l.kind === 'Game' && /-total$/.test(l.key);
+const GSD = D.gsd || { m: 13.0, t: 13.3 };   // game model sd (scripts/td_board.py SDM/SDT); week 11 values as a fallback
+function nflModel(l, line) {
+  if (isSpread(l)) return LineEdit.dist.normal(0, GSD.m, -line);            // more points = likelier to cover, either side
+  if (isTotal(l)) { const o = LineEdit.dist.normal(0, GSD.t, line); return l.sl === 'Under' ? 1 - o : o; }
+  const k = KIND_MKT[l.kind], y = k && !l.alt ? YD_BY[l.pid + '-' + k] : null; if (!y) return null;
+  const dist = (D.ydist || {})[k], o = dist ? LineEdit.dist.emp(dist, y.projection, line) : LineEdit.dist.logn(y.median, y.q25, y.q75, line);
+  return o == null ? null : l.sl === 'Under' ? 1 - o : o;
+}
+const GRP_LEGS = LEGS.reduce((a, l) => ((a[l.grp] = a[l.grp] || []).push(l), a), {});
+// the board's yards tables show DraftKings' side of each prop: follow the legs the user changed
+function patchYD() {
+  for (const p of YD) {
+    if (!p._s0) p._s0 = { line: p.line, lean: p.lean, sides: JSON.stringify(p.sides) };
+    p.sides = JSON.parse(p._s0.sides); p.line = p._s0.line; p.lean = p._s0.lean; p.edited = false;
+    const K = p.market[0].toUpperCase() + p.market.slice(1);
+    for (const [side, x] of Object.entries(p.sides)) {
+      const L = x.book === 'DraftKings' ? LEG[`y-${p.pid}-${K}-${side}-${x.line}`] : null;
+      if (L) x.leg = L.id;
+      if (!L || !L.edited) continue;
+      Object.assign(x, { line: L.edited.line, price: L.price, p: L.p, model: L.model, mkt: L.book_p, ev: L.ev }); p.edited = true;
+    }
+    if (p.edited) { const dk = Object.values(p.sides).find((x) => x.book === 'DraftKings'); if (dk) p.line = dk.line;
+      p.lean = Object.keys(p.sides).reduce((a, b) => (p.sides[b].ev > p.sides[a].ev ? b : a)); }
+  }
+}
+LineEdit.setup({ sport: 'nfl', stamp: [D.season, D.week, D.taken, D.yardsTaken, D.altTaken].join('|'), legs: LEGS, fields: { pm: 'model', pb: 'book_p', pct: false },
+  bar: (r) => r.p >= 0.55 && r.edge >= 0.01, barText: '55%+ to hit and edge 1+ pt',   // Most likely to hit's bar (modePool)
+  inSlip: (l) => slip.includes(l.id), swap: (a, b) => { slip = slip.map((i) => (i === a ? b : i)); SS.idx = -1; saveSlip(); render(); },
+  lineOf: (l) => (l.alt ? null : isSpread(l) ? numIn(l.sl) : isTotal(l) ? numIn(l.label) : KIND_MKT[l.kind] ? numIn(l.label) : null),
+  signed: isSpread, model: nflModel, name: (l) => legName(l),
+  weight: (l, pb) => 0.5 * Math.min(1, Math.max(0.4, (pb - 0.03) / 0.22)),   // same blend as scripts/td_board.py
+  sibling: (l) => (GRP_LEGS[l.grp] || []).find((x) => x.id !== l.id && !x.alt) || null,
+  onChange: () => { patchYD(); GROUPS.forEach((g) => { g.title = g.sides[0].gt; g.text = (g.title + ' ' + g.sides[0].game + ' ' + (g.sides[0].team || '')).toLowerCase(); }); render(); } });
+patchYD();
 const PK = 'props-parlay-v2';
 const PBOOKS = ['DraftKings'];
 const ABBR = { DraftKings: 'DK', FanDuel: 'FD' };
@@ -493,20 +540,31 @@ const logCtx = (l) => {
 };
 const legName = (l) => (l.kind === 'Game' ? (/^(Over|Under)/.test(l.label) ? `${l.game} ${l.label}` : l.label) : `${l.who} ${l.label}`);
 // a parlay sits at one book: price it at DraftKings and at FanDuel, keep the better payout (DraftKings on a tie)
+// Game simulation (board/site/sim.js, Thomas 2026-11-19): legs from the same game are drawn together with correlations
+// measured on 2021-25 games, so a QB over and his WR's over hit together more often than multiplying says, and an RB over
+// with his team losing big less often. Legs from different games multiply as before. null when sim.js didn't load.
+const posOf = (l) => l.pos || (LOGS[l.pid] || {}).pos;
+const simOf = (ls, shade = 0) => (window.GameSim && GameSim.ready('nfl') ? GameSim.nfl.parlay(ls, LEGS, posOf, shade) : null);
 function parlayMath(ids, priceOverride) {
   const ls = ids.map((i) => LEG[i]);
-  const p = ls.reduce((a, l) => a * l.p, 1);
+  const pInd = ls.reduce((a, l) => a * l.p, 1), sim = simOf(ls), p = sim ? sim.p : pInd;
   const at = PBOOKS.filter((b) => ls.every((l) => l.offers[b] != null)).map((b) => ({ b, d: ls.reduce((a, l) => a * dec(l.offers[b]), 1) }));
   at.sort((x, y) => y.d - x.d || (x.b === 'DraftKings' ? -1 : 1));
   const book = at.length ? at[0].b : null; const other = at[1] || null;
   const dBook = at.length ? at[0].d : ls.reduce((a, l) => a * dec(l.price), 1);
   const d = priceOverride ? dec(priceOverride) : dBook;
-  return { ls, p, d, dBook, book, other, ev: p * d - 1, be: 1 / d };
+  return { ls, p, pInd, sim, d, dBook, book, other, ev: p * d - 1, be: 1 / d };
 }
 function warnings(ids) {
   const ls = ids.map((i) => LEG[i]); const w = [];
   const byGame = {}; ls.forEach((l) => { (byGame[l.game] = byGame[l.game] || []).push(l); });
-  for (const [g, xs] of Object.entries(byGame)) if (xs.length > 1) w.push(['warn', `${xs.length} legs from ${g}. Same-game legs move together, and this math treats them as independent. Books also price same-game parlays differently.`]);
+  const sg = simOf(ls), sgOf = Object.fromEntries(((sg && sg.groups) || []).map((x) => [x.game, x]));
+  for (const [g, xs] of Object.entries(byGame)) if (xs.length > 1) {
+    const x = sgOf[g], r = x ? x.p / Math.max(1e-9, x.pInd) : 1;
+    const how = !x ? 'Same-game legs move together, but the game simulation didn\'t load, so this chance treats them as independent.'
+      : `The game simulation puts them at ${pct1(x.p)} to all hit, ${r >= 1.05 ? 'more than' : r <= 0.95 ? 'less than' : 'about the same as'} the ${pct1(x.pInd)} you get by multiplying them${r >= 1.05 ? ', because they tend to hit together' : r <= 0.95 ? ', because they work against each other' : ''}.`;
+    w.push(['warn', `${xs.length} legs from ${g}. ${how} DraftKings prices same-game parlays with its own correlation math, so its payout is usually different from the legs' prices multiplied: enter the price its slip shows in "Your book's parlay price" for a true EV.`]);
+  }
   const byKey = {}; ls.forEach((l) => { (byKey[l.key] = byKey[l.key] || []).push(l); });
   for (const xs of Object.values(byKey)) if (xs.length > 1) w.push(['bad', `${xs.map(legName).join(' and ')} are the same bet market twice. Most books won't allow it, and the chances aren't independent.`]);
   ls.filter((l) => started(l.game)).forEach((l) => w.push(['bad', `${l.game} has kicked off: DraftKings has pulled its pregame lines, so ${legName(l)} won't load. Swap it out.`]));
@@ -656,7 +714,8 @@ function slipsFor(k) {
 }
 // Kelly bankroll growth of a slip at DraftKings, each leg's chance cut 2 points for model error
 function growth(ids) {
-  const p = ids.reduce((a, id) => a * Math.max(0.01, LEG[id].p - 0.02), 1), b = ids.reduce((a, id) => a * dec(LEG[id].offers.DraftKings), 1) - 1;
+  const sm = simOf(ids.map((id) => LEG[id]), 0.02);
+  const p = sm ? sm.p : ids.reduce((a, id) => a * Math.max(0.01, LEG[id].p - 0.02), 1), b = ids.reduce((a, id) => a * dec(LEG[id].offers.DraftKings), 1) - 1;
   const f = (b * p - (1 - p)) / b; if (f <= 0) return 0;
   return p * Math.log(1 + f * b) + (1 - p) * Math.log(1 - f);
 }
@@ -797,6 +856,7 @@ function renderParlay() {
     }
     const st = el('span', 'e ' + (cur.edge >= 0 ? 'pos' : 'neg'), `${pct(cur.p)} · edge ${pts(cur.edge)} · EV ${cur.ev > 0 ? '+' : ''}${(cur.ev * 100).toFixed(0)}%${cur.season ? ` · hit ${cur.season} this season` : ''}`);
     box.append(seg, st);
+    { const e = el('span', 'lerow'); e.append(LineEdit.btn(cur)); const t = LineEdit.tag(cur); if (t) e.append(t); box.append(e); }
     if (isAlt) {
       box.append(el('span', 'e dim', `${cur.label}: model ${pct(cur.model)}, books ${pct(cur.book_p)} (margin removed)${cur.season ? `, reached it in ${cur.season} games this season` : ''}`));
       const tags = [cur === bestEv && g.sides.length > 1 ? '★ best EV of his alt lines' : '', cur === likely && g.sides.length > 1 ? '✓ most likely to hit at a fair price' : ''].filter(Boolean);
@@ -880,12 +940,15 @@ function renderParlay() {
       if (nm.tagName === 'BUTTON') { nm.type = 'button'; nm.title = 'Season game log'; nm.onclick = () => showLog(l.pid, logCtx(l)); }
       left.append(nm, el('small', null, `${l.game} · ${PBOOKS.filter((b) => l.offers[b] != null).map((b) => `${ABBR[b]} ${fmtOdds(l.offers[b])}`).join(' · ')}`));
       if (FL.has(l.id)) { const fm = el('small', null, l.alt ? '⚠ Alt line, added to fill the slip' : '⚠ Next-best leg, below the usual bar'); fm.style.color = 'var(--gold)'; left.append(fm); }
+      { const t = LineEdit.tag(l); if (t) left.append(t); }
       if (SWAP_OF[l.id]) left.append(el('small', 'dim', `Safer alt for ${SWAP_OF[l.id].label} (${pct(SWAP_OF[l.id].p)}, under 60%)`));
       const right = el('span', 'num ' + (l.ev >= 0 ? 'pos' : 'neg'), `${pct(l.p)} · ${pts(l.edge)} · EV ${l.ev > 0 ? '+' : ''}${(l.ev * 100).toFixed(0)}%`);
       const x = el('button', 'x', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Remove ' + legName(l)); x.onclick = () => { slip = slip.filter((i) => i !== l.id); SS.idx = -1; saveSlip(); renderParlay(); };
+      left.append(LineEdit.btn(l));
       r.append(left, right, x); lsx.append(r);
     }
     sl.append(lsx);
+    { const bn = LineEdit.banner(); if (bn) sl.append(bn); }
     // DraftKings betslip link: every leg's DraftKings outcome id, so the slip opens in DraftKings ready to place (as on NBA/NHL)
     const sids = m.ls.filter((l) => !started(l.game)).map((l) => l.sid).filter(Boolean);
     const dk = el('div', 'dkrow');
@@ -898,7 +961,7 @@ function renderParlay() {
     // Share (Thomas, 2026-11-19): a compact card of the slip for a screenshot or a text (board/site/share.js)
     const shr = el('div', 'dkrow'), shb = el('button', 'lnk sugb', 'Share slip'); shb.type = 'button';
     shb.onclick = () => window.shareSlip && window.shareSlip({ title: `NFL · ${m.ls.length === 1 ? 'straight bet' : m.ls.length + '-leg parlay'}`,
-      legs: m.ls.map((l) => ({ label: legName(l), sub: l.game, odds: fmtOdds(l.offers.DraftKings), tag: FL.has(l.id) ? '⚠ ' + fillTag(l) : '' })),
+      legs: m.ls.map((l) => ({ label: legName(l), sub: l.game, odds: fmtOdds(l.offers.DraftKings), tag: [FL.has(l.id) ? '⚠ ' + fillTag(l) : '', LineEdit.shareTag(l)].filter(Boolean).join(' · ') })),
       odds: fmtOdds(amer(m.d)), chance: pct1(m.p), pays: '$' + (10 * m.d).toFixed(2),
       warn: FL.size ? `⚠ ${fillWords(m.ls.filter((l) => FL.has(l.id)))} added to fill the slip` : '' });
     shr.append(shb, el('span', 'dim', 'A compact card of this slip to screenshot or send to a friend.')); sl.append(shr);
@@ -911,7 +974,8 @@ function renderParlay() {
     const ip = el('input'); ip.type = 'text'; ip.inputMode = 'numeric'; ip.placeholder = fmtOdds(amer(m.dBook)); ip.value = PS.price; ip.setAttribute('aria-label', "Your book's parlay price");
     ip.onchange = (e) => { PS.price = e.target.value.replace(/[^0-9+-]/g, ''); renderParlay(); };
     pin.append(ip); sl.append(pin);
-    const st = stats([[pct1(m.p), `chance it hits (about 1 in ${Math.max(1, Math.round(1 / m.p))})`], [fmtOdds(amer(m.d)), PS.price ? 'your price' : m.book ? `payout at ${m.book}` : 'payout (mixed books)'],
+    const simd = m.sim && m.sim.groups.length;   // same-game legs: say it's the simulated chance and what multiplying says
+    const st = stats([[pct1(m.p), `chance it hits (about 1 in ${Math.max(1, Math.round(1 / m.p))})${simd ? `, simulated; ${pct1(m.pInd)} if the legs were independent` : ''}`], [fmtOdds(amer(m.d)), PS.price ? 'your price' : m.book ? `payout at ${m.book}` : 'payout (mixed books)'],
       [pct1(m.be), 'break-even chance'], [`${m.ev > 0 ? '+' : ''}${(m.ev * 100).toFixed(0)}%`, 'expected value'], [`$${(10 * (m.d - 1)).toFixed(0)}`, 'profit on a $10 win'], [`${m.ev > 0 ? '+' : '-'}$${Math.abs(10 * m.ev).toFixed(2)}`, 'average result per $10']]);
     st.classList.add('pad'); sl.append(st);
     const v = verdict(m, slip.length, warnings(slip));
@@ -928,7 +992,7 @@ function renderParlay() {
     for (const [k, t] of warnings(slip)) wl.append(el('li', k, t)); if (wl.children.length) sl.append(wl);
   }
   board.append(pick, sl);
-  document.getElementById('foot').textContent = 'Legs are ranked by edge: our chance minus the break-even chance the price implies. EV alone favors long shots, because a small overestimate of a 5% chance turns into a huge EV at +2500; edge in percentage points does not, so it rewards legs that are both likely and underpriced. Each leg\'s chance blends our model with the books\' own chance, 50/50 for normal prices and leaning more on the books for long shots (down to 20% model below about a 12% book chance), since the model is least reliable in the tails. Game lines are blended too, because on past closing lines the spread model showed no edge by itself. Only DraftKings is used: each leg is DraftKings\' own number and price, and the parlay is priced at DraftKings. The parlay chance multiplies the legs, which assumes they are independent, so legs from the same game are flagged. EV uses that book\'s price unless you enter the parlay price your app shows (books sometimes boost or trim parlay payouts). None of these leg types has been graded against real lines yet, so treat the EV as the model\'s opinion, not a promise. Tracking only, not betting advice.';
+  document.getElementById('foot').textContent = 'Legs are ranked by edge: our chance minus the break-even chance the price implies. EV alone favors long shots, because a small overestimate of a 5% chance turns into a huge EV at +2500; edge in percentage points does not, so it rewards legs that are both likely and underpriced. Each leg\'s chance blends our model with the books\' own chance, 50/50 for normal prices and leaning more on the books for long shots (down to 20% model below about a 12% book chance), since the model is least reliable in the tails. Game lines are blended too, because on past closing lines the spread model showed no edge by itself. Only DraftKings is used: each leg is DraftKings\' own number and price, and the parlay is priced at DraftKings. The parlay chance comes from a game simulation: legs from the same game are drawn together 20,000 times with the correlations measured on 2021–25 games (a QB\'s yards and his receivers\' yards rise together, a team that wins big runs more, and so on), so same-game legs that tend to hit together get a higher chance than multiplying them, and legs that work against each other a lower one; each leg keeps its own chance. Legs from different games multiply. On 2024–25 games the simulated chances matched how often same-game parlays hit far better than multiplying (see Backtests). EV uses that book\'s price unless you enter the parlay price your app shows (books sometimes boost or trim parlay payouts). None of these leg types has been graded against real lines yet, so treat the EV as the model\'s opinion, not a promise. Tracking only, not betting advice.';
 }
 function render() {
   if (state.tab === 'test') { renderTabs(); renderTest(); return; }
