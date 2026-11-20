@@ -29,6 +29,20 @@ def started(season, week, now=None):
     return set((g.away_team + ' @ ' + g.home_team)[ko.dt.tz_convert('UTC') <= now])
 
 
+def early_slates(season, week):
+    """{'thu': {'AWAY @ HOME', ...}, 'fri': ..., 'sat': ...} for this week's games played before Sunday. Each slate gets
+    its own parlay log (<season>_wk<NN>thu_*.json) built from those games alone, so a Thursday game's parlays count on
+    Thursday in the Model record, the way the Parlay builder offers them that day (the week's log mixes it into
+    Sunday slips). Week 10's Thursday log was added by hand; Thomas noticed week 11's was missing (2026-11-20)."""
+    from nflmodel.model import G
+    g = G[(G.season == season) & (G.week == week)]
+    out = {}
+    for x in g.itertuples():
+        tag = {3: 'thu', 4: 'fri', 5: 'sat'}.get(pd.Timestamp(x.gameday).weekday())
+        if tag: out.setdefault(tag, set()).add(f'{x.away_team} @ {x.home_team}')
+    return out
+
+
 def log_legs(season, week, legs):
     """Save this week's categorized legs once (the earliest board of the week is the record)."""
     d = os.path.join(LOG, 'nfl_legs'); os.makedirs(d, exist_ok=True)
@@ -40,7 +54,7 @@ def log_legs(season, week, legs):
     return f
 
 
-def _week(day):   # '2026_wk10', or '2026_wk10thu' for a log of one week's Thursday game alone
+def _week(day):   # '2026_wk10', or '2026_wk10thu' (also fri/sat) for a log of one week's Thursday game alone
     s, w = day.split('_wk'); return int(s), int(w[:2])
 
 

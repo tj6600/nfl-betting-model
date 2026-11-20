@@ -447,6 +447,9 @@ _gone = REC.started(season, week)   # only games not yet kicked off count as pic
 _pre = [l for l in legs if l['game'] not in _gone]
 REC.log_legs(season, week, _pre)
 PZ.log(os.path.join(ROOT, 'odds_log'), f'{season}_wk{week:02d}', taken.strftime('%Y-%m-%dT%H%MZ'), _pre, nfl=True)
+for _tag, _gs in REC.early_slates(season, week).items():   # Thursday (Fri/Sat) games' own parlays, counted on their day
+    _sl = [l for l in _pre if l['game'] in _gs]
+    if _sl: PZ.log(os.path.join(ROOT, 'odds_log'), f'{season}_wk{week:02d}{_tag}', taken.strftime('%Y-%m-%dT%H%MZ'), _sl, nfl=True)
 D['record'] = REC.record()
 print('model record:', len(D['record']['picks']), 'pick groups,', len(D['record']['parlays']['groups']), 'parlay groups; graded weeks', D['record']['graded'])
 
