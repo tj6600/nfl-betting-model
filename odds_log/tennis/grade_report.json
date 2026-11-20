@@ -6,21 +6,21 @@
  "groups": [
   {
    "group": "Board picks (every match)",
-   "bets": 11,
-   "won": 8,
+   "bets": 13,
+   "won": 10,
    "lost": 3,
-   "hit": 0.7272727272727273,
-   "exp_hit": 0.5957272727272728,
+   "hit": 0.7692307692307693,
+   "exp_hit": 0.625,
    "units": 1.55,
    "roi": 0.3874556694043176
   },
   {
    "group": "Board picks, main draw",
-   "bets": 11,
-   "won": 8,
+   "bets": 13,
+   "won": 10,
    "lost": 3,
-   "hit": 0.7272727272727273,
-   "exp_hit": 0.5957272727272728,
+   "hit": 0.7692307692307693,
+   "exp_hit": 0.625,
    "units": 1.55,
    "roi": 0.3874556694043176
   },
@@ -49,13 +49,13 @@
   {
    "name": "Board picks",
    "note": "The player the board gave the better chance, every match.",
-   "n": 11,
-   "won": 8,
+   "n": 13,
+   "won": 10,
    "lost": 3,
-   "said": 0.5957,
-   "hit": 0.7273,
+   "said": 0.625,
+   "hit": 0.7692,
    "units": 1.55,
-   "roi": 0.1409,
+   "roi": 0.1192,
    "buckets": [
     {
      "label": "50\u201360%",
@@ -74,6 +74,15 @@
      "said": 0.6697,
      "hit": 0.6667,
      "units": 1.55
+    },
+    {
+     "label": "70\u201380%",
+     "n": 2,
+     "won": 2,
+     "lost": 0,
+     "said": 0.786,
+     "hit": 1.0,
+     "units": 0.0
     }
    ]
   }
@@ -81,7 +90,8 @@
  "parlays": {
   "days": [
    "2026-11-18",
-   "2026-11-19"
+   "2026-11-19",
+   "2026-11-20"
   ],
   "groups": [
    {
@@ -149,21 +159,21 @@
     "groups": [
      {
       "group": "Board picks (every match)",
-      "bets": 5,
-      "won": 4,
+      "bets": 6,
+      "won": 5,
       "lost": 1,
-      "hit": 0.8,
-      "exp_hit": 0.6078,
+      "hit": 0.8333333333333334,
+      "exp_hit": 0.6375000000000001,
       "units": 0.72,
       "roi": 0.3608485720156154
      },
      {
       "group": "Board picks, main draw",
-      "bets": 5,
-      "won": 4,
+      "bets": 6,
+      "won": 5,
       "lost": 1,
-      "hit": 0.8,
-      "exp_hit": 0.6078,
+      "hit": 0.8333333333333334,
+      "exp_hit": 0.6375000000000001,
       "units": 0.72,
       "roi": 0.3608485720156154
      },
@@ -192,13 +202,13 @@
      {
       "name": "Board picks",
       "note": "The player the board gave the better chance, every match.",
-      "n": 5,
-      "won": 4,
+      "n": 6,
+      "won": 5,
       "lost": 1,
-      "said": 0.6078,
-      "hit": 0.8,
+      "said": 0.6375,
+      "hit": 0.8333,
       "units": 0.72,
-      "roi": 0.1443,
+      "roi": 0.1203,
       "buckets": [
        {
         "label": "50\u201360%",
@@ -217,6 +227,15 @@
         "said": 0.6763,
         "hit": 0.6667,
         "units": 0.72
+       },
+       {
+        "label": "70\u201380%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.786,
+        "hit": 1.0,
+        "units": 0.0
        }
       ]
      }
@@ -266,21 +285,21 @@
     "groups": [
      {
       "group": "Board picks (every match)",
-      "bets": 6,
-      "won": 4,
+      "bets": 7,
+      "won": 5,
       "lost": 2,
-      "hit": 0.6666666666666666,
-      "exp_hit": 0.5856666666666667,
+      "hit": 0.7142857142857143,
+      "exp_hit": 0.6142857142857142,
       "units": 0.83,
       "roi": 0.4140627667930198
      },
      {
       "group": "Board picks, main draw",
-      "bets": 6,
-      "won": 4,
+      "bets": 7,
+      "won": 5,
       "lost": 2,
-      "hit": 0.6666666666666666,
-      "exp_hit": 0.5856666666666667,
+      "hit": 0.7142857142857143,
+      "exp_hit": 0.6142857142857142,
       "units": 0.83,
       "roi": 0.4140627667930198
      },
@@ -299,13 +318,13 @@
      {
       "name": "Board picks",
       "note": "The player the board gave the better chance, every match.",
-      "n": 6,
-      "won": 4,
+      "n": 7,
+      "won": 5,
       "lost": 2,
-      "said": 0.5857,
-      "hit": 0.6667,
+      "said": 0.6143,
+      "hit": 0.7143,
       "units": 0.83,
-      "roi": 0.138,
+      "roi": 0.1183,
       "buckets": [
        {
         "label": "50\u201360%",
@@ -324,6 +343,15 @@
         "said": 0.663,
         "hit": 0.6667,
         "units": 0.83
+       },
+       {
+        "label": "70\u201380%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.786,
+        "hit": 1.0,
+        "units": 0.0
        }
       ]
      }
@@ -341,21 +369,21 @@
     "groups": [
      {
       "group": "Board picks (every match)",
-      "bets": 11,
-      "won": 8,
+      "bets": 13,
+      "won": 10,
       "lost": 3,
-      "hit": 0.7272727272727273,
-      "exp_hit": 0.5957272727272728,
+      "hit": 0.7692307692307693,
+      "exp_hit": 0.625,
       "units": 1.55,
       "roi": 0.3874556694043176
      },
      {
       "group": "Board picks, main draw",
-      "bets": 11,
-      "won": 8,
+      "bets": 13,
+      "won": 10,
       "lost": 3,
-      "hit": 0.7272727272727273,
-      "exp_hit": 0.5957272727272728,
+      "hit": 0.7692307692307693,
+      "exp_hit": 0.625,
       "units": 1.55,
       "roi": 0.3874556694043176
      },
@@ -384,13 +412,13 @@
      {
       "name": "Board picks",
       "note": "The player the board gave the better chance, every match.",
-      "n": 11,
-      "won": 8,
+      "n": 13,
+      "won": 10,
       "lost": 3,
-      "said": 0.5957,
-      "hit": 0.7273,
+      "said": 0.625,
+      "hit": 0.7692,
       "units": 1.55,
-      "roi": 0.1409,
+      "roi": 0.1192,
       "buckets": [
        {
         "label": "50\u201360%",
@@ -409,6 +437,15 @@
         "said": 0.6697,
         "hit": 0.6667,
         "units": 1.55
+       },
+       {
+        "label": "70\u201380%",
+        "n": 2,
+        "won": 2,
+        "lost": 0,
+        "said": 0.786,
+        "hit": 1.0,
+        "units": 0.0
        }
       ]
      }
@@ -459,21 +496,21 @@
     "groups": [
      {
       "group": "Board picks (every match)",
-      "bets": 11,
-      "won": 8,
+      "bets": 13,
+      "won": 10,
       "lost": 3,
-      "hit": 0.7272727272727273,
-      "exp_hit": 0.5957272727272728,
+      "hit": 0.7692307692307693,
+      "exp_hit": 0.625,
       "units": 1.55,
       "roi": 0.3874556694043176
      },
      {
       "group": "Board picks, main draw",
-      "bets": 11,
-      "won": 8,
+      "bets": 13,
+      "won": 10,
       "lost": 3,
-      "hit": 0.7272727272727273,
-      "exp_hit": 0.5957272727272728,
+      "hit": 0.7692307692307693,
+      "exp_hit": 0.625,
       "units": 1.55,
       "roi": 0.3874556694043176
      },
@@ -502,13 +539,13 @@
      {
       "name": "Board picks",
       "note": "The player the board gave the better chance, every match.",
-      "n": 11,
-      "won": 8,
+      "n": 13,
+      "won": 10,
       "lost": 3,
-      "said": 0.5957,
-      "hit": 0.7273,
+      "said": 0.625,
+      "hit": 0.7692,
       "units": 1.55,
-      "roi": 0.1409,
+      "roi": 0.1192,
       "buckets": [
        {
         "label": "50\u201360%",
@@ -527,6 +564,15 @@
         "said": 0.6697,
         "hit": 0.6667,
         "units": 1.55
+       },
+       {
+        "label": "70\u201380%",
+        "n": 2,
+        "won": 2,
+        "lost": 0,
+        "said": 0.786,
+        "hit": 1.0,
+        "units": 0.0
        }
       ]
      }
