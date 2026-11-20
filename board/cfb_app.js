@@ -25,6 +25,8 @@ function patchCfb() {
   }
 }
 LineEdit.setup({ sport: 'cfb', stamp: [D.week, D.built].join('|'), legs: D.legs, model: cfbModel, name: (L) => L.label,
+  bar: (r) => r.p >= 0.55 && r.edge >= 0 && r.price >= -200, barText: '55%+ to hit, fair price or better, -200 or longer',
+  inSlip: (L) => slip.includes(L.id), swap: (a, b) => { slip = slip.map((i) => (i === a ? b : i)); sugIdx = -1; saveSlip(); render(); },
   signed: (L) => L.market === 'spread', weight: (L) => (D.weights[L.kind] != null ? D.weights[L.kind] : 0.5),
   sibling: (L) => D.legs.find((x) => x.id !== L.id && x.gid === L.gid && x.market === L.market) || null,
   onChange: () => { patchCfb(); render(); } });

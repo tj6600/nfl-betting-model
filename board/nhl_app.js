@@ -28,6 +28,8 @@ function patchNhl() {
   for (const g of D.games) { const t = g.legs.map((id) => LEG[id]).find((L) => L && L.market === 'total'); if (t) g.line_total = t.line; }
 }
 LineEdit.setup({ sport: 'nhl', stamp: [D.day, D.propsTaken].join('|'), legs: D.legs, model: nhlModel, name: (L) => L.label,
+  bar: (r) => r.p >= 0.55 && r.edge >= 0 && r.price >= -200, barText: '55%+ to hit, fair price or better, -200 or longer',
+  inSlip: (L) => slip.includes(L.id), swap: (a, b) => { slip = slip.map((i) => (i === a ? b : i)); sugIdx = -1; saveSlip(); render(); },
   weight: (L) => (D.weights[L.kind] != null ? D.weights[L.kind] : 0.5),
   sibling: (L) => D.legs.find((x) => x.id !== L.id && !x.alt && x.gid === L.gid && x.market === L.market && x.pid === L.pid) || null,
   onChange: () => { patchNhl(); render(); } });

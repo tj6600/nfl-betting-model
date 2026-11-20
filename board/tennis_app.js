@@ -14,6 +14,9 @@ function patchTennis() {
   }
 }
 LineEdit.setup({ sport: 'tennis', stamp: [D.day, D.built].join('|'), legs: D.legs, name: (L) => L.label, lineOf: () => null,
+  bar: (r) => r.p >= 0.55 && r.edge >= 0 && r.price >= -200, barText: '55%+ to hit, fair price or better, -200 or longer',
+  inSlip: (L) => slip.includes(L.id), swap: (a, b) => { slip = slip.map((i) => (i === a ? b : i)); sugIdx = -1; saveSlip(); render(); },
+  sibling: (L) => D.legs.find((x) => x.id !== L.id && x.gid === L.gid) || null,
   weight: () => D.w_model, onChange: () => { patchTennis(); render(); } });
 patchTennis();
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };

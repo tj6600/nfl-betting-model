@@ -1135,6 +1135,8 @@ function patchYD() {
   }
 }
 LineEdit.setup({ sport: 'nfl', stamp: [D.season, D.week, D.taken, D.yardsTaken, D.altTaken].join('|'), legs: LEGS, fields: { pm: 'model', pb: 'book_p', pct: false },
+  bar: (r) => r.p >= 0.55 && r.edge >= 0.01, barText: '55%+ to hit and edge 1+ pt',   // Most likely to hit's bar (modePool)
+  inSlip: (l) => slip.includes(l.id), swap: (a, b) => { slip = slip.map((i) => (i === a ? b : i)); SS.idx = -1; saveSlip(); render(); },
   lineOf: (l) => (l.alt ? null : isSpread(l) ? numIn(l.sl) : isTotal(l) ? numIn(l.label) : KIND_MKT[l.kind] ? numIn(l.label) : null),
   signed: isSpread, model: nflModel, name: (l) => legName(l),
   weight: (l, pb) => 0.5 * Math.min(1, Math.max(0.4, (pb - 0.03) / 0.22)),   // same blend as scripts/td_board.py
