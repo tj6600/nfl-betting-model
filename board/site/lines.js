@@ -107,7 +107,7 @@
   // the leg's numbers at edit e = { line, price } (either may be missing)
   function price(l, e) {
     const o = snap(l), f = F();
-    const line = e && e.line != null && lineOk(l) ? e.line : o.line, px = e && e.price != null ? e.price : o.price;
+    const line = e && e.line != null && lineOk(l) ? e.line : o.line, px = e && e.price != null ? e.price : e && e.est != null ? e.est : o.price;
     let pm = o.pm;
     if (line !== o.line) { const v = anchored(C.model(l, line), C.model(l, o.line), o.pm); if (v != null) pm = v; }
     let pb = null;
@@ -129,7 +129,7 @@
     l.p = Math.round(r.p * 1e4) / 1e4; l[f.pm] = Math.round(r.pm * 1e4) / 1e4; l[f.pb] = r.pb == null ? null : Math.round(r.pb * 1e4) / 1e4;
     l.price = r.price; l.edge = r.edge; l.ev = r.ev; if (o.dk !== undefined) l.offers.DraftKings = r.price;
     if (r.line !== o.line) { if (o.hasLine) l.line = r.line; const sg = C.signed(l); TXT.forEach((k) => { if (k in o) l[k] = swapNum(o[k], o.line, r.line, sg); }); }
-    l.edited = { line0: o.line, price0: o.price, p0: o.p, line: r.line, price: r.price, moved: r.line !== o.line, repriced: r.price !== o.price };
+    l.edited = { line0: o.line, price0: o.price, p0: o.p, line: r.line, price: r.price, moved: r.line !== o.line, repriced: r.price !== o.price, est: e.price == null && e.est != null };
   }
   function applyAll() { C.legs.forEach(applyOne); }
   function commit() { save(); applyAll(); if (C.onChange) C.onChange(); }
@@ -145,6 +145,11 @@
 .lerow,.books .lerow{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center;justify-content:flex-start;border-bottom:0;margin-top:4px;padding:0}
 .lerow .le-tag{margin-top:0}
 .slipl .le-btn{margin-top:4px}
+.le-wrap{display:block}
+.le-adv{display:block;font:600 12px var(--body)!important;margin-top:2px;white-space:normal}
+.le-adv.good{color:var(--pos)!important}.le-adv.warn{color:var(--gold)!important}.le-adv.bad{color:var(--neg)!important}
+.le-sh .le-adv{font-size:14px!important;margin:4px 0 8px;padding:8px 10px;border-radius:8px;background:var(--bg)}
+.le-swap{font-size:12px!important;text-decoration:underline}
 .le-ban{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;background:var(--gold-soft);color:var(--ink);border-radius:8px;padding:8px 12px;margin:8px 14px;font-size:13px}
 .le-ban .lnk{font-size:13px}
 .le-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:flex-end;justify-content:center}
@@ -194,8 +199,8 @@
     const pi = mk('input'); pi.inputMode = 'numeric'; pi.value = fmtOdds(e0.price != null ? e0.price : o.price); pi.setAttribute('aria-label', 'New American price, like -115');
     sign.onclick = () => { const v = num(pi.value); if (v != null) pi.value = fmtOdds(-v); upd(); };
     pr.append(sign, pi); sh.append(pr);
-    const err = mk('p', 'le-err'), pv = mk('div', 'le-prev');
-    sh.append(pv, err);
+    const err = mk('p', 'le-err'), pv = mk('div', 'le-prev'), adv = mk('div');
+    sh.append(pv, adv, err);
     sh.append(mk('p', 'dim', `Re-priced here from the model's projection${canLine ? ' at the new line' : ''} and the new price. Saved on this device until the next board update.`));
     const act = mk('div', 'le-act');
     if (EDITS[l.id]) { const u = mk('button', 'lnk', 'Undo my change'); u.type = 'button'; u.onclick = () => { clear(l); ov.remove(); }; act.append(u); }
@@ -213,6 +218,9 @@
       const r = price(l, e), k = f.pct ? 1 : 100;
       [[`${pc(o.p)} → ${pc(r.p)}`, 'chance'], [`${r.edge * k > 0 ? '+' : ''}${(r.edge * k).toFixed(1)}`, 'edge (pts)'], [`${r.ev * k > 0 ? '+' : ''}${(r.ev * k).toFixed(0)}%`, 'EV']].forEach(([v, t], i) => {
         const d = mk('div', i ? (r[i === 1 ? 'edge' : 'ev'] >= 0 ? 'pos' : 'neg') : null); d.append(mk('b', null, v), mk('span', null, t)); pv.append(d); });
+      const sib = C.sibling ? C.sibling(l) : null; let sr = null, sl = null;
+      if (sib) { const so = snap(sib); sl = e.line != null && lineOk(sib) ? (sg ? -e.line : e.line) : so.line; const up = (EDITS[sib.id] || {}).price; sr = price(sib, { line: sl, price: up, est: up == null && e.price != null ? estPrice(l, e.price) : null }); sr.est = up == null && e.price != null; }
+      adv.replaceChildren(adviceEl(advise(l, r, sr, sib, sl), l, null));
     }
     [li, pi].forEach((x) => x && (x.oninput = upd, x.onkeydown = (ev) => { if (ev.key === 'Enter') ok.click(); }));
     ok.onclick = () => {
@@ -222,21 +230,48 @@
     upd(); ov.append(sh); document.body.append(ov); (li || pi).focus({ preventScroll: true });
   }
   // the other side of a two-way market moves with it (Over/Under share the number, spreads flip its sign)
+  // the other side's price when the user gave only this side's: the board's two-way margin minus this side's new chance
+  function estPrice(l, px) {
+    const sib = C.sibling ? C.sibling(l) : null; if (!sib) return null;
+    const q = clamp(imp(snap(l).price) + imp(snap(sib).price) - imp(px), 0.03, 0.97);
+    const a = q >= 0.5 ? -100 * q / (1 - q) : 100 * (1 - q) / q; return Math.round(a / 5) * 5;
+  }
   function set(l, e) {
-    const o = snap(l), had = EDITS[l.id] || {}, sib = C.sibling ? C.sibling(l) : null;
-    if (e.line == null && e.price == null) delete EDITS[l.id]; else EDITS[l.id] = e;
-    if (sib && lineOk(sib)) {
+    const had = EDITS[l.id] || {}, sib = C.sibling ? C.sibling(l) : null;
+    if (e.line == null && e.price == null) delete EDITS[l.id]; else EDITS[l.id] = { line: e.line, price: e.price };
+    if (sib) {
       const se = { ...(EDITS[sib.id] || {}) };
-      if (e.line != null) se.line = C.signed(l) ? -e.line : e.line; else if (had.line != null) delete se.line;
-      if (se.line == null && se.price == null) delete EDITS[sib.id]; else EDITS[sib.id] = se;
+      if (lineOk(sib)) { if (e.line != null) se.line = C.signed(l) ? -e.line : e.line; else if (had.line != null) delete se.line; }
+      if (e.price != null) se.est = estPrice(l, e.price); else delete se.est;
+      if (se.line == null && se.price == null && se.est == null) delete EDITS[sib.id]; else EDITS[sib.id] = se;
     }
-    void o; commit();
+    commit();
   }
   function clear(l) {
     const sib = C.sibling ? C.sibling(l) : null, had = EDITS[l.id] || {};
     delete EDITS[l.id];
-    if (sib && EDITS[sib.id] && had.line != null) { delete EDITS[sib.id].line; if (EDITS[sib.id].price == null) delete EDITS[sib.id]; }
+    if (sib && EDITS[sib.id]) { if (had.line != null) delete EDITS[sib.id].line; delete EDITS[sib.id].est; if (EDITS[sib.id].line == null && EDITS[sib.id].price == null) delete EDITS[sib.id]; }
     commit();
+  }
+
+  // Should you still take it? (Thomas, 2026-11-19) After an edit: still worth it, thin, skip, or the other side is better now.
+  // r: this side's numbers at the edit, sr: the other side's (or null); bar: the builder's usual bar for a leg (per page).
+  function advise(l, r, sr, sib, sibLine) {
+    const k = F().pct ? 1 : 100, ev = (x) => `${x.ev * k > 0 ? '+' : ''}${(x.ev * k).toFixed(0)}%`;
+    const ok = C.bar ? C.bar(r, l) : r.p >= 0.55 && r.ev > 0, bt = C.barText || '55%+ to hit with a fair price';
+    if (sr && sr.ev > 0 && sr.ev > r.ev && (r.ev <= 0 || !ok)) {
+      const so = snap(sib), nm = sibLine == null || so.line == null ? (C.name ? C.name(sib) : sib.label) : (C.name ? C.name({ ...sib, label: swapNum(so.label, so.line, sibLine, C.signed(sib)), gt: swapNum(so.gt, so.line, sibLine, C.signed(sib)) }) : sib.label);
+      return { cls: 'warn', flip: true, text: `↔ Take the other side instead: ${nm} at ${sr.est ? 'about ' : ''}${fmtOdds(sr.price)}${sr.est ? ' (estimated; check DraftKings)' : ''} is ${pc(sr.p)} with EV ${ev(sr)}${r.ev <= 0 ? `, while this side is now EV ${ev(r)}` : ''}.` };
+    }
+    if (r.ev > 0 && ok) return { cls: 'good', text: `✓ Still worth taking: EV ${ev(r)} at ${pc(r.p)}, and it still clears the builder's bar (${bt}).` };
+    if (r.ev > 0) return { cls: 'warn', text: `Thin: still EV ${ev(r)}, but it's below the builder's usual bar (${bt}), so suggestions would leave it out.` };
+    return { cls: 'bad', text: `✗ Skip it: at this line and price the payout is too small for its chance (EV ${ev(r)}${sr ? `; the other side is EV ${ev(sr)} too` : ''}).` };
+  }
+  const now = (x) => ({ p: x.p, ev: x.ev, edge: x.edge, price: x.price, est: !!(x.edited && x.edited.est) });
+  function adviceEl(a, l, sib) {
+    const d = mk('small', 'le-adv ' + a.cls, a.text);
+    if (a.flip && sib && C.swap && C.inSlip && C.inSlip(l)) { const b = mk('button', 'lnk le-swap', 'Swap it in'); b.type = 'button'; b.onclick = (ev) => { ev.stopPropagation(); C.swap(l.id, sib.id); }; d.append(' ', b); }
+    return d;
   }
 
   window.LineEdit = {
@@ -260,7 +295,10 @@
     // "✎ Your number · board was 5.5 at -120 (58%)" under an edited leg, else null
     tag(l) {
       if (!l.edited) return null; css(); const x = l.edited, sg = C.signed(l);
-      return mk('small', 'le-tag', `✎ Your number · board was ${x.moved ? fmtLine(x.line0, sg) + ' at ' : ''}${fmtOdds(x.price0)} (${pc(x.p0)})`);
+      const w = mk('span', 'le-wrap'); w.append(mk('small', 'le-tag', `✎ Your number · board was ${x.moved ? fmtLine(x.line0, sg) + ' at ' : ''}${fmtOdds(x.price0)} (${pc(x.p0)})${x.est ? ` · price ${fmtOdds(x.price)} estimated from the other side` : ''}`));
+      const sib = C.sibling ? C.sibling(l) : null;
+      w.append(adviceEl(advise(l, now(l), sib ? now(sib) : null, sib, sib ? C.lineOf(sib) ?? snap(sib).line : null), l, sib));
+      return w;
     },
     edited: (l) => !!(l && l.edited),
     shareTag: (l) => (l && l.edited ? '✎ line you entered' : ''),
