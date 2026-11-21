@@ -1,0 +1,36 @@
+{
+  "packageId": "com.tj6600.goonergamble",
+  "host": "nfl-betting-model-u14v.onrender.com",
+  "name": "GoonerGamble: NFL, NBA, NHL",
+  "launcherName": "GoonerGamble",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#1f6b3a",
+  "navigationColor": "#0f1511",
+  "navigationColorDark": "#0f1511",
+  "navigationDividerColor": "#0f1511",
+  "navigationDividerColorDark": "#0f1511",
+  "backgroundColor": "#0f1511",
+  "enableNotifications": false,
+  "startUrl": "/?source=app",
+  "iconUrl": "https://nfl-betting-model-u14v.onrender.com/icons/icon-512.png",
+  "maskableIconUrl": "https://nfl-betting-model-u14v.onrender.com/icons/icon-512.png",
+  "webManifestUrl": "https://nfl-betting-model-u14v.onrender.com/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "minSdkVersion": 21,
+  "signingKey": {
+    "path": "./goonergamble-upload.keystore",
+    "alias": "upload"
+  },
+  "shortcuts": [
+    {"name": "NBA", "shortName": "NBA", "url": "/nba.html?source=app", "chosenIconUrl": "https://nfl-betting-model-u14v.onrender.com/icons/icon-192.png"},
+    {"name": "NHL", "shortName": "NHL", "url": "/nhl.html?source=app", "chosenIconUrl": "https://nfl-betting-model-u14v.onrender.com/icons/icon-192.png"},
+    {"name": "Bank Builder", "shortName": "Bank", "url": "/bank.html?source=app", "chosenIconUrl": "https://nfl-betting-model-u14v.onrender.com/icons/icon-192.png"}
+  ],
+  "generatorApp": "bubblewrap-cli"
+}

@@ -1,0 +1,465 @@
+id,gid,game,kind,market,side,line,pid,team,label,price,p,pm,pb,edge,ev,cat,flagged,pick
+-401891808-ml-SEA,-401891808,CAR @ SEA,Moneyline,moneyline,SEA,,,,SEA to win,245,0.3033,0.3286,0.2779,1.3,4.6,,False,False
+-401891808-ml-CAR,-401891808,CAR @ SEA,Moneyline,moneyline,CAR,,,,CAR to win,-305,0.6967,0.6714,0.7221,-5.6,-7.5,,False,True
+-401891808-pl-SEA,-401891808,CAR @ SEA,Puck line,puckline,SEA,1.5,,,SEA +1.5,102,0.4814,0.5038,0.4739,-1.4,-2.8,,False,False
+-401891808-pl-CAR,-401891808,CAR @ SEA,Puck line,puckline,CAR,-1.5,,,CAR -1.5,-122,0.5186,0.4962,0.5261,-3.1,-5.6,,False,False
+-401891808-to-Over,-401891808,CAR @ SEA,Total,total,Over,6.5,,,Over 6.5 goals,-112,0.4985,0.4811,0.5043,-3.0,-5.6,,False,False
+-401891808-to-Under,-401891808,CAR @ SEA,Total,total,Under,6.5,,,Under 6.5 goals,-108,0.5015,0.5189,0.4957,-1.8,-3.4,,False,False
+-401892696-ml-BOS,-401892696,MTL @ BOS,Moneyline,moneyline,BOS,,,,BOS to win,-125,0.5426,0.5527,0.5325,-1.3,-2.3,,False,True
+-401892696-ml-MTL,-401892696,MTL @ BOS,Moneyline,moneyline,MTL,,,,MTL to win,105,0.4574,0.4473,0.4675,-3.0,-6.2,,False,False
+-401892696-pl-BOS,-401892696,MTL @ BOS,Puck line,puckline,BOS,-1.5,,,BOS -1.5,195,0.3291,0.3416,0.325,-1.0,-2.9,,False,False
+-401892696-pl-MTL,-401892696,MTL @ BOS,Puck line,puckline,MTL,1.5,,,MTL +1.5,-238,0.6709,0.6584,0.675,-3.3,-4.7,,False,False
+-401892696-to-Over,-401892696,MTL @ BOS,Total,total,Over,6.5,,,Over 6.5 goals,110,0.4617,0.475,0.4573,-1.4,-3.0,,False,False
+-401892696-to-Under,-401892696,MTL @ BOS,Total,total,Under,6.5,,,Under 6.5 goals,-130,0.5383,0.525,0.5427,-2.7,-4.8,,False,False
+-401892697-ml-TOR,-401892697,MIN @ TOR,Moneyline,moneyline,TOR,,,,TOR to win,142,0.4028,0.4093,0.3962,-1.0,-2.5,,False,False
+-401892697-ml-MIN,-401892697,MIN @ TOR,Moneyline,moneyline,MIN,,,,MIN to win,-170,0.5972,0.5907,0.6038,-3.2,-5.1,,False,True
+-401892697-pl-TOR,-401892697,MIN @ TOR,Puck line,puckline,TOR,1.5,,,TOR +1.5,-175,0.6093,0.6093,0.6092,-2.7,-4.3,,False,False
+-401892697-pl-MIN,-401892697,MIN @ TOR,Puck line,puckline,MIN,-1.5,,,MIN -1.5,145,0.3907,0.3907,0.3908,-1.7,-4.3,,False,False
+-401892697-to-Over,-401892697,MIN @ TOR,Total,total,Over,6.5,,,Over 6.5 goals,-102,0.4718,0.4393,0.4826,-3.3,-6.6,,False,False
+-401892697-to-Under,-401892697,MIN @ TOR,Total,total,Under,6.5,,,Under 6.5 goals,-118,0.5282,0.5607,0.5174,-1.3,-2.4,,False,False
+-401892698-ml-OTT,-401892698,COL @ OTT,Moneyline,moneyline,OTT,,,,OTT to win,-105,0.4927,0.4963,0.4892,-1.9,-3.8,,False,False
+-401892698-ml-COL,-401892698,COL @ OTT,Moneyline,moneyline,COL,,,,COL to win,-115,0.5073,0.5037,0.5108,-2.8,-5.2,,False,True
+-401892698-pl-OTT,-401892698,COL @ OTT,Puck line,puckline,OTT,1.5,,,OTT +1.5,-258,0.6941,0.7041,0.6908,-2.7,-3.7,,False,False
+-401892698-pl-COL,-401892698,COL @ OTT,Puck line,puckline,COL,-1.5,,,COL -1.5,210,0.3059,0.2959,0.3092,-1.7,-5.2,,False,False
+-401892698-to-Over,-401892698,COL @ OTT,Total,total,Over,6.5,,,Over 6.5 goals,-102,0.4744,0.4497,0.4826,-3.1,-6.1,,False,False
+-401892698-to-Under,-401892698,COL @ OTT,Total,total,Under,6.5,,,Under 6.5 goals,-118,0.5256,0.5503,0.5174,-1.6,-2.9,,False,False
+-401892700-ml-NJD,-401892700,WSH @ NJD,Moneyline,moneyline,NJD,,,,NJD to win,-155,0.5971,0.6112,0.583,-1.1,-1.8,,False,True
+-401892700-ml-WSH,-401892700,WSH @ NJD,Moneyline,moneyline,WSH,,,,WSH to win,130,0.4029,0.3888,0.417,-3.2,-7.3,,False,False
+-401892700-pl-NJD,-401892700,WSH @ NJD,Puck line,puckline,NJD,-1.5,,,NJD -1.5,170,0.369,0.4101,0.3553,-0.1,-0.4,,False,False
+-401892700-pl-WSH,-401892700,WSH @ NJD,Puck line,puckline,WSH,1.5,,,WSH +1.5,-205,0.631,0.5899,0.6447,-4.1,-6.1,,False,False
+-401892700-to-Over,-401892700,WSH @ NJD,Total,total,Over,6.5,,,Over 6.5 goals,110,0.4633,0.4814,0.4573,-1.3,-2.7,,False,False
+-401892700-to-Under,-401892700,WSH @ NJD,Total,total,Under,6.5,,,Under 6.5 goals,-130,0.5367,0.5186,0.5427,-2.8,-5.0,,False,False
+-401892701-ml-CBJ,-401892701,TBL @ CBJ,Moneyline,moneyline,CBJ,,,,CBJ to win,-105,0.5004,0.5117,0.4892,-1.2,-2.3,,False,True
+-401892701-ml-TBL,-401892701,TBL @ CBJ,Moneyline,moneyline,TBL,,,,TBL to win,-115,0.4996,0.4883,0.5108,-3.5,-6.6,,False,False
+-401892701-pl-CBJ,-401892701,TBL @ CBJ,Puck line,puckline,CBJ,1.5,,,CBJ +1.5,-250,0.694,0.72,0.6854,-2.0,-2.8,,False,False
+-401892701-pl-TBL,-401892701,TBL @ CBJ,Puck line,puckline,TBL,-1.5,,,TBL -1.5,205,0.306,0.28,0.3146,-2.2,-6.7,,False,False
+-401892701-to-Over,-401892701,TBL @ CBJ,Total,total,Over,6.5,,,Over 6.5 goals,-105,0.4782,0.4451,0.4892,-3.4,-6.6,,False,False
+-401892701-to-Under,-401892701,TBL @ CBJ,Total,total,Under,6.5,,,Under 6.5 goals,-115,0.5218,0.5549,0.5108,-1.3,-2.4,,False,False
+-401892699-ml-FLA,-401892699,DET @ FLA,Moneyline,moneyline,FLA,,,,FLA to win,-170,0.5777,0.5517,0.6038,-5.2,-8.2,,False,True
+-401892699-ml-DET,-401892699,DET @ FLA,Moneyline,moneyline,DET,,,,DET to win,142,0.4223,0.4483,0.3962,0.9,2.2,,False,False
+-401892699-pl-FLA,-401892699,DET @ FLA,Puck line,puckline,FLA,-1.5,,,FLA -1.5,154,0.3687,0.3422,0.3775,-2.5,-6.3,,False,False
+-401892699-pl-DET,-401892699,DET @ FLA,Puck line,puckline,DET,1.5,,,DET +1.5,-185,0.6313,0.6578,0.6225,-1.8,-2.7,,False,False
+-401892699-to-Over,-401892699,DET @ FLA,Total,total,Over,5.5,,,Over 5.5 goals,-135,0.562,0.5936,0.5514,-1.2,-2.2,,False,False
+-401892699-to-Under,-401892699,DET @ FLA,Total,total,Under,5.5,,,Under 5.5 goals,114,0.438,0.4064,0.4486,-2.9,-6.3,,False,False
+-401892702-ml-CHI,-401892702,BUF @ CHI,Moneyline,moneyline,CHI,,,,CHI to win,130,0.4291,0.4412,0.417,-0.6,-1.3,,False,False
+-401892702-ml-BUF,-401892702,BUF @ CHI,Moneyline,moneyline,BUF,,,,BUF to win,-155,0.5709,0.5588,0.583,-3.7,-6.1,,False,True
+-401892702-pl-CHI,-401892702,BUF @ CHI,Puck line,puckline,CHI,1.5,,,CHI +1.5,-192,0.6338,0.6423,0.6309,-2.4,-3.6,,False,False
+-401892702-pl-BUF,-401892702,BUF @ CHI,Puck line,puckline,BUF,-1.5,,,BUF -1.5,160,0.3662,0.3577,0.3691,-1.8,-4.8,,False,False
+-401892702-to-Over,-401892702,BUF @ CHI,Total,total,Over,6.5,,,Over 6.5 goals,-102,0.4794,0.4696,0.4826,-2.6,-5.1,,False,False
+-401892702-to-Under,-401892702,BUF @ CHI,Total,total,Under,6.5,,,Under 6.5 goals,-118,0.5206,0.5304,0.5174,-2.1,-3.8,,False,False
+-401892703-ml-DAL,-401892703,WPG @ DAL,Moneyline,moneyline,DAL,,,,DAL to win,-175,0.6138,0.6183,0.6092,-2.3,-3.5,,False,True
+-401892703-ml-WPG,-401892703,WPG @ DAL,Moneyline,moneyline,WPG,,,,WPG to win,145,0.3862,0.3817,0.3908,-2.2,-5.4,,False,False
+-401892703-pl-DAL,-401892703,WPG @ DAL,Puck line,puckline,DAL,-1.5,,,DAL -1.5,150,0.3907,0.4121,0.3836,-0.9,-2.3,,False,False
+-401892703-pl-WPG,-401892703,WPG @ DAL,Puck line,puckline,WPG,1.5,,,WPG +1.5,-180,0.6093,0.5879,0.6164,-3.4,-5.2,,False,False
+-401892703-to-Over,-401892703,WPG @ DAL,Total,total,Over,5.5,,,Over 5.5 goals,-120,0.5254,0.5365,0.5217,-2.0,-3.7,,False,False
+-401892703-to-Under,-401892703,WPG @ DAL,Total,total,Under,5.5,,,Under 5.5 goals,100,0.4746,0.4635,0.4783,-2.5,-5.1,,False,False
+-401892704-ml-UTA,-401892704,STL @ UTA,Moneyline,moneyline,UTA,,,,UTA to win,-115,0.52,0.5293,0.5108,-1.5,-2.8,,False,True
+-401892704-ml-STL,-401892704,STL @ UTA,Moneyline,moneyline,STL,,,,STL to win,-105,0.48,0.4707,0.4892,-3.2,-6.3,,False,False
+-401892704-pl-UTA,-401892704,STL @ UTA,Puck line,puckline,UTA,-1.5,,,UTA -1.5,205,0.3134,0.3098,0.3146,-1.4,-4.4,,False,False
+-401892704-pl-STL,-401892704,STL @ UTA,Puck line,puckline,STL,1.5,,,STL +1.5,-250,0.6866,0.6902,0.6854,-2.8,-3.9,,False,False
+-401892704-to-Over,-401892704,STL @ UTA,Total,total,Over,5.5,,,Over 5.5 goals,-135,0.5454,0.5271,0.5514,-2.9,-5.1,,False,False
+-401892704-to-Under,-401892704,STL @ UTA,Total,total,Under,5.5,,,Under 5.5 goals,114,0.4546,0.4729,0.4486,-1.3,-2.7,,False,False
+-401892705-ml-LAK,-401892705,NYI @ LAK,Moneyline,moneyline,LAK,,,,LAK to win,-125,0.5482,0.5639,0.5325,-0.7,-1.3,,False,True
+-401892705-ml-NYI,-401892705,NYI @ LAK,Moneyline,moneyline,NYI,,,,NYI to win,105,0.4518,0.4361,0.4675,-3.6,-7.4,,False,False
+-401892705-pl-LAK,-401892705,NYI @ LAK,Puck line,puckline,LAK,-1.5,,,LAK -1.5,195,0.3316,0.3516,0.325,-0.7,-2.2,,False,False
+-401892705-pl-NYI,-401892705,NYI @ LAK,Puck line,puckline,NYI,1.5,,,NYI +1.5,-238,0.6684,0.6484,0.675,-3.6,-5.1,,False,False
+-401892705-to-Over,-401892705,NYI @ LAK,Total,total,Over,5.5,,,Over 5.5 goals,-130,0.5471,0.5604,0.5427,-1.8,-3.2,,False,False
+-401892705-to-Under,-401892705,NYI @ LAK,Total,total,Under,5.5,,,Under 5.5 goals,110,0.4529,0.4396,0.4573,-2.3,-4.9,,False,False
+8477960-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,2.5,8477960.0,LAK,Adrian Kempe Over 2.5 shots,-140,0.5632,0.5818,0.5446,-2.0,-3.4,,False,False
+8477960-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,2.5,8477960.0,LAK,Adrian Kempe Under 2.5 shots,105,0.4368,0.4182,0.4554,-5.1,-10.5,,False,False
+8478550-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,2.5,8478550.0,LAK,Artemi Panarin Over 2.5 shots,-140,0.5821,0.6257,0.5385,-0.1,-0.2,,False,False
+8478550-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,2.5,8478550.0,LAK,Artemi Panarin Under 2.5 shots,100,0.4179,0.3743,0.4615,-8.2,-16.4,,False,False
+8479675-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,1.5,8479675.0,LAK,Trevor Moore Over 1.5 shots,-160,0.5912,0.6073,0.5752,-2.4,-3.9,,False,False
+8479675-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,1.5,8479675.0,LAK,Trevor Moore Under 1.5 shots,120,0.4088,0.3927,0.4248,-4.6,-10.1,,False,False
+8482155-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,2.5,8482155.0,LAK,Alex Laferriere Over 2.5 shots,-125,0.5455,0.5763,0.5147,-1.0,-1.8,,False,False
+8482155-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,2.5,8482155.0,LAK,Alex Laferriere Under 2.5 shots,-110,0.4545,0.4237,0.4853,-6.9,-13.2,,False,False
+8475692-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,1.5,8475692.0,LAK,Mats Zuccarello Over 1.5 shots,-110,0.532,0.5741,0.4899,0.8,1.6,,False,False
+8475692-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,1.5,8475692.0,LAK,Mats Zuccarello Under 1.5 shots,-120,0.468,0.4259,0.5101,-7.7,-14.2,,False,False
+8482124-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,2.5,8482124.0,LAK,Quinton Byfield Over 2.5 shots,115,0.4533,0.473,0.4335,-1.2,-2.6,,False,False
+8482124-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,2.5,8482124.0,LAK,Quinton Byfield Under 2.5 shots,-155,0.5467,0.527,0.5665,-6.1,-10.1,,False,False
+8470621-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,1.5,8470621.0,LAK,Corey Perry Over 1.5 shots,110,0.4632,0.484,0.4425,-1.3,-2.7,,False,False
+8470621-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,1.5,8470621.0,LAK,Corey Perry Under 1.5 shots,-150,0.5368,0.516,0.5575,-6.3,-10.5,,False,False
+8482730-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,1.5,8482730.0,LAK,Brandt Clarke Over 1.5 shots,-110,0.4847,0.4841,0.4853,-3.9,-7.5,,False,False
+8482730-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,1.5,8482730.0,LAK,Brandt Clarke Under 1.5 shots,-125,0.5153,0.5159,0.5147,-4.0,-7.2,,False,False
+8475170-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,1.5,8475170.0,NYI,Brayden Schenn Over 1.5 shots,-160,0.5301,0.485,0.5752,-8.5,-13.9,,False,False
+8475170-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,1.5,8475170.0,NYI,Brayden Schenn Under 1.5 shots,120,0.4699,0.515,0.4248,1.5,3.4,,False,False
+8477500-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,2.5,8477500.0,NYI,Bo Horvat Over 2.5 shots,-170,0.5698,0.5534,0.5862,-6.0,-9.5,,False,False
+8477500-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,2.5,8477500.0,NYI,Bo Horvat Under 2.5 shots,125,0.4302,0.4466,0.4138,-1.4,-3.2,,False,False
+8475151-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,1.5,8475151.0,NYI,Kyle Palmieri Over 1.5 shots,-180,0.6191,0.6365,0.6017,-2.4,-3.7,,False,False
+8475151-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,1.5,8475151.0,NYI,Kyle Palmieri Under 1.5 shots,135,0.3809,0.3635,0.3983,-4.5,-10.5,,False,False
+8485388-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,1.5,8485388.0,NYI,Victor Eklund Over 1.5 shots,-160,0.514,0.4528,0.5752,-10.1,-16.5,,False,False
+8485388-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,1.5,8485388.0,NYI,Victor Eklund Under 1.5 shots,120,0.486,0.5472,0.4248,3.1,6.9,,False,False
+8482476-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,1.5,8482476.0,NYI,Emil Heineman Over 1.5 shots,-145,0.5175,0.4869,0.5482,-7.4,-12.6,,False,False
+8482476-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,1.5,8482476.0,NYI,Emil Heineman Under 1.5 shots,105,0.4825,0.5131,0.4518,-0.5,-1.1,,False,False
+8481601-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,1.5,8481601.0,NYI,Simon Holmstrom Over 1.5 shots,-175,0.5485,0.5029,0.5941,-8.8,-13.8,,False,False
+8481601-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,1.5,8481601.0,NYI,Simon Holmstrom Under 1.5 shots,130,0.4515,0.4971,0.4059,1.7,3.9,,False,False
+8485366-sog-Over,-401892705,NYI @ LAK,Shots on goal,sog,Over,2.5,8485366.0,NYI,Matthew Schaefer Over 2.5 shots,-150,0.5395,0.5215,0.5575,-6.0,-10.1,,False,False
+8485366-sog-Under,-401892705,NYI @ LAK,Shots on goal,sog,Under,2.5,8485366.0,NYI,Matthew Schaefer Under 2.5 shots,110,0.4605,0.4785,0.4425,-1.6,-3.3,,False,False
+8479343-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,2.5,8479343.0,UTA,Clayton Keller Over 2.5 shots,-115,0.5002,0.5005,0.5,-3.5,-6.5,,False,False
+8479343-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,2.5,8479343.0,UTA,Clayton Keller Under 2.5 shots,-115,0.4998,0.4995,0.5,-3.5,-6.6,,False,False
+8476389-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8476389.0,UTA,Vincent Trocheck Over 1.5 shots,-135,0.5523,0.57,0.5347,-2.2,-3.9,,False,False
+8476389-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8476389.0,UTA,Vincent Trocheck Under 1.5 shots,100,0.4477,0.43,0.4653,-5.2,-10.5,,False,False
+8480855-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8480855.0,UTA,Jack McBain Over 1.5 shots,-115,0.4357,0.3713,0.5,-9.9,-18.5,,False,False
+8480855-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8480855.0,UTA,Jack McBain Under 1.5 shots,-115,0.5643,0.6287,0.5,2.9,5.5,,False,False
+8480849-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8480849.0,UTA,Barrett Hayton Over 1.5 shots,-145,0.5358,0.5175,0.5541,-5.6,-9.5,,False,False
+8480849-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8480849.0,UTA,Barrett Hayton Under 1.5 shots,110,0.4642,0.4825,0.4459,-1.2,-2.5,,False,False
+8484388-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8484388.0,UTA,Daniil But Over 1.5 shots,-110,0.4261,0.3669,0.4853,-9.8,-18.7,,False,False
+8484388-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8484388.0,UTA,Daniil But Under 1.5 shots,-125,0.5739,0.6331,0.5147,1.8,3.3,,False,False
+8479619-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8479619.0,UTA,Michael Carcone Over 1.5 shots,-105,0.493,0.5107,0.4754,-1.9,-3.7,,False,False
+8479619-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8479619.0,UTA,Michael Carcone Under 1.5 shots,-130,0.507,0.4893,0.5246,-5.8,-10.3,,False,False
+8478474-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8478474.0,UTA,Lawson Crouse Over 1.5 shots,-105,0.4733,0.4713,0.4754,-3.9,-7.6,,False,False
+8478474-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8478474.0,UTA,Lawson Crouse Under 1.5 shots,-130,0.5267,0.5287,0.5246,-3.9,-6.8,,False,False
+8477346-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8477346.0,UTA,MacKenzie Weegar Over 1.5 shots,-120,0.52,0.5351,0.5049,-2.5,-4.7,,False,False
+8477346-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8477346.0,UTA,MacKenzie Weegar Under 1.5 shots,-115,0.48,0.4649,0.4951,-5.5,-10.3,,False,False
+8479410-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,2.5,8479410.0,UTA,Mikhail Sergachev Over 2.5 shots,120,0.3874,0.35,0.4248,-6.7,-14.8,,False,False
+8479410-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,2.5,8479410.0,UTA,Mikhail Sergachev Under 2.5 shots,-160,0.6126,0.65,0.5752,-0.3,-0.5,,False,False
+8480023-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8480023.0,STL,Robert Thomas Over 1.5 shots,-115,0.4853,0.4756,0.4951,-5.0,-9.3,,False,False
+8480023-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8480023.0,STL,Robert Thomas Under 1.5 shots,-120,0.5147,0.5244,0.5049,-3.1,-5.6,,False,False
+8483516-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,2.5,8483516.0,STL,Jimmy Snuggerud Over 2.5 shots,110,0.4217,0.3975,0.4459,-5.4,-11.4,,False,False
+8483516-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,2.5,8483516.0,STL,Jimmy Snuggerud Under 2.5 shots,-145,0.5783,0.6025,0.5541,-1.4,-2.3,,False,False
+8482089-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8482089.0,STL,Jake Neighbours Over 1.5 shots,110,0.401,0.3596,0.4425,-7.5,-15.8,,False,False
+8482089-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8482089.0,STL,Jake Neighbours Under 1.5 shots,-150,0.599,0.6404,0.5575,-0.1,-0.2,,False,False
+8481580-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8481580.0,STL,Connor McMichael Over 1.5 shots,105,0.4454,0.4353,0.4554,-4.2,-8.7,,False,False
+8481580-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8481580.0,STL,Connor McMichael Under 1.5 shots,-140,0.5546,0.5647,0.5446,-2.9,-4.9,,False,False
+8482077-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,2.5,8482077.0,STL,Dylan Holloway Over 2.5 shots,145,0.4026,0.4234,0.3818,-0.6,-1.4,,False,False
+8482077-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,2.5,8482077.0,STL,Dylan Holloway Under 2.5 shots,-195,0.5974,0.5766,0.6182,-6.4,-9.6,,False,False
+8482745-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,2.5,8482745.0,STL,Mason McTavish Over 2.5 shots,130,0.3664,0.327,0.4059,-6.8,-15.7,,False,False
+8482745-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,2.5,8482745.0,STL,Mason McTavish Under 2.5 shots,-175,0.6336,0.673,0.5941,-0.3,-0.4,,False,False
+8477402-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8477402.0,STL,Pavel Buchnevich Over 1.5 shots,100,0.4833,0.5013,0.4653,-1.7,-3.3,,False,False
+8477402-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8477402.0,STL,Pavel Buchnevich Under 1.5 shots,-135,0.5167,0.4987,0.5347,-5.8,-10.1,,False,False
+8481598-sog-Over,-401892704,STL @ UTA,Shots on goal,sog,Over,1.5,8481598.0,STL,Philip Broberg Over 1.5 shots,-135,0.4883,0.442,0.5347,-8.6,-15.0,,False,False
+8481598-sog-Under,-401892704,STL @ UTA,Shots on goal,sog,Under,1.5,8481598.0,STL,Philip Broberg Under 1.5 shots,100,0.5117,0.558,0.4653,1.2,2.3,,False,False
+8473994-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,1.5,8473994.0,DAL,Jamie Benn Over 1.5 shots,-110,0.414,0.3427,0.4853,-11.0,-21.0,,False,False
+8473994-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,1.5,8473994.0,DAL,Jamie Benn Under 1.5 shots,-125,0.586,0.6573,0.5147,3.0,5.5,Value,False,False
+8480027-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,2.5,8480027.0,DAL,Jason Robertson Over 2.5 shots,-155,0.5785,0.5906,0.5665,-2.9,-4.8,,False,False
+8480027-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,2.5,8480027.0,DAL,Jason Robertson Under 2.5 shots,115,0.4215,0.4094,0.4335,-4.4,-9.4,,False,False
+8478449-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,2.5,8478449.0,DAL,Roope Hintz Over 2.5 shots,140,0.3582,0.3276,0.3887,-5.9,-14.0,,False,False
+8478449-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,2.5,8478449.0,DAL,Roope Hintz Under 2.5 shots,-190,0.6418,0.6724,0.6113,-1.3,-2.0,,False,False
+8484938-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,1.5,8484938.0,DAL,Arttu Hyry Over 1.5 shots,-175,0.5272,0.4603,0.5941,-10.9,-17.2,,False,False
+8484938-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,1.5,8484938.0,DAL,Arttu Hyry Under 1.5 shots,130,0.4728,0.5397,0.4059,3.8,8.7,,False,False
+8482740-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,2.5,8482740.0,DAL,Wyatt Johnston Over 2.5 shots,-110,0.493,0.4962,0.4899,-3.1,-5.9,,False,False
+8482740-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,2.5,8482740.0,DAL,Wyatt Johnston Under 2.5 shots,-120,0.507,0.5038,0.5101,-3.8,-7.1,,False,False
+8475794-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,1.5,8475794.0,DAL,Tyler Seguin Over 1.5 shots,-145,0.5258,0.5034,0.5482,-6.6,-11.2,,False,False
+8475794-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,1.5,8475794.0,DAL,Tyler Seguin Under 1.5 shots,105,0.4742,0.4966,0.4518,-1.4,-2.8,,False,False
+8478420-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,1.5,8478420.0,DAL,Mikko Rantanen Over 1.5 shots,-190,0.6184,0.6256,0.6113,-3.7,-5.6,,False,False
+8478420-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,1.5,8478420.0,DAL,Mikko Rantanen Under 1.5 shots,140,0.3816,0.3744,0.3887,-3.5,-8.4,,False,False
+8481581-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,2.5,8481581.0,DAL,Thomas Harley Over 2.5 shots,120,0.3569,0.2917,0.422,-9.8,-21.5,,False,False
+8481581-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,2.5,8481581.0,DAL,Thomas Harley Under 2.5 shots,-165,0.6431,0.7083,0.578,2.1,3.3,,False,False
+8480014-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,1.5,8480014.0,WPG,Gabriel Vilardi Over 1.5 shots,-125,0.5053,0.4959,0.5147,-5.0,-9.0,,False,False
+8480014-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,1.5,8480014.0,WPG,Gabriel Vilardi Under 1.5 shots,-110,0.4947,0.5041,0.4853,-2.9,-5.6,,False,False
+8482110-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,1.5,8482110.0,WPG,Dawson Mercer Over 1.5 shots,105,0.4595,0.4672,0.4518,-2.8,-5.8,,False,False
+8482110-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,1.5,8482110.0,WPG,Dawson Mercer Under 1.5 shots,-145,0.5405,0.5328,0.5482,-5.1,-8.7,,False,False
+8476460-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,1.5,8476460.0,WPG,Mark Scheifele Over 1.5 shots,-170,0.5923,0.5985,0.5862,-3.7,-5.9,,False,False
+8476460-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,1.5,8476460.0,WPG,Mark Scheifele Under 1.5 shots,125,0.4077,0.4015,0.4138,-3.7,-8.3,,False,False
+8478398-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,2.5,8478398.0,WPG,Kyle Connor Over 2.5 shots,-175,0.5864,0.5787,0.5941,-5.0,-7.9,,False,False
+8478398-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,2.5,8478398.0,WPG,Kyle Connor Under 2.5 shots,130,0.4136,0.4213,0.4059,-2.1,-4.9,,False,False
+8482149-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,2.5,8482149.0,WPG,Cole Perfetti Over 2.5 shots,135,0.3801,0.3642,0.396,-4.5,-10.7,,False,False
+8482149-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,2.5,8482149.0,WPG,Cole Perfetti Under 2.5 shots,-185,0.6199,0.6358,0.604,-2.9,-4.5,,False,False
+8480145-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,1.5,8480145.0,WPG,Neal Pionk Over 1.5 shots,-120,0.5096,0.5143,0.5049,-3.6,-6.6,,False,False
+8480145-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,1.5,8480145.0,WPG,Neal Pionk Under 1.5 shots,-115,0.4904,0.4857,0.4951,-4.4,-8.3,,False,False
+8477504-sog-Over,-401892703,WPG @ DAL,Shots on goal,sog,Over,1.5,8477504.0,WPG,Josh Morrissey Over 1.5 shots,-145,0.5325,0.5167,0.5482,-5.9,-10.0,,False,False
+8477504-sog-Under,-401892703,WPG @ DAL,Shots on goal,sog,Under,1.5,8477504.0,WPG,Josh Morrissey Under 1.5 shots,105,0.4675,0.4833,0.4518,-2.0,-4.2,,False,False
+8477987-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8477987.0,CHI,Ryan Donato Over 1.5 shots,-110,0.4694,0.4489,0.4899,-5.4,-10.4,,False,False
+8477987-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8477987.0,CHI,Ryan Donato Under 1.5 shots,-120,0.5306,0.5511,0.5101,-1.5,-2.7,,False,False
+8485391-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,2.5,8485391.0,CHI,Anton Frondell Over 2.5 shots,135,0.3991,0.4021,0.396,-2.6,-6.2,,False,False
+8485391-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,2.5,8485391.0,CHI,Anton Frondell Under 2.5 shots,-185,0.6009,0.5979,0.604,-4.8,-7.4,,False,False
+8477479-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8477479.0,CHI,Tyler Bertuzzi Over 1.5 shots,105,0.4554,0.4554,0.4554,-3.2,-6.6,,False,False
+8477479-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8477479.0,CHI,Tyler Bertuzzi Under 1.5 shots,-140,0.5446,0.5446,0.5446,-3.9,-6.6,,False,False
+8484390-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8484390.0,CHI,Roman Kantserov Over 1.5 shots,-195,0.5767,0.5351,0.6182,-8.4,-12.8,,False,False
+8484390-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8484390.0,CHI,Roman Kantserov Under 1.5 shots,145,0.4233,0.4649,0.3818,1.5,3.7,,False,False
+8483493-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8483493.0,CHI,Frank Nazar Over 1.5 shots,-125,0.5394,0.5641,0.5147,-1.6,-2.9,,False,False
+8483493-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8483493.0,CHI,Frank Nazar Under 1.5 shots,-110,0.4606,0.4359,0.4853,-6.3,-12.1,,False,False
+8484144-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,3.5,8484144.0,CHI,Connor Bedard Over 3.5 shots,115,0.3988,0.3641,0.4335,-6.6,-14.3,,False,False
+8484144-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,3.5,8484144.0,CHI,Connor Bedard Under 3.5 shots,-155,0.6012,0.6359,0.5665,-0.7,-1.1,,False,False
+8483506-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8483506.0,CHI,Sam Rinzel Over 1.5 shots,-115,0.4461,0.397,0.4951,-8.9,-16.6,,False,False
+8483506-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8483506.0,CHI,Sam Rinzel Under 1.5 shots,-120,0.5539,0.603,0.5049,0.8,1.6,,False,False
+8484145-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,2.5,8484145.0,BUF,Zach Benson Over 2.5 shots,110,0.405,0.3675,0.4425,-7.1,-15.0,,False,False
+8484145-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,2.5,8484145.0,BUF,Zach Benson Under 2.5 shots,-150,0.595,0.6325,0.5575,-0.5,-0.8,,False,False
+8480064-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8480064.0,BUF,Josh Norris Over 1.5 shots,100,0.4441,0.4229,0.4653,-5.6,-11.2,,False,False
+8480064-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8480064.0,BUF,Josh Norris Under 1.5 shots,-135,0.5559,0.5771,0.5347,-1.9,-3.2,,False,False
+8475722-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8475722.0,BUF,Jason Zucker Over 1.5 shots,-120,0.5146,0.5243,0.5049,-3.1,-5.7,,False,False
+8475722-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8475722.0,BUF,Jason Zucker Under 1.5 shots,-115,0.4854,0.4757,0.4951,-4.9,-9.2,,False,False
+8482097-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,2.5,8482097.0,BUF,Jack Quinn Over 2.5 shots,-145,0.5181,0.488,0.5482,-7.4,-12.5,,False,False
+8482097-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,2.5,8482097.0,BUF,Jack Quinn Under 2.5 shots,105,0.4819,0.512,0.4518,-0.6,-1.2,,False,False
+8479420-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,3.5,8479420.0,BUF,Tage Thompson Over 3.5 shots,100,0.4472,0.429,0.4653,-5.3,-10.6,,False,False
+8479420-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,3.5,8479420.0,BUF,Tage Thompson Under 3.5 shots,-135,0.5528,0.571,0.5347,-2.2,-3.8,,False,False
+8483500-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8483500.0,BUF,Noah Ostlund Over 1.5 shots,-175,0.5622,0.5302,0.5941,-7.4,-11.7,,False,False
+8483500-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8483500.0,BUF,Noah Ostlund Under 1.5 shots,130,0.4378,0.4698,0.4059,0.3,0.7,,False,False
+8482659-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8482659.0,BUF,Josh Doan Over 1.5 shots,-165,0.556,0.5285,0.5835,-6.7,-10.7,,False,False
+8482659-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8482659.0,BUF,Josh Doan Under 1.5 shots,125,0.444,0.4715,0.4165,-0.0,-0.1,,False,False
+8482803-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8482803.0,BUF,Olen Zellweger Over 1.5 shots,-115,0.4649,0.4299,0.5,-7.0,-13.1,,False,False
+8482803-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8482803.0,BUF,Olen Zellweger Under 1.5 shots,-115,0.5351,0.5701,0.5,0.0,0.0,,False,False
+8480807-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8480807.0,BUF,Mattias Samuelsson Over 1.5 shots,-110,0.4456,0.4059,0.4853,-7.8,-14.9,,False,False
+8480807-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8480807.0,BUF,Mattias Samuelsson Under 1.5 shots,-125,0.5544,0.5941,0.5147,-0.1,-0.2,,False,False
+8482671-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,1.5,8482671.0,BUF,Owen Power Over 1.5 shots,-110,0.4503,0.4106,0.4899,-7.4,-14.0,,False,False
+8482671-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,1.5,8482671.0,BUF,Owen Power Under 1.5 shots,-120,0.5497,0.5894,0.5101,0.4,0.8,,False,False
+8480839-sog-Over,-401892702,BUF @ CHI,Shots on goal,sog,Over,2.5,8480839.0,BUF,Rasmus Dahlin Over 2.5 shots,-145,0.4762,0.4043,0.5482,-11.6,-19.5,,False,False
+8480839-sog-Under,-401892702,BUF @ CHI,Shots on goal,sog,Under,2.5,8480839.0,BUF,Rasmus Dahlin Under 2.5 shots,105,0.5238,0.5957,0.4518,3.6,7.4,,False,False
+8475745-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8475745.0,CBJ,Charlie Coyle Over 1.5 shots,-185,0.562,0.52,0.604,-8.7,-13.4,,False,False
+8475745-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8475745.0,CBJ,Charlie Coyle Under 1.5 shots,135,0.438,0.48,0.396,1.2,2.9,,False,False
+8482705-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8482705.0,CBJ,Cole Sillinger Over 1.5 shots,-110,0.4551,0.4249,0.4853,-6.9,-13.1,,False,False
+8482705-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8482705.0,CBJ,Cole Sillinger Under 1.5 shots,-125,0.5449,0.5751,0.5147,-1.1,-1.9,,False,False
+8481716-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8481716.0,CBJ,Dmitri Voronkov Over 1.5 shots,110,0.3811,0.3196,0.4425,-9.5,-20.0,,False,False
+8481716-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8481716.0,CBJ,Dmitri Voronkov Under 1.5 shots,-150,0.6189,0.6804,0.5575,1.9,3.2,,False,False
+8484166-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,2.5,8484166.0,CBJ,Adam Fantilli Over 2.5 shots,100,0.4691,0.4728,0.4653,-3.1,-6.2,,False,False
+8484166-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,2.5,8484166.0,CBJ,Adam Fantilli Under 2.5 shots,-135,0.5309,0.5272,0.5347,-4.4,-7.6,,False,False
+8477497-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8477497.0,CBJ,Sean Monahan Over 1.5 shots,-125,0.4527,0.3908,0.5147,-10.3,-18.5,,False,False
+8477497-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8477497.0,CBJ,Sean Monahan Under 1.5 shots,-110,0.5473,0.6092,0.4853,2.3,4.5,,False,False
+8479671-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8479671.0,CBJ,Mathieu Olivier Over 1.5 shots,-145,0.5034,0.4586,0.5482,-8.8,-14.9,,False,False
+8479671-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8479671.0,CBJ,Mathieu Olivier Under 1.5 shots,105,0.4966,0.5414,0.4518,0.9,1.8,,False,False
+8477501-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8477501.0,CBJ,Valeri Nichushkin Over 1.5 shots,-165,0.5494,0.5208,0.578,-7.3,-11.8,,False,False
+8477501-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8477501.0,CBJ,Valeri Nichushkin Under 1.5 shots,120,0.4506,0.4792,0.422,-0.4,-0.9,,False,False
+8482720-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8482720.0,CBJ,Matthew Knies Over 1.5 shots,-130,0.4688,0.413,0.5246,-9.6,-17.1,,False,False
+8482720-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8482720.0,CBJ,Matthew Knies Under 1.5 shots,-105,0.5312,0.587,0.4754,1.9,3.7,,False,False
+8482660-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,2.5,8482660.0,CBJ,Kent Johnson Over 2.5 shots,140,0.3308,0.2729,0.3887,-8.6,-20.6,,False,False
+8482660-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,2.5,8482660.0,CBJ,Kent Johnson Under 2.5 shots,-190,0.6692,0.7271,0.6113,1.4,2.1,,False,False
+8483485-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8483485.0,CBJ,Denton Mateychuk Over 1.5 shots,165,0.3602,0.3692,0.3513,-1.7,-4.5,,False,False
+8483485-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8483485.0,CBJ,Denton Mateychuk Under 1.5 shots,-230,0.6398,0.6308,0.6487,-5.7,-8.2,,False,False
+8478460-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,3.5,8478460.0,CBJ,Zach Werenski Over 3.5 shots,110,0.3886,0.3313,0.4459,-8.8,-18.4,,False,False
+8478460-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,3.5,8478460.0,CBJ,Zach Werenski Under 3.5 shots,-145,0.6114,0.6687,0.5541,2.0,3.3,,False,False
+8478500-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8478500.0,CBJ,Ivan Provorov Over 1.5 shots,-155,0.5448,0.5231,0.5665,-6.3,-10.4,,False,False
+8478500-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8478500.0,CBJ,Ivan Provorov Under 1.5 shots,115,0.4552,0.4769,0.4335,-1.0,-2.1,,False,False
+8479542-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,2.5,8479542.0,TBL,Brandon Hagel Over 2.5 shots,-170,0.5633,0.5404,0.5862,-6.6,-10.5,,False,False
+8479542-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,2.5,8479542.0,TBL,Brandon Hagel Under 2.5 shots,125,0.4367,0.4596,0.4138,-0.8,-1.7,,False,False
+8477404-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,2.5,8477404.0,TBL,Jake Guentzel Over 2.5 shots,-120,0.4605,0.4162,0.5049,-8.5,-15.6,,False,False
+8477404-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,2.5,8477404.0,TBL,Jake Guentzel Under 2.5 shots,-115,0.5395,0.5838,0.4951,0.5,0.9,,False,False
+8478519-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8478519.0,TBL,Anthony Cirelli Over 1.5 shots,-115,0.4654,0.4356,0.4951,-7.0,-13.0,,False,False
+8478519-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8478519.0,TBL,Anthony Cirelli Under 1.5 shots,-120,0.5346,0.5644,0.5049,-1.1,-2.0,,False,False
+8476453-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,2.5,8476453.0,TBL,Nikita Kucherov Over 2.5 shots,-170,0.5901,0.5941,0.5862,-3.9,-6.3,,False,False
+8476453-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,2.5,8476453.0,TBL,Nikita Kucherov Under 2.5 shots,125,0.4099,0.4059,0.4138,-3.5,-7.8,,False,False
+8480426-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8480426.0,TBL,Charle-Edouard D'Astous Over 1.5 shots,110,0.391,0.3395,0.4425,-8.5,-17.9,,False,False
+8480426-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8480426.0,TBL,Charle-Edouard D'Astous Under 1.5 shots,-150,0.609,0.6605,0.5575,0.9,1.5,,False,False
+8474590-sog-Over,-401892701,TBL @ CBJ,Shots on goal,sog,Over,1.5,8474590.0,TBL,John Carlson Over 1.5 shots,-150,0.5369,0.5163,0.5575,-6.3,-10.5,,False,False
+8474590-sog-Under,-401892701,TBL @ CBJ,Shots on goal,sog,Under,1.5,8474590.0,TBL,John Carlson Under 1.5 shots,110,0.4631,0.4837,0.4425,-1.3,-2.8,,False,False
+8480002-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,2.5,8480002.0,NJD,Nico Hischier Over 2.5 shots,120,0.4156,0.4064,0.4248,-3.9,-8.6,,False,False
+8480002-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,2.5,8480002.0,NJD,Nico Hischier Under 2.5 shots,-160,0.5844,0.5936,0.5752,-3.1,-5.0,,False,False
+8477015-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8477015.0,NJD,Connor Brown Over 1.5 shots,-110,0.4759,0.4664,0.4853,-4.8,-9.2,,False,False
+8477015-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8477015.0,NJD,Connor Brown Under 1.5 shots,-125,0.5241,0.5336,0.5147,-3.1,-5.7,,False,False
+8478542-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8478542.0,NJD,Evan Rodrigues Over 1.5 shots,-120,0.5418,0.5736,0.5101,-0.4,-0.7,,False,False
+8478542-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8478542.0,NJD,Evan Rodrigues Under 1.5 shots,-110,0.4582,0.4264,0.4899,-6.6,-12.5,,False,False
+8478414-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,2.5,8478414.0,NJD,Timo Meier Over 2.5 shots,-175,0.5987,0.6033,0.5941,-3.8,-5.9,,False,False
+8478414-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,2.5,8478414.0,NJD,Timo Meier Under 2.5 shots,130,0.4013,0.3967,0.4059,-3.3,-7.7,,False,False
+8479407-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8479407.0,NJD,Jesper Bratt Over 1.5 shots,-185,0.6176,0.6312,0.604,-3.1,-4.9,,False,False
+8479407-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8479407.0,NJD,Jesper Bratt Under 1.5 shots,135,0.3824,0.3688,0.396,-4.3,-10.1,,False,False
+8482146-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,2.5,8482146.0,NJD,Luke Evangelista Over 2.5 shots,125,0.3955,0.3772,0.4138,-4.9,-11.0,,False,False
+8482146-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,2.5,8482146.0,NJD,Luke Evangelista Under 2.5 shots,-170,0.6045,0.6228,0.5862,-2.5,-4.0,,False,False
+8481721-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,2.5,8481721.0,NJD,Arseny Gritsyuk Over 2.5 shots,135,0.3793,0.3627,0.396,-4.6,-10.9,,False,False
+8481721-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,2.5,8481721.0,NJD,Arseny Gritsyuk Under 2.5 shots,-185,0.6207,0.6373,0.604,-2.8,-4.4,,False,False
+8481559-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,3.5,8481559.0,NJD,Jack Hughes Over 3.5 shots,-145,0.5342,0.5203,0.5482,-5.8,-9.7,,False,False
+8481559-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,3.5,8481559.0,NJD,Jack Hughes Under 3.5 shots,105,0.4658,0.4797,0.4518,-2.2,-4.5,,False,False
+8476462-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,2.5,8476462.0,NJD,Dougie Hamilton Over 2.5 shots,110,0.4043,0.3661,0.4425,-7.2,-15.1,,False,False
+8476462-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,2.5,8476462.0,NJD,Dougie Hamilton Under 2.5 shots,-150,0.5957,0.6339,0.5575,-0.4,-0.7,,False,False
+8482684-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8482684.0,NJD,Luke Hughes Over 1.5 shots,-195,0.6086,0.6038,0.6134,-5.2,-7.9,,False,False
+8482684-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8482684.0,NJD,Luke Hughes Under 1.5 shots,140,0.3914,0.3962,0.3866,-2.5,-6.1,,False,False
+8471214-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8471214.0,WSH,Alex Ovechkin Over 1.5 shots,-155,0.6156,0.6646,0.5665,0.8,1.3,,False,False
+8471214-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8471214.0,WSH,Alex Ovechkin Under 1.5 shots,115,0.3844,0.3354,0.4335,-8.1,-17.3,,False,False
+8484186-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8484186.0,WSH,Ryan Leonard Over 1.5 shots,-175,0.5942,0.5943,0.5941,-4.2,-6.6,,False,False
+8484186-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8484186.0,WSH,Ryan Leonard Under 1.5 shots,130,0.4058,0.4057,0.4059,-2.9,-6.7,,False,False
+8478440-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8478440.0,WSH,Dylan Strome Over 1.5 shots,-115,0.507,0.514,0.5,-2.8,-5.2,,False,False
+8478440-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8478440.0,WSH,Dylan Strome Under 1.5 shots,-115,0.493,0.486,0.5,-4.2,-7.8,,False,False
+8481656-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8481656.0,WSH,Aliaksei Protas Over 1.5 shots,115,0.4385,0.4466,0.4305,-2.7,-5.7,,False,False
+8481656-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8481656.0,WSH,Aliaksei Protas Under 1.5 shots,-160,0.5615,0.5534,0.5695,-5.4,-8.8,,False,False
+8479385-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8479385.0,WSH,Jordan Kyrou Over 1.5 shots,-125,0.5208,0.5214,0.5203,-3.5,-6.2,,False,False
+8479385-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8479385.0,WSH,Jordan Kyrou Under 1.5 shots,-105,0.4792,0.4786,0.4797,-3.3,-6.4,,False,False
+8476880-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8476880.0,WSH,Tom Wilson Over 1.5 shots,-110,0.5045,0.5238,0.4853,-1.9,-3.7,,False,False
+8476880-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8476880.0,WSH,Tom Wilson Under 1.5 shots,-125,0.4955,0.4762,0.5147,-6.0,-10.8,,False,False
+8479400-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8479400.0,WSH,Pierre-Luc Dubois Over 1.5 shots,130,0.4229,0.4398,0.4059,-1.2,-2.7,,False,False
+8479400-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8479400.0,WSH,Pierre-Luc Dubois Under 1.5 shots,-175,0.5771,0.5602,0.5941,-5.9,-9.3,,False,False
+8477949-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8477949.0,WSH,Alex Tuch Over 1.5 shots,-170,0.6083,0.6304,0.5862,-2.1,-3.4,,False,False
+8477949-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8477949.0,WSH,Alex Tuch Under 1.5 shots,125,0.3917,0.3696,0.4138,-5.3,-11.9,,False,False
+8479345-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,2.5,8479345.0,WSH,Jakob Chychrun Over 2.5 shots,120,0.3983,0.3746,0.422,-5.6,-12.4,,False,False
+8479345-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,2.5,8479345.0,WSH,Jakob Chychrun Under 2.5 shots,-165,0.6017,0.6254,0.578,-2.1,-3.4,,False,False
+8484873-sog-Over,-401892700,WSH @ NJD,Shots on goal,sog,Over,1.5,8484873.0,WSH,Cole Hutson Over 1.5 shots,100,0.4463,0.431,0.4615,-5.4,-10.7,,False,False
+8484873-sog-Under,-401892700,WSH @ NJD,Shots on goal,sog,Under,1.5,8484873.0,WSH,Cole Hutson Under 1.5 shots,-140,0.5537,0.569,0.5385,-3.0,-5.1,,False,False
+8480801-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,3.5,8480801.0,FLA,Brady Tkachuk Over 3.5 shots,115,0.3976,0.3647,0.4305,-6.8,-14.5,,False,False
+8480801-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,3.5,8480801.0,FLA,Brady Tkachuk Under 3.5 shots,-160,0.6024,0.6353,0.5695,-1.3,-2.1,,False,False
+8477935-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,2.5,8477935.0,FLA,Sam Bennett Over 2.5 shots,115,0.4475,0.4615,0.4335,-1.8,-3.8,,False,False
+8477935-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,2.5,8477935.0,FLA,Sam Bennett Under 2.5 shots,-155,0.5525,0.5385,0.5665,-5.5,-9.1,,False,False
+8477933-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,2.5,8477933.0,FLA,Sam Reinhart Over 2.5 shots,-125,0.5232,0.5317,0.5147,-3.2,-5.8,,False,False
+8477933-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,2.5,8477933.0,FLA,Sam Reinhart Under 2.5 shots,-110,0.4768,0.4683,0.4853,-4.7,-9.0,,False,False
+8482113-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,2.5,8482113.0,FLA,Anton Lundell Over 2.5 shots,135,0.3969,0.3955,0.3983,-2.9,-6.7,,False,False
+8482113-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,2.5,8482113.0,FLA,Anton Lundell Under 2.5 shots,-180,0.6031,0.6045,0.6017,-4.0,-6.2,,False,False
+8479314-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,2.5,8479314.0,FLA,Matthew Tkachuk Over 2.5 shots,-115,0.4928,0.4856,0.5,-4.2,-7.9,,False,False
+8479314-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,2.5,8479314.0,FLA,Matthew Tkachuk Under 2.5 shots,-115,0.5072,0.5144,0.5,-2.8,-5.2,,False,False
+8477409-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,2.5,8477409.0,FLA,Carter Verhaeghe Over 2.5 shots,100,0.4643,0.4633,0.4653,-3.6,-7.1,,False,False
+8477409-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,2.5,8477409.0,FLA,Carter Verhaeghe Under 2.5 shots,-135,0.5357,0.5367,0.5347,-3.9,-6.8,,False,False
+8477495-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,1.5,8477495.0,FLA,Seth Jones Over 1.5 shots,-150,0.5609,0.5584,0.5633,-3.9,-6.5,,False,False
+8477495-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,1.5,8477495.0,FLA,Seth Jones Under 1.5 shots,115,0.4391,0.4416,0.4367,-2.6,-5.6,,False,False
+8477932-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,1.5,8477932.0,FLA,Aaron Ekblad Over 1.5 shots,100,0.4464,0.4274,0.4653,-5.4,-10.7,,False,False
+8477932-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,1.5,8477932.0,FLA,Aaron Ekblad Under 1.5 shots,-135,0.5536,0.5726,0.5347,-2.1,-3.6,,False,False
+8477429-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,1.5,8477429.0,DET,Andrew Copp Over 1.5 shots,110,0.4488,0.4552,0.4425,-2.7,-5.7,,False,False
+8477429-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,1.5,8477429.0,DET,Andrew Copp Under 1.5 shots,-150,0.5512,0.5448,0.5575,-4.9,-8.1,,False,False
+8482078-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,2.5,8482078.0,DET,Lucas Raymond Over 2.5 shots,125,0.4437,0.4709,0.4165,-0.1,-0.2,,False,False
+8482078-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,2.5,8482078.0,DET,Lucas Raymond Under 2.5 shots,-165,0.5563,0.5291,0.5835,-6.6,-10.7,,False,False
+8484794-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,1.5,8484794.0,DET,Michael Brandsegg-Nygård Over 1.5 shots,-110,0.4872,0.4892,0.4853,-3.7,-7.0,,False,False
+8484794-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,1.5,8484794.0,DET,Michael Brandsegg-Nygård Under 1.5 shots,-125,0.5128,0.5108,0.5147,-4.3,-7.7,,False,False
+8478042-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,2.5,8478042.0,DET,Viktor Arvidsson Over 2.5 shots,100,0.4528,0.4403,0.4653,-4.7,-9.4,,False,False
+8478042-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,2.5,8478042.0,DET,Viktor Arvidsson Under 2.5 shots,-135,0.5472,0.5597,0.5347,-2.7,-4.8,,False,False
+8484471-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,1.5,8484471.0,DET,Emmitt Finnie Over 1.5 shots,-150,0.5231,0.4887,0.5575,-7.7,-12.8,,False,False
+8484471-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,1.5,8484471.0,DET,Emmitt Finnie Under 1.5 shots,110,0.4769,0.5113,0.4425,0.1,0.1,,False,False
+8479337-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,3.5,8479337.0,DET,Alex DeBrincat Over 3.5 shots,125,0.4084,0.403,0.4138,-3.6,-8.1,,False,False
+8479337-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,3.5,8479337.0,DET,Alex DeBrincat Under 3.5 shots,-170,0.5916,0.597,0.5862,-3.8,-6.0,,False,False
+8481542-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,1.5,8481542.0,DET,Moritz Seider Over 1.5 shots,-155,0.5678,0.5691,0.5665,-4.0,-6.6,,False,False
+8481542-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,1.5,8481542.0,DET,Moritz Seider Under 1.5 shots,115,0.4322,0.4309,0.4335,-3.3,-7.1,,False,False
+8475753-sog-Over,-401892699,DET @ FLA,Shots on goal,sog,Over,1.5,8475753.0,DET,Justin Faulk Over 1.5 shots,105,0.4258,0.3998,0.4518,-6.2,-12.7,,False,False
+8475753-sog-Under,-401892699,DET @ FLA,Shots on goal,sog,Under,1.5,8475753.0,DET,Justin Faulk Under 1.5 shots,-145,0.5742,0.6002,0.5482,-1.8,-3.0,,False,False
+8481596-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8481596.0,OTT,Shane Pinto Over 1.5 shots,-190,0.6068,0.6023,0.6113,-4.8,-7.4,,False,False
+8481596-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8481596.0,OTT,Shane Pinto Under 1.5 shots,140,0.3932,0.3977,0.3887,-2.3,-5.6,,False,False
+8482116-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,2.5,8482116.0,OTT,Tim Stützle Over 2.5 shots,135,0.4091,0.4222,0.396,-1.6,-3.9,,False,False
+8482116-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,2.5,8482116.0,OTT,Tim Stützle Under 2.5 shots,-185,0.5909,0.5778,0.604,-5.8,-9.0,,False,False
+8480208-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,2.5,8480208.0,OTT,Drake Batherson Over 2.5 shots,130,0.3814,0.3568,0.4059,-5.3,-12.3,,False,False
+8480208-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,2.5,8480208.0,OTT,Drake Batherson Under 2.5 shots,-175,0.6186,0.6432,0.5941,-1.8,-2.8,,False,False
+8480188-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8480188.0,OTT,Fabian Zetterlund Over 1.5 shots,-170,0.5555,0.5247,0.5862,-7.4,-11.8,,False,False
+8480188-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8480188.0,OTT,Fabian Zetterlund Under 1.5 shots,125,0.4445,0.4753,0.4138,0.0,0.0,,False,False
+8481528-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,2.5,8481528.0,OTT,Dylan Cozens Over 2.5 shots,110,0.4272,0.4118,0.4425,-4.9,-10.3,,False,False
+8481528-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,2.5,8481528.0,OTT,Dylan Cozens Under 2.5 shots,-150,0.5728,0.5882,0.5575,-2.7,-4.5,,False,False
+8473512-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8473512.0,OTT,Claude Giroux Over 1.5 shots,-165,0.5296,0.4812,0.578,-9.3,-14.9,,False,False
+8473512-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8473512.0,OTT,Claude Giroux Under 1.5 shots,120,0.4704,0.5188,0.422,1.6,3.5,,False,False
+8481577-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8481577.0,OTT,Philip Tomasino Over 1.5 shots,-120,0.4509,0.3968,0.5049,-9.5,-17.3,,False,False
+8481577-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8481577.0,OTT,Philip Tomasino Under 1.5 shots,-115,0.5491,0.6032,0.4951,1.4,2.7,,False,False
+8482092-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8482092.0,OTT,Ridly Greig Over 1.5 shots,-110,0.4815,0.4732,0.4899,-4.2,-8.1,,False,False
+8482092-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8482092.0,OTT,Ridly Greig Under 1.5 shots,-120,0.5185,0.5268,0.5101,-2.7,-4.9,,False,False
+8478469-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8478469.0,OTT,Thomas Chabot Over 1.5 shots,-115,0.511,0.5219,0.5,-2.4,-4.5,,False,False
+8478469-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8478469.0,OTT,Thomas Chabot Under 1.5 shots,-115,0.489,0.4781,0.5,-4.6,-8.6,,False,False
+8482105-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8482105.0,OTT,Jake Sanderson Over 1.5 shots,-160,0.5871,0.5991,0.5752,-2.8,-4.6,,False,False
+8482105-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8482105.0,OTT,Jake Sanderson Under 1.5 shots,120,0.4129,0.4009,0.4248,-4.2,-9.2,,False,False
+8475754-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8475754.0,COL,Brock Nelson Over 1.5 shots,-110,0.5068,0.5237,0.4899,-1.7,-3.2,,False,False
+8475754-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8475754.0,COL,Brock Nelson Under 1.5 shots,-120,0.4932,0.4763,0.5101,-5.2,-9.6,,False,False
+8486171-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8486171.0,COL,T.J. Hughes Over 1.5 shots,-165,0.576,0.5686,0.5835,-4.7,-7.5,,False,False
+8486171-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8486171.0,COL,T.J. Hughes Under 1.5 shots,125,0.424,0.4314,0.4165,-2.0,-4.6,,False,False
+8477492-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,3.5,8477492.0,COL,Nathan MacKinnon Over 3.5 shots,120,0.4104,0.3988,0.422,-4.4,-9.7,,False,False
+8477492-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,3.5,8477492.0,COL,Nathan MacKinnon Under 3.5 shots,-165,0.5896,0.6012,0.578,-3.3,-5.3,,False,False
+8477476-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8477476.0,COL,Artturi Lehkonen Over 1.5 shots,-125,0.5391,0.5578,0.5203,-1.6,-3.0,,False,False
+8477476-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8477476.0,COL,Artturi Lehkonen Under 1.5 shots,-105,0.4609,0.4422,0.4797,-5.1,-10.0,,False,False
+8480039-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,2.5,8480039.0,COL,Martin Necas Over 2.5 shots,130,0.4045,0.4031,0.4059,-3.0,-7.0,,False,False
+8480039-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,2.5,8480039.0,COL,Martin Necas Under 2.5 shots,-175,0.5955,0.5969,0.5941,-4.1,-6.4,,False,False
+8475172-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,2.5,8475172.0,COL,Nazem Kadri Over 2.5 shots,125,0.4236,0.4335,0.4138,-2.1,-4.7,,False,False
+8475172-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,2.5,8475172.0,COL,Nazem Kadri Under 2.5 shots,-170,0.5764,0.5665,0.5862,-5.3,-8.5,,False,False
+8476455-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8476455.0,COL,Gabriel Landeskog Over 1.5 shots,110,0.4621,0.4816,0.4425,-1.4,-3.0,,False,False
+8476455-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8476455.0,COL,Gabriel Landeskog Under 1.5 shots,-150,0.5379,0.5184,0.5575,-6.2,-10.3,,False,False
+8478038-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8478038.0,COL,Devon Toews Over 1.5 shots,105,0.4378,0.4201,0.4554,-5.0,-10.3,,False,False
+8478038-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8478038.0,COL,Devon Toews Under 1.5 shots,-140,0.5622,0.5799,0.5446,-2.1,-3.6,,False,False
+8480069-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,2.5,8480069.0,COL,Cale Makar Over 2.5 shots,100,0.4369,0.4084,0.4653,-6.3,-12.6,,False,False
+8480069-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,2.5,8480069.0,COL,Cale Makar Under 2.5 shots,-135,0.5631,0.5916,0.5347,-1.1,-2.0,,False,False
+8484258-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8484258.0,COL,Sam Malinski Over 1.5 shots,100,0.4567,0.448,0.4653,-4.3,-8.7,,False,False
+8484258-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8484258.0,COL,Sam Malinski Under 1.5 shots,-135,0.5433,0.552,0.5347,-3.1,-5.4,,False,False
+8470613-sog-Over,-401892698,COL @ OTT,Shots on goal,sog,Over,1.5,8470613.0,COL,Brent Burns Over 1.5 shots,110,0.4381,0.4337,0.4425,-3.8,-8.0,,False,False
+8470613-sog-Under,-401892698,COL @ OTT,Shots on goal,sog,Under,1.5,8470613.0,COL,Brent Burns Under 1.5 shots,-150,0.5619,0.5663,0.5575,-3.8,-6.3,,False,False
+8479318-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,3.5,8479318.0,TOR,Auston Matthews Over 3.5 shots,110,0.4115,0.3771,0.4459,-6.5,-13.6,,False,False
+8479318-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,3.5,8479318.0,TOR,Auston Matthews Under 3.5 shots,-145,0.5885,0.6229,0.5541,-0.3,-0.6,,False,False
+8484158-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,1.5,8484158.0,TOR,Easton Cowan Over 1.5 shots,-115,0.496,0.492,0.5,-3.9,-7.3,,False,False
+8484158-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,1.5,8484158.0,TOR,Easton Cowan Under 1.5 shots,-115,0.504,0.508,0.5,-3.1,-5.8,,False,False
+8477939-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,2.5,8477939.0,TOR,William Nylander Over 2.5 shots,-110,0.478,0.4707,0.4853,-4.6,-8.7,,False,False
+8477939-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,2.5,8477939.0,TOR,William Nylander Under 2.5 shots,-125,0.522,0.5293,0.5147,-3.4,-6.0,,False,False
+8475166-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,2.5,8475166.0,TOR,John Tavares Over 2.5 shots,130,0.3868,0.3677,0.4059,-4.8,-11.0,,False,False
+8475166-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,2.5,8475166.0,TOR,John Tavares Under 2.5 shots,-175,0.6132,0.6323,0.5941,-2.3,-3.6,,False,False
+8486067-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,1.5,8486067.0,TOR,Gavin McKenna Over 1.5 shots,-105,0.4639,0.448,0.4797,-4.8,-9.4,,False,False
+8486067-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,1.5,8486067.0,TOR,Gavin McKenna Under 1.5 shots,-125,0.5361,0.552,0.5203,-1.9,-3.5,,False,False
+8478458-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,2.5,8478458.0,TOR,Jack Roslovic Over 2.5 shots,130,0.3822,0.3586,0.4059,-5.3,-12.1,,False,False
+8478458-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,2.5,8478458.0,TOR,Jack Roslovic Under 2.5 shots,-175,0.6178,0.6414,0.5941,-1.9,-2.9,,False,False
+8478178-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,2.5,8478178.0,TOR,Darren Raddysh Over 2.5 shots,105,0.436,0.4201,0.4518,-5.2,-10.6,,False,False
+8478178-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,2.5,8478178.0,TOR,Darren Raddysh Under 2.5 shots,-145,0.564,0.5799,0.5482,-2.8,-4.7,,False,False
+8481553-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,1.5,8481553.0,MIN,Bobby Brink Over 1.5 shots,-130,0.5146,0.5045,0.5246,-5.1,-9.0,,False,False
+8481553-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,1.5,8481553.0,MIN,Bobby Brink Under 1.5 shots,-105,0.4854,0.4955,0.4754,-2.7,-5.2,,False,False
+8481557-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,3.5,8481557.0,MIN,Matt Boldy Over 3.5 shots,-105,0.4774,0.4794,0.4754,-3.5,-6.8,,False,False
+8481557-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,3.5,8481557.0,MIN,Matt Boldy Under 3.5 shots,-130,0.5226,0.5206,0.5246,-4.3,-7.5,,False,False
+8478493-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,2.5,8478493.0,MIN,Joel Eriksson Ek Over 2.5 shots,-165,0.5547,0.5314,0.578,-6.8,-10.9,,False,False
+8478493-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,2.5,8478493.0,MIN,Joel Eriksson Ek Under 2.5 shots,120,0.4453,0.4686,0.422,-0.9,-2.0,,False,False
+8476399-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,2.5,8476399.0,MIN,Blake Coleman Over 2.5 shots,130,0.3907,0.3755,0.4059,-4.4,-10.1,,False,False
+8476399-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,2.5,8476399.0,MIN,Blake Coleman Under 2.5 shots,-175,0.6093,0.6245,0.5941,-2.7,-4.3,,False,False
+8483525-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,1.5,8483525.0,MIN,Danila Yurov Over 1.5 shots,105,0.4381,0.4209,0.4554,-5.0,-10.2,,False,False
+8483525-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,1.5,8483525.0,MIN,Danila Yurov Under 1.5 shots,-140,0.5619,0.5791,0.5446,-2.1,-3.7,,False,False
+8477451-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,1.5,8477451.0,MIN,Ryan Hartman Over 1.5 shots,115,0.4915,0.5496,0.4335,2.6,5.7,,False,False
+8477451-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,1.5,8477451.0,MIN,Ryan Hartman Under 1.5 shots,-155,0.5085,0.4504,0.5665,-9.9,-16.3,,False,False
+8477446-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,1.5,8477446.0,MIN,Michael McCarron Over 1.5 shots,100,0.4418,0.4183,0.4653,-5.8,-11.6,,False,False
+8477446-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,1.5,8477446.0,MIN,Michael McCarron Under 1.5 shots,-135,0.5582,0.5817,0.5347,-1.6,-2.8,,False,False
+8485702-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,1.5,8485702.0,MIN,Maxim Shabanov Over 1.5 shots,-115,0.4892,0.4783,0.5,-4.6,-8.6,,False,False
+8485702-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,1.5,8485702.0,MIN,Maxim Shabanov Under 1.5 shots,-115,0.5108,0.5217,0.5,-2.4,-4.5,,False,False
+8478864-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,3.5,8478864.0,MIN,Kirill Kaprizov Over 3.5 shots,105,0.4517,0.448,0.4554,-3.6,-7.4,,False,False
+8478864-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,3.5,8478864.0,MIN,Kirill Kaprizov Under 3.5 shots,-140,0.5483,0.552,0.5446,-3.5,-6.0,,False,False
+8480800-sog-Over,-401892697,MIN @ TOR,Shots on goal,sog,Over,2.5,8480800.0,MIN,Quinn Hughes Over 2.5 shots,110,0.4501,0.4576,0.4425,-2.6,-5.5,,False,False
+8480800-sog-Under,-401892697,MIN @ TOR,Shots on goal,sog,Under,2.5,8480800.0,MIN,Quinn Hughes Under 2.5 shots,-150,0.5499,0.5424,0.5575,-5.0,-8.3,,False,False
+8482175-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,2.5,8482175.0,BOS,JJ Peterka Over 2.5 shots,130,0.3898,0.3762,0.4035,-4.5,-10.3,,False,False
+8482175-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,2.5,8482175.0,BOS,JJ Peterka Under 2.5 shots,-180,0.6102,0.6238,0.5965,-3.3,-5.1,,False,False
+8478401-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,1.5,8478401.0,BOS,Pavel Zacha Over 1.5 shots,-165,0.5598,0.5415,0.578,-6.3,-10.1,,False,False
+8478401-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,1.5,8478401.0,BOS,Pavel Zacha Under 1.5 shots,120,0.4402,0.4585,0.422,-1.4,-3.2,,False,False
+8477496-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,1.5,8477496.0,BOS,Elias Lindholm Over 1.5 shots,-195,0.5949,0.5763,0.6134,-6.6,-10.0,,False,False
+8477496-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,1.5,8477496.0,BOS,Elias Lindholm Under 1.5 shots,140,0.4051,0.4237,0.3866,-1.2,-2.8,,False,False
+8479987-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,2.5,8479987.0,BOS,Morgan Geekie Over 2.5 shots,135,0.3842,0.3724,0.396,-4.1,-9.7,,False,False
+8479987-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,2.5,8479987.0,BOS,Morgan Geekie Under 2.5 shots,-185,0.6158,0.6276,0.604,-3.3,-5.1,,False,False
+8479591-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,1.5,8479591.0,BOS,Michael Eyssimont Over 1.5 shots,-145,0.506,0.4638,0.5482,-8.6,-14.5,,False,False
+8479591-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,1.5,8479591.0,BOS,Michael Eyssimont Under 1.5 shots,105,0.494,0.5362,0.4518,0.6,1.3,,False,False
+8477956-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,3.5,8477956.0,BOS,David Pastrnak Over 3.5 shots,-120,0.4816,0.4584,0.5049,-6.4,-11.7,,False,False
+8477956-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,3.5,8477956.0,BOS,David Pastrnak Under 3.5 shots,-115,0.5184,0.5416,0.4951,-1.7,-3.1,,False,False
+8483489-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,1.5,8483489.0,BOS,Fraser Minten Over 1.5 shots,-140,0.5202,0.4958,0.5446,-6.3,-10.8,,False,False
+8483489-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,1.5,8483489.0,BOS,Fraser Minten Under 1.5 shots,105,0.4798,0.5042,0.4554,-0.8,-1.6,,False,False
+8479325-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,1.5,8479325.0,BOS,Charlie McAvoy Over 1.5 shots,-135,0.5203,0.506,0.5347,-5.4,-9.4,,False,False
+8479325-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,1.5,8479325.0,BOS,Charlie McAvoy Under 1.5 shots,100,0.4797,0.494,0.4653,-2.0,-4.1,,False,False
+8481540-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,3.5,8481540.0,MTL,Cole Caufield Over 3.5 shots,125,0.3786,0.346,0.4112,-6.6,-14.8,,False,False
+8481540-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,3.5,8481540.0,MTL,Cole Caufield Under 3.5 shots,-175,0.6214,0.654,0.5888,-1.5,-2.4,,False,False
+8480018-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,2.5,8480018.0,MTL,Nick Suzuki Over 2.5 shots,105,0.4677,0.4837,0.4518,-2.0,-4.1,,False,False
+8480018-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,2.5,8480018.0,MTL,Nick Suzuki Under 2.5 shots,-145,0.5323,0.5163,0.5482,-6.0,-10.1,,False,False
+8476981-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,1.5,8476981.0,MTL,Josh Anderson Over 1.5 shots,115,0.4185,0.4035,0.4335,-4.7,-10.0,,False,False
+8476981-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,1.5,8476981.0,MTL,Josh Anderson Under 1.5 shots,-155,0.5815,0.5965,0.5665,-2.6,-4.3,,False,False
+8483515-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,2.5,8483515.0,MTL,Juraj Slafkovský Over 2.5 shots,115,0.4232,0.413,0.4335,-4.2,-9.0,,False,False
+8483515-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,2.5,8483515.0,MTL,Juraj Slafkovský Under 2.5 shots,-155,0.5768,0.587,0.5665,-3.1,-5.1,,False,False
+8483457-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,1.5,8483457.0,MTL,Lane Hutson Over 1.5 shots,-130,0.521,0.5175,0.5246,-4.4,-7.8,,False,False
+8483457-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,1.5,8483457.0,MTL,Lane Hutson Under 1.5 shots,-105,0.479,0.4825,0.4754,-3.3,-6.5,,False,False
+8480865-sog-Over,-401892696,MTL @ BOS,Shots on goal,sog,Over,1.5,8480865.0,MTL,Noah Dobson Over 1.5 shots,-170,0.5675,0.5488,0.5862,-6.2,-9.9,,False,False
+8480865-sog-Under,-401892696,MTL @ BOS,Shots on goal,sog,Under,1.5,8480865.0,MTL,Noah Dobson Under 1.5 shots,125,0.4325,0.4512,0.4138,-1.2,-2.7,,False,False
+8474586-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8474586.0,SEA,Jordan Eberle Over 1.5 shots,-135,0.5194,0.5042,0.5347,-5.5,-9.6,,False,False
+8474586-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8474586.0,SEA,Jordan Eberle Under 1.5 shots,100,0.4806,0.4958,0.4653,-1.9,-3.9,,False,False
+8482665-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8482665.0,SEA,Matty Beniers Over 1.5 shots,100,0.4593,0.4533,0.4653,-4.1,-8.1,,False,False
+8482665-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8482665.0,SEA,Matty Beniers Under 1.5 shots,-135,0.5407,0.5467,0.5347,-3.4,-5.9,,False,False
+8482713-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8482713.0,SEA,Mackie Samoskevich Over 1.5 shots,-150,0.5272,0.4969,0.5575,-7.3,-12.1,,False,False
+8482713-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8482713.0,SEA,Mackie Samoskevich Under 1.5 shots,110,0.4728,0.5031,0.4425,-0.3,-0.7,,False,False
+8484800-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8484800.0,SEA,Berkly Catton Over 1.5 shots,115,0.3948,0.3561,0.4335,-7.0,-15.1,,False,False
+8484800-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8484800.0,SEA,Berkly Catton Under 1.5 shots,-155,0.6052,0.6439,0.5665,-0.3,-0.4,,False,False
+8483497-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8483497.0,SEA,Jani Nyman Over 1.5 shots,175,0.3225,0.3037,0.3414,-4.1,-11.3,,False,False
+8483497-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8483497.0,SEA,Jani Nyman Under 1.5 shots,-235,0.6775,0.6963,0.6586,-2.4,-3.4,,False,False
+8482259-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,2.5,8482259.0,SEA,Bobby McMann Over 2.5 shots,105,0.4068,0.3582,0.4554,-8.1,-16.6,,False,False
+8482259-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,2.5,8482259.0,SEA,Bobby McMann Under 2.5 shots,-140,0.5932,0.6418,0.5446,1.0,1.7,,False,False
+8481554-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8481554.0,SEA,Kaapo Kakko Over 1.5 shots,140,0.3274,0.2661,0.3887,-8.9,-21.4,,False,False
+8481554-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8481554.0,SEA,Kaapo Kakko Under 1.5 shots,-190,0.6726,0.7339,0.6113,1.7,2.7,,False,False
+8478407-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8478407.0,SEA,Vince Dunn Over 1.5 shots,-125,0.5215,0.5282,0.5147,-3.4,-6.1,,False,False
+8478407-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8478407.0,SEA,Vince Dunn Under 1.5 shots,-110,0.4785,0.4718,0.4853,-4.5,-8.6,,False,False
+8482866-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,0.5,8482866.0,SEA,Ville Ottavainen Over 0.5 shots,-210,0.5815,0.5297,0.6334,-9.6,-14.2,,False,False
+8482866-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,0.5,8482866.0,SEA,Ville Ottavainen Under 0.5 shots,155,0.4185,0.4703,0.3666,2.6,6.7,,False,False
+8477986-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,2.5,8477986.0,SEA,Brandon Montour Over 2.5 shots,135,0.3514,0.3045,0.3983,-7.4,-17.4,,False,False
+8477986-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,2.5,8477986.0,SEA,Brandon Montour Under 2.5 shots,-180,0.6486,0.6955,0.6017,0.6,0.9,,False,False
+8478427-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,2.5,8478427.0,CAR,Sebastian Aho Over 2.5 shots,-165,0.5522,0.5265,0.578,-7.0,-11.3,,False,False
+8478427-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,2.5,8478427.0,CAR,Sebastian Aho Under 2.5 shots,120,0.4478,0.4735,0.422,-0.7,-1.5,,False,False
+8482702-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,2.5,8482702.0,CAR,Logan Stankoven Over 2.5 shots,140,0.3984,0.4081,0.3887,-1.8,-4.4,,False,False
+8482702-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,2.5,8482702.0,CAR,Logan Stankoven Under 2.5 shots,-190,0.6016,0.5919,0.6113,-5.4,-8.2,,False,False
+8482093-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,2.5,8482093.0,CAR,Seth Jarvis Over 2.5 shots,145,0.4162,0.4506,0.3818,0.8,2.0,,False,False
+8482093-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,2.5,8482093.0,CAR,Seth Jarvis Under 2.5 shots,-195,0.5838,0.5494,0.6182,-7.7,-11.7,,False,False
+8477940-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,2.5,8477940.0,CAR,Nikolaj Ehlers Over 2.5 shots,130,0.4196,0.4333,0.4059,-1.5,-3.5,,False,False
+8477940-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,2.5,8477940.0,CAR,Nikolaj Ehlers Under 2.5 shots,-175,0.5804,0.5667,0.5941,-5.6,-8.8,,False,False
+8477478-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8477478.0,CAR,William Carrier Over 1.5 shots,130,0.3921,0.3782,0.4059,-4.3,-9.8,,False,False
+8477478-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8477478.0,CAR,William Carrier Under 1.5 shots,-175,0.6079,0.6218,0.5941,-2.8,-4.5,,False,False
+8480830-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,2.5,8480830.0,CAR,Andrei Svechnikov Over 2.5 shots,-105,0.4864,0.4974,0.4754,-2.6,-5.0,,False,False
+8480830-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,2.5,8480830.0,CAR,Andrei Svechnikov Under 2.5 shots,-130,0.5136,0.5026,0.5246,-5.2,-9.1,,False,False
+8482809-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,2.5,8482809.0,CAR,Jackson Blake Over 2.5 shots,125,0.4199,0.4259,0.4138,-2.5,-5.5,,False,False
+8482809-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,2.5,8482809.0,CAR,Jackson Blake Under 2.5 shots,-170,0.5801,0.5741,0.5862,-4.9,-7.9,,False,False
+8475791-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8475791.0,CAR,Taylor Hall Over 1.5 shots,-155,0.5563,0.5461,0.5665,-5.2,-8.5,,False,False
+8475791-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8475791.0,CAR,Taylor Hall Under 1.5 shots,115,0.4437,0.4539,0.4335,-2.1,-4.6,,False,False
+8476873-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8476873.0,CAR,Mark Jankowski Over 1.5 shots,-115,0.461,0.4221,0.5,-7.4,-13.8,,False,False
+8476873-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8476873.0,CAR,Mark Jankowski Under 1.5 shots,-115,0.539,0.5779,0.5,0.4,0.8,,False,False
+8480829-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,0.5,8480829.0,CAR,Jesperi Kotkaniemi Over 0.5 shots,-175,0.6304,0.6668,0.5941,-0.6,-0.9,,False,False
+8480829-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,0.5,8480829.0,CAR,Jesperi Kotkaniemi Under 0.5 shots,130,0.3696,0.3332,0.4059,-6.5,-15.0,,False,False
+8476906-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8476906.0,CAR,Shayne Gostisbehere Over 1.5 shots,-130,0.5314,0.5381,0.5246,-3.4,-6.0,,False,False
+8476906-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8476906.0,CAR,Shayne Gostisbehere Under 1.5 shots,-105,0.4686,0.4619,0.4754,-4.4,-8.5,,False,False
+8480817-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8480817.0,CAR,K'Andre Miller Over 1.5 shots,120,0.4466,0.4713,0.422,-0.8,-1.7,,False,False
+8480817-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8480817.0,CAR,K'Andre Miller Under 1.5 shots,-165,0.5534,0.5287,0.578,-6.9,-11.1,,False,False
+8480336-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8480336.0,CAR,Sean Walker Over 1.5 shots,-125,0.5331,0.5516,0.5147,-2.2,-4.0,,False,False
+8480336-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8480336.0,CAR,Sean Walker Under 1.5 shots,-110,0.4669,0.4484,0.4853,-5.7,-10.9,,False,False
+8476958-sog-Over,-401891808,CAR @ SEA,Shots on goal,sog,Over,1.5,8476958.0,CAR,Jaccob Slavin Over 1.5 shots,110,0.4255,0.4085,0.4425,-5.1,-10.6,,False,False
+8476958-sog-Under,-401891808,CAR @ SEA,Shots on goal,sog,Under,1.5,8476958.0,CAR,Jaccob Slavin Under 1.5 shots,-150,0.5745,0.5915,0.5575,-2.6,-4.3,,False,False
+8481033-sv-Over,-401892699,DET @ FLA,Saves,saves,Over,23.5,8481033.0,FLA,Akira Schmid Over 23.5 saves,-110,0.441,0.3968,0.4853,-8.3,-15.8,,False,False
+8481033-sv-Under,-401892699,DET @ FLA,Saves,saves,Under,23.5,8481033.0,FLA,Akira Schmid Under 23.5 saves,-125,0.559,0.6032,0.5147,0.3,0.6,,False,False
+8480280-sv-Over,-401892696,MTL @ BOS,Saves,saves,Over,24.5,8480280.0,BOS,Jeremy Swayman Over 24.5 saves,-110,0.4551,0.4248,0.4853,-6.9,-13.1,,False,False
+8480280-sv-Under,-401892696,MTL @ BOS,Saves,saves,Under,24.5,8480280.0,BOS,Jeremy Swayman Under 24.5 saves,-125,0.5449,0.5752,0.5147,-1.1,-1.9,,False,False
+8475831-sv-Over,-401891808,CAR @ SEA,Saves,saves,Over,27.5,8475831.0,SEA,Philipp Grubauer Over 27.5 saves,-130,0.4994,0.4742,0.5246,-6.6,-11.6,,False,False
+8475831-sv-Under,-401891808,CAR @ SEA,Saves,saves,Under,27.5,8475831.0,SEA,Philipp Grubauer Under 27.5 saves,-105,0.5006,0.5258,0.4754,-1.2,-2.3,,False,False
+8483548-sv-Over,-401891808,CAR @ SEA,Saves,saves,Over,22.5,8483548.0,CAR,Brandon Bussi Over 22.5 saves,-105,0.4055,0.3355,0.4754,-10.7,-20.8,,False,False
+8483548-sv-Under,-401891808,CAR @ SEA,Saves,saves,Under,22.5,8483548.0,CAR,Brandon Bussi Under 22.5 saves,-130,0.5945,0.6645,0.5246,2.9,5.2,,False,False

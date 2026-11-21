@@ -1,0 +1,11 @@
+id,gid,game,start,tour,event,round,market,side,label,p,pm,price,cat,pick,bpick,flagged,pb,edge,ev
+187510-p1,187510,Carlos Alcaraz vs Flavio Cobolli,2026-11-20T13:00:00Z,atp,Nitto ATP Finals,Group Stage,pick,p1,Carlos Alcaraz to win,0.875,0.913,-930.0,,True,True,False,,,
+186801-p1,186801,Leyre Romero Gormaz vs Irene Burillo,2026-11-20T15:00:00Z,wta,LP Open by IND,Quarterfinal,pick,p1,Leyre Romero Gormaz to win,0.682,0.682,,,True,True,False,,,
+186800-p1,186800,Lucia Bronzetti vs Valeriya Strakhova,2026-11-20T16:30:00Z,wta,LP Open by IND,Quarterfinal,pick,p1,Lucia Bronzetti to win,0.669,0.669,,,True,True,False,,,
+187513-p1,187513,Daniil Medvedev vs Frances Tiafoe,2026-11-20T19:30:00Z,atp,Nitto ATP Finals,Group Stage,pick,p1,Daniil Medvedev to win,0.667,0.592,-264.0,,True,True,False,,,
+186799-p1,186799,Guiomar Maristany Zuleta De Reales vs Andrea Lazaro Garcia,2026-11-20T20:30:00Z,wta,LP Open by IND,Quarterfinal,pick,p1,Guiomar Maristany Zuleta De Reales to win,0.55,0.55,,,True,True,False,,,
+186798-p2,186798,Rebeka Masarova vs Laura Samson,2026-11-20T22:00:00Z,wta,LP Open by IND,Quarterfinal,pick,p2,Laura Samson to win,0.538,0.538,,,True,True,False,,,
+187510-p1,187510,Carlos Alcaraz vs Flavio Cobolli,2026-11-20T13:00:00Z,atp,Nitto ATP Finals,,moneyline,p1,Carlos Alcaraz to win,0.875,0.9133,-930.0,,True,True,False,0.8622,-2.8,-3.1
+187510-p2,187510,Carlos Alcaraz vs Flavio Cobolli,2026-11-20T13:00:00Z,atp,Nitto ATP Finals,,moneyline,p2,Flavio Cobolli to win,0.125,0.0867,593.0,,False,False,False,0.1378,-1.9,-13.4
+187513-p1,187513,Daniil Medvedev vs Frances Tiafoe,2026-11-20T19:30:00Z,atp,Nitto ATP Finals,,moneyline,p1,Daniil Medvedev to win,0.6665,0.5916,-264.0,,True,True,False,0.6915,-5.9,-8.1
+187513-p2,187513,Daniil Medvedev vs Frances Tiafoe,2026-11-20T19:30:00Z,atp,Nitto ATP Finals,,moneyline,p2,Frances Tiafoe to win,0.3335,0.4084,209.0,Value,False,False,False,0.3085,1.0,3.1

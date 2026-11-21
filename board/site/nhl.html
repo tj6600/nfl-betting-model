@@ -1,0 +1,1308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f6b3a">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="GoonerGamble">
+<script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
+<title>NHL Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: a game strip across the top, a filter bar, then a ranked board of player rows that open into a detail panel. */
+:root {
+  --bg: #f5f7f4; --panel: #ffffff; --ink: #18211b; --muted: #5d6b61; --line: #dde3dd;
+  --turf: #1f6b3a; --turf-soft: #e3efe6; --gold: #a86a00; --gold-soft: #fbf0d9; --risk: #8a5a9e; --risk-soft: #f1e8f5;
+  --bar: #cfe3d5; --tick: #18211b; --pos: #1f6b3a; --neg: #b03a2e;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1511; --panel: #161e18; --ink: #e6ece7; --muted: #95a399; --line: #27322a;
+  --turf: #5fc27f; --turf-soft: #1c3324; --gold: #e3ac4a; --gold-soft: #33280f; --risk: #c79bdb; --risk-soft: #2b2032;
+  --bar: #24412d; --tick: #e6ece7; --pos: #5fc27f; --neg: #ef8a7d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1511; --panel: #161e18; --ink: #e6ece7; --muted: #95a399; --line: #27322a;
+  --turf: #5fc27f; --turf-soft: #1c3324; --gold: #e3ac4a; --gold-soft: #33280f; --risk: #c79bdb; --risk-soft: #2b2032;
+  --bar: #24412d; --tick: #e6ece7; --pos: #5fc27f; --neg: #ef8a7d; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 24px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; flex-direction: column; gap: 6px; }
+.eyebrow { font-family: var(--display); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: 13px; color: var(--turf); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 6vw, 52px); line-height: 1; margin: 0; letter-spacing: .01em; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 68ch; margin: 0; }
+.tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--line); overflow-x: auto; }
+.tab { font: 700 18px var(--display); letter-spacing: .03em; text-transform: uppercase; border: 0; background: transparent; color: var(--muted); padding: 8px 14px 10px; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--turf); }
+.range { position: absolute; top: 2px; bottom: 2px; background: var(--bar); border-radius: 3px; }
+.mark { position: absolute; top: -4px; bottom: -4px; width: 3px; border-radius: 2px; background: var(--turf); }
+.line { position: absolute; top: -6px; bottom: -6px; width: 2px; background: var(--tick); }
+.side { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: .03em; text-transform: uppercase; }
+.side.over { color: var(--pos); } .side.under { color: var(--gold); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+ul.notes { margin: 0; padding: 10px 18px 14px 34px; line-height: 1.5; font-size: 14px; } ul.notes li { margin: 5px 0; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.tile .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.tile .big { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tile .s { font-size: 13px; color: var(--muted); }
+.tablewrap { overflow-x: auto; }
+table.res { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+table.res td { padding: 7px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.res td.num { text-align: right; }
+/* column names follow the reader down long tables, and the first column stays put when a table scrolls sideways (stickyHeads below) */
+table.res th.stuck { position: relative; z-index: 3; box-shadow: 0 1px 0 var(--line), 0 4px 6px -4px rgba(0,0,0,.25); }
+table.res tr > :first-child, table.res tr > th.stuck:first-child { position: sticky; left: 0; z-index: 2; }
+table.res tr > th.stuck:first-child { z-index: 4; }
+.tablewrap.xs table.res tr > :first-child { background-color: var(--stick-bg); box-shadow: 1px 0 0 var(--line), 4px 0 6px -4px rgba(0,0,0,.25); }
+.tablewrap.xs table.res tr.hl > td:first-child { background-image: linear-gradient(var(--turf-soft), var(--turf-soft)); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 600 14px var(--body); border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 12px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline; }
+.chip b { font-family: var(--display); font-size: 16px; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--turf); outline-offset: 2px; }
+.strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.game { flex: 0 0 auto; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: var(--r); padding: 8px 12px; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 2px; min-width: 118px; font: inherit; }
+.game .m { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: .02em; }
+.game .t { font-size: 12px; color: var(--muted); }
+.game[aria-pressed="true"] { border-color: var(--turf); box-shadow: inset 0 0 0 1px var(--turf); background: var(--turf-soft); }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.bar input[type="search"] { flex: 1 1 220px; min-width: 0; font: inherit; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { font: 600 13px var(--body); border: 0; background: transparent; color: var(--ink); padding: 8px 11px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+select { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); }
+label.tog { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-size: 14px; cursor: pointer; }
+.count { color: var(--muted); font-size: 13px; }
+.cols { display: grid; gap: 16px; grid-template-columns: 1fr; }
+.cols.two { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.col { display: flex; flex-direction: column; gap: 0; min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.colhead { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.colhead h2 { font-family: var(--display); font-size: 22px; margin: 0; letter-spacing: .02em; }
+.colhead span { color: var(--muted); font-size: 13px; }
+.row { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.6fr) auto; gap: 12px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer; background: transparent; border-left: 0; border-right: 0; border-top: 0; width: 100%; text-align: left; font: inherit; color: inherit; }
+.row:hover { background: var(--turf-soft); }
+.row[aria-expanded="true"] { background: var(--turf-soft); }
+.who { display: flex; flex-direction: column; min-width: 0; }
+.who .n { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.who .s { font-size: 12px; color: var(--muted); }
+.meter { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.track { position: relative; height: 10px; background: var(--bg); border-radius: 5px; border: 1px solid var(--line); }
+.fill { position: absolute; inset: 0 auto 0 0; background: var(--turf); border-radius: 5px; opacity: .85; }
+.tick { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--tick); border-radius: 1px; }
+.meter .l { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.meter .l b { color: var(--ink); font-size: 14px; }
+.price { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; font-variant-numeric: tabular-nums; }
+.price .o { font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1; }
+.price .e { font-size: 12px; }
+.pos { color: var(--pos); } .neg { color: var(--neg); } .dim { color: var(--muted); }
+.pill { font: 600 11px var(--body); text-transform: uppercase; letter-spacing: .06em; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+.pill.value { background: var(--gold-soft); color: var(--gold); }
+.pill.likely { background: var(--turf-soft); color: var(--turf); }
+.pill.check { background: var(--risk-soft); color: var(--risk); }
+.detail { padding: 14px; border-bottom: 1px solid var(--line); background: var(--bg); display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.detail h3 { font-family: var(--display); font-size: 15px; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 6px; color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.stat { display: flex; flex-direction: column; }
+.stat b { font-family: var(--display); font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); }
+.books { display: flex; flex-direction: column; gap: 4px; font-variant-numeric: tabular-nums; }
+.books div { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--line); padding-bottom: 3px; }
+.books .best { color: var(--pos); font-weight: 600; }
+.why { margin: 0; max-width: 60ch; }
+.note { color: var(--muted); font-size: 13px; max-width: 72ch; margin: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); align-items: center; }
+.legend i { display: inline-block; vertical-align: middle; margin-right: 5px; }
+.ladder { display: flex; flex-wrap: wrap; gap: 4px; }
+.step { font-size: 12px; font-variant-numeric: tabular-nums; padding: 2px 7px; border-radius: 6px; border: 1px solid var(--line); background: color-mix(in srgb, var(--turf) var(--a), var(--panel)); color: var(--ink); white-space: nowrap; }
+.step b { font-family: var(--display); font-size: 14px; }
+.step.hot { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.detail.one { grid-template-columns: 1fr; }
+table.res th { padding: 6px 14px; text-align: left; font: 600 12px var(--body); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.res th.num { text-align: right; }
+table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
+.cols.pl { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); align-items: start; }
+.plctl { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); align-items: center; }
+.plctl input[type="search"] { flex: 1 1 200px; min-width: 0; font: inherit; padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+.pllist { max-height: 70vh; overflow-y: auto; }
+.leg { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 14px; border-bottom: 1px solid var(--line); }
+.add { font: 600 13px var(--body); border: 1px solid var(--turf); color: var(--turf); background: transparent; border-radius: 8px; padding: 5px 10px; cursor: pointer; min-width: 64px; }
+.add.on { background: var(--turf); color: var(--bg); }
+.slip { position: sticky; top: 12px; }
+.acts { display: inline-flex; gap: 12px; }
+.lnk { border: 0; background: none; color: var(--turf); font: 600 13px var(--body); cursor: pointer; padding: 0; }
+.slipl { padding: 10px 14px; }
+.slipl small { color: var(--muted); font-weight: 400; }
+.slipl > div { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px; }
+.slipl small { display: block; font-size: 12px; }
+.slipl .num { font-size: 13px; white-space: nowrap; }
+.x { border: 0; background: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 2px; line-height: 1; }
+.placeat { margin: 0 14px 10px; padding: 8px 12px; border: 1px solid var(--turf); border-radius: 8px; display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--muted); }
+.placeat b { font-family: var(--display); font-size: 19px; color: var(--ink); letter-spacing: .02em; }
+.slip .colhead { flex-wrap: wrap; gap: 8px; }
+.lnk.sugb { background: var(--turf); color: var(--bg); padding: 5px 10px; border-radius: 8px; }
+.sugnote { padding: 10px 14px 0; }
+.sidebox { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; font-variant-numeric: tabular-nums; }
+.sidebox .e { font-size: 12px; }
+.seg.sides button { display: inline-flex; align-items: baseline; gap: 2px; padding: 6px 10px; }
+.seg.sides small { font-weight: 400; opacity: .8; }
+.warnc { color: var(--gold); }
+.leanmark { font-style: normal; color: var(--gold); font-size: 11px; margin-left: 3px; }
+.likemark { font-style: normal; color: #3fa66b; font-size: 12px; font-weight: 700; margin-left: 3px; }
+.logbtn { margin-top: 10px; font: 600 13px var(--body); border: 1px solid var(--turf); color: var(--turf); background: transparent; border-radius: 8px; padding: 6px 12px; cursor: pointer; justify-self: start; }
+.namebtn { border: 0; background: none; padding: 0; font: inherit; font-weight: 600; color: var(--ink); text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.namebtn:hover { text-decoration-color: var(--turf); color: var(--turf); }
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; z-index: 50; }
+.logpanel { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r); width: 100%; max-width: 720px; display: flex; flex-direction: column; }
+.loghead { display: flex; justify-content: space-between; align-items: flex-start; padding: 14px 14px 6px; }
+.loghead h2 { font-family: var(--display); font-size: 26px; margin: 0; }
+.loghead .dim { font-size: 13px; }
+.move { margin: 0 14px 10px; padding: 10px 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; border-left: 4px solid var(--line); background: var(--bg); }
+.move b { font-family: var(--display); font-size: 18px; letter-spacing: .02em; }
+.move.up { border-left-color: var(--pos); } .move.down { border-left-color: var(--neg); } .move.flat { border-left-color: var(--gold); }
+.loghit { margin: 0 14px 10px; padding: 8px 12px; background: var(--turf-soft); border-radius: 8px; font-weight: 600; }
+.logfoot { padding: 10px 14px 14px; }
+.pin { display: flex; gap: 8px; align-items: center; padding: 0 14px 10px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.pin input { width: 90px; font: inherit; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); }
+.stats.pad { padding: 4px 14px 12px; }
+.dkrow { margin: 0 14px 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13px; }
+.dkrow a.dkbtn { text-decoration: none; display: inline-block; }
+.verdict { margin: 0 14px 12px; padding: 10px 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
+.verdict b { font-family: var(--display); font-size: 20px; letter-spacing: .02em; }
+.verdict.good { background: var(--turf-soft); color: var(--ink); } .verdict.good b { color: var(--turf); }
+.verdict.warn { background: var(--gold-soft); } .verdict.warn b { color: var(--gold); }
+.verdict.bad { background: var(--risk-soft); } .verdict.bad b { color: var(--risk); }
+.warns { margin: 0; padding: 0 14px 14px 30px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+.warns .bad { color: var(--risk); } .warns .warn { color: var(--gold); } .warns .info { color: var(--muted); }
+.leg .who .n { white-space: normal; }
+@media (max-width: 520px) { .leg { grid-template-columns: minmax(0, 1fr) auto; } .leg .who { grid-column: 1 / -1; } .leg .price, .leg .sidebox { align-items: flex-start; } }
+@media (max-width: 720px) { .slip { position: static; } }
+/* the leg list scrolls inside its box only on wide screens; on phones and tablets the page itself scrolls */
+@media (max-width: 1024px) { .pllist { max-height: none; overflow: visible; } }
+.mgrp { border-bottom: 1px solid var(--line); }
+.mgrp > summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px; cursor: pointer; list-style: none; font-weight: 600; min-height: 44px; }
+.mgrp > summary::-webkit-details-marker { display: none; }
+.mgrp > summary::after { content: '▾'; margin-left: 4px; transition: transform .15s; }
+.mgrp[open] > summary::after { transform: rotate(180deg); }
+.mgrp > summary .dim { font-weight: 400; margin-left: auto; font-size: 13px; }
+.mgrp[open] > summary { position: sticky; top: 0; z-index: 2; background: var(--panel); border-bottom: 1px solid var(--line); }
+.lnk.more { display: block; width: 100%; padding: 14px; text-align: center; font-size: 14px; }
+.empty { padding: 24px 14px; color: var(--muted); }
+@media (max-width: 560px) {
+  .row { grid-template-columns: minmax(0, 1fr) auto; }
+  .row .meter { grid-column: 1 / -1; grid-row: 2; }
+  .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: no-preference) { .fill { transition: width .25s ease; } }
+.sugnav { display: flex; align-items: center; gap: 10px; padding: 10px 14px 0; flex-wrap: wrap; }
+.sugnav .lnk { font-size: 22px; line-height: 1; padding: 0 6px; }
+.sugnav .seg button { padding: 6px 10px; }
+.suglab { font: 600 14px var(--body); min-width: 130px; text-align: center; }
+.sugbest { font-size: 12px; }
+.savedrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px 0; }
+.savedrow .lnk { font-size: 13px; }
+.savedchip { display: inline-flex; align-items: center; gap: 2px; }
+.savedchip .chip { padding: 4px 10px; font-size: 13px; }
+.lnk.althint { font-size: 12px; font-weight: 600; text-align: right; white-space: normal; }
+.game .t.wxbad { color: var(--gold); font-weight: 600; }
+.seglab { flex-basis: 100%; font-size: 12px; margin-bottom: -4px; }
+/* Phones: nothing should need a sideways swipe except a wide table. Tabs, game buttons and button groups wrap
+   onto extra lines instead of scrolling (clipped .seg groups used to hide filters past the screen edge). */
+.tablewrap { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+@media (max-width: 640px) {
+  .wrap { gap: 14px; padding-block: 14px 36px; }
+  .tabs { flex-wrap: wrap; overflow: visible; gap: 2px 4px; }
+  .tab { font-size: 15px; padding: 6px 9px 7px; }
+  .strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); overflow: visible; gap: 6px; padding-bottom: 0; }
+  .game { min-width: 0; padding: 6px 8px; }
+  .game .m { font-size: 16px; white-space: nowrap; }
+  .game .t { font-size: 11px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; border: 0; background: none; overflow: visible; border-radius: 0; }
+  .seg button, .seg.sides button { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 7px 10px; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"], .seg.sides button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .bar input[type="search"], .plctl input[type="search"] { flex-basis: 100%; }
+  input, select { font-size: 16px; }   /* iOS zooms the page into any field under 16px */
+  .chip { font-size: 13px; padding: 5px 10px; }
+  .pllist { max-height: none; overflow: visible; }
+  table.res td, table.res th { padding: 6px 8px; white-space: normal; font-size: 13px; letter-spacing: 0; }
+  table.res td:first-child, table.res th:first-child { padding-left: 12px; }
+  .overlay { padding: 12px 8px; }
+  .loghead h2 { font-size: 22px; }
+  .colhead { flex-wrap: wrap; gap: 4px 8px; }
+  .detail { grid-template-columns: 1fr; padding: 12px; }
+  .stats { gap: 6px; }
+  .stat b { font-size: 19px; }
+  .sugnav { gap: 6px; }
+  .suglab { min-width: 0; flex: 1 1 auto; }
+  .detail.one { padding: 10px 6px; }
+  table.res .pill { font-size: 10px; padding: 2px 5px; letter-spacing: .02em; }
+  .opt { display: none; }   /* secondary table columns (milestone ladder: model, books, fair price) */
+  .logpanel table.res td, .logpanel table.res th { padding: 5px 6px; font-size: 13px; letter-spacing: 0; }
+  .logpanel table.res td:first-child, .logpanel table.res th:first-child { padding-left: 10px; }
+}
+
+/* Model record calibration bars (calib.py): solid bar = how often the side won, dashed line = the chance the board gave */
+.calgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.calkey { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.calkey i { display: inline-block; vertical-align: -2px; margin-right: 6px; }
+.calkey .k-bar { width: 22px; height: 12px; background: var(--turf); border-radius: 0 4px 4px 0; }
+.calkey .k-dash { width: 0; height: 16px; border-left: 2px dashed var(--ink); }
+.calsec .calsum { padding: 10px 14px 4px; font-size: 14px; }
+.calsec .calsum b { font-family: var(--display); font-size: 20px; margin-right: 6px; font-variant-numeric: tabular-nums; }
+.calsec .calsum .pos { color: var(--pos); } .calsec .calsum .neg { color: var(--neg); }
+.calrows { padding: 6px 14px 4px; display: flex; flex-direction: column; gap: 10px; }
+.calrow { display: grid; grid-template-columns: 62px 1fr 92px; gap: 10px; align-items: center; font-size: 13px; }
+.calrow.few { opacity: .55; }
+.calrow .lab { font-weight: 600; font-variant-numeric: tabular-nums; }
+.caltrack { position: relative; height: 18px; border-radius: 0 4px 4px 0; border-left: 1px solid var(--line);
+  background: repeating-linear-gradient(to right, transparent 0, transparent calc(25% - 1px), var(--line) calc(25% - 1px), var(--line) 25%); }
+.calfill { position: absolute; left: 0; top: 2px; bottom: 2px; background: var(--turf); border-radius: 0 4px 4px 0; min-width: 2px; }
+.calsaid { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px dashed var(--ink); margin-left: -1px; }
+.calrow .val { text-align: right; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.calrow .val small { display: block; color: var(--muted); font-size: 11.5px; }
+.calaxis { display: grid; grid-template-columns: 62px 1fr 92px; gap: 10px; padding: 0 14px 4px; font-size: 11px; color: var(--muted); }
+.calaxis span { display: flex; justify-content: space-between; }
+.calsec .calnote { padding: 4px 14px 12px; margin: 0; font-size: 12.5px; color: var(--muted); }
+@media (max-width: 560px) { .calgrid { grid-template-columns: 1fr; } .calrow, .calaxis { grid-template-columns: 54px 1fr 84px; gap: 8px; } }
+
+/* Model record menus (Thomas, 2026-11-18): period picker (all time / day / week / month), section picker, refresh */
+.recbar { min-width: 0; display: flex; flex-direction: column; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; margin-bottom: 16px; }
+.recrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.recrow .grow { flex: 1 1 auto; }
+.recnav { display: flex; gap: 6px; align-items: center; flex: 1 1 260px; min-width: 0; }
+.recnav select { flex: 1 1 auto; min-width: 0; font: 600 15px var(--body); padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+.recnav .arrow { font: 700 18px var(--body); width: 40px; height: 38px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); cursor: pointer; flex: 0 0 auto; }
+.recnav .arrow:disabled { opacity: .35; cursor: default; }
+.recviews { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.recviews .chip { flex: 0 0 auto; padding: 6px 12px; }
+.recviews .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.recsum { font-size: 13px; color: var(--muted); margin: 0; }
+.refbtn { font: 600 14px var(--body); border: 1px solid var(--turf); color: var(--turf); background: transparent; border-radius: 8px; padding: 8px 12px; cursor: pointer; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.refbtn[aria-busy="true"] .ico { animation: recspin 1s linear infinite; }
+@keyframes recspin { to { transform: rotate(360deg); } }
+.refstatus { font-size: 13px; color: var(--muted); margin: 0; }
+.refstatus.bad { color: var(--neg); font-weight: 600; } .refstatus.ok { color: var(--pos); font-weight: 600; }
+@media (max-width: 560px) { .recbar { padding: 10px; } .recrow > .seg { flex: 1 1 100%; } .recrow > .seg button { flex: 1 1 0; padding: 9px 4px; } .refbtn { flex: 1 1 100%; justify-content: center; } .recrow .grow { display: none; } }
+</style>
+<script>
+// Model record calibration sections (calib.py), shared by the NFL, NBA and NHL pages
+function renderCalibration(secs, title) {
+  const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  const pc = (x) => `${Math.round(x * 100)}%`;
+  const wrap = mk('div', 'calwrap');
+  const head = mk('div', 'colhead'); head.style.border = '0'; head.style.padding = '0 0 6px';
+  head.append(mk('h2', null, title || 'How often the picks were right'), mk('span', null, 'by the chance the board gave')); wrap.append(head);
+  const key = mk('p', 'calkey');
+  const a = mk('span'); a.append(mk('i', 'k-bar'), 'How often it was right');
+  const b = mk('span'); b.append(mk('i', 'k-dash'), 'The chance the board gave');
+  key.append(a, b, mk('span', null, 'Faded rows have under 20 bets, so they are mostly luck.')); wrap.append(key);
+  const grid = mk('div', 'calgrid');
+  for (const s of secs) {
+    const c = mk('section', 'col calsec');
+    const h = mk('div', 'colhead'); h.append(mk('h2', null, s.name), mk('span', null, `${s.n} bet${s.n === 1 ? '' : 's'}`)); c.append(h);
+    const sum = mk('div', 'calsum'); sum.append(mk('b', null, `${s.won}–${s.lost}`));
+    sum.append(`right ${pc(s.hit)}, board said ${pc(s.said)} · `);
+    sum.append(mk('span', s.units >= 0 ? 'pos' : 'neg', `${s.units >= 0 ? '+' : ''}${s.units.toFixed(2)} units`)); c.append(sum);
+    const rows = mk('div', 'calrows');
+    for (const k of s.buckets) {
+      const r = mk('div', 'calrow' + (k.n < 20 ? ' few' : ''));
+      r.title = `Board said ${k.label}: ${k.won} of ${k.n} won (${pc(k.hit)}); the board's average chance was ${(k.said * 100).toFixed(1)}%. ${k.units >= 0 ? '+' : ''}${k.units.toFixed(2)} units at DraftKings.`;
+      const t = mk('div', 'caltrack'); const f = mk('div', 'calfill'); f.style.width = `${k.hit * 100}%`;
+      const d = mk('div', 'calsaid'); d.style.left = `${k.said * 100}%`; t.append(f, d);
+      const v = mk('div', 'val', `${pc(k.hit)} · ${k.won}/${k.n}`); v.append(mk('small', null, `said ${pc(k.said)}`));
+      r.append(mk('span', 'lab', k.label), t, v); rows.append(r);
+    }
+    c.append(rows);
+    const ax = mk('div', 'calaxis'); const sp = mk('span'); ['0', '25', '50', '75', '100%'].forEach((x) => sp.append(mk('em', null, x)));
+    ax.append(mk('i'), sp, mk('i')); ax.querySelectorAll('em').forEach((e) => { e.style.fontStyle = 'normal'; }); c.append(ax);
+    if (s.note) c.append(mk('p', 'calnote', s.note));
+    grid.append(c);
+  }
+  wrap.append(grid); return wrap;
+}
+
+// ---- Model record menus (Thomas, 2026-11-18): pick all time, a day, a week or a month, and which sections to show ----
+// src.by_period = { menu: {day|week|month: [{key, label}] newest first}, reports: {key: report} } (calib.by_period).
+// The chosen period's report replaces the all-time fields, so each page's own record code draws it unchanged.
+const REC_KINDS = [['all', 'All time'], ['day', 'Day'], ['week', 'Week'], ['month', 'Month']];
+function recLoad(sport) { try { return JSON.parse(localStorage.getItem('gg-rec-' + sport) || '{}') || {}; } catch (e) { return {}; } }
+function recSave(sport, st) { try { localStorage.setItem('gg-rec-' + sport, JSON.stringify(st)); } catch (e) { /* storage unavailable */ } }
+function recordMenus(o) {
+  // o: {sport, src, views: [[key, label]], rerender, weekNote}; returns {bar, rep, view, show(v), label, empty}
+  const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  o = Object.assign({}, o, { src: liveSrc(o.sport, o.src), raw: o.src });
+  const bp = (o.src && o.src.by_period) || { menu: { day: [], week: [], month: [] }, reports: {} };
+  const st = Object.assign({ kind: 'all', keys: {}, view: 'all' }, recLoad(o.sport));
+  if (!o.views.some(([k]) => k === st.view)) st.view = 'all';
+  const list = st.kind === 'all' ? null : (bp.menu[st.kind] || []);
+  if (list && !list.length) st.kind = 'all';
+  let key = null, label = 'All time';
+  if (st.kind !== 'all') {
+    const l = bp.menu[st.kind]; let i = l.findIndex((x) => x.key === st.keys[st.kind]); if (i < 0) i = 0;
+    key = l[i].key; label = l[i].label; st.keys[st.kind] = key;
+  }
+  recSave(o.sport, st);
+  const sub = key ? bp.reports[key] : null;
+  const rep = sub ? Object.assign({}, o.src, sub) : o.src;
+  const redo = () => { recSave(o.sport, st); o.rerender(); };
+  const bar = mk('div', 'recbar');
+  const r1 = mk('div', 'recrow'); const seg = mk('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Time period');
+  for (const [k, lab] of REC_KINDS) {
+    const b = mk('button', null, lab); b.type = 'button'; b.setAttribute('aria-pressed', st.kind === k);
+    const n = k === 'all' ? 1 : (bp.menu[k] || []).length; if (!n) { b.disabled = true; b.title = 'Nothing graded yet'; }
+    b.onclick = () => { if (st.kind !== k) { st.kind = k; redo(); } }; seg.append(b);
+  }
+  r1.append(seg, mk('span', 'grow'), refreshButton({ sport: o.sport, src: o.raw, rerender: o.rerender }, bar)); bar.append(r1);
+  const lv = o.src && o.src._live;
+  const stx = REC_STATUS.text || (lv ? `Includes ${lv.legs} bet${lv.legs === 1 ? '' : 's'}${lv.parlays ? ` and ${lv.parlays} parlay${lv.parlays === 1 ? '' : 's'}` : ''} checked live on ESPN at ${new Date(lv.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}. The overnight grading makes them official.` : '');
+  if (stx) bar.append(mk('p', 'refstatus ' + (REC_STATUS.text ? REC_STATUS.cls : ''), stx));
+  if (st.kind !== 'all') {
+    const l = bp.menu[st.kind]; const i = l.findIndex((x) => x.key === key);
+    const nav = mk('div', 'recnav');
+    const prev = mk('button', 'arrow', '‹'); prev.type = 'button'; prev.setAttribute('aria-label', 'Earlier'); prev.disabled = i >= l.length - 1;
+    const next = mk('button', 'arrow', '›'); next.type = 'button'; next.setAttribute('aria-label', 'Later'); next.disabled = i <= 0;
+    const sel = mk('select'); sel.setAttribute('aria-label', 'Choose the ' + st.kind);
+    l.forEach((x) => { const op = mk('option', null, x.label); op.value = x.key; if (x.key === key) op.selected = true; sel.append(op); });
+    sel.onchange = () => { st.keys[st.kind] = sel.value; redo(); };
+    prev.onclick = () => { st.keys[st.kind] = l[i + 1].key; redo(); };
+    next.onclick = () => { st.keys[st.kind] = l[i - 1].key; redo(); };
+    nav.append(prev, sel, next); const r2 = mk('div', 'recrow'); r2.append(nav); bar.append(r2);
+    if (st.kind === 'day' && o.dayNote) bar.append(mk('p', 'recsum', o.dayNote));
+    if (st.kind === 'week' && o.weekNote) bar.append(mk('p', 'recsum', o.weekNote));
+  }
+  const vs = mk('div', 'recviews'); vs.setAttribute('role', 'group'); vs.setAttribute('aria-label', 'Sections');
+  for (const [k, lab] of o.views) {
+    const b = mk('button', 'chip', lab); b.type = 'button'; b.setAttribute('aria-pressed', st.view === k);
+    b.onclick = () => { if (st.view !== k) { st.view = k; redo(); } }; vs.append(b);
+  }
+  bar.append(vs);
+  return { bar, rep, view: st.view, kind: st.kind, label, period: key, show: (v) => st.view === 'all' || st.view === v };
+}
+
+// ---- Refresh results (Thomas, 2026-11-18): the page grades the bets still waiting on a result itself, from ESPN's free
+// scoreboard and box scores (no odds credits, no keys), and adds them to the record. src.pending (calib.Pending) lists each
+// waiting leg with the groups, chance-check sections and day/week/month reports it belongs to. The next grading run
+// (2:43 AM, 8:13 AM) makes the results official and they drop out of the waiting list.
+const ESPN = 'https://site.api.espn.com/apis/site/v2/sports/';
+const ESPN_SPORT = { nba: 'basketball/nba', nhl: 'hockey/nhl', nfl: 'football/nfl', cfb: 'football/college-football' };
+const NFL_ESPN_ABBR = { LA: 'LAR', WAS: 'WSH' };
+const REC_PICK = [[0, .6], [.6, .7], [.7, .8], [.8, .9], [.9, 1.01]];
+const REC_ALL = [[0, .1], [.1, .2], [.2, .3], [.3, .4], [.4, .5], [.5, .6], [.6, .7], [.7, .8], [.8, .9], [.9, 1.01]];
+const recDec = (a) => a > 0 ? 1 + a / 100 : 1 + 100 / -a;
+const recNorm = (n) => String(n || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]/g, '').replace(/(jr|sr|ii|iii|iv)$/, '');
+function liveLoad(sport) { try { return JSON.parse(localStorage.getItem('gg-live-' + sport) || 'null'); } catch (e) { return null; } }
+function liveSave(sport, v) { try { localStorage.setItem('gg-live-' + sport, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+
+// the record with the live results added (a copy; the page's own data is untouched)
+function liveSrc(sport, src) {
+  const P = src && src.pending, st = liveLoad(sport);
+  if (!P || !st || !st.res) return src;
+  const res = st.res;
+  if (!P.legs.some((L) => res[L[0]]) ) return src;
+  const R = JSON.parse(JSON.stringify(src));
+  const bp = R.by_period = R.by_period || { menu: { day: [], week: [], month: [] }, reports: {} };
+  const kindOf = { d: 'day', w: 'week', m: 'month' };
+  const rep = (key) => {
+    if (!bp.reports[key]) {
+      bp.reports[key] = { days: [], groups: [], by_kind: [], cal_sections: [], cal: [], picks: [], legs: [], parlays: { days: [], groups: [] } };
+      const l = bp.menu[kindOf[key[0]]]; l.push({ key, label: P.per[key] || key }); l.sort((a, b) => (a.key < b.key ? 1 : -1));
+    }
+    return bp.reports[key];
+  };
+  const targets = (day) => [R].concat(((P.days || {})[day] || []).map(rep));
+  const arr = (T, path) => { const ps = path.split('.'); let o = T; for (let i = 0; i < ps.length - 1; i++) o = o[ps[i]] = o[ps[i]] || {}; return o[ps.at(-1)] = o[ps.at(-1)] || []; };
+  const addGroup = (T, path, name, r, p, u, pushCounts) => {
+    if (r === 'push' && !pushCounts) return;
+    const A = arr(T, path); let g = A.find((x) => x.group === name);
+    if (!g) { g = { group: name, bets: 0, won: 0, lost: 0, hit: 0, exp_hit: 0, units: 0, roi: 0 }; A.push(g); }
+    g.exp_hit = ((g.exp_hit || 0) * g.bets + p) / (g.bets + 1); g.bets += 1;
+    if (r === 'win') g.won += 1; else if (r === 'loss') g.lost += 1;
+    g.hit = g.won / Math.max(1, g.won + g.lost); g._u = (g._u ?? g.units) + u; g.units = Math.round(g._u * 100) / 100; g.roi = g._u / g.bets; g.live = (g.live || 0) + 1;
+  };
+  const addCal = (T, [path, name, picked, note], p, won, u) => {
+    const A = arr(T, path); let c = A.find((x) => x.name === name);
+    if (!c) { c = { name, note, n: 0, won: 0, lost: 0, said: 0, hit: 0, units: 0, roi: 0, buckets: [] }; A.push(c); }
+    const upd = (o) => { o.said = (o.said * o.n + p) / (o.n + 1); o.n += 1; if (won) o.won += 1; else o.lost += 1; o.hit = o.won / o.n; o._u = (o._u ?? o.units) + u; o.units = Math.round(o._u * 100) / 100; };
+    upd(c); c.roi = c._u / c.n;
+    const [lo, hi] = (picked ? REC_PICK : REC_ALL).find(([a, b]) => a <= p && p < b) || [0.9, 1.01];
+    const label = `${picked && lo === 0 ? 50 : Math.round(lo * 100)}–${Math.min(100, Math.round(hi * 100))}%`;
+    let k = c.buckets.find((x) => x.label === label);
+    if (!k) { k = { label, n: 0, won: 0, lost: 0, said: 0, hit: 0, units: 0 }; c.buckets.push(k); c.buckets.sort((a, b) => parseInt(a.label) - parseInt(b.label)); }
+    upd(k);
+  };
+  let nl = 0, np = 0;
+  for (const [key, day, , price, p, gs, cs] of P.legs) {
+    const r = res[key]; if (!r || r === 'void') continue;
+    const u = r === 'win' ? Math.round((recDec(price) - 1) * 1000) / 1000 : r === 'loss' ? -1 : 0; nl += 1;   // the graders round a win's profit to 3 places
+    for (const T of targets(day)) {
+      if (T.days && !T.days.includes(day) && T !== R) T.days.push(day);
+      for (const gi of gs) addGroup(T, P.g[gi][0], P.g[gi][1], r, p, u, P.push);
+      if (r !== 'push') for (const ci of cs) addCal(T, P.c[ci], p, r === 'win', u);
+    }
+  }
+  for (const [day, legs, gs, p] of P.parlays) {
+    const rs = legs.map(([k, known]) => known || res[k] || null);
+    let r, u;
+    if (rs.includes('loss')) { r = 'loss'; u = -1; }
+    else if (rs.includes(null)) continue;
+    else {
+      const live = legs.filter((_, i) => rs[i] === 'win'); if (!live.length) continue;   // every leg pushed or voided
+      r = 'win'; u = live.reduce((a, [, , pr]) => a * recDec(pr), 1) - 1;
+    }
+    np += 1;
+    for (const T of targets(day)) {
+      if (T.parlays && T.parlays.days && !T.parlays.days.includes(day) && T !== R) T.parlays.days.push(day);
+      for (const gi of gs) addGroup(T, P.g[gi][0], P.g[gi][1], r, p, u, false);
+    }
+  }
+  R._live = { legs: nl, parlays: np, at: st.at };
+  return R;
+}
+
+// ESPN box scores -> a result for each waiting leg whose game is final
+async function liveCheck(sport, P, say, store) {   // store: localStorage name for the results (default: the sport's own)
+  const get = async (u) => { const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); };
+  const base = ESPN + ESPN_SPORT[sport];
+  const st = liveLoad(store || sport) || {}; const res = Object.assign({}, st.res || {});
+  const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+  const want = P.legs.filter((L) => !res[L[0]] && L[1] && L[1] <= todayET);
+  if (!want.length) { say('Nothing is waiting on a result right now.', 'ok'); return 0; }
+  // which ESPN games to read
+  const evOf = new Map();
+  if (sport === 'nfl') {
+    const weeks = [...new Set(want.map((L) => L[2][6].slice(0, 2).join('-')))];
+    for (const w of weeks) {
+      const [se, wk] = w.split('-');
+      const sb = await get(`${base}/scoreboard?seasontype=2&week=${wk}&dates=${se}`);
+      for (const e of sb.events || []) {
+        const c = e.competitions[0].competitors; const h = c.find((x) => x.homeAway === 'home').team.abbreviation, a = c.find((x) => x.homeAway === 'away').team.abbreviation;
+        evOf.set(`${w}|${a}|${h}`, e.id);
+      }
+    }
+    for (const L of want) { const [se, wk, a, h] = L[2][6]; L._ev = evOf.get(`${se}-${wk}|${NFL_ESPN_ABBR[a] || a}|${NFL_ESPN_ABBR[h] || h}`); }
+  } else for (const L of want) L._ev = L[2][0];
+  const evs = [...new Set(want.map((L) => L._ev).filter(Boolean))];
+  say(`Checking ${evs.length} game${evs.length === 1 ? '' : 's'} on ESPN…`);
+  const box = {}; let failed = 0;
+  await Promise.all(evs.map(async (id) => {
+    try {
+      const d = await get(`${base}/summary?event=${id}`);
+      const comp = d.header.competitions[0];
+      if (!comp.status.type.completed) return;
+      const sc = {}; comp.competitors.forEach((c) => { sc[c.homeAway] = Number(c.score); });
+      const byId = {}, byName = {}, byCat = {};
+      for (const t of (d.boxscore && d.boxscore.players) || []) {
+        let goalie = 0;
+        for (const cat of t.statistics || []) {
+          const keys = cat.keys || [];
+          for (const a of cat.athletes || []) {
+            const v = {}; keys.forEach((k, i) => { v[k] = a.stats ? a.stats[i] : undefined; });
+            const rec = byId[a.athlete.id] = byId[a.athlete.id] || { dnp: false, s: {} };
+            if (a.didNotPlay || !a.stats || !a.stats.length) rec.dnp = true;
+            const n = (x) => { const y = parseFloat(String(x).split(/[-/]/)[0]); return isNaN(y) ? 0 : y; };
+            if (sport === 'nba') Object.assign(rec.s, { min: n(v.minutes), pts: n(v.points), reb: n(v.rebounds), ast: n(v.assists), fg3m: n(v['threePointFieldGoalsMade-threePointFieldGoalsAttempted']) });
+            if (sport === 'nhl') { if (cat.name === 'goalies') { rec.s.saves = n(v.saves); rec.s.starter = goalie === 0; goalie += 1; } else rec.s.sog = n(v.shotsTotal); }
+            if (sport === 'nfl') {
+              if (cat.name === 'passing') rec.s.pass = n(v.passingYards);
+              if (cat.name === 'rushing') { rec.s.rush = n(v.rushingYards); rec.s.td = (rec.s.td || 0) + n(v.rushingTouchdowns); }
+              if (cat.name === 'receiving') { rec.s.rec = n(v.receivingYards); rec.s.recs = n(v.receptions); rec.s.td = (rec.s.td || 0) + n(v.receivingTouchdowns); }
+            }
+            if (sport === 'nhl') { const t = String(a.athlete.displayName).split(' '); (byCat[{ goalies: 'G', defenses: 'D' }[cat.name] || 'F'] ||= []).push({ f: recNorm(t[0]), l: recNorm(t.at(-1)), rec }); }
+            const nk = recNorm(a.athlete.displayName);   // two players with one name (VAN's two Elias Petterssons): leave the bet waiting
+            if (byName[nk] && byName[nk] !== rec) byName[nk] = 'twice'; else byName[nk] = rec;
+          }
+        }
+      }
+      box[id] = { sc, byId, byName, byCat };
+    } catch (e) { failed += 1; /* this game's box score didn't load: it stays waiting */ }
+  }));
+  let n = 0;
+  for (const L of want) {
+    const b = box[L._ev]; if (!b) continue;
+    const [, m, stat, sd, ln, who] = L[2]; let x;
+    const hm = b.sc.home - b.sc.away;
+    if (m === 'ml') x = sd === 'home' ? hm : -hm;
+    else if (m === 'sp') x = (sd === 'home' ? hm : -hm) + ln;
+    else if (m === 'tot') x = (b.sc.home + b.sc.away - ln) * (sd === 'Over' ? 1 : -1);
+    else {
+      let p = (sport === 'nba' ? b.byId[who] : null) || b.byName[recNorm(who)];
+      if (sport === 'nhl') {   // match within the player's group (forward, defenseman, goalie) by first and last name
+        const t = String(who).split(' '), f = recNorm(t[0]), l = recNorm(t.at(-1));
+        const c = L[2][6] ? (b.byCat[L[2][6]] || []).filter((x) => x.f === f && x.l === l) : [];
+        if (c.length) p = c.length === 1 ? c[0].rec : 'twice';
+      }
+      if (p === 'twice') continue;
+      if (!p && sport !== 'nba') continue;   // name not in ESPN's box score: leave it for the grading run rather than guess void
+      let v = p && !p.dnp ? (stat === 'pra' ? p.s.pts + p.s.reb + p.s.ast : p.s[stat]) : undefined;
+      if (sport === 'nba' && p && !(p.s.min > 0)) v = undefined;
+      if (sport === 'nhl' && stat === 'saves' && p && !p.s.starter) v = undefined;
+      if (stat === 'td' && p && v === undefined) v = 0;   // listed in the box score with no touches: an anytime TD loses
+      if (v === undefined && sport === 'nfl') continue;   // no line for this stat in ESPN's box: leave it for the grading run
+      if (v === undefined) { res[L[0]] = 'void'; n += 1; continue; }
+      x = (v - ln) * (sd === 'Over' ? 1 : -1);
+    }
+    res[L[0]] = x > 0 ? 'win' : x < 0 ? 'loss' : 'push'; n += 1;
+  }
+  if (evs.length && failed === evs.length) { say('Could not reach ESPN. Check the connection and try again.', 'bad'); return 0; }
+  liveSave(store || sport, { res, at: Date.now() });
+  const left = want.length - n, fin = Object.keys(box).length;
+  say(n ? `Graded ${n} bet${n === 1 ? '' : 's'} from ${fin} finished game${fin === 1 ? '' : 's'}.${left ? ` ${left} still waiting for their games to finish or for the overnight grading.` : ''}`
+    : fin ? 'No new results yet.' : 'No games have finished yet. Try again after they end.', n ? 'ok' : '');
+  return n;
+}
+
+function refreshButton(o, bar) {
+  const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  const b = mk('button', 'refbtn'); b.type = 'button'; b.append(mk('span', 'ico', '↻'), mk('span', null, 'Refresh results'));
+  const P = o.src && o.src.pending;
+  if (!P) { b.disabled = true; b.title = 'Available after the next grading run'; }
+  b.onclick = async () => {
+    if (b.getAttribute('aria-busy') === 'true') return;
+    b.setAttribute('aria-busy', 'true');
+    const say = (t, c) => { REC_STATUS.text = t; REC_STATUS.cls = c || ''; let s = bar.querySelector('.refstatus'); if (!s) { s = mk('p'); bar.children[0].after(s); } s.textContent = t; s.className = 'refstatus ' + (c || ''); };
+    try { await liveCheck(o.sport, P, say); } catch (e) { say('Could not reach ESPN. Check the connection and try again.', 'bad'); }
+    b.setAttribute('aria-busy', 'false'); o.rerender();
+  };
+  return b;
+}
+// Keep each table's column-name row in view while scrolling through its rows (page or popup), and its first column in view
+// when the table scrolls sideways (CSS sticky, with a solid background added here once it has moved).
+// .tablewrap scrolls sideways, which stops CSS position: sticky from working, so the row is shifted in JS.
+(function stickyHeads() {
+  let queued = false;
+  const bgOf = (n) => { for (; n && n.nodeType === 1; n = n.parentElement) { const c = getComputedStyle(n).backgroundColor; if (c && c !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(c)) return c; } return ''; };
+  const headRow = (t) => (t.tHead && t.tHead.rows[0]) || Array.from(t.rows).find((r) => r.cells.length && Array.from(r.cells).every((c) => c.tagName === 'TH'));
+  const set = (hr, s) => {
+    if ((+hr.dataset.shift || 0) === s) return;
+    hr.dataset.shift = s;
+    let bg = '';
+    if (s) bg = bgOf(hr.closest('table').parentElement);
+    for (const c of hr.cells) { c.style.transform = s ? `translateY(${s}px)` : ''; c.classList.toggle('stuck', !!s); c.style.background = s ? bg : ''; }
+  };
+  const update = () => {
+    queued = false;
+    for (const w of document.querySelectorAll('.tablewrap')) {   // first column: give it a solid background once the table scrolls sideways
+      const on = w.scrollLeft > 0;
+      if (on && !w.classList.contains('xs')) w.style.setProperty('--stick-bg', bgOf(w) || getComputedStyle(document.body).backgroundColor);
+      w.classList.toggle('xs', on);
+    }
+    for (const t of document.querySelectorAll('table.res')) {
+      const hr = headRow(t); if (!hr) continue;
+      if (!t.offsetParent) { set(hr, 0); continue; }
+      // measure from layout (offsetTop/offsetHeight), which the shift itself never moves, so it can't feed back into itself
+      const tr = t.getBoundingClientRect(), hh = hr.offsetHeight, top = tr.top + hr.offsetTop;
+      const last = t.rows[t.rows.length - 1], lh = last && last !== hr ? last.offsetHeight : 0;
+      set(hr, Math.round(Math.max(0, Math.min(-top, tr.bottom - top - hh - lh))));
+    }
+  };
+  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+  document.addEventListener('scroll', queue, { capture: true, passive: true });
+  addEventListener('resize', queue);
+  const go = () => new MutationObserver(queue).observe(document.body, { childList: true, subtree: true });
+  if (document.body) go(); else document.addEventListener('DOMContentLoaded', go);
+})();
+const REC_STATUS = { text: '', cls: '' };
+</script>
+<script src="share.js"></script>
+<script src="sim_tables.js"></script>
+<script src="sim.js"></script>
+<script src="lines.js"></script>
+<style>
+.sportnav { display: flex; flex-wrap: wrap; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; }
+.sportnav a { font: 700 15px var(--display, sans-serif); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; background: var(--panel); }
+.sportnav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.sportnav a.bell { margin-left: auto; padding: 6px 12px; }
+</style>
+<style>
+.gcards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+@media (max-width: 400px) { .gcards { grid-template-columns: 1fr; } }
+.gcard .colhead h2 { font-size: 24px; }
+.gcard table.res td, .gcard table.res th { padding: 6px 8px; font-size: 14px; }
+.gcard table.res td:first-child, .gcard table.res th:first-child { padding-left: 14px; white-space: normal; }
+.gcard .add { min-width: 0; padding: 4px 8px; }
+.gcard .outs { padding: 8px 14px 12px; font-size: 13px; color: var(--muted); }
+.gcard .proj { padding: 10px 14px 4px; display: flex; gap: 18px; flex-wrap: wrap; }
+.gcard .proj div { display: flex; flex-direction: column; }
+.gcard .proj b { font-family: var(--display); font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.gcard .proj span { font-size: 12px; color: var(--muted); }
+.track .range { position: absolute; top: 1px; bottom: 1px; background: var(--bar); border-radius: 4px; }
+.track .mark { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1px; border-radius: 2px; background: var(--turf); }
+.track .line { position: absolute; top: -6px; bottom: -6px; width: 2px; margin-left: -1px; background: var(--tick); }
+table.log td, table.log th { padding: 5px 10px; }
+table.log td.hit { color: var(--pos); font-weight: 600; }
+table.log td.miss { color: var(--neg); font-weight: 600; }
+.logpanel .tablewrap { padding: 0 6px 6px; }
+.lchips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 10px; }
+.sugnav { display: flex; align-items: center; gap: 10px; padding: 10px 14px 0; flex-wrap: wrap; }
+.sugnav .lnk:not(.sugb) { font-size: 22px; line-height: 1; padding: 0 6px; }
+.suglab { font: 600 14px var(--body); min-width: 130px; text-align: center; }
+.sugnav .sugb { margin-left: auto; }
+.savedrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px 0; }
+.savedchip { display: inline-flex; align-items: center; gap: 2px; }
+.savedchip .chip { padding: 4px 10px; font-size: 13px; }
+.sugnav .seg button { padding: 6px 10px; }
+.sugbest { font-size: 12px; }
+</style>
+</head>
+<body>
+<nav class="sportnav" aria-label="Sport"><a href="index.html">NFL</a><a href="cfb.html">College</a><a href="nhl.html" aria-current="page">NHL</a><a href="tennis.html">Tennis</a><a href="bank.html">Bank Builder</a><a href="friends.html">Friends</a><a class="bell" href="alerts.html" aria-label="Alerts" title="Alerts">&#128276;</a></nav>
+<div class="wrap">
+  <header>
+    <span class="eyebrow" id="eyebrow">NHL</span>
+    <h1>NHL Board</h1>
+    <p class="lede" id="lede"></p>
+  </header>
+  <div class="tabs" id="tabs" role="tablist" aria-label="Board section"></div>
+  <div class="strip" id="games" role="group" aria-label="Games"></div>
+  <div class="bar" id="bar">
+    <input type="search" id="q" placeholder="Search a player or team" aria-label="Search a player or team">
+    <div class="seg" id="pos" role="group" aria-label="Position"></div>
+    <select id="sort" aria-label="Sort players"></select>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div id="board"></div>
+  <p class="note" id="foot"></p>
+</div>
+<script type="application/json" id="nhl-data">{"day":"2026-11-20","dayLabel":"Friday, November 20","book":"DraftKings","through":"2026-11-19","propsTaken":null,"injuries":true,"nb":{"sog":17.023,"saves":26.7631},"games":[],"players":[],"goalies":[],"legs":[],"pool":[],"backtest":{"sog":{"2025-26":{"lines":3344,"ll":{"model":0.6842933428851762,"market":0.6839728575238395,"blend_50":0.682850211637564},"b3":{"bets":231,"hit":0.5497835497835498,"roi":0.1223689567171961,"avg_model_prob":0.5215162062508323,"overs":6,"no_heavy_juice":{"bets":213,"hit":0.5492957746478874,"roi":0.1419867157241547}},"b0":{"bets":613,"hit":0.5171288743882545,"roi":0.030066938665330865,"avg_model_prob":0.5173045192586782,"overs":50,"no_heavy_juice":{"bets":552,"hit":0.5126811594202898,"roi":0.04585070360567372}}},"2026-27":{"lines":822,"ll":{"model":0.6771797830830423,"market":0.6791916375242303,"blend_50":0.6764654799162837},"b3":{"bets":40,"hit":0.6,"roi":0.13035372949713114,"avg_model_prob":0.5608889758599879,"overs":1,"no_heavy_juice":{"bets":34,"hit":0.5294117647058824,"roi":0.049668009834250244}},"b0":{"bets":139,"hit":0.5899280575539568,"roi":0.09344344933698746,"avg_model_prob":0.5481267614324733,"overs":14,"no_heavy_juice":{"bets":112,"hit":0.5357142857142857,"roi":0.04226960964418127}}}},"saves":{"lines":375,"ll":{"model":0.6959872051041709,"market":0.6936188095859146,"blend_50":0.6923604587815884},"b3":{"bets":55,"hit":0.5636363636363636,"roi":0.06780623855722671,"avg_model_prob":0.5588494453531585,"overs":3,"no_heavy_juice":{"bets":55,"hit":0.5636363636363636,"roi":0.06780623855722671}}},"ml":{"n":1215,"ll":{"model":0.6840799768999062,"market":0.6833399659404229,"blend_50":0.6825377985913801},"b0":{"bets":495,"hit":0.4444444444444444,"roi":0.002629801992610572,"no_heavy_juice":{"bets":479,"hit":0.4342379958246347,"roi":-0.0037930474861771787}}},"pl":{"n":1215,"ll":{"model":0.6260837758933607,"market":0.6236235873127066,"blend_50":0.6236608416398184},"b0":{"bets":803,"hit":0.47322540473225405,"roi":-0.031694658185892045,"no_heavy_juice":{"bets":556,"hit":0.36510791366906475,"roi":-0.06944075704808061}}},"totals":{"20252026":{"n":932,"ll":{"model":0.6953886269734154,"market":0.6902203403629404,"blend_50":0.6919773427355655}},"20262027":{"n":292,"ll":{"model":0.694314831618515,"market":0.6911110484215164,"blend_50":0.6922142114861902}}},"winners":{"20252026":{"games":932,"model":{"all":0.5407725321888412,"conf55":[557,0.5816876122082585],"conf60":[263,0.6387832699619772],"conf65":[90,0.6666666666666666]},"draftkings":{"all":0.555793991416309,"conf55":[602,0.5830564784053156],"conf60":[287,0.6376306620209059],"conf65":[107,0.7009345794392523]},"blend":{"all":0.5525751072961373,"conf55":[548,0.5912408759124088],"conf60":[264,0.6401515151515151],"conf65":[87,0.7241379310344828]}},"20262027":{"games":292,"model":{"all":0.6095890410958904,"conf55":[190,0.6684210526315789],"conf60":[100,0.72],"conf65":[45,0.7555555555555555]},"draftkings":{"all":0.6232876712328768,"conf55":[187,0.6951871657754011],"conf60":[104,0.75],"conf65":[52,0.7884615384615384]},"blend":{"all":0.6164383561643836,"conf55":[177,0.711864406779661],"conf60":[104,0.7403846153846154],"conf65":[41,0.8536585365853658]}}}},"live":{"days":["2026-11-12","2026-11-13","2026-11-14","2026-11-15","2026-11-16","2026-11-17","2026-11-18","2026-11-19"],"groups":[{"group":"Board winner picks","bets":56,"won":26,"lost":30,"hit":0.4642857142857143,"exp_hit":0.5705875,"units":-12.45,"roi":-0.22238569892002863},{"group":"Value legs","bets":26,"won":12,"lost":14,"hit":0.46153846153846156,"exp_hit":0.5976192307692307,"units":-4.42,"roi":-0.17005124619888892},{"group":"Prop leans with an edge (shots + saves)","bets":192,"won":90,"lost":102,"hit":0.46875,"exp_hit":0.5472567708333334,"units":-20.68,"roi":-0.10772026215541458},{"group":"Shots on goal leans with an edge","bets":157,"won":74,"lost":83,"hit":0.4713375796178344,"exp_hit":0.5434324840764331,"units":-15.63,"roi":-0.0995709737569702},{"group":"Saves leans with an edge","bets":35,"won":16,"lost":19,"hit":0.45714285714285713,"exp_hit":0.5644114285714286,"units":-5.05,"roi":-0.14427564154272227},{"group":"Puck line leans with an edge","bets":3,"won":1,"lost":2,"hit":0.3333333333333333,"exp_hit":0.4027333333333334,"units":-0.2,"roi":-0.06666666666666672},{"group":"Total leans with an edge","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.472,"units":1.14,"roi":1.1399999999999997}],"latest_day":{"day":"2026-11-19","props_won":18,"props_lost":13,"picks_won":8,"picks_lost":4},"calibration":[{"bucket":"0-45%","n":677,"said":0.4045460856720827,"hit":0.4150664697193501},{"bucket":"45-50%","n":555,"said":0.47471405405405404,"hit":0.4774774774774775},{"bucket":"50-55%","n":731,"said":0.5249990424076607,"hit":0.5280437756497948},{"bucket":"55-60%","n":589,"said":0.5742166383701188,"hit":0.5636672325976231},{"bucket":"60-65%","n":368,"said":0.6206785326086957,"hit":0.6521739130434783},{"bucket":"65-70%","n":175,"said":0.6731028571428572,"hit":0.7028571428571428},{"bucket":"70-80%","n":422,"said":0.7551369668246446,"hit":0.7867298578199052},{"bucket":"80-90%","n":442,"said":0.8469721719457013,"hit":0.8710407239819005},{"bucket":"90-100%","n":96,"said":0.923215625,"hit":0.9375}],"cal_sections":[{"name":"Moneyline picks","note":"The team the board gave the better chance to win, every game (overtime and shootouts count).","n":56,"won":26,"lost":30,"said":0.5706,"hit":0.4643,"units":-12.45,"roi":-0.2224,"buckets":[{"label":"50\u201360%","n":44,"won":21,"lost":23,"said":0.5472,"hit":0.4773,"units":-7.75},{"label":"60\u201370%","n":10,"won":5,"lost":5,"said":0.6388,"hit":0.5,"units":-2.7},{"label":"70\u201380%","n":2,"won":0,"lost":2,"said":0.7448,"hit":0.0,"units":-2.0}]},{"name":"Puck lines","note":"The side the board favored on each DraftKings puck line.","n":56,"won":33,"lost":23,"said":0.6439,"hit":0.5893,"units":-7.14,"roi":-0.1275,"buckets":[{"label":"50\u201360%","n":9,"won":4,"lost":5,"said":0.5615,"hit":0.4444,"units":-2.28},{"label":"60\u201370%","n":42,"won":26,"lost":16,"said":0.6538,"hit":0.619,"units":-3.95},{"label":"70\u201380%","n":5,"won":3,"lost":2,"said":0.7087,"hit":0.6,"units":-0.91}]},{"name":"Totals","note":"Over or Under, whichever the board favored.","n":56,"won":30,"lost":26,"said":0.5304,"hit":0.5357,"units":-1.45,"roi":-0.0259,"buckets":[{"label":"50\u201360%","n":56,"won":30,"lost":26,"said":0.5304,"hit":0.5357,"units":-1.45}]},{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":975,"won":550,"lost":425,"said":0.563,"hit":0.5641,"units":-50.5,"roi":-0.0518,"buckets":[{"label":"50\u201360%","n":774,"won":421,"lost":353,"said":0.5477,"hit":0.5439,"units":-51.74},{"label":"60\u201370%","n":200,"won":128,"lost":72,"said":0.6214,"hit":0.64,"units":0.72},{"label":"70\u201380%","n":1,"won":1,"lost":0,"said":0.7284,"hit":1.0,"units":0.51}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":89,"won":47,"lost":42,"said":0.5392,"hit":0.5281,"units":-2.94,"roi":-0.033,"buckets":[{"label":"50\u201360%","n":85,"won":46,"lost":39,"said":0.5355,"hit":0.5412,"units":-0.77},{"label":"60\u201370%","n":4,"won":1,"lost":3,"said":0.6169,"hit":0.25,"units":-2.17}]},{"name":"Alt lines","note":"Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).","n":1591,"won":1202,"lost":389,"said":0.7261,"hit":0.7555,"units":-39.08,"roi":-0.0246,"buckets":[{"label":"50\u201360%","n":352,"won":196,"lost":156,"said":0.5502,"hit":0.5568,"units":-23.06},{"label":"60\u201370%","n":287,"won":203,"lost":84,"said":0.6467,"hit":0.7073,"units":3.74},{"label":"70\u201380%","n":414,"won":328,"lost":86,"said":0.7558,"hit":0.7923,"units":-8.12},{"label":"80\u201390%","n":442,"won":385,"lost":57,"said":0.847,"hit":0.871,"units":-9.02},{"label":"90\u2013100%","n":96,"won":90,"lost":6,"said":0.9232,"hit":0.9375,"units":-2.61}]}],"parlays":{"days":["2026-11-12","2026-11-13","2026-11-14","2026-11-15","2026-11-16","2026-11-17","2026-11-18","2026-11-19"],"groups":[{"group":"Best value: \u2605 suggestion","bets":8,"won":2,"lost":6,"hit":0.25,"exp_hit":0.34212635153,"units":-1.57,"roi":-0.1958276098901099},{"group":"Best value: straight (all suggestions)","bets":37,"won":15,"lost":22,"hit":0.40540540540540543,"exp_hit":0.5946891891891891,"units":-10.33,"roi":-0.27919112999758167},{"group":"Best value: 2-leg (all suggestions)","bets":32,"won":8,"lost":24,"hit":0.25,"exp_hit":0.3586487596875,"units":-7.96,"roi":-0.24883155549391484},{"group":"Best value: 3-leg (all suggestions)","bets":25,"won":3,"lost":22,"hit":0.12,"exp_hit":0.21540968292896,"units":-8.61,"roi":-0.3444733610214507},{"group":"Best value: 4-leg (all suggestions)","bets":7,"won":1,"lost":6,"hit":0.14285714285714285,"exp_hit":0.13638733424078425,"units":1.42,"roi":0.20339277946933418},{"group":"Best value: 5-leg (all suggestions)","bets":6,"won":0,"lost":6,"hit":0.0,"exp_hit":0.08713038175572453,"units":-6.0,"roi":-1.0},{"group":"Best value: 6-leg (all suggestions)","bets":5,"won":0,"lost":5,"hit":0.0,"exp_hit":0.05070627748311239,"units":-5.0,"roi":-1.0},{"group":"Most likely to hit: \u2605 suggestion","bets":8,"won":4,"lost":4,"hit":0.5,"exp_hit":0.535600365114022,"units":-1.77,"roi":-0.22152564175590492},{"group":"Most likely to hit: straight (all suggestions)","bets":41,"won":21,"lost":20,"hit":0.5121951219512195,"exp_hit":0.6483390243902439,"units":-8.06,"roi":-0.19663440330962795},{"group":"Most likely to hit: 2-leg (all suggestions)","bets":38,"won":14,"lost":24,"hit":0.3684210526315789,"exp_hit":0.391575705,"units":-1.49,"roi":-0.03921229254660194},{"group":"Most likely to hit: 3-leg (all suggestions)","bets":37,"won":11,"lost":26,"hit":0.2972972972972973,"exp_hit":0.2712465494957838,"units":4.64,"roi":0.12536408036618404},{"group":"Most likely to hit: 4-leg (all suggestions)","bets":14,"won":2,"lost":12,"hit":0.14285714285714285,"exp_hit":0.17334129949491994,"units":-6.39,"roi":-0.4561121807989482},{"group":"Most likely to hit: 5-leg (all suggestions)","bets":12,"won":1,"lost":11,"hit":0.08333333333333333,"exp_hit":0.12139572008944093,"units":-5.08,"roi":-0.4232898273910582},{"group":"Most likely to hit: 6-leg (all suggestions)","bets":10,"won":0,"lost":10,"hit":0.0,"exp_hit":0.09087435018263341,"units":-10.0,"roi":-1.0},{"group":"Most likely to hit: 11-leg (all suggestions)","bets":8,"won":0,"lost":8,"hit":0.0,"exp_hit":0.013250632566723057,"units":-8.0,"roi":-1.0}]},"by_period":{"menu":{"day":[{"key":"d:2026-11-19","label":"Thu Nov 19"},{"key":"d:2026-11-18","label":"Wed Nov 18"},{"key":"d:2026-11-17","label":"Tue Nov 17"},{"key":"d:2026-11-16","label":"Mon Nov 16"},{"key":"d:2026-11-15","label":"Sun Nov 15"},{"key":"d:2026-11-14","label":"Sat Nov 14"},{"key":"d:2026-11-13","label":"Fri Nov 13"},{"key":"d:2026-11-12","label":"Thu Nov 12"}],"week":[{"key":"w:2026-11-16","label":"Nov 16 \u2013 22"},{"key":"w:2026-11-09","label":"Nov 9 \u2013 15"}],"month":[{"key":"m:2026-11","label":"November 2026"}]},"reports":{"d:2026-11-19":{"days":["2026-11-19"],"groups":[{"group":"Board winner picks","bets":12,"won":8,"lost":4,"hit":0.6666666666666666,"exp_hit":0.5787,"units":1.84,"roi":0.15328818360675453},{"group":"Value legs","bets":9,"won":4,"lost":5,"hit":0.4444444444444444,"exp_hit":0.6079222222222221,"units":-2.15,"roi":-0.23876627819280158},{"group":"Prop leans with an edge (shots + saves)","bets":31,"won":18,"lost":13,"hit":0.5806451612903226,"exp_hit":0.562325806451613,"units":2.71,"roi":0.0875180946441362},{"group":"Shots on goal leans with an edge","bets":27,"won":16,"lost":11,"hit":0.5925925925925926,"exp_hit":0.5603666666666667,"units":2.97,"roi":0.11002358116829553},{"group":"Saves leans with an edge","bets":4,"won":2,"lost":2,"hit":0.5,"exp_hit":0.57555,"units":-0.26,"roi":-0.06439393939393934},{"group":"Puck line leans with an edge","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.3641,"units":1.8,"roi":1.7999999999999998}],"latest_day":{"day":"2026-11-19","props_won":18,"props_lost":13,"picks_won":8,"picks_lost":4},"cal_sections":[{"name":"Moneyline picks","note":"The team the board gave the better chance to win, every game (overtime and shootouts count).","n":12,"won":8,"lost":4,"said":0.5787,"hit":0.6667,"units":1.84,"roi":0.1533,"buckets":[{"label":"50\u201360%","n":10,"won":7,"lost":3,"said":0.5556,"hit":0.7,"units":2.42},{"label":"60\u201370%","n":1,"won":1,"lost":0,"said":0.6493,"hit":1.0,"units":0.42},{"label":"70\u201380%","n":1,"won":0,"lost":1,"said":0.7391,"hit":0.0,"units":-1.0}]},{"name":"Puck lines","note":"The side the board favored on each DraftKings puck line.","n":12,"won":6,"lost":6,"said":0.6416,"hit":0.5,"units":-3.45,"roi":-0.2878,"buckets":[{"label":"50\u201360%","n":2,"won":0,"lost":2,"said":0.5535,"hit":0.0,"units":-2.0},{"label":"60\u201370%","n":8,"won":4,"lost":4,"said":0.6463,"hit":0.5,"units":-2.19},{"label":"70\u201380%","n":2,"won":2,"lost":0,"said":0.7109,"hit":1.0,"units":0.74}]},{"name":"Totals","note":"Over or Under, whichever the board favored.","n":12,"won":7,"lost":5,"said":0.5276,"hit":0.5833,"units":0.85,"roi":0.0712,"buckets":[{"label":"50\u201360%","n":12,"won":7,"lost":5,"said":0.5276,"hit":0.5833,"units":0.85}]},{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":205,"won":119,"lost":86,"said":0.5596,"hit":0.5805,"units":-2.44,"roi":-0.0119,"buckets":[{"label":"50\u201360%","n":168,"won":96,"lost":72,"said":0.5459,"hit":0.5714,"units":-1.34},{"label":"60\u201370%","n":36,"won":22,"lost":14,"said":0.6184,"hit":0.6111,"units":-1.61},{"label":"70\u201380%","n":1,"won":1,"lost":0,"said":0.7284,"hit":1.0,"units":0.51}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":21,"won":12,"lost":9,"said":0.5284,"hit":0.5714,"units":0.88,"roi":0.0421,"buckets":[{"label":"50\u201360%","n":20,"won":11,"lost":9,"said":0.5247,"hit":0.55,"units":0.05},{"label":"60\u201370%","n":1,"won":1,"lost":0,"said":0.603,"hit":1.0,"units":0.83}]},{"name":"Alt lines","note":"Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).","n":421,"won":312,"lost":109,"said":0.7239,"hit":0.7411,"units":-15.98,"roi":-0.038,"buckets":[{"label":"50\u201360%","n":90,"won":50,"lost":40,"said":0.5419,"hit":0.5556,"units":-4.32},{"label":"60\u201370%","n":79,"won":52,"lost":27,"said":0.6441,"hit":0.6582,"units":-4.04},{"label":"70\u201380%","n":110,"won":85,"lost":25,"said":0.7556,"hit":0.7727,"units":-4.62},{"label":"80\u201390%","n":119,"won":104,"lost":15,"said":0.8471,"hit":0.8739,"units":-1.86},{"label":"90\u2013100%","n":23,"won":21,"lost":2,"said":0.9207,"hit":0.913,"units":-1.14}]}],"parlays":{"days":["2026-11-19"],"groups":[{"group":"Best value: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.26911000224000003,"units":-1.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":6,"won":2,"lost":4,"hit":0.3333333333333333,"exp_hit":0.6279666666666667,"units":-2.84,"roi":-0.4736696994761511},{"group":"Best value: 2-leg (all suggestions)","bets":6,"won":1,"lost":5,"hit":0.16666666666666666,"exp_hit":0.384598645,"units":-2.65,"roi":-0.4421768707482993},{"group":"Best value: 3-leg (all suggestions)","bets":6,"won":0,"lost":6,"hit":0.0,"exp_hit":0.23723625423300002,"units":-6.0,"roi":-1.0},{"group":"Most likely to hit: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.46748712000000003,"units":-1.0,"roi":-1.0},{"group":"Most likely to hit: straight (all suggestions)","bets":6,"won":3,"lost":3,"hit":0.5,"exp_hit":0.6692166666666667,"units":-1.49,"roi":-0.24786324786324787},{"group":"Most likely to hit: 2-leg (all suggestions)","bets":6,"won":1,"lost":5,"hit":0.16666666666666666,"exp_hit":0.4155557366666667,"units":-3.25,"roi":-0.5416666666666666},{"group":"Most likely to hit: 3-leg (all suggestions)","bets":6,"won":0,"lost":6,"hit":0.0,"exp_hit":0.264745316575,"units":-6.0,"roi":-1.0}]}},"d:2026-11-18":{"days":["2026-11-18"],"groups":[{"group":"Board winner picks","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.5382,"units":-3.0,"roi":-1.0},{"group":"Value legs","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.5276,"units":-1.0,"roi":-1.0},{"group":"Prop leans with an edge (shots + saves)","bets":12,"won":4,"lost":8,"hit":0.3333333333333333,"exp_hit":0.5285833333333333,"units":-4.78,"roi":-0.3986671842650103},{"group":"Shots on goal leans with an edge","bets":9,"won":3,"lost":6,"hit":0.3333333333333333,"exp_hit":0.5190777777777777,"units":-3.65,"roi":-0.40595238095238095},{"group":"Saves leans with an edge","bets":3,"won":1,"lost":2,"hit":0.3333333333333333,"exp_hit":0.5571,"units":-1.13,"roi":-0.3768115942028986}],"latest_day":{"day":"2026-11-18","props_won":4,"props_lost":8,"picks_won":0,"picks_lost":3},"cal_sections":[{"name":"Moneyline picks","note":"The team the board gave the better chance to win, every game (overtime and shootouts count).","n":3,"won":0,"lost":3,"said":0.5382,"hit":0.0,"units":-3.0,"roi":-1.0,"buckets":[{"label":"50\u201360%","n":3,"won":0,"lost":3,"said":0.5382,"hit":0.0,"units":-3.0}]},{"name":"Puck lines","note":"The side the board favored on each DraftKings puck line.","n":3,"won":2,"lost":1,"said":0.6743,"hit":0.6667,"units":-0.09,"roi":-0.0312,"buckets":[{"label":"60\u201370%","n":1,"won":1,"lost":0,"said":0.6186,"hit":1.0,"units":0.56},{"label":"70\u201380%","n":2,"won":1,"lost":1,"said":0.7022,"hit":0.5,"units":-0.65}]},{"name":"Totals","note":"Over or Under, whichever the board favored.","n":3,"won":3,"lost":0,"said":0.5363,"hit":1.0,"units":2.29,"roi":0.7641,"buckets":[{"label":"50\u201360%","n":3,"won":3,"lost":0,"said":0.5363,"hit":1.0,"units":2.29}]},{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":53,"won":29,"lost":24,"said":0.5574,"hit":0.5472,"units":-3.95,"roi":-0.0745,"buckets":[{"label":"50\u201360%","n":42,"won":21,"lost":21,"said":0.5413,"hit":0.5,"units":-5.52},{"label":"60\u201370%","n":11,"won":8,"lost":3,"said":0.6187,"hit":0.7273,"units":1.57}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":6,"won":3,"lost":3,"said":0.5427,"hit":0.5,"units":-0.49,"roi":-0.0819,"buckets":[{"label":"50\u201360%","n":6,"won":3,"lost":3,"said":0.5427,"hit":0.5,"units":-0.49}]},{"name":"Alt lines","note":"Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).","n":119,"won":90,"lost":29,"said":0.7211,"hit":0.7563,"units":-1.66,"roi":-0.0139,"buckets":[{"label":"50\u201360%","n":30,"won":19,"lost":11,"said":0.5468,"hit":0.6333,"units":1.85},{"label":"60\u201370%","n":20,"won":14,"lost":6,"said":0.6401,"hit":0.7,"units":0.17},{"label":"70\u201380%","n":25,"won":20,"lost":5,"said":0.7614,"hit":0.8,"units":-0.75},{"label":"80\u201390%","n":36,"won":30,"lost":6,"said":0.8384,"hit":0.8333,"units":-2.19},{"label":"90\u2013100%","n":8,"won":7,"lost":1,"said":0.9239,"hit":0.875,"units":-0.75}]}],"parlays":{"days":["2026-11-18"],"groups":[{"group":"Best value: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.29587807999999993,"units":-1.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.5442,"units":-2.0,"roi":-1.0},{"group":"Best value: 2-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.29587807999999993,"units":-1.0,"roi":-1.0},{"group":"Most likely to hit: \u2605 suggestion","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.646,"units":0.57,"roi":0.5714285714285714},{"group":"Most likely to hit: straight (all suggestions)","bets":6,"won":4,"lost":2,"hit":0.6666666666666666,"exp_hit":0.6312,"units":0.36,"roi":0.060328185328185326},{"group":"Most likely to hit: 2-leg (all suggestions)","bets":6,"won":3,"lost":3,"hit":0.5,"exp_hit":0.3726675816666667,"units":1.44,"roi":0.24079278858690625},{"group":"Most likely to hit: 3-leg (all suggestions)","bets":6,"won":1,"lost":5,"hit":0.16666666666666666,"exp_hit":0.209113066226,"units":-1.5,"roi":-0.24987764424384137}]}},"d:2026-11-17":{"days":["2026-11-17"],"groups":[{"group":"Board winner picks","bets":11,"won":5,"lost":6,"hit":0.45454545454545453,"exp_hit":0.5531909090909091,"units":-2.64,"roi":-0.2403817200565168},{"group":"Value legs","bets":6,"won":3,"lost":3,"hit":0.5,"exp_hit":0.5570333333333334,"units":-0.13,"roi":-0.022222222222222292},{"group":"Prop leans with an edge (shots + saves)","bets":36,"won":18,"lost":18,"hit":0.5,"exp_hit":0.5367138888888889,"units":-0.82,"roi":-0.0227994378616984},{"group":"Shots on goal leans with an edge","bets":24,"won":13,"lost":11,"hit":0.5416666666666666,"exp_hit":0.5252583333333334,"units":1.73,"roi":0.07216808707469624},{"group":"Saves leans with an edge","bets":12,"won":5,"lost":7,"hit":0.4166666666666667,"exp_hit":0.5596249999999999,"units":-2.55,"roi":-0.21273448773448775}],"latest_day":{"day":"2026-11-17","props_won":18,"props_lost":18,"picks_won":5,"picks_lost":6},"cal_sections":[{"name":"Moneyline picks","note":"The team the board gave the better chance to win, every game (overtime and shootouts count).","n":11,"won":5,"lost":6,"said":0.5532,"hit":0.4545,"units":-2.64,"roi":-0.2404,"buckets":[{"label":"50\u201360%","n":9,"won":3,"lost":6,"said":0.5381,"hit":0.3333,"units":-3.75},{"label":"60\u201370%","n":2,"won":2,"lost":0,"said":0.6213,"hit":1.0,"units":1.11}]},{"name":"Puck lines","note":"The side the board favored on each DraftKings puck line.","n":11,"won":7,"lost":4,"said":0.6544,"hit":0.6364,"units":-0.91,"roi":-0.0827,"buckets":[{"label":"50\u201360%","n":1,"won":0,"lost":1,"said":0.5711,"hit":0.0,"units":-1.0},{"label":"60\u201370%","n":10,"won":7,"lost":3,"said":0.6627,"hit":0.7,"units":0.09}]},{"name":"Totals","note":"Over or Under, whichever the board favored.","n":11,"won":4,"lost":7,"said":0.5334,"hit":0.3636,"units":-3.67,"roi":-0.3333,"buckets":[{"label":"50\u201360%","n":11,"won":4,"lost":7,"said":0.5334,"hit":0.3636,"units":-3.67}]},{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":190,"won":98,"lost":92,"said":0.5628,"hit":0.5158,"units":-25.94,"roi":-0.1366,"buckets":[{"label":"50\u201360%","n":152,"won":70,"lost":82,"said":0.5476,"hit":0.4605,"units":-31.58},{"label":"60\u201370%","n":38,"won":28,"lost":10,"said":0.6236,"hit":0.7368,"units":5.63}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":19,"won":9,"lost":10,"said":0.5531,"hit":0.4737,"units":-2.44,"roi":-0.1283,"buckets":[{"label":"50\u201360%","n":18,"won":9,"lost":9,"said":0.5493,"hit":0.5,"units":-1.44},{"label":"60\u201370%","n":1,"won":0,"lost":1,"said":0.6223,"hit":0.0,"units":-1.0}]},{"name":"Alt lines","note":"Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).","n":389,"won":284,"lost":105,"said":0.7299,"hit":0.7301,"units":-28.67,"roi":-0.0737,"buckets":[{"label":"50\u201360%","n":80,"won":35,"lost":45,"said":0.5513,"hit":0.4375,"units":-22.34},{"label":"60\u201370%","n":71,"won":51,"lost":20,"said":0.6485,"hit":0.7183,"units":1.35},{"label":"70\u201380%","n":110,"won":90,"lost":20,"said":0.7568,"hit":0.8182,"units":1.24},{"label":"80\u201390%","n":102,"won":84,"lost":18,"said":0.8485,"hit":0.8235,"units":-7.82},{"label":"90\u2013100%","n":26,"won":24,"lost":2,"said":0.9231,"hit":0.9231,"units":-1.11}]}],"parlays":{"days":["2026-11-17"],"groups":[{"group":"Best value: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.38441924,"units":-1.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":6,"won":3,"lost":3,"hit":0.5,"exp_hit":0.5570333333333334,"units":-0.13,"roi":-0.022222222222222292},{"group":"Best value: 2-leg (all suggestions)","bets":6,"won":1,"lost":5,"hit":0.16666666666666666,"exp_hit":0.31929616,"units":-3.1,"roi":-0.5164609053497943},{"group":"Best value: 3-leg (all suggestions)","bets":6,"won":1,"lost":5,"hit":0.16666666666666666,"exp_hit":0.1732851684083333,"units":0.24,"roi":0.03960905349794223},{"group":"Most likely to hit: \u2605 suggestion","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.6551,"units":0.51,"roi":0.5050505050505052},{"group":"Most likely to hit: straight (all suggestions)","bets":6,"won":6,"lost":0,"hit":1.0,"exp_hit":0.6506833333333333,"units":3.28,"roi":0.5465190070453229},{"group":"Most likely to hit: 2-leg (all suggestions)","bets":6,"won":4,"lost":2,"hit":0.6666666666666666,"exp_hit":0.40412567166666663,"units":3.73,"roi":0.6219929004407562},{"group":"Most likely to hit: 3-leg (all suggestions)","bets":6,"won":4,"lost":2,"hit":0.6666666666666666,"exp_hit":0.25655384944166665,"units":8.78,"roi":1.462908826761166}]}},"d:2026-11-16":{"days":["2026-11-16"],"groups":[{"group":"Value legs","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.6715,"units":-1.0,"roi":-1.0},{"group":"Prop leans with an edge (shots + saves)","bets":4,"won":1,"lost":3,"hit":0.25,"exp_hit":0.5416,"units":-2.13,"roi":-0.532608695652174},{"group":"Shots on goal leans with an edge","bets":4,"won":1,"lost":3,"hit":0.25,"exp_hit":0.5416,"units":-2.13,"roi":-0.532608695652174}],"latest_day":{"day":"2026-11-16","props_won":1,"props_lost":3,"picks_won":0,"picks_lost":0},"cal_sections":[{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":33,"won":21,"lost":12,"said":0.577,"hit":0.6364,"units":1.56,"roi":0.0472,"buckets":[{"label":"50\u201360%","n":24,"won":16,"lost":8,"said":0.5585,"hit":0.6667,"units":2.77},{"label":"60\u201370%","n":9,"won":5,"lost":4,"said":0.6263,"hit":0.5556,"units":-1.22}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":3,"won":0,"lost":3,"said":0.5114,"hit":0.0,"units":-3.0,"roi":-1.0,"buckets":[{"label":"50\u201360%","n":3,"won":0,"lost":3,"said":0.5114,"hit":0.0,"units":-3.0}]},{"name":"Alt lines","note":"Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).","n":64,"won":50,"lost":14,"said":0.713,"hit":0.7812,"units":2.61,"roi":0.0407,"buckets":[{"label":"50\u201360%","n":18,"won":11,"lost":7,"said":0.5532,"hit":0.6111,"units":0.54},{"label":"60\u201370%","n":11,"won":10,"lost":1,"said":0.6454,"hit":0.9091,"units":3.47},{"label":"70\u201380%","n":13,"won":9,"lost":4,"said":0.76,"hit":0.6923,"units":-1.91},{"label":"80\u201390%","n":20,"won":18,"lost":2,"said":0.8427,"hit":0.9,"units":0.42},{"label":"90\u2013100%","n":2,"won":2,"lost":0,"said":0.9213,"hit":1.0,"units":0.07}]}],"parlays":{"days":["2026-11-16"],"groups":[{"group":"Best value: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.36549745,"units":-1.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.6079,"units":-2.0,"roi":-1.0},{"group":"Best value: 2-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.36549745,"units":-1.0,"roi":-1.0},{"group":"Most likely to hit: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.6715,"units":-1.0,"roi":-1.0},{"group":"Most likely to hit: straight (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.6715,"units":-1.0,"roi":-1.0},{"group":"Most likely to hit: 3-leg (all suggestions)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.4388788609916667,"units":-3.0,"roi":-1.0}]}},"d:2026-11-15":{"days":["2026-11-15"],"groups":[{"group":"Board winner picks","bets":5,"won":3,"lost":2,"hit":0.6,"exp_hit":0.60238,"units":0.09,"roi":0.01801354704580511},{"group":"Value legs","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.6814,"units":0.62,"roi":0.625},{"group":"Prop leans with an edge (shots + saves)","bets":21,"won":9,"lost":12,"hit":0.42857142857142855,"exp_hit":0.5740476190476189,"units":-5.09,"roi":-0.24234753186366095},{"group":"Shots on goal leans with an edge","bets":19,"won":7,"lost":12,"hit":0.3684210526315789,"exp_hit":0.5753210526315788,"units":-6.72,"roi":-0.353822710656327},{"group":"Saves leans with an edge","bets":2,"won":2,"lost":0,"hit":1.0,"exp_hit":0.56195,"units":1.63,"roi":0.8166666666666668}],"latest_day":{"day":"2026-11-15","props_won":9,"props_lost":12,"picks_won":3,"picks_lost":2},"cal_sections":[{"name":"Moneyline picks","note":"The team the board gave the better chance to win, every game (overtime and shootouts count).","n":5,"won":3,"lost":2,"said":0.6024,"hit":0.6,"units":0.09,"roi":0.018,"buckets":[{"label":"50\u201360%","n":4,"won":3,"lost":1,"said":0.5654,"hit":0.75,"units":1.09},{"label":"70\u201380%","n":1,"won":0,"lost":1,"said":0.7505,"hit":0.0,"units":-1.0}]},{"name":"Puck lines","note":"The side the board favored on each DraftKings puck line.","n":5,"won":2,"lost":3,"said":0.6264,"hit":0.4,"units":-1.98,"roi":-0.3954,"buckets":[{"label":"50\u201360%","n":1,"won":0,"lost":1,"said":0.5789,"hit":0.0,"units":-1.0},{"label":"60\u201370%","n":4,"won":2,"lost":2,"said":0.6383,"hit":0.5,"units":-0.98}]},{"name":"Totals","note":"Over or Under, whichever the board favored.","n":5,"won":2,"lost":3,"said":0.5273,"hit":0.4,"units":-1.35,"roi":-0.2705,"buckets":[{"label":"50\u201360%","n":5,"won":2,"lost":3,"said":0.5273,"hit":0.4,"units":-1.35}]},{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":87,"won":50,"lost":37,"said":0.5739,"hit":0.5747,"units":-4.29,"roi":-0.0493,"buckets":[{"label":"50\u201360%","n":62,"won":35,"lost":27,"said":0.5528,"hit":0.5645,"units":-3.14},{"label":"60\u201370%","n":25,"won":15,"lost":10,"said":0.6262,"hit":0.6,"units":-1.15}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":9,"won":5,"lost":4,"said":0.5304,"hit":0.5556,"units":0.14,"roi":0.0151,"buckets":[{"label":"50\u201360%","n":9,"won":5,"lost":4,"said":0.5304,"hit":0.5556,"units":0.14}]},{"name":"Alt lines","note":"Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).","n":186,"won":150,"lost":36,"said":0.7233,"hit":0.8065,"units":9.63,"roi":0.0518,"buckets":[{"label":"50\u201360%","n":45,"won":31,"lost":14,"said":0.5606,"hit":0.6889,"units":6.33},{"label":"60\u201370%","n":26,"won":19,"lost":7,"said":0.6552,"hit":0.7308,"units":0.84},{"label":"70\u201380%","n":58,"won":46,"lost":12,"said":0.7453,"hit":0.7931,"units":-0.35},{"label":"80\u201390%","n":49,"won":46,"lost":3,"said":0.8503,"hit":0.9388,"units":2.52},{"label":"90\u2013100%","n":8,"won":8,"lost":0,"said":0.9232,"hit":1.0,"units":0.3}]}],"parlays":{"days":["2026-11-15"],"groups":[{"group":"Best value: \u2605 suggestion","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.38499099999999997,"units":1.98,"roi":1.979166666666667},{"group":"Best value: straight (all suggestions)","bets":6,"won":3,"lost":3,"hit":0.5,"exp_hit":0.6243666666666666,"units":-0.88,"roi":-0.14583333333333334},{"group":"Best value: 2-leg (all suggestions)","bets":6,"won":1,"lost":5,"hit":0.16666666666666666,"exp_hit":0.393409045,"units":-3.02,"roi":-0.5034722222222222},{"group":"Best value: 3-leg (all suggestions)","bets":6,"won":0,"lost":6,"hit":0.0,"exp_hit":0.2477308544723333,"units":-6.0,"roi":-1.0},{"group":"Best value: 4-leg (all suggestions)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.15926435755630916,"units":-3.0,"roi":-1.0},{"group":"Best value: 5-leg (all suggestions)","bets":4,"won":0,"lost":4,"hit":0.0,"exp_hit":0.10018840761477343,"units":-4.0,"roi":-1.0},{"group":"Best value: 6-leg (all suggestions)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.06077485717671923,"units":-3.0,"roi":-1.0},{"group":"Most likely to hit: \u2605 suggestion","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.6814,"units":0.62,"roi":0.625},{"group":"Most likely to hit: straight (all suggestions)","bets":6,"won":2,"lost":4,"hit":0.3333333333333333,"exp_hit":0.6634,"units":-2.71,"roi":-0.4513888888888889},{"group":"Most likely to hit: 2-leg (all suggestions)","bets":6,"won":0,"lost":6,"hit":0.0,"exp_hit":0.38860956166666666,"units":-6.0,"roi":-1.0},{"group":"Most likely to hit: 3-leg (all suggestions)","bets":6,"won":3,"lost":3,"hit":0.5,"exp_hit":0.3289362340715,"units":2.12,"roi":0.3527165275193085},{"group":"Most likely to hit: 4-leg (all suggestions)","bets":6,"won":2,"lost":4,"hit":0.3333333333333333,"exp_hit":0.21302109326072863,"units":1.61,"roi":0.26907157813578747},{"group":"Most likely to hit: 5-leg (all suggestions)","bets":6,"won":1,"lost":5,"hit":0.16666666666666666,"exp_hit":0.15147805045475862,"units":0.92,"roi":0.15342034521788359},{"group":"Most likely to hit: 6-leg (all suggestions)","bets":6,"won":0,"lost":6,"hit":0.0,"exp_hit":0.11277302056092564,"units":-6.0,"roi":-1.0},{"group":"Most likely to hit: 11-leg (all suggestions)","bets":6,"won":0,"lost":6,"hit":0.0,"exp_hit":0.015460716634757614,"units":-6.0,"roi":-1.0}]}},"d:2026-11-14":{"days":["2026-11-14"],"groups":[{"group":"Board winner picks","bets":12,"won":5,"lost":7,"hit":0.4166666666666667,"exp_hit":0.5640833333333334,"units":-3.33,"roi":-0.27773927773927776},{"group":"Value legs","bets":5,"won":3,"lost":2,"hit":0.6,"exp_hit":0.59406,"units":0.44,"roi":0.08717948717948718},{"group":"Prop leans with an edge (shots + saves)","bets":41,"won":19,"lost":22,"hit":0.4634146341463415,"exp_hit":0.547470731707317,"units":-4.75,"roi":-0.11583979333183997},{"group":"Shots on goal leans with an edge","bets":32,"won":14,"lost":18,"hit":0.4375,"exp_hit":0.544534375,"units":-5.24,"roi":-0.16368888634513637},{"group":"Saves leans with an edge","bets":9,"won":5,"lost":4,"hit":0.5555555555555556,"exp_hit":0.5579111111111111,"units":0.49,"roi":0.05429031515988039},{"group":"Puck line leans with an edge","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.42205000000000004,"units":-2.0,"roi":-1.0},{"group":"Total leans with an edge","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.472,"units":1.14,"roi":1.1399999999999997}],"latest_day":{"day":"2026-11-14","props_won":19,"props_lost":22,"picks_won":5,"picks_lost":7},"cal_sections":[{"name":"Moneyline picks","note":"The team the board gave the better chance to win, every game (overtime and shootouts count).","n":12,"won":5,"lost":7,"said":0.5641,"hit":0.4167,"units":-3.33,"roi":-0.2777,"buckets":[{"label":"50\u201360%","n":9,"won":5,"lost":4,"said":0.5377,"hit":0.5556,"units":-0.33},{"label":"60\u201370%","n":3,"won":0,"lost":3,"said":0.6433,"hit":0.0,"units":-3.0}]},{"name":"Puck lines","note":"The side the board favored on each DraftKings puck line.","n":12,"won":7,"lost":5,"said":0.6499,"hit":0.5833,"units":-1.32,"roi":-0.1104,"buckets":[{"label":"50\u201360%","n":3,"won":3,"lost":0,"said":0.5743,"hit":1.0,"units":1.9},{"label":"60\u201370%","n":8,"won":4,"lost":4,"said":0.6699,"hit":0.5,"units":-2.23},{"label":"70\u201380%","n":1,"won":0,"lost":1,"said":0.7175,"hit":0.0,"units":-1.0}]},{"name":"Totals","note":"Over or Under, whichever the board favored.","n":12,"won":6,"lost":6,"said":0.5281,"hit":0.5,"units":-1.18,"roi":-0.098,"buckets":[{"label":"50\u201360%","n":12,"won":6,"lost":6,"said":0.5281,"hit":0.5,"units":-1.18}]},{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":182,"won":112,"lost":70,"said":0.5629,"hit":0.6154,"units":6.16,"roi":0.0338,"buckets":[{"label":"50\u201360%","n":144,"won":86,"lost":58,"said":0.548,"hit":0.5972,"units":3.27},{"label":"60\u201370%","n":38,"won":26,"lost":12,"said":0.6192,"hit":0.6842,"units":2.88}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":23,"won":14,"lost":9,"said":0.5358,"hit":0.6087,"units":2.68,"roi":0.1166,"buckets":[{"label":"50\u201360%","n":22,"won":14,"lost":8,"said":0.5325,"hit":0.6364,"units":3.68},{"label":"60\u201370%","n":1,"won":0,"lost":1,"said":0.6101,"hit":0.0,"units":-1.0}]},{"name":"Alt lines","note":"Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).","n":412,"won":316,"lost":96,"said":0.7294,"hit":0.767,"units":-5.01,"roi":-0.0122,"buckets":[{"label":"50\u201360%","n":89,"won":50,"lost":39,"said":0.5531,"hit":0.5618,"units":-5.12},{"label":"60\u201370%","n":80,"won":57,"lost":23,"said":0.6468,"hit":0.7125,"units":1.95},{"label":"70\u201380%","n":98,"won":78,"lost":20,"said":0.7592,"hit":0.7959,"units":-1.74},{"label":"80\u201390%","n":116,"won":103,"lost":13,"said":0.8475,"hit":0.8879,"units":-0.1},{"label":"90\u2013100%","n":29,"won":28,"lost":1,"said":0.9252,"hit":0.9655,"units":0.01}]}],"parlays":{"days":["2026-11-14"],"groups":[{"group":"Best value: \u2605 suggestion","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.3453966,"units":2.45,"roi":2.454212454212454},{"group":"Best value: straight (all suggestions)","bets":6,"won":3,"lost":3,"hit":0.5,"exp_hit":0.5849,"units":-0.56,"roi":-0.09401709401709402},{"group":"Best value: 2-leg (all suggestions)","bets":6,"won":3,"lost":3,"hit":0.5,"exp_hit":0.34754061,"units":3.2,"roi":0.5333458104190792},{"group":"Best value: 3-leg (all suggestions)","bets":4,"won":1,"lost":3,"hit":0.25,"exp_hit":0.20431735954275002,"units":0.73,"roi":0.1814613526570048},{"group":"Best value: 4-leg (all suggestions)","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.119041587304812,"units":-2.0,"roi":-1.0},{"group":"Best value: 5-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.06567132257444655,"units":-1.0,"roi":-1.0},{"group":"Best value: 6-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.034963412138635346,"units":-1.0,"roi":-1.0},{"group":"Most likely to hit: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.09020976091217564,"units":-1.0,"roi":-1.0},{"group":"Most likely to hit: straight (all suggestions)","bets":6,"won":3,"lost":3,"hit":0.5,"exp_hit":0.6514666666666667,"units":-1.31,"roi":-0.21777065527065528},{"group":"Most likely to hit: 2-leg (all suggestions)","bets":6,"won":2,"lost":4,"hit":0.3333333333333333,"exp_hit":0.391921445,"units":-0.61,"roi":-0.10229276895943558},{"group":"Most likely to hit: 3-leg (all suggestions)","bets":6,"won":2,"lost":4,"hit":0.3333333333333333,"exp_hit":0.2382031161596667,"units":3.34,"roi":0.557190729532426},{"group":"Most likely to hit: 4-leg (all suggestions)","bets":5,"won":0,"lost":5,"hit":0.0,"exp_hit":0.14363135501956756,"units":-5.0,"roi":-1.0},{"group":"Most likely to hit: 5-leg (all suggestions)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.10043915711903456,"units":-3.0,"roi":-1.0},{"group":"Most likely to hit: 6-leg (all suggestions)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.057491988097231744,"units":-3.0,"roi":-1.0},{"group":"Most likely to hit: 11-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.008426472335803181,"units":-1.0,"roi":-1.0}]}},"d:2026-11-13":{"days":["2026-11-13"],"groups":[{"group":"Board winner picks","bets":2,"won":1,"lost":1,"hit":0.5,"exp_hit":0.628,"units":-0.56,"roi":-0.2777777777777778},{"group":"Value legs","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.6438999999999999,"units":-2.0,"roi":-1.0},{"group":"Prop leans with an edge (shots + saves)","bets":9,"won":2,"lost":7,"hit":0.2222222222222222,"exp_hit":0.5476555555555556,"units":-4.2,"roi":-0.4666666666666667},{"group":"Shots on goal leans with an edge","bets":6,"won":2,"lost":4,"hit":0.3333333333333333,"exp_hit":0.5270166666666667,"units":-1.2,"roi":-0.20000000000000004},{"group":"Saves leans with an edge","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.5889333333333333,"units":-3.0,"roi":-1.0}],"latest_day":{"day":"2026-11-13","props_won":2,"props_lost":7,"picks_won":1,"picks_lost":1},"cal_sections":[{"name":"Moneyline picks","note":"The team the board gave the better chance to win, every game (overtime and shootouts count).","n":2,"won":1,"lost":1,"said":0.628,"hit":0.5,"units":-0.56,"roi":-0.2778,"buckets":[{"label":"60\u201370%","n":2,"won":1,"lost":1,"said":0.628,"hit":0.5,"units":-0.56}]},{"name":"Puck lines","note":"The side the board favored on each DraftKings puck line.","n":2,"won":1,"lost":1,"said":0.5797,"hit":0.5,"units":-0.44,"roi":-0.2222,"buckets":[{"label":"50\u201360%","n":1,"won":0,"lost":1,"said":0.5552,"hit":0.0,"units":-1.0},{"label":"60\u201370%","n":1,"won":1,"lost":0,"said":0.6043,"hit":1.0,"units":0.56}]},{"name":"Totals","note":"Over or Under, whichever the board favored.","n":2,"won":2,"lost":0,"said":0.5342,"hit":1.0,"units":1.61,"roi":0.8052,"buckets":[{"label":"50\u201360%","n":2,"won":2,"lost":0,"said":0.5342,"hit":1.0,"units":1.61}]},{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":31,"won":14,"lost":17,"said":0.5598,"hit":0.4516,"units":-7.23,"roi":-0.2331,"buckets":[{"label":"50\u201360%","n":26,"won":12,"lost":14,"said":0.5478,"hit":0.4615,"units":-5.39},{"label":"60\u201370%","n":5,"won":2,"lost":3,"said":0.6221,"hit":0.4,"units":-1.83}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":4,"won":1,"lost":3,"said":0.5731,"hit":0.25,"units":-2.23,"roi":-0.5577,"buckets":[{"label":"50\u201360%","n":3,"won":1,"lost":2,"said":0.5534,"hit":0.3333,"units":-1.23},{"label":"60\u201370%","n":1,"won":0,"lost":1,"said":0.6322,"hit":0.0,"units":-1.0}]}],"parlays":{"days":["2026-11-13"],"groups":[{"group":"Best value: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.38477163999999997,"units":-1.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.6248999999999999,"units":-3.0,"roi":-1.0},{"group":"Best value: 2-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.38477163999999997,"units":-1.0,"roi":-1.0},{"group":"Most likely to hit: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.40050603999999995,"units":-1.0,"roi":-1.0},{"group":"Most likely to hit: straight (all suggestions)","bets":4,"won":0,"lost":4,"hit":0.0,"exp_hit":0.6214,"units":-4.0,"roi":-1.0},{"group":"Most likely to hit: 2-leg (all suggestions)","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.38577211,"units":-2.0,"roi":-1.0}]}},"d:2026-11-12":{"days":["2026-11-12"],"groups":[{"group":"Board winner picks","bets":11,"won":4,"lost":7,"hit":0.36363636363636365,"exp_hit":0.5701727272727273,"units":-4.85,"roi":-0.44095447899846446},{"group":"Value legs","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.586,"units":0.8,"roi":0.8},{"group":"Prop leans with an edge (shots + saves)","bets":38,"won":19,"lost":19,"hit":0.5,"exp_hit":0.5363131578947369,"units":-1.62,"roi":-0.04266844250672483},{"group":"Shots on goal leans with an edge","bets":36,"won":18,"lost":18,"hit":0.5,"exp_hit":0.5340666666666667,"units":-1.39,"roi":-0.0386286551246198},{"group":"Saves leans with an edge","bets":2,"won":1,"lost":1,"hit":0.5,"exp_hit":0.5767500000000001,"units":-0.23,"roi":-0.11538461538461542}],"latest_day":{"day":"2026-11-12","props_won":19,"props_lost":19,"picks_won":4,"picks_lost":7},"cal_sections":[{"name":"Moneyline picks","note":"The team the board gave the better chance to win, every game (overtime and shootouts count).","n":11,"won":4,"lost":7,"said":0.5702,"hit":0.3636,"units":-4.85,"roi":-0.441,"buckets":[{"label":"50\u201360%","n":9,"won":3,"lost":6,"said":0.5513,"hit":0.3333,"units":-4.18},{"label":"60\u201370%","n":2,"won":1,"lost":1,"said":0.6552,"hit":0.5,"units":-0.67}]},{"name":"Puck lines","note":"The side the board favored on each DraftKings puck line.","n":11,"won":8,"lost":3,"said":0.6407,"hit":0.7273,"units":1.06,"roi":0.0968,"buckets":[{"label":"50\u201360%","n":1,"won":1,"lost":0,"said":0.5186,"hit":1.0,"units":0.82},{"label":"60\u201370%","n":10,"won":7,"lost":3,"said":0.6529,"hit":0.7,"units":0.24}]},{"name":"Totals","note":"Over or Under, whichever the board favored.","n":11,"won":6,"lost":5,"said":0.5321,"hit":0.5455,"units":-0.01,"roi":-0.0012,"buckets":[{"label":"50\u201360%","n":11,"won":6,"lost":5,"said":0.5321,"hit":0.5455,"units":-0.01}]},{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":194,"won":107,"lost":87,"said":0.5619,"hit":0.5515,"units":-14.36,"roi":-0.074,"buckets":[{"label":"50\u201360%","n":156,"won":85,"lost":71,"said":0.5476,"hit":0.5449,"units":-10.81},{"label":"60\u201370%","n":38,"won":22,"lost":16,"said":0.6205,"hit":0.5789,"units":-3.55}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":4,"won":3,"lost":1,"said":0.5498,"hit":0.75,"units":1.52,"roi":0.3804,"buckets":[{"label":"50\u201360%","n":4,"won":3,"lost":1,"said":0.5498,"hit":0.75,"units":1.52}]}],"parlays":{"days":["2026-11-12"],"groups":[{"group":"Best value: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.3069468,"units":-1.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":6,"won":4,"lost":2,"hit":0.6666666666666666,"exp_hit":0.5765,"units":1.08,"roi":0.18073038073038072},{"group":"Best value: 2-leg (all suggestions)","bets":5,"won":2,"lost":3,"hit":0.4,"exp_hit":0.352309276,"units":0.61,"roi":0.12199507032042903},{"group":"Best value: 3-leg (all suggestions)","bets":3,"won":1,"lost":2,"hit":0.3333333333333333,"exp_hit":0.20615299079033333,"units":2.42,"roi":0.8082220809493533},{"group":"Best value: 4-leg (all suggestions)","bets":2,"won":1,"lost":1,"hit":0.5,"exp_hit":0.11941754620346909,"units":6.42,"roi":3.2118747281426696},{"group":"Best value: 5-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.05635733750080692,"units":-1.0,"roi":-1.0},{"group":"Best value: 6-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.03624340374676893,"units":-1.0,"roi":-1.0},{"group":"Most likely to hit: \u2605 suggestion","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.6726,"units":0.53,"roi":0.5263157894736841},{"group":"Most likely to hit: straight (all suggestions)","bets":6,"won":3,"lost":3,"hit":0.5,"exp_hit":0.6381666666666667,"units":-1.2,"roi":-0.2001594896331739},{"group":"Most likely to hit: 2-leg (all suggestions)","bets":6,"won":4,"lost":2,"hit":0.6666666666666666,"exp_hit":0.378508765,"units":5.2,"roi":0.8661625604699609},{"group":"Most likely to hit: 3-leg (all suggestions)","bets":4,"won":1,"lost":3,"hit":0.25,"exp_hit":0.2335440633815,"units":0.9,"roi":0.22521008403361353},{"group":"Most likely to hit: 4-leg (all suggestions)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.1434982860888898,"units":-3.0,"roi":-1.0},{"group":"Most likely to hit: 5-leg (all suggestions)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.0821876223292119,"units":-3.0,"roi":-1.0},{"group":"Most likely to hit: 6-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.05962941416908511,"units":-1.0,"roi":-1.0},{"group":"Most likely to hit: 11-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.004814288389435591,"units":-1.0,"roi":-1.0}]}},"w:2026-11-16":{"days":["2026-11-16","2026-11-17","2026-11-18","2026-11-19"],"groups":[{"group":"Board winner picks","bets":26,"won":13,"lost":13,"hit":0.5,"exp_hit":0.5632346153846153,"units":-3.8,"roi":-0.1463361814361781},{"group":"Value legs","bets":17,"won":7,"lost":10,"hit":0.4117647058823529,"exp_hit":0.5889764705882353,"units":-4.28,"roi":-0.2518958727687381},{"group":"Prop leans with an edge (shots + saves)","bets":83,"won":41,"lost":42,"hit":0.4939759036144578,"exp_hit":0.5453397590361445,"units":-5.02,"roi":-0.06050794967279207},{"group":"Shots on goal leans with an edge","bets":64,"won":33,"lost":31,"hit":0.515625,"exp_hit":0.540221875,"units":-1.08,"roi":-0.016895866091303682},{"group":"Saves leans with an edge","bets":19,"won":8,"lost":11,"hit":0.42105263157894735,"exp_hit":0.5625789473684212,"units":-3.94,"roi":-0.20741181015780555},{"group":"Puck line leans with an edge","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.3641,"units":1.8,"roi":1.7999999999999998}],"latest_day":{"day":"2026-11-19","props_won":18,"props_lost":13,"picks_won":8,"picks_lost":4},"cal_sections":[{"name":"Moneyline picks","note":"The team the board gave the better chance to win, every game (overtime and shootouts count).","n":26,"won":13,"lost":13,"said":0.5632,"hit":0.5,"units":-3.8,"roi":-0.1463,"buckets":[{"label":"50\u201360%","n":22,"won":10,"lost":12,"said":0.5461,"hit":0.4545,"units":-4.33},{"label":"60\u201370%","n":3,"won":3,"lost":0,"said":0.6306,"hit":1.0,"units":1.53},{"label":"70\u201380%","n":1,"won":0,"lost":1,"said":0.7391,"hit":0.0,"units":-1.0}]},{"name":"Puck lines","note":"The side the board favored on each DraftKings puck line.","n":26,"won":15,"lost":11,"said":0.6508,"hit":0.5769,"units":-4.46,"roi":-0.1714,"buckets":[{"label":"50\u201360%","n":3,"won":0,"lost":3,"said":0.5594,"hit":0.0,"units":-3.0},{"label":"60\u201370%","n":19,"won":12,"lost":7,"said":0.6534,"hit":0.6316,"units":-1.55},{"label":"70\u201380%","n":4,"won":3,"lost":1,"said":0.7066,"hit":0.75,"units":0.09}]},{"name":"Totals","note":"Over or Under, whichever the board favored.","n":26,"won":14,"lost":12,"said":0.5311,"hit":0.5385,"units":-0.52,"roi":-0.02,"buckets":[{"label":"50\u201360%","n":26,"won":14,"lost":12,"said":0.5311,"hit":0.5385,"units":-0.52}]},{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":481,"won":267,"lost":214,"said":0.5618,"hit":0.5551,"units":-30.77,"roi":-0.064,"buckets":[{"label":"50\u201360%","n":386,"won":203,"lost":183,"said":0.5469,"hit":0.5259,"units":-35.66},{"label":"60\u201370%","n":94,"won":63,"lost":31,"said":0.6213,"hit":0.6702,"units":4.37},{"label":"70\u201380%","n":1,"won":1,"lost":0,"said":0.7284,"hit":1.0,"units":0.51}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":49,"won":24,"lost":25,"said":0.5387,"hit":0.4898,"units":-5.05,"roi":-0.103,"buckets":[{"label":"50\u201360%","n":47,"won":23,"lost":24,"said":0.5356,"hit":0.4894,"units":-4.88},{"label":"60\u201370%","n":2,"won":1,"lost":1,"said":0.6126,"hit":0.5,"units":-0.17}]},{"name":"Alt lines","note":"Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).","n":993,"won":736,"lost":257,"said":0.7252,"hit":0.7412,"units":-43.71,"roi":-0.044,"buckets":[{"label":"50\u201360%","n":218,"won":115,"lost":103,"said":0.5469,"hit":0.5275,"units":-24.27},{"label":"60\u201370%","n":181,"won":127,"lost":54,"said":0.6455,"hit":0.7017,"units":0.95},{"label":"70\u201380%","n":258,"won":204,"lost":54,"said":0.7569,"hit":0.7907,"units":-6.03},{"label":"80\u201390%","n":277,"won":236,"lost":41,"said":0.8462,"hit":0.852,"units":-11.45},{"label":"90\u2013100%","n":59,"won":54,"lost":5,"said":0.9222,"hit":0.9153,"units":-2.92}]}],"parlays":{"days":["2026-11-16","2026-11-17","2026-11-18","2026-11-19"],"groups":[{"group":"Best value: \u2605 suggestion","bets":4,"won":0,"lost":4,"hit":0.0,"exp_hit":0.32872619306,"units":-4.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":16,"won":5,"lost":11,"hit":0.3125,"exp_hit":0.5883875,"units":-6.98,"roi":-0.43595947063689},{"group":"Best value: 2-leg (all suggestions)","bets":14,"won":2,"lost":12,"hit":0.14285714285714285,"exp_hit":0.34891031142857143,"units":-7.75,"roi":-0.5537019040420401},{"group":"Best value: 3-leg (all suggestions)","bets":12,"won":1,"lost":11,"hit":0.08333333333333333,"exp_hit":0.20526071132066667,"units":-5.76,"roi":-0.4801954732510289},{"group":"Most likely to hit: \u2605 suggestion","bets":4,"won":2,"lost":2,"hit":0.5,"exp_hit":0.6100217800000001,"units":-0.92,"roi":-0.23088023088023085},{"group":"Most likely to hit: straight (all suggestions)","bets":19,"won":13,"lost":6,"hit":0.6842105263157895,"exp_hit":0.651478947368421,"units":1.15,"roi":0.060731771950608505},{"group":"Most likely to hit: 2-leg (all suggestions)","bets":18,"won":8,"lost":10,"hit":0.4444444444444444,"exp_hit":0.3974496633333333,"units":1.93,"roi":0.10703967412033194},{"group":"Most likely to hit: 3-leg (all suggestions)","bets":21,"won":5,"lost":16,"hit":0.23809523809523808,"exp_hit":0.27138618935385717,"units":-1.72,"roi":-0.0819910907093358}]}},"w:2026-11-09":{"days":["2026-11-12","2026-11-13","2026-11-14","2026-11-15"],"groups":[{"group":"Board winner picks","bets":30,"won":13,"lost":17,"hit":0.43333333333333335,"exp_hit":0.5769599999999999,"units":-8.65,"roi":-0.28829528073936567},{"group":"Value legs","bets":9,"won":5,"lost":4,"hit":0.5555555555555556,"exp_hit":0.6139444444444444,"units":-0.14,"roi":-0.01545584045584045},{"group":"Prop leans with an edge (shots + saves)","bets":109,"won":49,"lost":60,"hit":0.44954128440366975,"exp_hit":0.5487165137614679,"units":-15.66,"roi":-0.1436709221192464},{"group":"Shots on goal leans with an edge","bets":93,"won":41,"lost":52,"hit":0.44086021505376344,"exp_hit":0.545641935483871,"units":-14.55,"roi":-0.1564656715053859},{"group":"Saves leans with an edge","bets":16,"won":8,"lost":8,"hit":0.5,"exp_hit":0.5665875,"units":-1.11,"roi":-0.06930144131231086},{"group":"Puck line leans with an edge","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.42205000000000004,"units":-2.0,"roi":-1.0},{"group":"Total leans with an edge","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.472,"units":1.14,"roi":1.1399999999999997}],"latest_day":{"day":"2026-11-15","props_won":9,"props_lost":12,"picks_won":3,"picks_lost":2},"cal_sections":[{"name":"Moneyline picks","note":"The team the board gave the better chance to win, every game (overtime and shootouts count).","n":30,"won":13,"lost":17,"said":0.577,"hit":0.4333,"units":-8.65,"roi":-0.2883,"buckets":[{"label":"50\u201360%","n":22,"won":11,"lost":11,"said":0.5483,"hit":0.5,"units":-3.42},{"label":"60\u201370%","n":7,"won":2,"lost":5,"said":0.6424,"hit":0.2857,"units":-4.23},{"label":"70\u201380%","n":1,"won":0,"lost":1,"said":0.7505,"hit":0.0,"units":-1.0}]},{"name":"Puck lines","note":"The side the board favored on each DraftKings puck line.","n":30,"won":18,"lost":12,"said":0.6379,"hit":0.6,"units":-2.68,"roi":-0.0894,"buckets":[{"label":"50\u201360%","n":6,"won":4,"lost":2,"said":0.5626,"hit":0.6667,"units":0.72},{"label":"60\u201370%","n":23,"won":14,"lost":9,"said":0.6541,"hit":0.6087,"units":-2.41},{"label":"70\u201380%","n":1,"won":0,"lost":1,"said":0.7175,"hit":0.0,"units":-1.0}]},{"name":"Totals","note":"Over or Under, whichever the board favored.","n":30,"won":16,"lost":14,"said":0.5298,"hit":0.5333,"units":-0.93,"roi":-0.0311,"buckets":[{"label":"50\u201360%","n":30,"won":16,"lost":14,"said":0.5298,"hit":0.5333,"units":-0.93}]},{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":494,"won":283,"lost":211,"said":0.5642,"hit":0.5729,"units":-19.72,"roi":-0.0399,"buckets":[{"label":"50\u201360%","n":388,"won":218,"lost":170,"said":0.5486,"hit":0.5619,"units":-16.08},{"label":"60\u201370%","n":106,"won":65,"lost":41,"said":0.6214,"hit":0.6132,"units":-3.65}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":40,"won":23,"lost":17,"said":0.5397,"hit":0.575,"units":2.11,"roi":0.0527,"buckets":[{"label":"50\u201360%","n":38,"won":23,"lost":15,"said":0.5354,"hit":0.6053,"units":4.11},{"label":"60\u201370%","n":2,"won":0,"lost":2,"said":0.6211,"hit":0.0,"units":-2.0}]},{"name":"Alt lines","note":"Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).","n":598,"won":466,"lost":132,"said":0.7275,"hit":0.7793,"units":4.63,"roi":0.0077,"buckets":[{"label":"50\u201360%","n":134,"won":81,"lost":53,"said":0.5556,"hit":0.6045,"units":1.2},{"label":"60\u201370%","n":106,"won":76,"lost":30,"said":0.6489,"hit":0.717,"units":2.78},{"label":"70\u201380%","n":156,"won":124,"lost":32,"said":0.7541,"hit":0.7949,"units":-2.09},{"label":"80\u201390%","n":165,"won":149,"lost":16,"said":0.8483,"hit":0.903,"units":2.42},{"label":"90\u2013100%","n":37,"won":36,"lost":1,"said":0.9248,"hit":0.973,"units":0.31}]}],"parlays":{"days":["2026-11-12","2026-11-13","2026-11-14","2026-11-15"],"groups":[{"group":"Best value: \u2605 suggestion","bets":4,"won":2,"lost":2,"hit":0.5,"exp_hit":0.35552651,"units":2.43,"roi":0.6083447802197802},{"group":"Best value: straight (all suggestions)","bets":21,"won":10,"lost":11,"hit":0.47619047619047616,"exp_hit":0.5994904761904761,"units":-3.35,"roi":-0.15974858474858475},{"group":"Best value: 2-leg (all suggestions)","bets":18,"won":6,"lost":12,"hit":0.3333333333333333,"exp_hit":0.3662231083333334,"units":-0.21,"roi":-0.01171017328981737},{"group":"Best value: 3-leg (all suggestions)","bets":13,"won":2,"lost":11,"hit":0.15384615384615385,"exp_hit":0.22477796441353848,"units":-2.85,"roi":-0.21919141127107084},{"group":"Best value: 4-leg (all suggestions)","bets":7,"won":1,"lost":6,"hit":0.14285714285714285,"exp_hit":0.13638733424078425,"units":1.42,"roi":0.20339277946933418},{"group":"Best value: 5-leg (all suggestions)","bets":6,"won":0,"lost":6,"hit":0.0,"exp_hit":0.08713038175572453,"units":-6.0,"roi":-1.0},{"group":"Best value: 6-leg (all suggestions)","bets":5,"won":0,"lost":5,"hit":0.0,"exp_hit":0.05070627748311239,"units":-5.0,"roi":-1.0},{"group":"Most likely to hit: \u2605 suggestion","bets":4,"won":2,"lost":2,"hit":0.5,"exp_hit":0.4611789502280439,"units":-0.85,"roi":-0.21217105263157898},{"group":"Most likely to hit: straight (all suggestions)","bets":22,"won":8,"lost":14,"hit":0.36363636363636365,"exp_hit":0.6456272727272727,"units":-9.22,"roi":-0.4189051910343777},{"group":"Most likely to hit: 2-leg (all suggestions)","bets":20,"won":6,"lost":14,"hit":0.3,"exp_hit":0.3862891425,"units":-3.42,"roi":-0.17083906254684242},{"group":"Most likely to hit: 3-leg (all suggestions)","bets":16,"won":6,"lost":10,"hit":0.375,"exp_hit":0.2710632721820625,"units":6.36,"roi":0.3975177424028038},{"group":"Most likely to hit: 4-leg (all suggestions)","bets":14,"won":2,"lost":12,"hit":0.14285714285714285,"exp_hit":0.17334129949491994,"units":-6.39,"roi":-0.4561121807989482},{"group":"Most likely to hit: 5-leg (all suggestions)","bets":12,"won":1,"lost":11,"hit":0.08333333333333333,"exp_hit":0.12139572008944093,"units":-5.08,"roi":-0.4232898273910582},{"group":"Most likely to hit: 6-leg (all suggestions)","bets":10,"won":0,"lost":10,"hit":0.0,"exp_hit":0.09087435018263341,"units":-10.0,"roi":-1.0},{"group":"Most likely to hit: 11-leg (all suggestions)","bets":8,"won":0,"lost":8,"hit":0.0,"exp_hit":0.013250632566723057,"units":-8.0,"roi":-1.0}]}},"m:2026-11":{"days":["2026-11-12","2026-11-13","2026-11-14","2026-11-15","2026-11-16","2026-11-17","2026-11-18","2026-11-19"],"groups":[{"group":"Board winner picks","bets":56,"won":26,"lost":30,"hit":0.4642857142857143,"exp_hit":0.5705875,"units":-12.45,"roi":-0.22238569892002863},{"group":"Value legs","bets":26,"won":12,"lost":14,"hit":0.46153846153846156,"exp_hit":0.5976192307692307,"units":-4.42,"roi":-0.17005124619888892},{"group":"Prop leans with an edge (shots + saves)","bets":192,"won":90,"lost":102,"hit":0.46875,"exp_hit":0.5472567708333334,"units":-20.68,"roi":-0.10772026215541458},{"group":"Shots on goal leans with an edge","bets":157,"won":74,"lost":83,"hit":0.4713375796178344,"exp_hit":0.5434324840764331,"units":-15.63,"roi":-0.0995709737569702},{"group":"Saves leans with an edge","bets":35,"won":16,"lost":19,"hit":0.45714285714285713,"exp_hit":0.5644114285714286,"units":-5.05,"roi":-0.14427564154272227},{"group":"Puck line leans with an edge","bets":3,"won":1,"lost":2,"hit":0.3333333333333333,"exp_hit":0.4027333333333334,"units":-0.2,"roi":-0.06666666666666672},{"group":"Total leans with an edge","bets":1,"won":1,"lost":0,"hit":1.0,"exp_hit":0.472,"units":1.14,"roi":1.1399999999999997}],"latest_day":{"day":"2026-11-19","props_won":18,"props_lost":13,"picks_won":8,"picks_lost":4},"cal_sections":[{"name":"Moneyline picks","note":"The team the board gave the better chance to win, every game (overtime and shootouts count).","n":56,"won":26,"lost":30,"said":0.5706,"hit":0.4643,"units":-12.45,"roi":-0.2224,"buckets":[{"label":"50\u201360%","n":44,"won":21,"lost":23,"said":0.5472,"hit":0.4773,"units":-7.75},{"label":"60\u201370%","n":10,"won":5,"lost":5,"said":0.6388,"hit":0.5,"units":-2.7},{"label":"70\u201380%","n":2,"won":0,"lost":2,"said":0.7448,"hit":0.0,"units":-2.0}]},{"name":"Puck lines","note":"The side the board favored on each DraftKings puck line.","n":56,"won":33,"lost":23,"said":0.6439,"hit":0.5893,"units":-7.14,"roi":-0.1275,"buckets":[{"label":"50\u201360%","n":9,"won":4,"lost":5,"said":0.5615,"hit":0.4444,"units":-2.28},{"label":"60\u201370%","n":42,"won":26,"lost":16,"said":0.6538,"hit":0.619,"units":-3.95},{"label":"70\u201380%","n":5,"won":3,"lost":2,"said":0.7087,"hit":0.6,"units":-0.91}]},{"name":"Totals","note":"Over or Under, whichever the board favored.","n":56,"won":30,"lost":26,"said":0.5304,"hit":0.5357,"units":-1.45,"roi":-0.0259,"buckets":[{"label":"50\u201360%","n":56,"won":30,"lost":26,"said":0.5304,"hit":0.5357,"units":-1.45}]},{"name":"Shots on goal","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":975,"won":550,"lost":425,"said":0.563,"hit":0.5641,"units":-50.5,"roi":-0.0518,"buckets":[{"label":"50\u201360%","n":774,"won":421,"lost":353,"said":0.5477,"hit":0.5439,"units":-51.74},{"label":"60\u201370%","n":200,"won":128,"lost":72,"said":0.6214,"hit":0.64,"units":0.72},{"label":"70\u201380%","n":1,"won":1,"lost":0,"said":0.7284,"hit":1.0,"units":0.51}]},{"name":"Saves","note":"Over or Under on the main DraftKings line, whichever the board favored.","n":89,"won":47,"lost":42,"said":0.5392,"hit":0.5281,"units":-2.94,"roi":-0.033,"buckets":[{"label":"50\u201360%","n":85,"won":46,"lost":39,"said":0.5355,"hit":0.5412,"units":-0.77},{"label":"60\u201370%","n":4,"won":1,"lost":3,"said":0.6169,"hit":0.25,"units":-2.17}]},{"name":"Alt lines","note":"Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).","n":1591,"won":1202,"lost":389,"said":0.7261,"hit":0.7555,"units":-39.08,"roi":-0.0246,"buckets":[{"label":"50\u201360%","n":352,"won":196,"lost":156,"said":0.5502,"hit":0.5568,"units":-23.06},{"label":"60\u201370%","n":287,"won":203,"lost":84,"said":0.6467,"hit":0.7073,"units":3.74},{"label":"70\u201380%","n":414,"won":328,"lost":86,"said":0.7558,"hit":0.7923,"units":-8.12},{"label":"80\u201390%","n":442,"won":385,"lost":57,"said":0.847,"hit":0.871,"units":-9.02},{"label":"90\u2013100%","n":96,"won":90,"lost":6,"said":0.9232,"hit":0.9375,"units":-2.61}]}],"parlays":{"days":["2026-11-12","2026-11-13","2026-11-14","2026-11-15","2026-11-16","2026-11-17","2026-11-18","2026-11-19"],"groups":[{"group":"Best value: \u2605 suggestion","bets":8,"won":2,"lost":6,"hit":0.25,"exp_hit":0.34212635153,"units":-1.57,"roi":-0.1958276098901099},{"group":"Best value: straight (all suggestions)","bets":37,"won":15,"lost":22,"hit":0.40540540540540543,"exp_hit":0.5946891891891891,"units":-10.33,"roi":-0.27919112999758167},{"group":"Best value: 2-leg (all suggestions)","bets":32,"won":8,"lost":24,"hit":0.25,"exp_hit":0.3586487596875,"units":-7.96,"roi":-0.24883155549391484},{"group":"Best value: 3-leg (all suggestions)","bets":25,"won":3,"lost":22,"hit":0.12,"exp_hit":0.21540968292896,"units":-8.61,"roi":-0.3444733610214507},{"group":"Best value: 4-leg (all suggestions)","bets":7,"won":1,"lost":6,"hit":0.14285714285714285,"exp_hit":0.13638733424078425,"units":1.42,"roi":0.20339277946933418},{"group":"Best value: 5-leg (all suggestions)","bets":6,"won":0,"lost":6,"hit":0.0,"exp_hit":0.08713038175572453,"units":-6.0,"roi":-1.0},{"group":"Best value: 6-leg (all suggestions)","bets":5,"won":0,"lost":5,"hit":0.0,"exp_hit":0.05070627748311239,"units":-5.0,"roi":-1.0},{"group":"Most likely to hit: \u2605 suggestion","bets":8,"won":4,"lost":4,"hit":0.5,"exp_hit":0.535600365114022,"units":-1.77,"roi":-0.22152564175590492},{"group":"Most likely to hit: straight (all suggestions)","bets":41,"won":21,"lost":20,"hit":0.5121951219512195,"exp_hit":0.6483390243902439,"units":-8.06,"roi":-0.19663440330962795},{"group":"Most likely to hit: 2-leg (all suggestions)","bets":38,"won":14,"lost":24,"hit":0.3684210526315789,"exp_hit":0.391575705,"units":-1.49,"roi":-0.03921229254660194},{"group":"Most likely to hit: 3-leg (all suggestions)","bets":37,"won":11,"lost":26,"hit":0.2972972972972973,"exp_hit":0.2712465494957838,"units":4.64,"roi":0.12536408036618404},{"group":"Most likely to hit: 4-leg (all suggestions)","bets":14,"won":2,"lost":12,"hit":0.14285714285714285,"exp_hit":0.17334129949491994,"units":-6.39,"roi":-0.4561121807989482},{"group":"Most likely to hit: 5-leg (all suggestions)","bets":12,"won":1,"lost":11,"hit":0.08333333333333333,"exp_hit":0.12139572008944093,"units":-5.08,"roi":-0.4232898273910582},{"group":"Most likely to hit: 6-leg (all suggestions)","bets":10,"won":0,"lost":10,"hit":0.0,"exp_hit":0.09087435018263341,"units":-10.0,"roi":-1.0},{"group":"Most likely to hit: 11-leg (all suggestions)","bets":8,"won":0,"lost":8,"hit":0.0,"exp_hit":0.013250632566723057,"units":-8.0,"roi":-1.0}]}}}},"pending":{"push":false,"g":[],"c":[],"per":{},"days":{},"legs":[],"parlays":[]}},"weights":{"Moneyline":0.5,"Puck line":0.25,"Total":0.25,"Shots on goal":0.5,"Saves":0.5,"Alt shots":0.5,"Alt saves":0.5}}</script>
+<script>
+const D = JSON.parse(document.getElementById('nhl-data').textContent);
+// games that have started: DraftKings pulls pregame lines at the start, so their legs leave suggestions and the DraftKings link
+const STARTS = {}; (D.games || []).forEach((g) => { if (g.start) STARTS[g.game] = g.start; });
+const started = (game) => !!STARTS[game] && Date.parse(STARTS[game]) <= Date.now();
+const LEG = Object.fromEntries(D.legs.map((l) => [l.id, l]));
+// "Line changed?" (board/site/lines.js, Thomas 2026-11-19): the user enters DraftKings' new line or price and the leg is
+// re-priced here: shots and saves from the props model's negative binomial around the player's projection, totals from the
+// game model's total-goals chances. Moneylines, puck lines (always 1.5) and alt rungs: price only.
+const P_BY = Object.fromEntries(D.players.map((p) => [p.id, p])), G_BY = Object.fromEntries(D.goalies.map((p) => [p.id, p])), GM_BY = Object.fromEntries(D.games.map((g) => [g.id, g]));
+function nbSize(k, pr) {   // the model's NB size; older pages without D.nb: fit it to the board's own numbers
+  if (D.nb && D.nb[k]) return D.nb[k];
+  if (k === 'saves' && pr.hi > pr.proj) { const sd = (pr.hi - pr.proj) / 1.28, v = sd * sd - pr.proj; return v > 0 ? pr.proj * pr.proj / v : 50; }
+  if (pr.ch && pr.ch['3+'] != null) { let best = 8, err = 9; for (let r = 0.5; r < 400; r *= 1.05) { const e = Math.abs(LineEdit.dist.nb(pr.proj, r, 2.5) - pr.ch['3+']); if (e < err) { err = e; best = r; } } return best; }
+  return 8;
+}
+function nhlModel(L, line) {
+  if (L.alt) return null;
+  if (L.kind === 'Total') { const g = GM_BY[L.gid]; if (!g) return null; const o = g.tpmf ? LineEdit.dist.pmf(g.tpmf, line) : LineEdit.dist.poisson(g.total, line); return L.side === 'Under' ? 1 - o : o; }
+  const k = L.kind === 'Shots on goal' ? 'sog' : L.kind === 'Saves' ? 'saves' : null, pl = k && (k === 'sog' ? P_BY : G_BY)[L.pid];
+  if (!pl || !pl[k]) return null;
+  const o = LineEdit.dist.nb(pl[k].proj, nbSize(k, pl[k]), line); return L.side === 'Under' ? 1 - o : o;
+}
+function patchNhl() {
+  for (const [k, src] of [['sog', D.players], ['saves', D.goalies]]) for (const p of src) {
+    const pr = p[k]; if (!pr) continue; p.edited = false;
+    for (const sd of ['over', 'under']) { const x = pr[sd], L = x && LEG[x.id]; if (!L) continue; Object.assign(x, { price: L.price, p: L.p, edge: L.edge, ev: L.ev }); pr.line = L.line; if (L.edited) p.edited = true; }
+  }
+  for (const g of D.games) { const t = g.legs.map((id) => LEG[id]).find((L) => L && L.market === 'total'); if (t) g.line_total = t.line; }
+}
+LineEdit.setup({ sport: 'nhl', stamp: [D.day, D.propsTaken].join('|'), legs: D.legs, model: nhlModel, name: (L) => L.label,
+  bar: (r) => r.p >= 0.55 && r.edge >= 0 && r.price >= -200, barText: '55%+ to hit, fair price or better, -200 or longer',
+  inSlip: (L) => slip.includes(L.id), swap: (a, b) => { slip = slip.map((i) => (i === a ? b : i)); sugIdx = -1; saveSlip(); render(); },
+  weight: (L) => (D.weights[L.kind] != null ? D.weights[L.kind] : 0.5),
+  sibling: (L) => D.legs.find((x) => x.id !== L.id && !x.alt && x.gid === L.gid && x.market === L.market && x.pid === L.pid) || null,
+  onChange: () => { patchNhl(); render(); } });
+patchNhl();
+const STATS = [['sog', 'Shots on goal'], ['saves', 'Goalie saves']];
+const SRC = (k) => (k === 'saves' ? D.goalies : D.players);
+const SL = Object.fromEntries(STATS);
+const TABS = [['games', 'Games']].concat(STATS).concat([['parlay', 'Parlay builder'], ['sim', 'Simulation'], ['record', 'Model record']]);
+const state = { tab: 'games', game: 'all', pos: 'all', q: '', sort: 'edge', pmin: 0.25, pq: '' };
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+const fmt = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
+const pct = (p) => p == null ? '—' : p < 0.01 ? (p * 100).toFixed(2) + '%' : Math.round(p * 100) + '%';
+const sgn = (x) => (x > 0 ? '+' : '') + x;
+const dec = (a) => a > 0 ? 1 + a / 100 : 1 + 100 / -a;
+const toAm = (d) => d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1));
+const $ = (id) => document.getElementById(id);
+let slip = [];
+try { slip = JSON.parse(localStorage.getItem('nhl-slip-' + D.day) || '[]').filter((id) => LEG[id]); } catch (e) { slip = []; }
+const saveSlip = () => { try { localStorage.setItem('nhl-slip-' + D.day, JSON.stringify(slip)); } catch (e) {} };
+// suggested parlays are built here so the leg count can be chosen: best remaining legs, 1 per game and 1 per player,
+// no leg reused across suggestions (same rule as scripts/nhl_board.py)
+// two ways to build: 'value' = biggest edge first (scripts/nhl_board.py pool); 'likely' = most likely to hit first,
+// among legs that still pay more than they risk on average (edge 1+ pt) and carry no flags
+// alternate lines (alt: true, Over only, e.g. "25+ points") as in the NFL builder: a shaky Over main line (under 60%) gives way to
+// the same player's likeliest fairly priced alt line at 60%+, and Most likely to hit slips of 3+ legs lead with alt lines
+// that are 70%+, cost at most 3 pts of juice and are priced -500 or longer, likeliest first (parlays.py uses the same rules)
+// Thomas, 2026-11-16: no leg heavier than -200 and at most 3 legs (live grading: 3+ leg parlays 0 for ~200 on NBA), 'likely' legs judged on
+// their chance at no worse than DraftKings' usual juice (edge -3+) instead of a model edge (parlays.py likely(), MAX_JUICE, SHORT_SIZES)
+const SECURE = 0.6, ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3, ALT_JUICE = 3, ALT_MIN_PRICE = -200, MAX_LEGS = 3;
+const ALT_BY = {};
+for (const l of D.legs) if (l.alt && !l.flags.length && l.p >= SECURE && l.edge >= -3 && l.price >= ALT_MIN_PRICE) (ALT_BY[l.pid + '|' + l.market] = ALT_BY[l.pid + '|' + l.market] || []).push(l);
+Object.values(ALT_BY).forEach((xs) => xs.sort((a, b) => b.p - a.p));
+const safer = (l) => (l.alt || l.side !== 'Over' || l.p >= SECURE) ? l : ((ALT_BY[l.pid + '|' + l.market] || []).find((a) => a.p > l.p) || l);
+const dedupe = (xs) => { const s = new Set(); return xs.filter((l) => !s.has(l.id) && s.add(l.id)); };
+const ALT_FIRST = D.legs.filter((l) => l.alt && !l.flags.length && l.p >= ALT_FIRST_P && l.edge >= -ALT_JUICE && l.price >= ALT_MIN_PRICE).sort((a, b) => b.p - a.p || b.edge - a.edge);
+const capped = (xs) => xs.filter((l) => l.price >= ALT_MIN_PRICE);
+const VALUE_POOL = capped(dedupe((D.pool || []).map((id) => LEG[id]).filter(Boolean).map(safer)));
+// NHL: the board's winner picks count as "likely" even without an edge (Thomas wants correct picks more than edge),
+// but nothing priced shorter than -200, so no leg risks much more than it pays
+const LIKELY_POOL = capped(dedupe(D.legs.filter((l) => (l.edge >= -3 || l.pick) && l.p >= 0.55 && l.price >= ALT_MIN_PRICE && !l.flags.length).sort((a, b) => b.p - a.p || b.edge - a.edge).map(safer)));
+let mode = 'value';
+try { mode = localStorage.getItem('nhl-mode') === 'likely' ? 'likely' : 'value'; } catch (e) {}
+let POOL = mode === 'likely' ? LIKELY_POOL : VALUE_POOL;
+// market filter: pick any mix of markets (e.g. Points + Assists); none picked = every market. Suggestions follow it.
+let KINDS = new Set();
+const OPEN = new Set(), GLIM = {};
+try { KINDS = new Set(JSON.parse(localStorage.getItem('nhl-kinds') || '[]')); } catch (e) {}
+const kindOk = (L) => !KINDS.size || KINDS.has(L.kind);
+const MKTS = [...new Set(D.legs.map((L) => L.kind))];
+// markets DraftKings won't take in a same-game parlay: such a leg can't share its game with any other leg
+const NO_SGP = new Set(['Saves', 'Alt saves']);
+// market family, for mixing markets within a slip (alt and main lines of a stat are one family)
+function fam(L) {
+  if (L.kind === 'Milestone') return (L.key || '').split('-').pop().toLowerCase();
+  let k = L.kind.toLowerCase(); if (k.startsWith('alt ')) k = k.slice(4);
+  return k === 'shots on goal' ? 'shots' : k;
+}
+// up to n slips: at most half of a slip from one market family when the pool allows; legs are used once across the
+// suggestions first, then (least-used first) a leg may appear in up to 3, so each size shows n different slips
+// whenever the pool allows. Same rule as parlays.py many(). pick(pool, size, allowed, cap) -> array of legs or null
+function many(pool, size, n, pick) {
+  const out = [], uses = {}, seen = new Set(), cap = size < 2 ? size : Math.ceil(size / 2);
+  for (let s = 0; s < n; s++) {
+    let slip = null;
+    for (const [mx, c] of [[0, cap], [0, size], [1, cap], [1, size], [2, cap], [2, size]]) {
+      const cand = mx ? pool.map((L, i) => [L, i]).sort((a, b) => (uses[a[0].id] || 0) - (uses[b[0].id] || 0) || a[1] - b[1]).map((x) => x[0]) : pool;
+      const t = pick(cand, size, (L) => (uses[L.id] || 0) <= mx, c);
+      if (t && !seen.has(t.map((L) => L.id).sort().join('|'))) { slip = t; break; }
+    }
+    if (!slip) break;
+    seen.add(slip.map((L) => L.id).sort().join('|')); out.push(slip.map((L) => L.id));
+    slip.forEach((L) => { uses[L.id] = (uses[L.id] || 0) + 1; });
+  }
+  return out;
+}
+// one market of one game (of one player for props): a slip never holds two of them, e.g. both teams to win
+const sideKey = (L) => `${L.game}|${L.market}|${L.pid && L.kind !== 'Winner' ? L.pid : ''}`;
+// the usual pool for a slip of this size (relax 0 in buildSlips)
+const usualPool = (size) => (mode === 'likely' && size >= ALT_FIRST_SIZE ? dedupe(ALT_FIRST.concat(POOL)) : POOL).filter((L) => kindOk(L) && !started(L.game));
+// next-best legs (Thomas, 2026-11-19): every other leg not yet started, ranked like the mode (chance for Most likely to hit, edge for
+// Best value), with legs that carry no flags, are priced no shorter than ALT_MIN_PRICE and are 40%+ to hit ahead of the rest
+// fill order (Thomas, 2026-11-19): alt-line rungs that are 60%+ to hit and priced -500 or longer go first (likeliest first, since
+// they hit more often than next-best main lines), then the next-best legs. Boards with no alt lines saved go straight to next-best.
+const FILL_ALT_P = 0.6, FILL_ALT_MIN = -500;
+const fillTag = (L) => (L.alt ? 'alt line' : 'next-best');
+const HAS_ALT = D.legs.some((L) => L.alt);
+// "2 alt lines and 1 next-best leg" for the warnings and the share card
+function fillWords(ls) {
+  const a = ls.filter((l) => l.alt).length, b = ls.length - a, w = [];
+  if (a) w.push(`${a} alt line${a === 1 ? '' : 's'}`); if (b) w.push(`${b} next-best leg${b === 1 ? '' : 's'}`);
+  return w.join(' and ');
+}
+const fillHow = () => (HAS_ALT ? 'likely alt lines first (60%+ to hit), then next-best legs' : 'the next-best legs');
+function fillPool() {
+  const by = mode === 'likely' ? (a, b) => b.p - a.p || b.edge - a.edge : (a, b) => b.edge - a.edge || b.p - a.p;
+  const ls = D.legs.filter((L) => kindOk(L) && !started(L.game));
+  const ok = (L) => !L.flags.length && L.price >= ALT_MIN_PRICE && L.p >= 0.4;
+  const alt = ls.filter((L) => L.alt && !L.flags.length && L.p >= FILL_ALT_P && L.price >= FILL_ALT_MIN).sort((a, b) => b.p - a.p || b.edge - a.edge);
+  const rest = ls.filter((L) => !alt.includes(L));
+  return alt.concat(rest.filter(ok).sort(by), rest.filter((L) => !ok(L)).sort(by));
+}
+// relax: 0 = usual rules; 1 = next-best legs fill in after the usual ones; 2 = also any number of legs per game and market;
+// 3 = also more than one leg per player; 4 = as many legs as the slate has (a shorter slip than asked when it runs out)
+function buildSlips(size, n = 6, relax = 0) {
+  let pool = usualPool(size);
+  if (relax) pool = dedupe(pool.concat(fillPool()));
+  const nG = new Set(pool.map((L) => L.game)).size;
+  const perGame = relax >= 2 ? size : Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / Math.max(1, nG))));   // more per game only when the slate is too small
+  const metric = mode === 'likely' ? (L) => L.p : (L) => L.edge / 100;
+  return many(pool, size, n, (pool, size, allowed, cap) => {
+    if (relax >= 2) cap = size;
+    const slip = [], g = {}, pl = new Set(), fm = {}, sk = new Set();
+    const fits = (L) => {
+      if (sk.has(sideKey(L))) return false;   // never both sides (or two lines) of one market
+      if (!allowed(L) || (g[L.game] || 0) >= perGame || (relax < 3 && L.pid && pl.has(L.pid)) || (fm[fam(L)] || 0) >= cap) return false;
+      return !((g[L.game] || 0) && (NO_SGP.has(L.kind) || slip.some((x) => x.game === L.game && NO_SGP.has(x.kind))));
+    };
+    while (slip.length < size) {
+      const c = []; for (const L of pool) if (fits(L) && c.push(L) >= LINK_W) break;
+      if (!c.length) break;
+      const L = linkedPick(c, slip, metric, simLink);
+      slip.push(L); sk.add(sideKey(L)); g[L.game] = (g[L.game] || 0) + 1; fm[fam(L)] = (fm[fam(L)] || 0) + 1; if (L.pid) pl.add(L.pid);
+    }
+    return slip.length >= size || (relax >= 4 && slip.length) ? slip : null;
+  });
+}
+// Builders use the game simulation (Thomas, 2026-11-21): each next leg is chosen from the next few legs that fit (LINK_W, in
+// the mode's order) by its chance given the slip's other legs from its game (goalie saves rise with the other team's shots,
+// and so on). The mode's own leg stays first unless another one is at least half a point better after the links. Legs from
+// different games are unaffected. Same rule as parlays.py linked_pick().
+const LINK_W = 6, LINK_EPS = 0.005;
+const simLink = (a, b) => (window.GameSim && GameSim.ready('nhl') && GameSim.nhl.link ? GameSim.nhl.link(a, b, D.legs || [], (l) => SIM_POS[String(l.pid)]) : 1);
+function linkedPick(c, slip, metric, link) {
+  if (!slip.length || c.length < 2) return c[0];
+  const gain = (L) => { let r = 1; for (const x of slip) if (x.game === L.game) r *= link(L, x); return Math.min(1, L.p * r) - L.p; };   // extra chance
+  let best = c[0], bg = gain(best);
+  for (const L of c.slice(1)) { const g = gain(L); if (g > bg + LINK_EPS && metric(L) + g > metric(best) + bg + LINK_EPS) { best = L; bg = g; } }
+  return best;
+}
+// growth score: Kelly bankroll growth of the slip, with each leg's chance cut 2 points for model error
+// Game simulation (board/site/sim.js, Thomas 2026-11-19): same-game legs are drawn together with correlations measured on
+// past NHL games (goalie saves rise with the other team's shots and with his team winning, etc.); different games multiply
+const SIM_POS = Object.fromEntries((D.players || []).map((x) => [String(x.id), x.pos]));
+const simOf = (ls, shade = 0) => (window.GameSim && GameSim.ready('nhl') ? GameSim.nhl.parlay(ls, D.legs || [], (l) => SIM_POS[String(l.pid)], shade) : null);
+function growth(ids) {
+  const sm = simOf(ids.map((id) => LEG[id]), 0.02);
+  const p = sm ? sm.p : ids.reduce((a, id) => a * Math.max(0.01, LEG[id].p - 0.02), 1), b = ids.reduce((a, id) => a * dec(LEG[id].price), 1) - 1;
+  const f = (b * p - (1 - p)) / b; if (f <= 0) return 0;
+  return p * Math.log(1 + f * b) + (1 - p) * Math.log(1 - f);
+}
+// Legs picker (Thomas, 2026-11-19): any size from 1 to 12 from a menu. A size the usual rules can't fill is still built, with the
+// next-best legs (relax levels in buildSlips); those legs are marked and warned about. ★ marks the best size among the usual ones.
+const MAX_PICK = 12;
+let SIZES = [], BEST = null, OK_SIZES = new Set(), FILL = 0;
+// best parlay size by growth; when no parlay has positive growth (or none can be built), suggest a straight bet
+function sizesFor() {
+  OK_SIZES = new Set(Array.from({ length: MAX_PICK }, (_, i) => i + 1).filter((k) => buildSlips(k, 1).length));
+  SIZES = [...OK_SIZES].filter((k) => k <= MAX_LEGS);
+  const PS = SIZES.filter((k) => k > 1 && growth(buildSlips(k, 1)[0]) > 0);
+  BEST = PS.length ? PS.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), PS[0]) : SIZES.includes(1) ? 1 : null;
+}
+sizesFor();
+const sizeName = (k) => (k === 1 ? 'Straight' : String(k));
+let legCount = null;
+try { legCount = +localStorage.getItem('nhl-legs') || null; } catch (e) {}
+if (!(legCount >= 1 && legCount <= MAX_PICK)) legCount = BEST || 1;
+let SLIPS = [];
+const setMode = (m) => {
+  mode = m; POOL = m === 'likely' ? LIKELY_POOL : VALUE_POOL; try { localStorage.setItem('nhl-mode', m); } catch (e) {}
+  sizesFor(); if (!legCount) legCount = BEST || 1;
+};
+const setSize = (k) => { legCount = k; try { localStorage.setItem('nhl-legs', k); } catch (e) {} SLIPS = !k ? [] : slipsFor(k); };
+// the first relax level that builds at least one slip of k legs (FILL says which); the saved suggestions as a last resort
+function slipsFor(k) {
+  for (let r = 0; r <= 4; r++) { const s = buildSlips(k, 6, r); if (s.length) { FILL = r; return s; } }
+  FILL = 0; return D.slips || [];
+}
+const sizeOpt = (k) => (k === 1 ? '1 · straight bet' : `${k} legs`) + (k === BEST ? ' ★' : '') + (OK_SIZES.has(k) ? '' : ' ⚠');
+setSize(legCount);
+let sugIdx = -1;   // which suggestion is loaded (-1 = own slip)
+let saved = [];
+try { saved = JSON.parse(localStorage.getItem('nhl-saved-' + D.day) || '[]').map((s) => ({ ...s, legs: s.legs.filter((id) => LEG[id]) })).filter((s) => s.legs.length); } catch (e) { saved = []; }
+const saveSaved = () => { try { localStorage.setItem('nhl-saved-' + D.day, JSON.stringify(saved)); } catch (e) {} };
+const loadSug = (i) => { sugIdx = (i + SLIPS.length) % SLIPS.length; slip = SLIPS[sugIdx].slice(); saveSlip(); render(); };
+const hasLines = (k) => SRC(k).some((p) => p[k] && p[k].line != null);
+const hasProps = hasLines('sog') || hasLines('saves');
+if (!hasProps) state.sort = 'proj';
+
+const nLegs = (k) => `${k} leg${k === 1 ? '' : 's'}`;
+// warning under the Legs menu when the chosen size needs next-best legs or goes past the usual cap
+function fillWarn() {
+  const t = [];
+  const got = SLIPS.length ? SLIPS[0].length : 0;
+  if (FILL >= 4) t.push(`Only ${got} leg${got === 1 ? '' : 's'} can go in one slip on this slate, so this parlay has ${got}, not ${nLegs(legCount)}.`);
+  else if (FILL) t.push(`Not enough legs meet the usual bar for ${nLegs(legCount)}, so this parlay is filled with ${fillHow()} (marked ⚠ below)${HAS_ALT ? '' : '. No alt lines are on this board yet'}${FILL >= 2 ? ', with more legs from the same game, market or player than usual' : ''}. Expect a lower hit chance and value.`);
+  if (legCount > MAX_LEGS) t.push(`${nLegs(legCount)} is past the usual ${MAX_LEGS}-leg cap: every extra leg multiplies the chance of a miss.`);
+  if (!t.length) return null;
+  const ul = el('ul', 'warns'); ul.style.paddingTop = '8px'; ul.style.paddingBottom = '0'; t.forEach((x) => ul.append(el('li', 'warn', '⚠ ' + x))); return ul;
+}
+// legs of a loaded suggestion that came from the next-best fill, not the usual pool
+const fillers = (legs) => { if (sugIdx < 0 || !FILL) return new Set(); const u = new Set(usualPool(legCount).map((L) => L.id)); return new Set(legs.filter((L) => !u.has(L.id)).map((L) => L.id)); };
+
+function header() {
+  $('eyebrow').textContent = `NHL · ${D.dayLabel}`;
+  $('lede').textContent = 'Tonight\'s winners, puck lines and totals, plus shots on goal and goalie saves, set against DraftKings. Chances blend the model with the book; pick a game, open a player for his game log, or build a parlay.';
+  const t = $('tabs'); t.innerHTML = '';
+  TABS.forEach(([k, label]) => { const b = el('button', 'tab', label); b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', state.tab === k); b.onclick = () => { state.tab = k; render(); }; t.append(b); });
+}
+
+function strip() {
+  const s = $('games'); s.innerHTML = '';
+  s.style.display = state.tab === 'record' || state.tab === 'parlay' || state.tab === 'sim' ? 'none' : '';
+  const mk = (id, m, sub) => { const b = el('button', 'game'); b.setAttribute('aria-pressed', state.game === id); b.append(el('span', 'm', m), el('span', 't', sub)); b.onclick = () => { state.game = id; render(); }; s.append(b); };
+  mk('all', 'All games', `${D.games.length} tonight`);
+  D.games.forEach((g) => mk(g.game, g.game, g.tip));
+}
+
+function bar() {
+  const show = STATS.some(([k]) => k === state.tab);
+  $('bar').style.display = show ? '' : 'none'; $('legend').style.display = show ? '' : 'none';
+  if (!show) return;
+  const pos = $('pos'); pos.innerHTML = '';
+  $('pos').style.display = state.tab === 'saves' ? 'none' : '';
+  [['all', 'All'], ['F', 'Forwards'], ['D', 'Defense']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', state.pos === k); b.onclick = () => { state.pos = k; render(); }; pos.append(b); });
+  const so = $('sort');
+  if (!so.options.length) {
+    [['edge', 'Best edge'], ['proj', 'Projection'], ['chance', 'Highest chance'], ['name', 'Name']].forEach(([k, l]) => so.append(new Option(l, k)));
+    so.onchange = () => { state.sort = so.value; render(); };
+    $('q').oninput = (e) => { state.q = e.target.value.toLowerCase(); render(); };
+  }
+  so.value = state.sort;
+  const lg = $('legend'); lg.innerHTML = '';
+  const i1 = el('i'); i1.style.cssText = 'width:22px;height:8px;background:var(--bar);border-radius:3px';
+  const i2 = el('i'); i2.style.cssText = 'width:3px;height:12px;background:var(--turf)';
+  const i3 = el('i'); i3.style.cssText = 'width:2px;height:14px;background:var(--tick)';
+  [[i1, 'Likely range (10th to 90th percentile)'], [i2, 'Projection'], [i3, 'DraftKings line']].forEach(([i, t]) => { const s = el('span'); s.append(i, t); lg.append(s); });
+}
+
+function bestSide(pr) {
+  const c = [pr.over, pr.under].filter(Boolean);
+  if (!c.length) return null;
+  return c.reduce((a, b) => (b.edge > a.edge ? b : a));
+}
+
+function propRows(k) {
+  let ps = SRC(k).filter((p) => p[k]);
+  if (state.game !== 'all') ps = ps.filter((p) => p.game === state.game);
+  if (state.pos !== 'all' && k !== 'saves') ps = ps.filter((p) => p.pos === state.pos);
+  if (state.q) ps = ps.filter((p) => (p.name + ' ' + p.team).toLowerCase().includes(state.q));
+  if (hasLines(k)) ps = ps.filter((p) => p[k].line != null);
+  const key = { edge: (p) => -((bestSide(p[k]) || {}).edge ?? -99), proj: (p) => -p[k].proj, chance: (p) => -((bestSide(p[k]) || {}).p ?? (p[k].ch ? p[k].ch['3+'] : 0)), name: (p) => p.name };
+  const f = key[state.sort] || key.proj;
+  return ps.sort((a, b) => { const x = f(a), y = f(b); return x < y ? -1 : x > y ? 1 : 0; });
+}
+
+function meter(pr) {
+  const max = Math.max(pr.hi, pr.line || 0) * 1.12 || 1;
+  const m = el('div', 'meter'); const tr = el('div', 'track');
+  const r = el('div', 'range'); r.style.left = (pr.lo / max * 100) + '%'; r.style.width = ((pr.hi - pr.lo) / max * 100) + '%';
+  const mk = el('div', 'mark'); mk.style.left = (pr.proj / max * 100) + '%';
+  tr.append(r, mk);
+  if (pr.line != null) { const ln = el('div', 'line'); ln.style.left = (pr.line / max * 100) + '%'; tr.append(ln); }
+  const l = el('div', 'l'); const a = el('span'); a.append(el('b', null, pr.proj.toFixed(1)), document.createTextNode(' proj'));
+  l.append(a, el('span', null, pr.line != null ? `line ${pr.line}` : `${Math.round(pr.lo)}–${Math.round(pr.hi)}`));
+  m.append(tr, l); return m;
+}
+
+function boardProps(k) {
+  const B = $('board'); B.innerHTML = '';
+  const rows = propRows(k);
+  $('count').textContent = `${rows.length} ${k === 'saves' ? 'goalies' : 'players'}`;
+  const col = el('div', 'col');
+  const h = el('div', 'colhead'); h.append(el('h2', null, SL[k]), el('span', null, hasLines(k) ? 'Lean side and DraftKings price' : 'DraftKings prop lines not pulled for this slate'));
+  col.append(h);
+  if (!rows.length) col.append(el('div', 'empty', 'No players match.'));
+  rows.forEach((p) => {
+    const pr = p[k]; const best = bestSide(pr);
+    const row = el('div', 'row');
+    const who = el('div', 'who'); const nb = el('button', 'namebtn', p.name); nb.onclick = () => openLog(p, k);
+    const sub = k === 'saves' ? `${p.team} vs ${p.opp} · ${p.confirmed ? 'confirmed starter' : 'projected starter'} · save rate ${pr.sv.toFixed(3).slice(1)}` : `${p.team} ${p.pos} vs ${p.opp} · ${p.toi} min${p.avg != null ? ' · ' + p.avg + ' shots/game this season' : ''}`;
+    who.append(nb, el('span', 's', `${sub}${p.flags.length ? ' · ' + p.flags.join('; ') : ''}`));
+    const price = el('div', 'price');
+    if (best) {
+      const side = best === pr.over ? 'Over' : 'Under';
+      const sd = el('span', 'side ' + side.toLowerCase(), `${side} ${pr.line}`);
+      price.append(sd, el('span', 'o', fmt(best.price)), el('span', 'e ' + (best.edge > 0 ? 'pos' : 'neg'), `${pct(best.p)} · edge ${sgn(best.edge)}`));
+      const L = LEG[best.id];
+      if (L && L.cat === 'Value') price.append(el('span', 'pill value', 'Value'));
+      if (L) { price.append(LineEdit.btn(L)); if (p.edited) price.append(el('span', 'le-tag', '✎ your line')); }
+    } else {
+      price.append(el('span', 'o dim', pr.proj.toFixed(1)), el('span', 'e dim', pr.ch ? `3+ shots ${pct(pr.ch['3+'])}` : `proj saves`));
+    }
+    row.append(who, meter(pr), price); col.append(row);
+  });
+  B.append(col);
+  $('foot').textContent = hasLines(k) ? `Props from DraftKings, pulled ${D.propsTaken || ''}. Chance = half model, half DraftKings no-vig. Edge = chance minus the price's break-even, in points. Value = edge 3+ and chance 55%+ with no flag. In testing, shots-on-goal edges came almost all from Unders.` :
+    'DraftKings prop lines have not been pulled for this slate, so this shows projections and the model\'s chances only. Pulling shots on goal and saves costs about 2 Odds API credits per game.';
+}
+
+function boardGames() {
+  const B = $('board'); B.innerHTML = '';
+  const wrap = el('div', 'gcards');
+  let gs = D.games; if (state.game !== 'all') gs = gs.filter((g) => g.game === state.game);
+  if (!gs.length) wrap.append(el('div', 'empty', 'No games on this slate.'));
+  gs.forEach((g) => {
+    const c = el('div', 'col gcard');
+    const h = el('div', 'colhead'); h.append(el('h2', null, g.game), el('span', null, g.tip)); c.append(h);
+    const pj = el('div', 'proj');
+    const gk = (n, okk) => n ? `${n}${okk ? '' : ' (projected)'}` : 'unknown';
+    [[g.pick ? `${g.pick} ${pct(g.pick_p)}` : '—', 'Pick to win'], [`${g.xg_away.toFixed(1)} – ${g.xg_home.toFixed(1)}`, 'Model goals, away – home'], [g.total.toFixed(1), 'Model total'],
+     [g.line_total ?? '—', 'DK total']].forEach(([v, k]) => { const d = el('div'); d.append(el('b', null, v), el('span', null, k)); pj.append(d); });
+    c.append(pj);
+    c.append(el('div', 'outs', `Goalies: ${g.away} ${gk(g.gk_away, g.gk_away_ok)}; ${g.home} ${gk(g.gk_home, g.gk_home_ok)}.`));
+    if (g.legs.length) {
+      const tw = el('div', 'tablewrap'); const t = el('table', 'res');
+      const hr = el('tr'); ['Bet', 'DK', 'Chance', 'Edge', ''].forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr);
+      g.legs.map((id) => LEG[id]).forEach((L) => {
+        const tr = el('tr'); if (L.cat === 'Value') tr.className = 'hl';
+        const lab = el('td', null, `${L.kind}: ${L.label}`); { const tg = LineEdit.tag(L); if (tg) lab.append(tg); }
+        tr.append(lab, el('td', 'num', fmt(L.price)), el('td', 'num', pct(L.p)), el('td', 'num ' + (L.edge > 0 ? 'pos' : 'neg'), sgn(L.edge)));
+        const td = el('td', 'num lecell'); td.append(addBtn(L.id), LineEdit.btn(L)); tr.append(td); t.append(tr);
+      });
+      tw.append(t); c.append(tw);
+    } else c.append(el('div', 'outs', 'DraftKings lines not posted yet.'));
+    const outs = [...g.out_away.map((o) => `${g.away}: ${o}`), ...g.out_home.map((o) => `${g.home}: ${o}`)];
+    if (outs.length) c.append(el('div', 'outs', `Out (ESPN injury report): ${outs.join(', ')}.`));
+    wrap.append(c);
+  });
+  B.append(wrap);
+  const w = D.weights;
+  $('foot').textContent = `Pick to win = the side with the higher blended chance (moneyline ${w.Moneyline * 100}% model, ${100 - w.Moneyline * 100}% DraftKings no-vig). Puck lines and totals lean on DraftKings (${w['Puck line'] * 100}% model) because the model did not beat them in testing. Goalies are ESPN's probable starters; "projected" means not yet listed, so it uses the team's most-used goalie lately. Box scores through ${D.through}.`;
+}
+
+function addBtn(id) {
+  const on = slip.includes(id);
+  const b = el('button', 'add' + (on ? ' on' : ''), on ? 'Added' : 'Add');
+  b.onclick = () => { slip = on ? slip.filter((x) => x !== id) : slip.concat(id); sugIdx = -1; saveSlip(); render(); };
+  return b;
+}
+
+function boardParlay() {
+  const B = $('board'); B.innerHTML = '';
+  const cols = el('div', 'cols pl');
+  const list = el('div', 'col');
+  const h = el('div', 'colhead'); h.append(el('h2', null, 'Legs'), el('span', null, mode === 'likely' ? 'Ranked by chance to hit, DraftKings prices' : 'Ranked by edge, DraftKings prices')); list.append(h);
+  const ctl = el('div', 'plctl');
+  const q = el('input'); q.type = 'search'; q.placeholder = 'Search legs'; q.value = state.pq; q.oninput = (e) => { state.pq = e.target.value.toLowerCase(); drawList(); };
+  const kl = el('span', 'dim seglab', 'Markets: tap one or more');
+  const kinds = el('div', 'seg'); kinds.setAttribute('aria-label', 'Markets (pick one or more)');
+  [['all', 'All']].concat(MKTS.map((k) => [k, k])).forEach(([k, l]) => {
+    const b = el('button', null, l); b.setAttribute('aria-pressed', k === 'all' ? !KINDS.size : KINDS.has(k));
+    b.onclick = () => {
+      if (k === 'all') KINDS.clear(); else if (KINDS.has(k)) KINDS.delete(k); else KINDS.add(k);
+      try { localStorage.setItem('nhl-kinds', JSON.stringify([...KINDS])); } catch (e) {}
+      sizesFor(); if (!legCount) legCount = BEST || 1; setSize(legCount); sugIdx = -1; render();
+    };
+    kinds.append(b);
+  });
+  const mins = el('div', 'seg'); [[0.25, '25%+'], [0.4, '40%+'], [0.55, '55%+']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', state.pmin === k); b.onclick = () => { state.pmin = k; render(); }; mins.append(b); });
+  ctl.append(q, kl, kinds, mins); list.append(ctl);
+  const pl = el('div', 'pllist'); list.append(pl);
+  function drawList() {
+    pl.innerHTML = '';
+    let ls = D.legs.filter((l) => l.p >= state.pmin);
+    ls = ls.filter(kindOk);
+    if (state.pq) ls = ls.filter((l) => (l.label + ' ' + l.game).toLowerCase().includes(state.pq));
+    ls.sort(mode === 'likely' ? (a, b) => (b.edge >= 1) - (a.edge >= 1) || b.p - a.p : (a, b) => b.edge - a.edge);
+    if (!ls.length) pl.append(el('div', 'empty', 'No legs match.'));
+    const row = (L) => {
+      const r = el('div', 'leg'); const who = el('div', 'who');
+      who.append(legLabel(L, 'n'), el('span', 's', `${L.kind} · ${L.game}${L.flags.length ? ' · ' + L.flags.join('; ') : ''}`));
+      const sb = el('div', 'sidebox'); sb.append(el('span', 'o', fmt(L.price)), el('span', 'e ' + (L.edge > 0 ? 'pos' : 'neg'), `${pct(L.p)} · ${sgn(L.edge)}`));
+      r.append(who, sb, addBtn(L.id)); return r;
+    };
+    // phones and tablets: one tap-to-open section per market, so you can jump between markets without scrolling past every leg
+    if (matchMedia('(max-width: 1024px)').matches) {
+      const ks = MKTS.filter((k) => ls.some((L) => L.kind === k));
+      ks.forEach((k) => {
+        const gl = ls.filter((L) => L.kind === k), lim = GLIM[k] || 25;
+        const d = el('details', 'mgrp'); d.open = OPEN.has(k) || ks.length === 1 || !!state.pq;
+        const sm = el('summary'); sm.append(el('span', 'mname', k), el('span', 'dim', `${gl.length} leg${gl.length > 1 ? 's' : ''} · best ${mode === 'likely' ? pct(gl[0].p) : sgn(gl[0].edge)}`));
+        d.append(sm); d.ontoggle = () => { if (d.open) OPEN.add(k); else OPEN.delete(k); };
+        gl.slice(0, lim).forEach((L) => d.append(row(L)));
+        if (gl.length > lim) { const m = el('button', 'lnk more', `Show more ${k} (${gl.length - lim} left)`); m.type = 'button'; m.onclick = () => { GLIM[k] = lim + 25; OPEN.add(k); drawList(); }; d.append(m); }
+        pl.append(d);
+      });
+      return;
+    }
+    ls.slice(0, 200).forEach((L) => pl.append(row(L)));
+  }
+  drawList();
+  const sl = el('div', 'col slip');
+  const sh = el('div', 'colhead'); sh.append(el('h2', null, 'Slip'));
+  const acts = el('span', 'acts');
+  const clr = el('button', 'lnk', 'Clear'); clr.onclick = () => { slip = []; sugIdx = -1; saveSlip(); render(); };
+  acts.append(clr); sh.append(acts); sl.append(sh);
+  {
+    const md = el('div', 'sugnav');
+    md.append(el('b', null, 'Build for'));
+    const seg = el('div', 'seg');
+    [['value', 'Best value'], ['likely', 'Most likely to hit']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', mode === k); b.onclick = () => { setMode(k); setSize(legCount); if (SLIPS.length) loadSug(0); else { sugIdx = -1; render(); } }; seg.append(b); });
+    md.append(seg);
+    md.append(el('span', 'dim sugbest', (mode === 'likely' ? 'Highest-chance legs: board winner picks plus legs 55%+ to hit at DraftKings\' usual juice or better, nothing shorter than -200, up to 3 legs. A shaky Over swaps to a safer alt line' : 'Value first: shots on goal with expected value 3%+, game lines with edge 3+ and 55%+ chance (saves don\'t count), nothing shorter than -200') + (KINDS.size ? `. Only ${[...KINDS].join(' + ')} legs (market filter).` : '')));
+    sl.append(md);
+  }
+  if (D.legs.length) {
+    const lc = el('div', 'sugnav');
+    lc.append(el('b', null, 'Legs'));
+    const sel = el('select', 'legsel'); sel.setAttribute('aria-label', 'Number of legs');
+    for (let k = 1; k <= MAX_PICK; k++) sel.append(new Option(sizeOpt(k), k));
+    sel.value = legCount; sel.onchange = () => { setSize(+sel.value); if (SLIPS.length) loadSug(0); else { sugIdx = -1; render(); } };
+    lc.append(sel);
+    lc.append(el('span', 'dim sugbest', (BEST == null ? 'No leg meets the usual bar tonight' : BEST === 1 ? '★ No parlay is worth it tonight: take a straight bet' : `★ ${BEST} legs is best tonight`) + '. ⚠ = needs alt lines or next-best legs.'));
+    sl.append(lc);
+    const fw = fillWarn(); if (fw) sl.append(fw);
+  }
+  if (SLIPS.length) {
+    const nav = el('div', 'sugnav');
+    const prev = el('button', 'lnk', '‹'); prev.setAttribute('aria-label', 'Previous suggestion'); prev.onclick = () => loadSug(sugIdx < 0 ? SLIPS.length - 1 : sugIdx - 1);
+    const lab = el('span', 'suglab', sugIdx >= 0 ? `${legCount === 1 ? 'Straight bet' : 'Suggestion'} ${sugIdx + 1} of ${SLIPS.length}` : `${SLIPS.length} suggested parlays`);
+    const next = el('button', 'lnk', '›'); next.setAttribute('aria-label', 'Next suggestion'); next.onclick = () => loadSug(sugIdx + 1);
+    const shuf = el('button', 'lnk sugb', sugIdx < 0 ? 'Load suggested' : 'Shuffle');
+    shuf.onclick = () => { if (sugIdx < 0 || SLIPS.length < 2) return loadSug(0); let k = sugIdx; while (k === sugIdx) k = Math.floor(Math.random() * SLIPS.length); loadSug(k); };
+    nav.append(prev, lab, next, shuf); sl.append(nav);
+  }
+  if (saved.length || slip.length) {
+    const sv = el('div', 'savedrow');
+    if (slip.length) {
+      const sb = el('button', 'lnk', 'Save this slip');
+      sb.onclick = () => { const key = slip.slice().sort().join('|'); if (!saved.some((s) => s.legs.slice().sort().join('|') === key)) { saved.push({ name: sugIdx >= 0 ? `Suggestion ${sugIdx + 1}` : `My slip ${saved.length + 1}`, legs: slip.slice() }); saveSaved(); } render(); };
+      sv.append(sb);
+    }
+    saved.forEach((s, i) => {
+      const on = s.legs.slice().sort().join('|') === slip.slice().sort().join('|');
+      const c = el('button', 'chip', s.name); c.setAttribute('aria-pressed', on); c.onclick = () => { slip = s.legs.slice(); sugIdx = -1; saveSlip(); render(); };
+      const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Delete ' + s.name); x.onclick = () => { saved.splice(i, 1); saveSaved(); render(); };
+      const w = el('span', 'savedchip'); w.append(c, x); sv.append(w);
+    });
+    sl.append(sv);
+  }
+  const legs = slip.map((id) => LEG[id]).filter(Boolean);
+  if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : mode === 'likely' ? 'Add legs from the list. No leg is 55%+ to hit at -200 or longer on this slate.' : 'Add legs from the list. No leg meets the value rule on this slate.'));
+  const box = el('div', 'slipl'), FL = fillers(legs);
+  legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); if (FL.has(L.id)) { const m = el('small', null, L.alt ? '⚠ Alt line, added to fill the slip' : '⚠ Next-best leg, below the usual bar'); m.style.color = 'var(--gold)'; n.append(m); } { const t = LineEdit.tag(L); if (t) n.append(t); n.append(LineEdit.btn(L)); } const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
+  if (legs.length) {
+    sl.append(box);
+    { const bn = LineEdit.banner(); if (bn) sl.append(bn); }
+    const pInd = legs.reduce((a, l) => a * l.p, 1), sim = simOf(legs), p = sim ? sim.p : pInd, d = legs.reduce((a, l) => a * dec(l.price), 1), ev = p * d - 1;
+    const simd = sim && sim.groups.length, sgOf = Object.fromEntries(((sim && sim.groups) || []).map((x) => [x.game, x]));
+    const st = el('div', 'stats pad');
+    [[pct(p), simd ? `Hit chance (simulated; ${pct(pInd)} if independent)` : 'Hit chance'], [fmt(toAm(d)), 'Payout'], [sgn(Math.round(ev * 100)) + '%', 'Expected value']].forEach(([v, k]) => { const s = el('div', 'stat'); s.append(el('b', null, v), el('span', null, k)); st.append(s); });
+    sl.append(st);
+    // DraftKings betslip link: every leg's DraftKings outcome id, so the slip opens in DraftKings ready to place
+    const sids = legs.filter((l) => !started(l.game)).map((l) => l.sid).filter(Boolean);
+    const dk = el('div', 'dkrow');
+    if (sids.length) {
+      const a = el('a', 'lnk sugb dkbtn', sids.length === legs.length ? 'Open in DraftKings' : `Open ${sids.length} of ${legs.length} legs in DraftKings`);
+      a.href = 'https://sportsbook.draftkings.com/?outcomes=' + sids.map(encodeURIComponent).join('+'); a.target = '_blank'; a.rel = 'noopener';
+      dk.append(a, el('span', 'dim', sids.length === legs.length ? 'Loads these legs into your DraftKings betslip. Sign in, check the prices, and place it.' : 'The other legs have no DraftKings link (game started, or none on this pull); add them by hand.'));
+    } else dk.append(el('span', 'dim', 'No DraftKings link for these legs yet: links come with the next odds pull.'));
+    sl.append(dk);
+    // Share (Thomas, 2026-11-19): a compact card of the slip for a screenshot or a text (board/site/share.js)
+    const shr = el('div', 'dkrow'), shb = el('button', 'lnk sugb', 'Share slip'); shb.type = 'button';
+    shb.onclick = () => window.shareSlip && window.shareSlip({ title: `NHL · ${legs.length === 1 ? 'straight bet' : legs.length + '-leg parlay'}`,
+      legs: legs.map((l) => ({ label: l.label, sub: l.game, odds: fmt(l.price), tag: [FL.has(l.id) ? '⚠ ' + fillTag(l) : '', LineEdit.shareTag(l)].filter(Boolean).join(' · ') })),
+      odds: fmt(toAm(d)), chance: pct(p), pays: '$' + (10 * d).toFixed(2),
+      warn: FL.size ? `⚠ ${fillWords(legs.filter((l) => FL.has(l.id)))} added to fill the slip` : '' });
+    shr.append(shb, el('span', 'dim', 'A compact card of this slip to screenshot or send to a friend.')); sl.append(shr);
+    const games = {}; legs.forEach((l) => { games[l.game] = (games[l.game] || 0) + 1; });
+    const warns = [];
+    Object.entries(games).filter(([, n]) => n > 1).forEach(([g, n]) => {
+      const bad = legs.filter((l) => l.game === g && NO_SGP.has(l.kind));
+      if (bad.length) warns.push(['bad', `DraftKings won't put goalie saves in a same-game parlay: ${bad.map((l) => l.label).join(', ')} can't be combined with the other ${g} leg${n > 2 ? 's' : ''}. Keep one leg from that game.`]);
+      else { const x = sgOf[g], r = x ? x.p / Math.max(1e-9, x.pInd) : 1;
+        warns.push(['warn', `${n} legs from ${g}: ${x ? `the game simulation puts them at ${pct(x.p)} to all hit, ${r >= 1.05 ? 'more than' : r <= 0.95 ? 'less than' : 'about the same as'} the ${pct(x.pInd)} from multiplying them. ` : ''}DraftKings prices same-game legs together, so the real payout differs from the legs multiplied.`]); }
+    });
+    legs.filter((l) => started(l.game)).forEach((l) => warns.push(['bad', `${l.game} has started: DraftKings has pulled its pregame lines, so ${l.label} won't load. Swap it out.`]));
+    { const fa = legs.filter((l) => FL.has(l.id) && l.alt), fb = legs.filter((l) => FL.has(l.id) && !l.alt);
+      if (fa.length) warns.push(['warn', `Alt lines, added to reach ${nLegs(legCount)}: ${fa.map((l) => l.label).join(', ')}. Likelier to hit, but they pay less and aren't the board's usual picks.`]);
+      if (fb.length) warns.push(['warn', `Next-best legs, added to reach ${nLegs(legCount)}: ${fb.map((l) => l.label).join(', ')}. They miss the usual bar for ${mode === 'likely' ? 'Most likely to hit' : 'Best value'}.`]); }
+    legs.filter((l) => l.edge < 0).forEach((l) => warns.push(['bad', `${l.label} has negative edge.`]));
+    legs.filter((l) => l.flags.length).forEach((l) => warns.push(['warn', `${l.label}: ${l.flags.join('; ')}.`]));
+    const good = ev > 0 && !warns.some((w) => w[0] === 'bad');
+    const v = el('div', 'verdict ' + (good ? 'good' : ev > -0.1 ? 'warn' : 'bad'));
+    v.append(el('b', null, good ? 'Positive expected value' : ev > -0.1 ? 'Close to break-even' : 'Long shot'), el('span', null, `${legs.length} leg${legs.length > 1 ? "s" : ""}. ${simd ? 'Same-game legs use the game simulation; different games multiply.' : 'Legs from different games are independent, so the chance multiplies them.'}`));
+    sl.append(v);
+    if (warns.length) { const ul = el('ul', 'warns'); warns.forEach(([c, t]) => ul.append(el('li', c, t))); sl.append(ul); }
+  }
+  cols.append(list, sl); B.append(cols);
+  $('foot').textContent = 'Parlay chance: legs from the same game come from a game simulation (20,000 draws with correlations measured on 1,279 past games with DraftKings lines). NHL legs are close to independent except goalie saves, which rise with the other team\'s shots on goal and with his own team winning; legs from different games multiply. Edge is the leg\'s chance minus the break-even of its DraftKings price, in percentage points. Ranking by edge rather than payout keeps long shots from crowding the top. ★ marks the leg count whose top suggestion grows a bankroll fastest (Kelly growth, with each leg\'s chance cut 2 points for model error): more legs raise the payout, but every leg compounds the chance of being wrong. Your slip is saved in this browser.';
+}
+
+function boardRecord() {
+  const B = $('board'); B.innerHTML = '';
+  const M = recordMenus({ sport: 'nhl', src: D.live, rerender: boardRecord,
+    views: [['all', 'Everything'], ['bets', 'Bets'], ['parlays', 'Parlays'], ['chance', 'Chance check'], ['tests', 'Backtests']] });
+  B.append(M.bar);
+  const LV = M.rep;
+  if (LV && (LV.cal_sections || []).length && M.show('chance')) { const cw = renderCalibration(LV.cal_sections); cw.style.marginBottom = '8px'; B.append(cw); }
+  const bt = D.backtest || {}; const lv = LV;
+  const fmtp = (x) => x == null ? '—' : (x * 100).toFixed(1) + '%';
+  const roi = (x) => x == null ? '—' : sgn(Math.round(x * 1000) / 10) + '%';
+  const mk = (title, head, rows, note) => { const c = el('div', 'col'); c.style.marginTop = '16px'; const h = el('div', 'colhead'); h.append(el('h2', null, title)); c.append(h); const tw = el('div', 'tablewrap'); const t = el('table', 'res'); const hr = el('tr'); head.forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr); rows.forEach((r) => { const tr = el('tr'); r.forEach((x, i) => tr.append(el('td', i ? 'num' : null, String(x)))); t.append(tr); }); tw.append(t); c.append(tw); if (note) c.append(el('p', 'note logfoot', note)); B.append(c); };
+  if (M.period && !(lv && lv.groups && lv.groups.length) && !(lv && lv.parlays && lv.parlays.groups.some((g) => g.bets))) B.append(el('div', 'empty', `Nothing graded for ${M.label} yet.`));
+  if (lv && lv.groups && lv.groups.length && M.show('bets')) {
+    mk('Live record at DraftKings', ['Group', 'Bets', 'W-L', 'Hit', 'Units', 'ROI'], lv.groups.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), sgn(g.units), roi(g.roi)]),
+       `${lv.days.length} slate${lv.days.length > 1 ? 's' : ''} graded. Every priced leg is logged when the board is built and graded at that DraftKings price, 1 unit per leg.`);
+  }
+  const pz = lv && lv.parlays && lv.parlays.groups.filter((g) => g.bets);
+  if (pz && pz.length && M.show('parlays')) mk('Suggested parlays at DraftKings', ['Parlays', 'Count', 'W-L', 'Hit', 'Expected', 'Units', 'ROI'], pz.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), fmtp(g.exp_hit), sgn(g.units), roi(g.roi)]),
+     'Each day\'s suggested parlays are saved when the board is built, for both Best value and Most likely to hit and every leg count (up to 6 suggestions each a day; fewer on a slate without enough qualifying legs, and from Nov 15 a leg can repeat in up to 3 suggestions so the 6 fill more often), and graded as whole parlays at DraftKings prices, 1 unit each. A parlay loses if any leg loses; pushed or voided legs drop out. Expected is the chance the board gave the parlays.');
+  if (!M.show('tests')) { $('foot').textContent = 'Every priced leg is graded at the DraftKings price the board showed, 1 unit per leg. Grading uses free box scores, so it costs no odds credits.'; return; }
+  if (bt.winners) {
+    const rows = []; Object.entries(bt.winners).forEach(([se, r]) => { [['model', 'Model'], ['blend', 'Board pick (blend)'], ['draftkings', 'DraftKings favorite']].forEach(([k, l]) => rows.push([`${se.slice(0, 4)}-${se.slice(6)}`, l, r.games, fmtp(r[k].all), r[k].conf60 ? `${fmtp(r[k].conf60[1])} (${r[k].conf60[0]})` : '—'])); });
+    mk('Picking winners', ['Season', 'Picker', 'Games', 'Correct', 'When 60%+ sure (games)'], rows, 'Hockey is close to a coin flip: even DraftKings\' favorite wins only about 55-62% of the time. When the board is 60%+ sure, its pick wins about two times in three.');
+  }
+  if (bt.sog) {
+    mk('Shots on goal vs real DraftKings lines', ['Test', 'Lines', 'Log loss: model / DK / blend', 'Edge 0+: bets, hit, ROI', 'Edge 3+: bets, hit, ROI'], Object.entries(bt.sog).map(([se, r]) => [se, r.lines, `${r.ll.model.toFixed(4)} / ${r.ll.market.toFixed(4)} / ${r.ll.blend_50.toFixed(4)}`, `${r.b0.bets}, ${fmtp(r.b0.hit)}, ${roi(r.b0.roi)}`, `${r.b3.bets}, ${fmtp(r.b3.hit)}, ${roi(r.b3.roi)}`]),
+       'Lower log loss is better. The blend (half model, half DraftKings) beat DraftKings in both tests, and its picks were almost all Unders. Betting every Under blindly lost money, so the model is choosing which Unders. Samples are still small.');
+  }
+  const gr = [];
+  if (bt.saves) gr.push(['Goalie saves (2025-26)', bt.saves.lines, `${bt.saves.ll.model.toFixed(4)} / ${bt.saves.ll.market.toFixed(4)} / ${bt.saves.ll.blend_50.toFixed(4)}`, `${bt.saves.b3.bets} bets edge 3+: ${roi(bt.saves.b3.roi)}`]);
+  if (bt.ml) gr.push(['Moneyline (2025-26)', bt.ml.n, `${bt.ml.ll.model.toFixed(4)} / ${bt.ml.ll.market.toFixed(4)} / ${bt.ml.ll.blend_50.toFixed(4)}`, `${bt.ml.b0.bets} bets edge 0+: ${roi(bt.ml.b0.roi)}`]);
+  if (bt.pl) gr.push(['Puck line (2025-26)', bt.pl.n, `${bt.pl.ll.model.toFixed(4)} / ${bt.pl.ll.market.toFixed(4)} / ${bt.pl.ll.blend_50.toFixed(4)}`, `model picks: ${roi(bt.pl.b0.roi)}`]);
+  Object.entries(bt.totals || {}).forEach(([se, r]) => gr.push([`Totals at close (${se.slice(0, 4)}-${se.slice(6)})`, r.n, `${r.ll.model.toFixed(4)} / ${r.ll.market.toFixed(4)} / ${r.ll.blend_50.toFixed(4)}`, 'DraftKings better']));
+  if (gr.length) mk('Other markets', ['Market', 'Lines', 'Log loss: model / DK / blend', 'Betting result'], gr, 'Models are fit only on earlier seasons. Saves and game lines have not shown a reliable edge, so the board leans on DraftKings for them.');
+  if (B.children.length <= 1) B.append(el('div', 'empty', 'No backtest yet.'));
+  $('foot').textContent = 'Backtests: scripts/nhl_props_backtest.py and scripts/nhl_game_backtest.py.';
+}
+
+// a leg's label, tappable to open the player's game log when the leg is a player prop
+function legLabel(L, cls) {
+  const pl = L.pid ? SRC(L.market).find((x) => x.id === L.pid) : null;
+  if (!pl) return el('span', cls, L.label);
+  const b = el('button', (cls ? cls + ' ' : '') + 'namebtn', L.label); b.type = 'button'; b.title = 'Game log';
+  b.onclick = (e) => { e.stopPropagation(); openLog(pl, L.market, L); }; return b;
+}
+// the side the popup colors for: a parlay leg's own side and line, else the board's lean on the main line.
+// Green = the game supports that side (Thomas, 2026-11-17); no lean -> plain over-the-line coloring.
+function logSide(pr, leg) {
+  if (leg && leg.side && leg.line != null) return { line: Number(leg.line), side: leg.side };
+  if (!pr || pr.line == null) return { line: null, side: null };
+  const b = bestSide(pr);
+  return { line: pr.line, side: b ? (b === pr.under ? 'Under' : 'Over') : null };
+}
+const sideHit = (v, s) => (s.side === 'Under' ? v < s.line : v > s.line);
+const sideNote = (s, stat) => (s.side ? `Green marks games that would have hit tonight's ${s.side} ${s.line}${stat ? ' ' + stat : ''}.` : `Green marks games over tonight's ${stat ? stat + ' ' : ''}line of ${s.line}.`);
+function openLog(p, k, leg) {
+  const ov = el('div', 'overlay'); ov.onclick = (e) => { if (e.target === ov) ov.remove(); };
+  const pn = el('div', 'logpanel'); pn.setAttribute('role', 'dialog'); pn.setAttribute('aria-label', p.name + ' game log');
+  const gkp = k === 'saves';
+  const h = el('div', 'loghead'); const t = el('div'); t.append(el('h2', null, p.name), el('div', 'dim', gkp ? `${p.team} goalie · ${p.confirmed ? 'confirmed' : 'projected'} starter` : `${p.team} ${p.pos} · ${p.gp} games this season · ${p.toi} min lately`));
+  const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Close'); x.onclick = () => ov.remove(); h.append(t, x); pn.append(h);
+  const pr = p[k]; const S = logSide(pr, leg); const chips = el('div', 'lchips');
+  chips.append(el('span', 'pill likely', `proj ${pr.proj}${pr.line != null ? ' · line ' + pr.line : ''}`));
+  if (pr.ch) Object.entries(pr.ch).forEach(([c, v]) => chips.append(el('span', 'pill', `${c} shots: ${pct(v)}`)));
+  pn.append(chips);
+  if (p.flags.length) pn.append(el('div', 'loghit', p.flags.join('; ')));
+  const tw = el('div', 'tablewrap'); const tb = el('table', 'res log');
+  const cols = gkp ? [['d', 'Date'], ['o', 'Opp'], ['sa', 'Shots'], ['sv', 'Saves'], ['pct', 'SV%']] : [['d', 'Date'], ['o', 'Opp'], ['toi', 'TOI'], ['sog', 'SOG'], ['g', 'G'], ['a', 'A'], ['blk', 'BLK']];
+  const key = gkp ? 'sv' : 'sog';
+  const hr = el('tr'); cols.forEach(([, c], i) => hr.append(el('th', i > 1 ? 'num' : null, c))); tb.append(hr);
+  p.log.forEach((g) => { const tr = el('tr'); cols.forEach(([c], i) => { const v = c === 'pct' && g[c] != null ? g[c].toFixed(3).slice(1) : g[c]; tr.append(el('td', (i > 1 ? 'num' : '') + (c === key && S.line != null && g[c] != null ? (sideHit(g[c], S) ? ' hit' : ' miss') : ''), v ?? '—')); }); tb.append(tr); });
+  tw.append(tb); pn.append(tw);
+  pn.append(el('p', 'note logfoot', S.line != null ? sideNote(S, '') : `Last ${p.log.length} games.`));
+  ov.append(pn); document.body.append(ov);
+  x.focus();
+  const esc = (e) => { if (e.key === 'Escape') { ov.remove(); document.removeEventListener('keydown', esc); } }; document.addEventListener('keydown', esc);
+}
+
+// ---- Simulation tab (Thomas, 2026-11-21): each game's simulation (board/site/sim.js renderTab), from the board's chances ----
+function boardSim() {
+  const B = $('board'); B.innerHTML = '';
+  if (!(window.GameSim && GameSim.ready('nhl') && GameSim.renderTab)) { B.append(el('div', 'empty', 'The simulation tables did not load. Refresh the page.')); return; }
+  B.append(el('p', 'note', 'Each game simulated 20,000 times with correlations measured on past NHL games: the game lines\' chances, how each player\'s chance moves if each team wins or the game goes over or under, the likeliest same-game parlays, and the legs that rise and fall together. Hockey legs are mostly independent, except goalie saves. Tap Build to open a parlay in the builder.'));
+  const box = el('div'); B.append(box);
+  GameSim.renderTab(box, {
+    sport: 'nhl', all: D.legs, posOf: (l) => SIM_POS[String(l.pid)], starts: STARTS, legs: D.legs.filter((l) => l.price != null),
+    name: (l) => l.label, price: (l) => l.price, side: (l) => String(l.side || ''), team: (l) => l.side,
+    role: (l) => (l.kind === 'Moneyline' ? 'win' : l.kind === 'Total' ? 'total' : l.kind === 'Puck line' ? 'line' : 'player'),
+    main: (l) => !l.alt, slot: sideKey, who: (l) => (l.pid && !['Moneyline', 'Puck line', 'Total'].includes(l.kind) ? String(l.pid) : ''),
+    ok: (l) => !l.flags.length && l.p >= 0.5 && l.price >= ALT_MIN_PRICE && !NO_SGP.has(l.kind),
+    onBuild: (ids) => { slip = ids.slice(); sugIdx = -1; saveSlip(); state.tab = 'parlay'; render(); window.scrollTo(0, 0); },
+  });
+}
+function render() {
+  header(); strip(); bar();
+  if (state.tab === 'games') boardGames();
+  else if (state.tab === 'parlay') boardParlay();
+  else if (state.tab === 'record') boardRecord();
+  else if (state.tab === 'sim') boardSim();
+  else boardProps(state.tab);
+}
+render();
+</script>
+</body>
+</html>

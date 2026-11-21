@@ -1,0 +1,50 @@
+# Bank Builder after every board update (Thomas, 2026-11-18). The scheduled NBA/NHL/NFL runs commit only their own
+# sport's files, so bank.html and the Bank Builder slip logs (odds_log/bank/) built at the end of each run were dropped.
+# This rebuilds them from the pushed pages and commits them. It reads only the built pages and the graders' result
+# files: no Odds API key, no odds credits. A new-picks commit (same subjects as the phone alerts) logs that build's
+# slips; any other page update (grading, rebuilds) refreshes the page and record only.
+name: Bank Builder
+on:
+  push:
+    branches: [epa-model]
+    paths: ['board/site/index.html', 'board/site/nba.html', 'board/site/nhl.html']
+permissions:
+  contents: write
+concurrency:
+  group: bank-builder
+  cancel-in-progress: false
+jobs:
+  bank:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: epa-model
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --quiet -r requirements.txt
+      - name: Build Bank Builder and commit it
+        env:
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          set -u
+          SUBJECT=$(printf '%s\n' "$COMMIT_MESSAGE" | head -n1)
+          if printf '%s' "$SUBJECT" | grep -Eq '^(NBA board:|NHL board:|Odds log: .*(opener|Saturday props refresh)|Game-day injuries:)'; then
+            python scripts/bank_board.py
+          else
+            python scripts/bank_board.py --no-log
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add board/site/bank.html odds_log/bank
+          if git diff --cached --quiet; then echo "Bank Builder unchanged."; exit 0; fi
+          git commit -q -m "Bank Builder: $(TZ=America/New_York date +%F) (after: $SUBJECT)"
+          for i in 1 2 3 4; do
+            git push origin HEAD:epa-model && exit 0
+            git pull --rebase -q origin epa-model || { git rebase --abort; git fetch -q origin epa-model; git reset -q --hard origin/epa-model; python scripts/bank_board.py --no-log; git add board/site/bank.html odds_log/bank; git commit -q -m "Bank Builder: $(TZ=America/New_York date +%F) (page refresh)" || exit 0; }
+            sleep $((i * 5))
+          done
+          exit 1

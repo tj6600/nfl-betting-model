@@ -1,0 +1,6438 @@
+{
+ "days": [
+  "2026-11-11",
+  "2026-11-12",
+  "2026-11-13",
+  "2026-11-14",
+  "2026-11-15",
+  "2026-11-16",
+  "2026-11-17"
+ ],
+ "groups": [
+  {
+   "group": "Value legs",
+   "bets": 231,
+   "won": 105,
+   "lost": 126,
+   "hit": 0.455,
+   "units": -35.06,
+   "roi": -0.152,
+   "exp_hit": 0.587,
+   "clv_n": 77,
+   "beat": 0.545,
+   "lost_clv": 0.273
+  },
+  {
+   "group": "Suggested-parlay legs",
+   "bets": 24,
+   "won": 13,
+   "lost": 11,
+   "hit": 0.542,
+   "units": 0.9,
+   "roi": 0.038,
+   "exp_hit": 0.597,
+   "clv_n": 8,
+   "beat": 0.5,
+   "lost_clv": 0.125
+  },
+  {
+   "group": "All +edge legs",
+   "bets": 1089,
+   "won": 500,
+   "lost": 589,
+   "hit": 0.459,
+   "units": -124.29,
+   "roi": -0.114,
+   "exp_hit": 0.544,
+   "clv_n": 344,
+   "beat": 0.462,
+   "lost_clv": 0.308
+  },
+  {
+   "group": "Negative-edge legs (control)",
+   "bets": 6501,
+   "won": 3857,
+   "lost": 2644,
+   "hit": 0.593,
+   "units": -286.95,
+   "roi": -0.044,
+   "exp_hit": 0.566,
+   "clv_n": 1137,
+   "beat": 0.339,
+   "lost_clv": 0.388
+  }
+ ],
+ "by_kind": [
+  {
+   "group": "Assists",
+   "bets": 28,
+   "won": 19,
+   "lost": 9,
+   "hit": 0.679,
+   "units": 7.43,
+   "roi": 0.265,
+   "exp_hit": 0.591,
+   "clv_n": 8,
+   "beat": 0.5,
+   "lost_clv": 0.375
+  },
+  {
+   "group": "Points",
+   "bets": 71,
+   "won": 28,
+   "lost": 43,
+   "hit": 0.394,
+   "units": -18.34,
+   "roi": -0.258,
+   "exp_hit": 0.581,
+   "clv_n": 26,
+   "beat": 0.654,
+   "lost_clv": 0.269
+  },
+  {
+   "group": "Pts+Reb+Ast",
+   "bets": 70,
+   "won": 29,
+   "lost": 41,
+   "hit": 0.414,
+   "units": -15.43,
+   "roi": -0.22,
+   "exp_hit": 0.58,
+   "clv_n": 23,
+   "beat": 0.478,
+   "lost_clv": 0.348
+  },
+  {
+   "group": "Rebounds",
+   "bets": 39,
+   "won": 22,
+   "lost": 17,
+   "hit": 0.564,
+   "units": 1.74,
+   "roi": 0.045,
+   "exp_hit": 0.596,
+   "clv_n": 16,
+   "beat": 0.562,
+   "lost_clv": 0.188
+  },
+  {
+   "group": "Spread",
+   "bets": 1,
+   "won": 0,
+   "lost": 1,
+   "hit": 0.0,
+   "units": -1.0,
+   "roi": -1.0,
+   "exp_hit": 0.578,
+   "clv_n": 1,
+   "beat": 0.0,
+   "lost_clv": 0.0
+  },
+  {
+   "group": "Threes",
+   "bets": 20,
+   "won": 7,
+   "lost": 13,
+   "hit": 0.35,
+   "units": -7.46,
+   "roi": -0.373,
+   "exp_hit": 0.61,
+   "clv_n": 3,
+   "beat": 0.333,
+   "lost_clv": 0.0
+  },
+  {
+   "group": "Total",
+   "bets": 2,
+   "won": 0,
+   "lost": 2,
+   "hit": 0.0,
+   "units": -2.0,
+   "roi": -1.0,
+   "exp_hit": 0.584,
+   "clv_n": 0,
+   "beat": null,
+   "lost_clv": null
+  }
+ ],
+ "calibration": [
+  {
+   "bucket": "0-45%",
+   "n": 1068,
+   "said": 0.41169831460674156,
+   "hit": 0.4691011235955056
+  },
+  {
+   "bucket": "45-50%",
+   "n": 1472,
+   "said": 0.4772188858695652,
+   "hit": 0.4904891304347826
+  },
+  {
+   "bucket": "50-55%",
+   "n": 1858,
+   "said": 0.5229040904198062,
+   "hit": 0.5193756727664155
+  },
+  {
+   "bucket": "55-60%",
+   "n": 1155,
+   "said": 0.5723472727272727,
+   "hit": 0.5454545454545454
+  },
+  {
+   "bucket": "60-65%",
+   "n": 515,
+   "said": 0.6218225242718447,
+   "hit": 0.6174757281553398
+  },
+  {
+   "bucket": "65-70%",
+   "n": 335,
+   "said": 0.6759364179104478,
+   "hit": 0.6597014925373135
+  },
+  {
+   "bucket": "70-80%",
+   "n": 666,
+   "said": 0.749242042042042,
+   "hit": 0.7942942942942943
+  },
+  {
+   "bucket": "80-90%",
+   "n": 559,
+   "said": 0.8432821109123435,
+   "hit": 0.8729874776386404
+  },
+  {
+   "bucket": "90-100%",
+   "n": 11,
+   "said": 0.9057090909090909,
+   "hit": 0.9090909090909091
+  }
+ ],
+ "cal_sections": [
+  {
+   "name": "Moneyline picks",
+   "note": "The team the board gave the better chance to win, every game.",
+   "n": 46,
+   "won": 33,
+   "lost": 13,
+   "said": 0.6908,
+   "hit": 0.7174,
+   "units": 0.69,
+   "roi": 0.0151,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 11,
+     "won": 9,
+     "lost": 2,
+     "said": 0.5618,
+     "hit": 0.8182,
+     "units": 4.41
+    },
+    {
+     "label": "60\u201370%",
+     "n": 14,
+     "won": 9,
+     "lost": 5,
+     "said": 0.6464,
+     "hit": 0.6429,
+     "units": -0.64
+    },
+    {
+     "label": "70\u201380%",
+     "n": 14,
+     "won": 9,
+     "lost": 5,
+     "said": 0.7497,
+     "hit": 0.6429,
+     "units": -2.7
+    },
+    {
+     "label": "80\u201390%",
+     "n": 7,
+     "won": 6,
+     "lost": 1,
+     "said": 0.8649,
+     "hit": 0.8571,
+     "units": -0.37
+    }
+   ]
+  },
+  {
+   "name": "Spreads",
+   "note": "The side the board favored on each DraftKings spread.",
+   "n": 46,
+   "won": 23,
+   "lost": 23,
+   "said": 0.5223,
+   "hit": 0.5,
+   "units": -2.46,
+   "roi": -0.0535,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 46,
+     "won": 23,
+     "lost": 23,
+     "said": 0.5223,
+     "hit": 0.5,
+     "units": -2.46
+    }
+   ]
+  },
+  {
+   "name": "Totals",
+   "note": "Over or Under, whichever the board favored.",
+   "n": 46,
+   "won": 21,
+   "lost": 25,
+   "said": 0.5211,
+   "hit": 0.4565,
+   "units": -6.16,
+   "roi": -0.1339,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 46,
+     "won": 21,
+     "lost": 25,
+     "said": 0.5211,
+     "hit": 0.4565,
+     "units": -6.16
+    }
+   ]
+  },
+  {
+   "name": "Points",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 554,
+   "won": 283,
+   "lost": 271,
+   "said": 0.5349,
+   "hit": 0.5108,
+   "units": -26.59,
+   "roi": -0.048,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 542,
+     "won": 277,
+     "lost": 265,
+     "said": 0.5332,
+     "hit": 0.5111,
+     "units": -25.44
+    },
+    {
+     "label": "60\u201370%",
+     "n": 12,
+     "won": 6,
+     "lost": 6,
+     "said": 0.6127,
+     "hit": 0.5,
+     "units": -1.15
+    }
+   ]
+  },
+  {
+   "name": "Rebounds",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 517,
+   "won": 265,
+   "lost": 252,
+   "said": 0.5473,
+   "hit": 0.5126,
+   "units": -47.68,
+   "roi": -0.0922,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 486,
+     "won": 250,
+     "lost": 236,
+     "said": 0.5427,
+     "hit": 0.5144,
+     "units": -41.47
+    },
+    {
+     "label": "60\u201370%",
+     "n": 31,
+     "won": 15,
+     "lost": 16,
+     "said": 0.6194,
+     "hit": 0.4839,
+     "units": -6.2
+    }
+   ]
+  },
+  {
+   "name": "Assists",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 406,
+   "won": 221,
+   "lost": 185,
+   "said": 0.5545,
+   "hit": 0.5443,
+   "units": -22.08,
+   "roi": -0.0544,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 348,
+     "won": 189,
+     "lost": 159,
+     "said": 0.5437,
+     "hit": 0.5431,
+     "units": -15.29
+    },
+    {
+     "label": "60\u201370%",
+     "n": 58,
+     "won": 32,
+     "lost": 26,
+     "said": 0.6195,
+     "hit": 0.5517,
+     "units": -6.8
+    }
+   ]
+  },
+  {
+   "name": "Threes",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 448,
+   "won": 235,
+   "lost": 213,
+   "said": 0.5702,
+   "hit": 0.5246,
+   "units": -53.79,
+   "roi": -0.1201,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 346,
+     "won": 182,
+     "lost": 164,
+     "said": 0.552,
+     "hit": 0.526,
+     "units": -33.31
+    },
+    {
+     "label": "60\u201370%",
+     "n": 100,
+     "won": 53,
+     "lost": 47,
+     "said": 0.6304,
+     "hit": 0.53,
+     "units": -18.48
+    },
+    {
+     "label": "70\u201380%",
+     "n": 2,
+     "won": 0,
+     "lost": 2,
+     "said": 0.7074,
+     "hit": 0.0,
+     "units": -2.0
+    }
+   ]
+  },
+  {
+   "name": "Pts+Reb+Ast",
+   "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+   "n": 438,
+   "won": 220,
+   "lost": 218,
+   "said": 0.5375,
+   "hit": 0.5023,
+   "units": -27.45,
+   "roi": -0.0627,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 426,
+     "won": 216,
+     "lost": 210,
+     "said": 0.5353,
+     "hit": 0.507,
+     "units": -22.91
+    },
+    {
+     "label": "60\u201370%",
+     "n": 12,
+     "won": 4,
+     "lost": 8,
+     "said": 0.6158,
+     "hit": 0.3333,
+     "units": -4.54
+    }
+   ]
+  },
+  {
+   "name": "Alt lines",
+   "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
+   "n": 2513,
+   "won": 1823,
+   "lost": 690,
+   "said": 0.6897,
+   "hit": 0.7254,
+   "units": -105.19,
+   "roi": -0.0419,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 719,
+     "won": 410,
+     "lost": 309,
+     "said": 0.5482,
+     "hit": 0.5702,
+     "units": -36.72
+    },
+    {
+     "label": "60\u201370%",
+     "n": 591,
+     "won": 408,
+     "lost": 183,
+     "said": 0.6504,
+     "hit": 0.6904,
+     "units": -20.05
+    },
+    {
+     "label": "70\u201380%",
+     "n": 643,
+     "won": 514,
+     "lost": 129,
+     "said": 0.7496,
+     "hit": 0.7994,
+     "units": -22.0
+    },
+    {
+     "label": "80\u201390%",
+     "n": 549,
+     "won": 481,
+     "lost": 68,
+     "said": 0.843,
+     "hit": 0.8761,
+     "units": -25.73
+    },
+    {
+     "label": "90\u2013100%",
+     "n": 11,
+     "won": 10,
+     "lost": 1,
+     "said": 0.9057,
+     "hit": 0.9091,
+     "units": -0.69
+    }
+   ]
+  }
+ ],
+ "parlays": {
+  "days": [
+   "2026-11-11",
+   "2026-11-12",
+   "2026-11-13",
+   "2026-11-14",
+   "2026-11-15",
+   "2026-11-16",
+   "2026-11-17"
+  ],
+  "groups": [
+   {
+    "group": "Best value: \u2605 suggestion",
+    "bets": 6,
+    "won": 1,
+    "lost": 5,
+    "hit": 0.16666666666666666,
+    "exp_hit": 0.3282081598716667,
+    "units": 2.24,
+    "roi": 0.3738942307692306
+   },
+   {
+    "group": "Best value: straight (all suggestions)",
+    "bets": 36,
+    "won": 15,
+    "lost": 21,
+    "hit": 0.4166666666666667,
+    "exp_hit": 0.6022944444444445,
+    "units": -6.81,
+    "roi": -0.18911516605784184
+   },
+   {
+    "group": "Best value: 2-leg (all suggestions)",
+    "bets": 36,
+    "won": 6,
+    "lost": 30,
+    "hit": 0.16666666666666666,
+    "exp_hit": 0.36003992416666664,
+    "units": -14.37,
+    "roi": -0.39926172523996883
+   },
+   {
+    "group": "Best value: 3-leg (all suggestions)",
+    "bets": 36,
+    "won": 1,
+    "lost": 35,
+    "hit": 0.027777777777777776,
+    "exp_hit": 0.21080707973605556,
+    "units": -27.76,
+    "roi": -0.7710176282051282
+   },
+   {
+    "group": "Best value: 4-leg (all suggestions)",
+    "bets": 33,
+    "won": 0,
+    "lost": 33,
+    "hit": 0.0,
+    "exp_hit": 0.12238969070954847,
+    "units": -33.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Best value: 5-leg (all suggestions)",
+    "bets": 31,
+    "won": 0,
+    "lost": 31,
+    "hit": 0.0,
+    "exp_hit": 0.07157079826487316,
+    "units": -31.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Best value: 6-leg (all suggestions)",
+    "bets": 33,
+    "won": 0,
+    "lost": 33,
+    "hit": 0.0,
+    "exp_hit": 0.040316820646560614,
+    "units": -33.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Best value: 11-leg (all suggestions)",
+    "bets": 29,
+    "won": 0,
+    "lost": 29,
+    "hit": 0.0,
+    "exp_hit": 0.002523335845936183,
+    "units": -29.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Most likely to hit: \u2605 suggestion",
+    "bets": 7,
+    "won": 0,
+    "lost": 7,
+    "hit": 0.0,
+    "exp_hit": 0.3691104565079577,
+    "units": -7.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Most likely to hit: straight (all suggestions)",
+    "bets": 42,
+    "won": 17,
+    "lost": 25,
+    "hit": 0.40476190476190477,
+    "exp_hit": 0.6413095238095238,
+    "units": -14.17,
+    "roi": -0.3374408647141568
+   },
+   {
+    "group": "Most likely to hit: 2-leg (all suggestions)",
+    "bets": 42,
+    "won": 7,
+    "lost": 35,
+    "hit": 0.16666666666666666,
+    "exp_hit": 0.392969219047619,
+    "units": -21.29,
+    "roi": -0.5069628837496712
+   },
+   {
+    "group": "Most likely to hit: 3-leg (all suggestions)",
+    "bets": 42,
+    "won": 3,
+    "lost": 39,
+    "hit": 0.07142857142857142,
+    "exp_hit": 0.2580804052088809,
+    "units": -26.6,
+    "roi": -0.6332940373223521
+   },
+   {
+    "group": "Most likely to hit: 4-leg (all suggestions)",
+    "bets": 35,
+    "won": 0,
+    "lost": 35,
+    "hit": 0.0,
+    "exp_hit": 0.1607526208313203,
+    "units": -35.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Most likely to hit: 5-leg (all suggestions)",
+    "bets": 32,
+    "won": 0,
+    "lost": 32,
+    "hit": 0.0,
+    "exp_hit": 0.09899299584867584,
+    "units": -32.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Most likely to hit: 6-leg (all suggestions)",
+    "bets": 34,
+    "won": 0,
+    "lost": 34,
+    "hit": 0.0,
+    "exp_hit": 0.057224757313553705,
+    "units": -34.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Most likely to hit: 11-leg (all suggestions)",
+    "bets": 28,
+    "won": 0,
+    "lost": 28,
+    "hit": 0.0,
+    "exp_hit": 0.004958735455082189,
+    "units": -28.0,
+    "roi": -1.0
+   }
+  ]
+ },
+ "by_period": {
+  "menu": {
+   "day": [
+    {
+     "key": "d:2026-11-17",
+     "label": "Tue Nov 17"
+    },
+    {
+     "key": "d:2026-11-16",
+     "label": "Mon Nov 16"
+    },
+    {
+     "key": "d:2026-11-15",
+     "label": "Sun Nov 15"
+    },
+    {
+     "key": "d:2026-11-14",
+     "label": "Sat Nov 14"
+    },
+    {
+     "key": "d:2026-11-13",
+     "label": "Fri Nov 13"
+    },
+    {
+     "key": "d:2026-11-12",
+     "label": "Thu Nov 12"
+    },
+    {
+     "key": "d:2026-11-11",
+     "label": "Wed Nov 11"
+    }
+   ],
+   "week": [
+    {
+     "key": "w:2026-11-16",
+     "label": "Nov 16 \u2013 22"
+    },
+    {
+     "key": "w:2026-11-09",
+     "label": "Nov 9 \u2013 15"
+    }
+   ],
+   "month": [
+    {
+     "key": "m:2026-11",
+     "label": "November 2026"
+    }
+   ]
+  },
+  "reports": {
+   "d:2026-11-17": {
+    "days": [
+     "2026-11-17"
+    ],
+    "groups": [
+     {
+      "group": "Value legs",
+      "bets": 0,
+      "won": 0,
+      "lost": 0,
+      "hit": 0.0,
+      "units": 0.0,
+      "roi": 0.0,
+      "exp_hit": null,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Suggested-parlay legs",
+      "bets": 0,
+      "won": 0,
+      "lost": 0,
+      "hit": 0.0,
+      "units": 0.0,
+      "roi": 0.0,
+      "exp_hit": null,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "All +edge legs",
+      "bets": 2,
+      "won": 1,
+      "lost": 1,
+      "hit": 0.5,
+      "units": 2.4,
+      "roi": 1.2,
+      "exp_hit": 0.371,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Negative-edge legs (control)",
+      "bets": 1082,
+      "won": 654,
+      "lost": 428,
+      "hit": 0.604,
+      "units": -58.52,
+      "roi": -0.054,
+      "exp_hit": 0.597,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "by_kind": [],
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game.",
+      "n": 5,
+      "won": 3,
+      "lost": 2,
+      "said": 0.6742,
+      "hit": 0.6,
+      "units": -0.41,
+      "roi": -0.082,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.5756,
+        "hit": 1.0,
+        "units": 0.69
+       },
+       {
+        "label": "60\u201370%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.6424,
+        "hit": 0.5,
+        "units": -0.44
+       },
+       {
+        "label": "70\u201380%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.7552,
+        "hit": 0.5,
+        "units": -0.65
+       }
+      ]
+     },
+     {
+      "name": "Spreads",
+      "note": "The side the board favored on each DraftKings spread.",
+      "n": 5,
+      "won": 3,
+      "lost": 2,
+      "said": 0.5115,
+      "hit": 0.6,
+      "units": 0.71,
+      "roi": 0.1428,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 5,
+        "won": 3,
+        "lost": 2,
+        "said": 0.5115,
+        "hit": 0.6,
+        "units": 0.71
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever the board favored.",
+      "n": 5,
+      "won": 0,
+      "lost": 5,
+      "said": 0.509,
+      "hit": 0.0,
+      "units": -5.0,
+      "roi": -1.0,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 5,
+        "won": 0,
+        "lost": 5,
+        "said": 0.509,
+        "hit": 0.0,
+        "units": -5.0
+       }
+      ]
+     },
+     {
+      "name": "Points",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 62,
+      "won": 32,
+      "lost": 30,
+      "said": 0.5168,
+      "hit": 0.5161,
+      "units": -3.49,
+      "roi": -0.0563,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 62,
+        "won": 32,
+        "lost": 30,
+        "said": 0.5168,
+        "hit": 0.5161,
+        "units": -3.49
+       }
+      ]
+     },
+     {
+      "name": "Rebounds",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 58,
+      "won": 31,
+      "lost": 27,
+      "said": 0.5364,
+      "hit": 0.5345,
+      "units": -4.01,
+      "roi": -0.0691,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 57,
+        "won": 30,
+        "lost": 27,
+        "said": 0.5351,
+        "hit": 0.5263,
+        "units": -4.57
+       },
+       {
+        "label": "60\u201370%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.6118,
+        "hit": 1.0,
+        "units": 0.56
+       }
+      ]
+     },
+     {
+      "name": "Assists",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 45,
+      "won": 26,
+      "lost": 19,
+      "said": 0.5509,
+      "hit": 0.5778,
+      "units": -0.43,
+      "roi": -0.0096,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 43,
+        "won": 25,
+        "lost": 18,
+        "said": 0.5481,
+        "hit": 0.5814,
+        "units": 0.04
+       },
+       {
+        "label": "60\u201370%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.6114,
+        "hit": 0.5,
+        "units": -0.48
+       }
+      ]
+     },
+     {
+      "name": "Threes",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 49,
+      "won": 29,
+      "lost": 20,
+      "said": 0.5716,
+      "hit": 0.5918,
+      "units": -2.22,
+      "roi": -0.0452,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 35,
+        "won": 17,
+        "lost": 18,
+        "said": 0.5536,
+        "hit": 0.4857,
+        "units": -6.44
+       },
+       {
+        "label": "60\u201370%",
+        "n": 14,
+        "won": 12,
+        "lost": 2,
+        "said": 0.6165,
+        "hit": 0.8571,
+        "units": 4.23
+       }
+      ]
+     },
+     {
+      "name": "Pts+Reb+Ast",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 49,
+      "won": 19,
+      "lost": 30,
+      "said": 0.5121,
+      "hit": 0.3878,
+      "units": -14.26,
+      "roi": -0.2909,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 49,
+        "won": 19,
+        "lost": 30,
+        "said": 0.5121,
+        "hit": 0.3878,
+        "units": -14.26
+       }
+      ]
+     },
+     {
+      "name": "Alt lines",
+      "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
+      "n": 529,
+      "won": 377,
+      "lost": 152,
+      "said": 0.6983,
+      "hit": 0.7127,
+      "units": -23.22,
+      "roi": -0.0439,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 146,
+        "won": 82,
+        "lost": 64,
+        "said": 0.5485,
+        "hit": 0.5616,
+        "units": -6.29
+       },
+       {
+        "label": "60\u201370%",
+        "n": 116,
+        "won": 78,
+        "lost": 38,
+        "said": 0.6472,
+        "hit": 0.6724,
+        "units": -2.66
+       },
+       {
+        "label": "70\u201380%",
+        "n": 126,
+        "won": 96,
+        "lost": 30,
+        "said": 0.7481,
+        "hit": 0.7619,
+        "units": -6.28
+       },
+       {
+        "label": "80\u201390%",
+        "n": 134,
+        "won": 115,
+        "lost": 19,
+        "said": 0.8482,
+        "hit": 0.8582,
+        "units": -7.19
+       },
+       {
+        "label": "90\u2013100%",
+        "n": 7,
+        "won": 6,
+        "lost": 1,
+        "said": 0.905,
+        "hit": 0.8571,
+        "units": -0.8
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-17"
+     ],
+     "groups": [
+      {
+       "group": "Most likely to hit: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.6337,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: straight (all suggestions)",
+       "bets": 6,
+       "won": 4,
+       "lost": 2,
+       "hit": 0.6666666666666666,
+       "exp_hit": 0.60905,
+       "units": 0.3,
+       "roi": 0.04990283245203275
+      },
+      {
+       "group": "Most likely to hit: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 3,
+       "lost": 3,
+       "hit": 0.5,
+       "exp_hit": 0.35533170666666664,
+       "units": 1.82,
+       "roi": 0.3033575655972181
+      },
+      {
+       "group": "Most likely to hit: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.20922194296883334,
+       "units": -1.39,
+       "roi": -0.2321065740315921
+      }
+     ]
+    }
+   },
+   "d:2026-11-16": {
+    "days": [
+     "2026-11-16"
+    ],
+    "groups": [
+     {
+      "group": "Value legs",
+      "bets": 31,
+      "won": 14,
+      "lost": 17,
+      "hit": 0.452,
+      "units": -4.17,
+      "roi": -0.135,
+      "exp_hit": 0.575,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Suggested-parlay legs",
+      "bets": 4,
+      "won": 3,
+      "lost": 1,
+      "hit": 0.75,
+      "units": 2.09,
+      "roi": 0.522,
+      "exp_hit": 0.573,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "All +edge legs",
+      "bets": 206,
+      "won": 95,
+      "lost": 111,
+      "hit": 0.461,
+      "units": -22.75,
+      "roi": -0.11,
+      "exp_hit": 0.541,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Negative-edge legs (control)",
+      "bets": 1561,
+      "won": 987,
+      "lost": 574,
+      "hit": 0.632,
+      "units": -56.54,
+      "roi": -0.036,
+      "exp_hit": 0.599,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "by_kind": [
+     {
+      "group": "Assists",
+      "bets": 7,
+      "won": 6,
+      "lost": 1,
+      "hit": 0.857,
+      "units": 4.66,
+      "roi": 0.666,
+      "exp_hit": 0.573,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Points",
+      "bets": 6,
+      "won": 3,
+      "lost": 3,
+      "hit": 0.5,
+      "units": -0.3,
+      "roi": -0.05,
+      "exp_hit": 0.571,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Pts+Reb+Ast",
+      "bets": 11,
+      "won": 3,
+      "lost": 8,
+      "hit": 0.273,
+      "units": -5.39,
+      "roi": -0.49,
+      "exp_hit": 0.572,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Rebounds",
+      "bets": 4,
+      "won": 1,
+      "lost": 3,
+      "hit": 0.25,
+      "units": -2.04,
+      "roi": -0.51,
+      "exp_hit": 0.579,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Threes",
+      "bets": 3,
+      "won": 1,
+      "lost": 2,
+      "hit": 0.333,
+      "units": -1.11,
+      "roi": -0.369,
+      "exp_hit": 0.597,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game.",
+      "n": 8,
+      "won": 4,
+      "lost": 4,
+      "said": 0.6538,
+      "hit": 0.5,
+      "units": -1.9,
+      "roi": -0.2372,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.5534,
+        "hit": 0.5,
+        "units": -0.26
+       },
+       {
+        "label": "60\u201370%",
+        "n": 3,
+        "won": 2,
+        "lost": 1,
+        "said": 0.6238,
+        "hit": 0.6667,
+        "units": 0.08
+       },
+       {
+        "label": "70\u201380%",
+        "n": 3,
+        "won": 1,
+        "lost": 2,
+        "said": 0.7506,
+        "hit": 0.3333,
+        "units": -1.72
+       }
+      ]
+     },
+     {
+      "name": "Spreads",
+      "note": "The side the board favored on each DraftKings spread.",
+      "n": 8,
+      "won": 2,
+      "lost": 6,
+      "said": 0.5214,
+      "hit": 0.25,
+      "units": -4.18,
+      "roi": -0.5228,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 8,
+        "won": 2,
+        "lost": 6,
+        "said": 0.5214,
+        "hit": 0.25,
+        "units": -4.18
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever the board favored.",
+      "n": 8,
+      "won": 6,
+      "lost": 2,
+      "said": 0.5174,
+      "hit": 0.75,
+      "units": 3.38,
+      "roi": 0.423,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 8,
+        "won": 6,
+        "lost": 2,
+        "said": 0.5174,
+        "hit": 0.75,
+        "units": 3.38
+       }
+      ]
+     },
+     {
+      "name": "Points",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 102,
+      "won": 56,
+      "lost": 46,
+      "said": 0.5333,
+      "hit": 0.549,
+      "units": 2.36,
+      "roi": 0.0231,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 102,
+        "won": 56,
+        "lost": 46,
+        "said": 0.5333,
+        "hit": 0.549,
+        "units": 2.36
+       }
+      ]
+     },
+     {
+      "name": "Rebounds",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 95,
+      "won": 40,
+      "lost": 55,
+      "said": 0.5495,
+      "hit": 0.4211,
+      "units": -23.91,
+      "roi": -0.2517,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 90,
+        "won": 40,
+        "lost": 50,
+        "said": 0.5462,
+        "hit": 0.4444,
+        "units": -18.91
+       },
+       {
+        "label": "60\u201370%",
+        "n": 5,
+        "won": 0,
+        "lost": 5,
+        "said": 0.6093,
+        "hit": 0.0,
+        "units": -5.0
+       }
+      ]
+     },
+     {
+      "name": "Assists",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 72,
+      "won": 44,
+      "lost": 28,
+      "said": 0.5529,
+      "hit": 0.6111,
+      "units": 5.31,
+      "roi": 0.0737,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 63,
+        "won": 40,
+        "lost": 23,
+        "said": 0.5438,
+        "hit": 0.6349,
+        "units": 7.93
+       },
+       {
+        "label": "60\u201370%",
+        "n": 9,
+        "won": 4,
+        "lost": 5,
+        "said": 0.6168,
+        "hit": 0.4444,
+        "units": -2.62
+       }
+      ]
+     },
+     {
+      "name": "Threes",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 84,
+      "won": 41,
+      "lost": 43,
+      "said": 0.5687,
+      "hit": 0.4881,
+      "units": -15.12,
+      "roi": -0.18,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 69,
+        "won": 34,
+        "lost": 35,
+        "said": 0.5551,
+        "hit": 0.4928,
+        "units": -10.93
+       },
+       {
+        "label": "60\u201370%",
+        "n": 14,
+        "won": 7,
+        "lost": 7,
+        "said": 0.6255,
+        "hit": 0.5,
+        "units": -3.19
+       },
+       {
+        "label": "70\u201380%",
+        "n": 1,
+        "won": 0,
+        "lost": 1,
+        "said": 0.7092,
+        "hit": 0.0,
+        "units": -1.0
+       }
+      ]
+     },
+     {
+      "name": "Pts+Reb+Ast",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 82,
+      "won": 41,
+      "lost": 41,
+      "said": 0.5376,
+      "hit": 0.5,
+      "units": -5.64,
+      "roi": -0.0688,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 82,
+        "won": 41,
+        "lost": 41,
+        "said": 0.5376,
+        "hit": 0.5,
+        "units": -5.64
+       }
+      ]
+     },
+     {
+      "name": "Alt lines",
+      "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
+      "n": 869,
+      "won": 637,
+      "lost": 232,
+      "said": 0.6883,
+      "hit": 0.733,
+      "units": -26.36,
+      "roi": -0.0303,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 256,
+        "won": 142,
+        "lost": 114,
+        "said": 0.5492,
+        "hit": 0.5547,
+        "units": -18.7
+       },
+       {
+        "label": "60\u201370%",
+        "n": 197,
+        "won": 146,
+        "lost": 51,
+        "said": 0.65,
+        "hit": 0.7411,
+        "units": 7.56
+       },
+       {
+        "label": "70\u201380%",
+        "n": 224,
+        "won": 182,
+        "lost": 42,
+        "said": 0.7486,
+        "hit": 0.8125,
+        "units": -4.48
+       },
+       {
+        "label": "80\u201390%",
+        "n": 189,
+        "won": 164,
+        "lost": 25,
+        "said": 0.842,
+        "hit": 0.8677,
+        "units": -10.82
+       },
+       {
+        "label": "90\u2013100%",
+        "n": 3,
+        "won": 3,
+        "lost": 0,
+        "said": 0.9075,
+        "hit": 1.0,
+        "units": 0.08
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-16"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 1,
+       "won": 1,
+       "lost": 0,
+       "hit": 1.0,
+       "exp_hit": 0.18318537923,
+       "units": 7.24,
+       "roi": 7.243365384615384
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 6,
+       "won": 4,
+       "lost": 2,
+       "hit": 0.6666666666666666,
+       "exp_hit": 0.5879833333333333,
+       "units": 2.05,
+       "roi": 0.3419395785732419
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 2,
+       "lost": 4,
+       "hit": 0.3333333333333333,
+       "exp_hit": 0.3318841666666667,
+       "units": 1.91,
+       "roi": 0.3177642077394553
+      },
+      {
+       "group": "Best value: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.19313556273733334,
+       "units": 2.24,
+       "roi": 0.3738942307692306
+      },
+      {
+       "group": "Best value: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.10936458768701228,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.062661847796977,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.03443994074166475,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 11-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.002013350883004967,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.43025398000000004,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: straight (all suggestions)",
+       "bets": 6,
+       "won": 2,
+       "lost": 4,
+       "hit": 0.3333333333333333,
+       "exp_hit": 0.62685,
+       "units": -2.79,
+       "roi": -0.4645276685410465
+      },
+      {
+       "group": "Most likely to hit: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.3716266183333334,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.35865533091216667,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.22273959004614863,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.1373939569300861,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.08413838944899284,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 11-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.007857204731798044,
+       "units": -6.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   },
+   "d:2026-11-15": {
+    "days": [
+     "2026-11-15"
+    ],
+    "groups": [
+     {
+      "group": "Value legs",
+      "bets": 53,
+      "won": 23,
+      "lost": 30,
+      "hit": 0.434,
+      "units": -10.33,
+      "roi": -0.195,
+      "exp_hit": 0.594,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Suggested-parlay legs",
+      "bets": 4,
+      "won": 2,
+      "lost": 2,
+      "hit": 0.5,
+      "units": -0.35,
+      "roi": -0.088,
+      "exp_hit": 0.605,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "All +edge legs",
+      "bets": 256,
+      "won": 105,
+      "lost": 151,
+      "hit": 0.41,
+      "units": -58.53,
+      "roi": -0.229,
+      "exp_hit": 0.548,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Negative-edge legs (control)",
+      "bets": 1413,
+      "won": 868,
+      "lost": 545,
+      "hit": 0.614,
+      "units": -79.58,
+      "roi": -0.056,
+      "exp_hit": 0.591,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "by_kind": [
+     {
+      "group": "Assists",
+      "bets": 4,
+      "won": 4,
+      "lost": 0,
+      "hit": 1.0,
+      "units": 3.13,
+      "roi": 0.782,
+      "exp_hit": 0.602,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Points",
+      "bets": 14,
+      "won": 5,
+      "lost": 9,
+      "hit": 0.357,
+      "units": -4.59,
+      "roi": -0.328,
+      "exp_hit": 0.585,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Pts+Reb+Ast",
+      "bets": 12,
+      "won": 6,
+      "lost": 6,
+      "hit": 0.5,
+      "units": -0.55,
+      "roi": -0.046,
+      "exp_hit": 0.576,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Rebounds",
+      "bets": 12,
+      "won": 6,
+      "lost": 6,
+      "hit": 0.5,
+      "units": -1.04,
+      "roi": -0.087,
+      "exp_hit": 0.611,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Threes",
+      "bets": 10,
+      "won": 2,
+      "lost": 8,
+      "hit": 0.2,
+      "units": -6.28,
+      "roi": -0.628,
+      "exp_hit": 0.605,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Total",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "units": -1.0,
+      "roi": -1.0,
+      "exp_hit": 0.6,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game.",
+      "n": 8,
+      "won": 8,
+      "lost": 0,
+      "said": 0.7133,
+      "hit": 1.0,
+      "units": 3.06,
+      "roi": 0.382,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 2,
+        "won": 2,
+        "lost": 0,
+        "said": 0.5676,
+        "hit": 1.0,
+        "units": 1.56
+       },
+       {
+        "label": "60\u201370%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.6403,
+        "hit": 1.0,
+        "units": 0.46
+       },
+       {
+        "label": "70\u201380%",
+        "n": 3,
+        "won": 3,
+        "lost": 0,
+        "said": 0.7391,
+        "hit": 1.0,
+        "units": 0.83
+       },
+       {
+        "label": "80\u201390%",
+        "n": 2,
+        "won": 2,
+        "lost": 0,
+        "said": 0.8569,
+        "hit": 1.0,
+        "units": 0.2
+       }
+      ]
+     },
+     {
+      "name": "Spreads",
+      "note": "The side the board favored on each DraftKings spread.",
+      "n": 8,
+      "won": 4,
+      "lost": 4,
+      "said": 0.5287,
+      "hit": 0.5,
+      "units": -0.49,
+      "roi": -0.0612,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 8,
+        "won": 4,
+        "lost": 4,
+        "said": 0.5287,
+        "hit": 0.5,
+        "units": -0.49
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever the board favored.",
+      "n": 8,
+      "won": 6,
+      "lost": 2,
+      "said": 0.5231,
+      "hit": 0.75,
+      "units": 3.34,
+      "roi": 0.417,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 8,
+        "won": 6,
+        "lost": 2,
+        "said": 0.5231,
+        "hit": 0.75,
+        "units": 3.34
+       }
+      ]
+     },
+     {
+      "name": "Points",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 93,
+      "won": 46,
+      "lost": 47,
+      "said": 0.5352,
+      "hit": 0.4946,
+      "units": -6.68,
+      "roi": -0.0718,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 91,
+        "won": 45,
+        "lost": 46,
+        "said": 0.5334,
+        "hit": 0.4945,
+        "units": -6.48
+       },
+       {
+        "label": "60\u201370%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.6162,
+        "hit": 0.5,
+        "units": -0.21
+       }
+      ]
+     },
+     {
+      "name": "Rebounds",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 89,
+      "won": 48,
+      "lost": 41,
+      "said": 0.5492,
+      "hit": 0.5393,
+      "units": -3.68,
+      "roi": -0.0414,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 83,
+        "won": 44,
+        "lost": 39,
+        "said": 0.5433,
+        "hit": 0.5301,
+        "units": -4.5
+       },
+       {
+        "label": "60\u201370%",
+        "n": 6,
+        "won": 4,
+        "lost": 2,
+        "said": 0.6313,
+        "hit": 0.6667,
+        "units": 0.82
+       }
+      ]
+     },
+     {
+      "name": "Assists",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 68,
+      "won": 40,
+      "lost": 28,
+      "said": 0.5517,
+      "hit": 0.5882,
+      "units": 0.63,
+      "roi": 0.0092,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 60,
+        "won": 35,
+        "lost": 25,
+        "said": 0.5427,
+        "hit": 0.5833,
+        "units": 0.65
+       },
+       {
+        "label": "60\u201370%",
+        "n": 8,
+        "won": 5,
+        "lost": 3,
+        "said": 0.6193,
+        "hit": 0.625,
+        "units": -0.02
+       }
+      ]
+     },
+     {
+      "name": "Threes",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 75,
+      "won": 33,
+      "lost": 42,
+      "said": 0.5669,
+      "hit": 0.44,
+      "units": -19.45,
+      "roi": -0.2594,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 60,
+        "won": 26,
+        "lost": 34,
+        "said": 0.55,
+        "hit": 0.4333,
+        "units": -15.0
+       },
+       {
+        "label": "60\u201370%",
+        "n": 15,
+        "won": 7,
+        "lost": 8,
+        "said": 0.6342,
+        "hit": 0.4667,
+        "units": -4.45
+       }
+      ]
+     },
+     {
+      "name": "Pts+Reb+Ast",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 68,
+      "won": 36,
+      "lost": 32,
+      "said": 0.536,
+      "hit": 0.5294,
+      "units": -0.46,
+      "roi": -0.0067,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 67,
+        "won": 35,
+        "lost": 32,
+        "said": 0.5345,
+        "hit": 0.5224,
+        "units": -1.34
+       },
+       {
+        "label": "60\u201370%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.6391,
+        "hit": 1.0,
+        "units": 0.89
+       }
+      ]
+     },
+     {
+      "name": "Alt lines",
+      "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
+      "n": 730,
+      "won": 506,
+      "lost": 224,
+      "said": 0.6859,
+      "hit": 0.6932,
+      "units": -66.59,
+      "roi": -0.0912,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 213,
+        "won": 119,
+        "lost": 94,
+        "said": 0.5481,
+        "hit": 0.5587,
+        "units": -17.33
+       },
+       {
+        "label": "60\u201370%",
+        "n": 176,
+        "won": 110,
+        "lost": 66,
+        "said": 0.6527,
+        "hit": 0.625,
+        "units": -25.09
+       },
+       {
+        "label": "70\u201380%",
+        "n": 198,
+        "won": 154,
+        "lost": 44,
+        "said": 0.7506,
+        "hit": 0.7778,
+        "units": -13.89
+       },
+       {
+        "label": "80\u201390%",
+        "n": 143,
+        "won": 123,
+        "lost": 20,
+        "said": 0.8427,
+        "hit": 0.8601,
+        "units": -10.28
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-15"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.35994112,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.6289166666666667,
+       "units": -4.12,
+       "roi": -0.6858407079646017
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.388052695,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.22647622154766667,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.1301085585556876,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.0764706649775694,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.043349711987175486,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 11-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.0029796351200357418,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.5108449399999999,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: straight (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.6962666666666667,
+       "units": -4.32,
+       "roi": -0.7199546485260772
+      },
+      {
+       "group": "Most likely to hit: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.4683041433333333,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.31101921929049997,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.18777668384189794,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.11145748179247068,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.06487741762029119,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 11-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.005989567176315523,
+       "units": -6.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   },
+   "d:2026-11-14": {
+    "days": [
+     "2026-11-14"
+    ],
+    "groups": [
+     {
+      "group": "Value legs",
+      "bets": 15,
+      "won": 9,
+      "lost": 6,
+      "hit": 0.6,
+      "units": 1.34,
+      "roi": 0.09,
+      "exp_hit": 0.584,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Suggested-parlay legs",
+      "bets": 4,
+      "won": 3,
+      "lost": 1,
+      "hit": 0.75,
+      "units": 1.49,
+      "roi": 0.372,
+      "exp_hit": 0.591,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "All +edge legs",
+      "bets": 76,
+      "won": 34,
+      "lost": 42,
+      "hit": 0.447,
+      "units": -12.12,
+      "roi": -0.16,
+      "exp_hit": 0.546,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Negative-edge legs (control)",
+      "bets": 688,
+      "won": 461,
+      "lost": 227,
+      "hit": 0.67,
+      "units": 7.63,
+      "roi": 0.011,
+      "exp_hit": 0.6,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "by_kind": [
+     {
+      "group": "Assists",
+      "bets": 3,
+      "won": 1,
+      "lost": 2,
+      "hit": 0.333,
+      "units": -1.3,
+      "roi": -0.432,
+      "exp_hit": 0.597,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Points",
+      "bets": 4,
+      "won": 2,
+      "lost": 2,
+      "hit": 0.5,
+      "units": -0.28,
+      "roi": -0.071,
+      "exp_hit": 0.579,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Pts+Reb+Ast",
+      "bets": 6,
+      "won": 4,
+      "lost": 2,
+      "hit": 0.667,
+      "units": 1.56,
+      "roi": 0.261,
+      "exp_hit": 0.563,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Rebounds",
+      "bets": 1,
+      "won": 1,
+      "lost": 0,
+      "hit": 1.0,
+      "units": 0.72,
+      "roi": 0.725,
+      "exp_hit": 0.612,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Threes",
+      "bets": 1,
+      "won": 1,
+      "lost": 0,
+      "hit": 1.0,
+      "units": 0.63,
+      "roi": 0.633,
+      "exp_hit": 0.665,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game.",
+      "n": 5,
+      "won": 2,
+      "lost": 3,
+      "said": 0.7053,
+      "hit": 0.4,
+      "units": -2.03,
+      "roi": -0.4062,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.5434,
+        "hit": 1.0,
+        "units": 0.82
+       },
+       {
+        "label": "60\u201370%",
+        "n": 2,
+        "won": 0,
+        "lost": 2,
+        "said": 0.6344,
+        "hit": 0.0,
+        "units": -2.0
+       },
+       {
+        "label": "80\u201390%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.8571,
+        "hit": 0.5,
+        "units": -0.85
+       }
+      ]
+     },
+     {
+      "name": "Spreads",
+      "note": "The side the board favored on each DraftKings spread.",
+      "n": 5,
+      "won": 3,
+      "lost": 2,
+      "said": 0.5206,
+      "hit": 0.6,
+      "units": 0.76,
+      "roi": 0.1524,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 5,
+        "won": 3,
+        "lost": 2,
+        "said": 0.5206,
+        "hit": 0.6,
+        "units": 0.76
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever the board favored.",
+      "n": 5,
+      "won": 4,
+      "lost": 1,
+      "said": 0.5167,
+      "hit": 0.8,
+      "units": 2.58,
+      "roi": 0.517,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 5,
+        "won": 4,
+        "lost": 1,
+        "said": 0.5167,
+        "hit": 0.8,
+        "units": 2.58
+       }
+      ]
+     },
+     {
+      "name": "Points",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 42,
+      "won": 25,
+      "lost": 17,
+      "said": 0.5331,
+      "hit": 0.5952,
+      "units": 4.06,
+      "roi": 0.0967,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 42,
+        "won": 25,
+        "lost": 17,
+        "said": 0.5331,
+        "hit": 0.5952,
+        "units": 4.06
+       }
+      ]
+     },
+     {
+      "name": "Rebounds",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 39,
+      "won": 22,
+      "lost": 17,
+      "said": 0.5389,
+      "hit": 0.5641,
+      "units": -0.35,
+      "roi": -0.009,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 38,
+        "won": 21,
+        "lost": 17,
+        "said": 0.537,
+        "hit": 0.5526,
+        "units": -1.07
+       },
+       {
+        "label": "60\u201370%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.6123,
+        "hit": 1.0,
+        "units": 0.72
+       }
+      ]
+     },
+     {
+      "name": "Assists",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 31,
+      "won": 13,
+      "lost": 18,
+      "said": 0.5621,
+      "hit": 0.4194,
+      "units": -9.37,
+      "roi": -0.3022,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 28,
+        "won": 10,
+        "lost": 18,
+        "said": 0.5561,
+        "hit": 0.3571,
+        "units": -11.23
+       },
+       {
+        "label": "60\u201370%",
+        "n": 3,
+        "won": 3,
+        "lost": 0,
+        "said": 0.6178,
+        "hit": 1.0,
+        "units": 1.86
+       }
+      ]
+     },
+     {
+      "name": "Threes",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 30,
+      "won": 17,
+      "lost": 13,
+      "said": 0.5753,
+      "hit": 0.5667,
+      "units": -1.97,
+      "roi": -0.0655,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 23,
+        "won": 13,
+        "lost": 10,
+        "said": 0.5586,
+        "hit": 0.5652,
+        "units": -1.22
+       },
+       {
+        "label": "60\u201370%",
+        "n": 7,
+        "won": 4,
+        "lost": 3,
+        "said": 0.6302,
+        "hit": 0.5714,
+        "units": -0.74
+       }
+      ]
+     },
+     {
+      "name": "Pts+Reb+Ast",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 35,
+      "won": 18,
+      "lost": 17,
+      "said": 0.5354,
+      "hit": 0.5143,
+      "units": -1.37,
+      "roi": -0.0391,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 34,
+        "won": 18,
+        "lost": 16,
+        "said": 0.5334,
+        "hit": 0.5294,
+        "units": -0.37
+       },
+       {
+        "label": "60\u201370%",
+        "n": 1,
+        "won": 0,
+        "lost": 1,
+        "said": 0.6039,
+        "hit": 0.0,
+        "units": -1.0
+       }
+      ]
+     },
+     {
+      "name": "Alt lines",
+      "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
+      "n": 385,
+      "won": 303,
+      "lost": 82,
+      "said": 0.6883,
+      "hit": 0.787,
+      "units": 10.97,
+      "roi": 0.0285,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 104,
+        "won": 67,
+        "lost": 37,
+        "said": 0.5456,
+        "hit": 0.6442,
+        "units": 5.6
+       },
+       {
+        "label": "60\u201370%",
+        "n": 102,
+        "won": 74,
+        "lost": 28,
+        "said": 0.6511,
+        "hit": 0.7255,
+        "units": 0.14
+       },
+       {
+        "label": "70\u201380%",
+        "n": 95,
+        "won": 82,
+        "lost": 13,
+        "said": 0.7518,
+        "hit": 0.8632,
+        "units": 2.65
+       },
+       {
+        "label": "80\u201390%",
+        "n": 83,
+        "won": 79,
+        "lost": 4,
+        "said": 0.8375,
+        "hit": 0.9518,
+        "units": 2.56
+       },
+       {
+        "label": "90\u2013100%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.9054,
+        "hit": 1.0,
+        "units": 0.02
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-14"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.32839176999999997,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 6,
+       "won": 3,
+       "lost": 3,
+       "hit": 0.5,
+       "exp_hit": 0.5969,
+       "units": -0.55,
+       "roi": -0.09108323312061699
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 2,
+       "lost": 4,
+       "hit": 0.3333333333333333,
+       "exp_hit": 0.35283272666666665,
+       "units": 0.52,
+       "roi": 0.08678071574724318
+      },
+      {
+       "group": "Best value: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.19703237837949997,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 4-leg (all suggestions)",
+       "bets": 3,
+       "won": 0,
+       "lost": 3,
+       "hit": 0.0,
+       "exp_hit": 0.118755300015801,
+       "units": -3.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 5-leg (all suggestions)",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.06725254176033514,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 6-leg (all suggestions)",
+       "bets": 3,
+       "won": 0,
+       "lost": 3,
+       "hit": 0.0,
+       "exp_hit": 0.038812417408169674,
+       "units": -3.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 11-leg (all suggestions)",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.0024716716930101865,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.4376358,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: straight (all suggestions)",
+       "bets": 6,
+       "won": 3,
+       "lost": 3,
+       "hit": 0.5,
+       "exp_hit": 0.63195,
+       "units": -0.94,
+       "roi": -0.1563709290538067
+      },
+      {
+       "group": "Most likely to hit: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.376516075,
+       "units": -2.55,
+       "roi": -0.4242223205071502
+      },
+      {
+       "group": "Most likely to hit: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.21686476913633332,
+       "units": 0.63,
+       "roi": 0.10555697847595742
+      },
+      {
+       "group": "Most likely to hit: 4-leg (all suggestions)",
+       "bets": 5,
+       "won": 0,
+       "lost": 5,
+       "hit": 0.0,
+       "exp_hit": 0.12515655890064048,
+       "units": -5.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 5-leg (all suggestions)",
+       "bets": 2,
+       "won": 0,
+       "lost": 2,
+       "hit": 0.0,
+       "exp_hit": 0.08323325272780671,
+       "units": -2.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 6-leg (all suggestions)",
+       "bets": 4,
+       "won": 0,
+       "lost": 4,
+       "hit": 0.0,
+       "exp_hit": 0.04334918403775491,
+       "units": -4.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 11-leg (all suggestions)",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.004422032019145848,
+       "units": -1.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   },
+   "d:2026-11-13": {
+    "days": [
+     "2026-11-13"
+    ],
+    "groups": [
+     {
+      "group": "Value legs",
+      "bets": 47,
+      "won": 21,
+      "lost": 26,
+      "hit": 0.447,
+      "units": -7.71,
+      "roi": -0.164,
+      "exp_hit": 0.592,
+      "clv_n": 47,
+      "beat": 0.489,
+      "lost_clv": 0.255
+     },
+     {
+      "group": "Suggested-parlay legs",
+      "bets": 4,
+      "won": 1,
+      "lost": 3,
+      "hit": 0.25,
+      "units": -2.05,
+      "roi": -0.512,
+      "exp_hit": 0.613,
+      "clv_n": 4,
+      "beat": 0.5,
+      "lost_clv": 0.0
+     },
+     {
+      "group": "All +edge legs",
+      "bets": 245,
+      "won": 120,
+      "lost": 125,
+      "hit": 0.49,
+      "units": -10.65,
+      "roi": -0.043,
+      "exp_hit": 0.544,
+      "clv_n": 242,
+      "beat": 0.442,
+      "lost_clv": 0.285
+     },
+     {
+      "group": "Negative-edge legs (control)",
+      "bets": 777,
+      "won": 390,
+      "lost": 387,
+      "hit": 0.502,
+      "units": -41.09,
+      "roi": -0.053,
+      "exp_hit": 0.486,
+      "clv_n": 781,
+      "beat": 0.325,
+      "lost_clv": 0.376
+     }
+    ],
+    "by_kind": [
+     {
+      "group": "Assists",
+      "bets": 6,
+      "won": 4,
+      "lost": 2,
+      "hit": 0.667,
+      "units": 1.39,
+      "roi": 0.232,
+      "exp_hit": 0.598,
+      "clv_n": 6,
+      "beat": 0.333,
+      "lost_clv": 0.5
+     },
+     {
+      "group": "Points",
+      "bets": 14,
+      "won": 5,
+      "lost": 9,
+      "hit": 0.357,
+      "units": -4.48,
+      "roi": -0.32,
+      "exp_hit": 0.582,
+      "clv_n": 14,
+      "beat": 0.714,
+      "lost_clv": 0.143
+     },
+     {
+      "group": "Pts+Reb+Ast",
+      "bets": 13,
+      "won": 6,
+      "lost": 7,
+      "hit": 0.462,
+      "units": -1.71,
+      "roi": -0.132,
+      "exp_hit": 0.59,
+      "clv_n": 13,
+      "beat": 0.462,
+      "lost_clv": 0.385
+     },
+     {
+      "group": "Rebounds",
+      "bets": 11,
+      "won": 6,
+      "lost": 5,
+      "hit": 0.545,
+      "units": 0.09,
+      "roi": 0.008,
+      "exp_hit": 0.597,
+      "clv_n": 11,
+      "beat": 0.455,
+      "lost_clv": 0.182
+     },
+     {
+      "group": "Spread",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "units": -1.0,
+      "roi": -1.0,
+      "exp_hit": 0.578,
+      "clv_n": 1,
+      "beat": 0.0,
+      "lost_clv": 0.0
+     },
+     {
+      "group": "Threes",
+      "bets": 2,
+      "won": 0,
+      "lost": 2,
+      "hit": 0.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "exp_hit": 0.638,
+      "clv_n": 2,
+      "beat": 0.0,
+      "lost_clv": 0.0
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game.",
+      "n": 9,
+      "won": 6,
+      "lost": 3,
+      "said": 0.7145,
+      "hit": 0.6667,
+      "units": -0.94,
+      "roi": -0.1046,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.5274,
+        "hit": 1.0,
+        "units": 0.74
+       },
+       {
+        "label": "60\u201370%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.6508,
+        "hit": 0.5,
+        "units": -0.38
+       },
+       {
+        "label": "70\u201380%",
+        "n": 5,
+        "won": 3,
+        "lost": 2,
+        "said": 0.7448,
+        "hit": 0.6,
+        "units": -1.38
+       },
+       {
+        "label": "80\u201390%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.8771,
+        "hit": 1.0,
+        "units": 0.09
+       }
+      ]
+     },
+     {
+      "name": "Spreads",
+      "note": "The side the board favored on each DraftKings spread.",
+      "n": 9,
+      "won": 6,
+      "lost": 3,
+      "said": 0.531,
+      "hit": 0.6667,
+      "units": 2.34,
+      "roi": 0.26,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 9,
+        "won": 6,
+        "lost": 3,
+        "said": 0.531,
+        "hit": 0.6667,
+        "units": 2.34
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever the board favored.",
+      "n": 9,
+      "won": 4,
+      "lost": 5,
+      "said": 0.5258,
+      "hit": 0.4444,
+      "units": -1.37,
+      "roi": -0.1519,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 9,
+        "won": 4,
+        "lost": 5,
+        "said": 0.5258,
+        "hit": 0.4444,
+        "units": -1.37
+       }
+      ]
+     },
+     {
+      "name": "Points",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 112,
+      "won": 55,
+      "lost": 57,
+      "said": 0.5401,
+      "hit": 0.4911,
+      "units": -8.89,
+      "roi": -0.0793,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 109,
+        "won": 55,
+        "lost": 54,
+        "said": 0.5379,
+        "hit": 0.5046,
+        "units": -5.89
+       },
+       {
+        "label": "60\u201370%",
+        "n": 3,
+        "won": 0,
+        "lost": 3,
+        "said": 0.6199,
+        "hit": 0.0,
+        "units": -3.0
+       }
+      ]
+     },
+     {
+      "name": "Rebounds",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 104,
+      "won": 55,
+      "lost": 49,
+      "said": 0.554,
+      "hit": 0.5288,
+      "units": -6.15,
+      "roi": -0.0592,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 92,
+        "won": 50,
+        "lost": 42,
+        "said": 0.5452,
+        "hit": 0.5435,
+        "units": -2.32
+       },
+       {
+        "label": "60\u201370%",
+        "n": 12,
+        "won": 5,
+        "lost": 7,
+        "said": 0.6216,
+        "hit": 0.4167,
+        "units": -3.83
+       }
+      ]
+     },
+     {
+      "name": "Assists",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 88,
+      "won": 43,
+      "lost": 45,
+      "said": 0.5518,
+      "hit": 0.4886,
+      "units": -11.68,
+      "roi": -0.1327,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 73,
+        "won": 36,
+        "lost": 37,
+        "said": 0.5362,
+        "hit": 0.4932,
+        "units": -7.72
+       },
+       {
+        "label": "60\u201370%",
+        "n": 15,
+        "won": 7,
+        "lost": 8,
+        "said": 0.6277,
+        "hit": 0.4667,
+        "units": -3.96
+       }
+      ]
+     },
+     {
+      "name": "Threes",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 96,
+      "won": 47,
+      "lost": 49,
+      "said": 0.5751,
+      "hit": 0.4896,
+      "units": -16.37,
+      "roi": -0.1705,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 69,
+        "won": 36,
+        "lost": 33,
+        "said": 0.5506,
+        "hit": 0.5217,
+        "units": -6.21
+       },
+       {
+        "label": "60\u201370%",
+        "n": 27,
+        "won": 11,
+        "lost": 16,
+        "said": 0.6377,
+        "hit": 0.4074,
+        "units": -10.16
+       }
+      ]
+     },
+     {
+      "name": "Pts+Reb+Ast",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 88,
+      "won": 44,
+      "lost": 44,
+      "said": 0.5415,
+      "hit": 0.5,
+      "units": -5.69,
+      "roi": -0.0647,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 84,
+        "won": 42,
+        "lost": 42,
+        "said": 0.538,
+        "hit": 0.5,
+        "units": -5.44
+       },
+       {
+        "label": "60\u201370%",
+        "n": 4,
+        "won": 2,
+        "lost": 2,
+        "said": 0.6156,
+        "hit": 0.5,
+        "units": -0.25
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-13"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.37515621,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 6,
+       "won": 3,
+       "lost": 3,
+       "hit": 0.5,
+       "exp_hit": 0.606,
+       "units": -0.08,
+       "roi": -0.01336464249308289
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.372366425,
+       "units": -2.26,
+       "roi": -0.37607397699140815
+      },
+      {
+       "group": "Best value: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.22834716262583332,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.1351077348005691,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.0782342830582692,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.04615091679606448,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 11-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.002748634594004536,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.11376393975686377,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: straight (all suggestions)",
+       "bets": 6,
+       "won": 2,
+       "lost": 4,
+       "hit": 0.3333333333333333,
+       "exp_hit": 0.6505666666666666,
+       "units": -2.66,
+       "roi": -0.44349902970592625
+      },
+      {
+       "group": "Most likely to hit: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.40583289666666666,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.25000217578916667,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.15266411719424847,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.09164790472551489,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.05448866828148407,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 11-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.0037189632979278096,
+       "units": -6.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   },
+   "d:2026-11-12": {
+    "days": [
+     "2026-11-12"
+    ],
+    "groups": [
+     {
+      "group": "Value legs",
+      "bets": 30,
+      "won": 14,
+      "lost": 16,
+      "hit": 0.467,
+      "units": -4.11,
+      "roi": -0.137,
+      "exp_hit": 0.586,
+      "clv_n": 30,
+      "beat": 0.633,
+      "lost_clv": 0.3
+     },
+     {
+      "group": "Suggested-parlay legs",
+      "bets": 4,
+      "won": 2,
+      "lost": 2,
+      "hit": 0.5,
+      "units": -0.2,
+      "roi": -0.049,
+      "exp_hit": 0.603,
+      "clv_n": 4,
+      "beat": 0.5,
+      "lost_clv": 0.25
+     },
+     {
+      "group": "All +edge legs",
+      "bets": 102,
+      "won": 47,
+      "lost": 55,
+      "hit": 0.461,
+      "units": -11.66,
+      "roi": -0.114,
+      "exp_hit": 0.548,
+      "clv_n": 102,
+      "beat": 0.51,
+      "lost_clv": 0.363
+     },
+     {
+      "group": "Negative-edge legs (control)",
+      "bets": 356,
+      "won": 181,
+      "lost": 175,
+      "hit": 0.508,
+      "units": -23.26,
+      "roi": -0.065,
+      "exp_hit": 0.486,
+      "clv_n": 356,
+      "beat": 0.368,
+      "lost_clv": 0.413
+     }
+    ],
+    "by_kind": [
+     {
+      "group": "Assists",
+      "bets": 2,
+      "won": 1,
+      "lost": 1,
+      "hit": 0.5,
+      "units": -0.37,
+      "roi": -0.183,
+      "exp_hit": 0.618,
+      "clv_n": 2,
+      "beat": 1.0,
+      "lost_clv": 0.0
+     },
+     {
+      "group": "Points",
+      "bets": 12,
+      "won": 4,
+      "lost": 8,
+      "hit": 0.333,
+      "units": -4.44,
+      "roi": -0.37,
+      "exp_hit": 0.581,
+      "clv_n": 12,
+      "beat": 0.583,
+      "lost_clv": 0.417
+     },
+     {
+      "group": "Pts+Reb+Ast",
+      "bets": 10,
+      "won": 4,
+      "lost": 6,
+      "hit": 0.4,
+      "units": -2.62,
+      "roi": -0.262,
+      "exp_hit": 0.586,
+      "clv_n": 10,
+      "beat": 0.5,
+      "lost_clv": 0.3
+     },
+     {
+      "group": "Rebounds",
+      "bets": 5,
+      "won": 4,
+      "lost": 1,
+      "hit": 0.8,
+      "units": 2.55,
+      "roi": 0.511,
+      "exp_hit": 0.585,
+      "clv_n": 5,
+      "beat": 0.8,
+      "lost_clv": 0.2
+     },
+     {
+      "group": "Threes",
+      "bets": 1,
+      "won": 1,
+      "lost": 0,
+      "hit": 1.0,
+      "units": 0.77,
+      "roi": 0.769,
+      "exp_hit": 0.605,
+      "clv_n": 1,
+      "beat": 1.0,
+      "lost_clv": 0.0
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game.",
+      "n": 4,
+      "won": 4,
+      "lost": 0,
+      "said": 0.703,
+      "hit": 1.0,
+      "units": 1.49,
+      "roi": 0.3713,
+      "buckets": [
+       {
+        "label": "60\u201370%",
+        "n": 3,
+        "won": 3,
+        "lost": 0,
+        "said": 0.6732,
+        "hit": 1.0,
+        "units": 1.26
+       },
+       {
+        "label": "70\u201380%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.7923,
+        "hit": 1.0,
+        "units": 0.23
+       }
+      ]
+     },
+     {
+      "name": "Spreads",
+      "note": "The side the board favored on each DraftKings spread.",
+      "n": 4,
+      "won": 2,
+      "lost": 2,
+      "said": 0.5092,
+      "hit": 0.5,
+      "units": -0.24,
+      "roi": -0.0612,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 4,
+        "won": 2,
+        "lost": 2,
+        "said": 0.5092,
+        "hit": 0.5,
+        "units": -0.24
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever the board favored.",
+      "n": 4,
+      "won": 0,
+      "lost": 4,
+      "said": 0.5258,
+      "hit": 0.0,
+      "units": -4.0,
+      "roi": -1.0,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 4,
+        "won": 0,
+        "lost": 4,
+        "said": 0.5258,
+        "hit": 0.0,
+        "units": -4.0
+       }
+      ]
+     },
+     {
+      "name": "Points",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 51,
+      "won": 26,
+      "lost": 25,
+      "said": 0.5395,
+      "hit": 0.5098,
+      "units": -1.91,
+      "roi": -0.0375,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 49,
+        "won": 25,
+        "lost": 24,
+        "said": 0.5367,
+        "hit": 0.5102,
+        "units": -1.82
+       },
+       {
+        "label": "60\u201370%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.606,
+        "hit": 0.5,
+        "units": -0.09
+       }
+      ]
+     },
+     {
+      "name": "Rebounds",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 47,
+      "won": 25,
+      "lost": 22,
+      "said": 0.5401,
+      "hit": 0.5319,
+      "units": -2.52,
+      "roi": -0.0536,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 45,
+        "won": 24,
+        "lost": 21,
+        "said": 0.5371,
+        "hit": 0.5333,
+        "units": -2.1
+       },
+       {
+        "label": "60\u201370%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.6069,
+        "hit": 0.5,
+        "units": -0.42
+       }
+      ]
+     },
+     {
+      "name": "Assists",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 39,
+      "won": 22,
+      "lost": 17,
+      "said": 0.5597,
+      "hit": 0.5641,
+      "units": -1.84,
+      "roi": -0.0473,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 30,
+        "won": 16,
+        "lost": 14,
+        "said": 0.5428,
+        "hit": 0.5333,
+        "units": -2.49
+       },
+       {
+        "label": "60\u201370%",
+        "n": 9,
+        "won": 6,
+        "lost": 3,
+        "said": 0.6157,
+        "hit": 0.6667,
+        "units": 0.65
+       }
+      ]
+     },
+     {
+      "name": "Threes",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 40,
+      "won": 25,
+      "lost": 15,
+      "said": 0.5705,
+      "hit": 0.625,
+      "units": 2.08,
+      "roi": 0.0521,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 33,
+        "won": 21,
+        "lost": 12,
+        "said": 0.5572,
+        "hit": 0.6364,
+        "units": 2.77
+       },
+       {
+        "label": "60\u201370%",
+        "n": 6,
+        "won": 4,
+        "lost": 2,
+        "said": 0.6212,
+        "hit": 0.6667,
+        "units": 0.32
+       },
+       {
+        "label": "70\u201380%",
+        "n": 1,
+        "won": 0,
+        "lost": 1,
+        "said": 0.7056,
+        "hit": 0.0,
+        "units": -1.0
+       }
+      ]
+     },
+     {
+      "name": "Pts+Reb+Ast",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 41,
+      "won": 19,
+      "lost": 22,
+      "said": 0.5435,
+      "hit": 0.4634,
+      "units": -5.17,
+      "roi": -0.126,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 40,
+        "won": 19,
+        "lost": 21,
+        "said": 0.5417,
+        "hit": 0.475,
+        "units": -4.17
+       },
+       {
+        "label": "60\u201370%",
+        "n": 1,
+        "won": 0,
+        "lost": 1,
+        "said": 0.6144,
+        "hit": 0.0,
+        "units": -1.0
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-12"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.3714048,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 6,
+       "won": 3,
+       "lost": 3,
+       "hit": 0.5,
+       "exp_hit": 0.5910166666666666,
+       "units": -0.19,
+       "roi": -0.03134199134199137
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.3518402766666667,
+       "units": -2.54,
+       "roi": -0.4240412979351032
+      },
+      {
+       "group": "Best value: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.20498197144600003,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.11463027215214394,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.0692910705139171,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.0377769449133688,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 11-leg (all suggestions)",
+       "bets": 4,
+       "won": 0,
+       "lost": 4,
+       "hit": 0.0,
+       "exp_hit": 0.002281471806536234,
+       "units": -4.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.279143940096,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: straight (all suggestions)",
+       "bets": 6,
+       "won": 2,
+       "lost": 4,
+       "hit": 0.3333333333333333,
+       "exp_hit": 0.63085,
+       "units": -2.6,
+       "roi": -0.43297630639402795
+      },
+      {
+       "group": "Most likely to hit: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.37663062,
+       "units": -2.5,
+       "roi": -0.4166666666666666
+      },
+      {
+       "group": "Most likely to hit: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.2216771076781667,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.12682650280210336,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.07482840438244094,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.04263024573738509,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 11-leg (all suggestions)",
+       "bets": 3,
+       "won": 0,
+       "lost": 3,
+       "hit": 0.0,
+       "exp_hit": 0.0031541462312144578,
+       "units": -3.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   },
+   "d:2026-11-11": {
+    "days": [
+     "2026-11-11"
+    ],
+    "groups": [
+     {
+      "group": "Value legs",
+      "bets": 55,
+      "won": 24,
+      "lost": 31,
+      "hit": 0.436,
+      "units": -10.08,
+      "roi": -0.183,
+      "exp_hit": 0.584,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Suggested-parlay legs",
+      "bets": 4,
+      "won": 2,
+      "lost": 2,
+      "hit": 0.5,
+      "units": -0.07,
+      "roi": -0.019,
+      "exp_hit": 0.599,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "All +edge legs",
+      "bets": 202,
+      "won": 98,
+      "lost": 104,
+      "hit": 0.485,
+      "units": -10.98,
+      "roi": -0.054,
+      "exp_hit": 0.543,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Negative-edge legs (control)",
+      "bets": 624,
+      "won": 316,
+      "lost": 308,
+      "hit": 0.506,
+      "units": -35.59,
+      "roi": -0.057,
+      "exp_hit": 0.485,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "by_kind": [
+     {
+      "group": "Assists",
+      "bets": 6,
+      "won": 3,
+      "lost": 3,
+      "hit": 0.5,
+      "units": -0.08,
+      "roi": -0.014,
+      "exp_hit": 0.586,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Points",
+      "bets": 21,
+      "won": 9,
+      "lost": 12,
+      "hit": 0.429,
+      "units": -4.25,
+      "roi": -0.202,
+      "exp_hit": 0.582,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Pts+Reb+Ast",
+      "bets": 18,
+      "won": 6,
+      "lost": 12,
+      "hit": 0.333,
+      "units": -6.72,
+      "roi": -0.373,
+      "exp_hit": 0.584,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Rebounds",
+      "bets": 6,
+      "won": 4,
+      "lost": 2,
+      "hit": 0.667,
+      "units": 1.45,
+      "roi": 0.242,
+      "exp_hit": 0.579,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Threes",
+      "bets": 3,
+      "won": 2,
+      "lost": 1,
+      "hit": 0.667,
+      "units": 0.52,
+      "roi": 0.173,
+      "exp_hit": 0.607,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Total",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "units": -1.0,
+      "roi": -1.0,
+      "exp_hit": 0.567,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game.",
+      "n": 7,
+      "won": 6,
+      "lost": 1,
+      "said": 0.6718,
+      "hit": 0.8571,
+      "units": 1.43,
+      "roi": 0.2046,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 4,
+        "won": 3,
+        "lost": 1,
+        "said": 0.5728,
+        "hit": 0.75,
+        "units": 0.86
+       },
+       {
+        "label": "60\u201370%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.6625,
+        "hit": 1.0,
+        "units": 0.38
+       },
+       {
+        "label": "80\u201390%",
+        "n": 2,
+        "won": 2,
+        "lost": 0,
+        "said": 0.8745,
+        "hit": 1.0,
+        "units": 0.19
+       }
+      ]
+     },
+     {
+      "name": "Spreads",
+      "note": "The side the board favored on each DraftKings spread.",
+      "n": 7,
+      "won": 3,
+      "lost": 4,
+      "said": 0.5214,
+      "hit": 0.4286,
+      "units": -1.36,
+      "roi": -0.1941,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 7,
+        "won": 3,
+        "lost": 4,
+        "said": 0.5214,
+        "hit": 0.4286,
+        "units": -1.36
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever the board favored.",
+      "n": 7,
+      "won": 1,
+      "lost": 6,
+      "said": 0.5259,
+      "hit": 0.1429,
+      "units": -5.1,
+      "roi": -0.7284,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 7,
+        "won": 1,
+        "lost": 6,
+        "said": 0.5259,
+        "hit": 0.1429,
+        "units": -5.1
+       }
+      ]
+     },
+     {
+      "name": "Points",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 92,
+      "won": 43,
+      "lost": 49,
+      "said": 0.5404,
+      "hit": 0.4674,
+      "units": -12.04,
+      "roi": -0.1309,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 87,
+        "won": 39,
+        "lost": 48,
+        "said": 0.5365,
+        "hit": 0.4483,
+        "units": -14.19
+       },
+       {
+        "label": "60\u201370%",
+        "n": 5,
+        "won": 4,
+        "lost": 1,
+        "said": 0.6096,
+        "hit": 0.8,
+        "units": 2.15
+       }
+      ]
+     },
+     {
+      "name": "Rebounds",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 85,
+      "won": 44,
+      "lost": 41,
+      "said": 0.5498,
+      "hit": 0.5176,
+      "units": -7.06,
+      "roi": -0.083,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 81,
+        "won": 41,
+        "lost": 40,
+        "said": 0.5465,
+        "hit": 0.5062,
+        "units": -8.0
+       },
+       {
+        "label": "60\u201370%",
+        "n": 4,
+        "won": 3,
+        "lost": 1,
+        "said": 0.6175,
+        "hit": 0.75,
+        "units": 0.94
+       }
+      ]
+     },
+     {
+      "name": "Assists",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 63,
+      "won": 33,
+      "lost": 30,
+      "said": 0.5587,
+      "hit": 0.5238,
+      "units": -4.7,
+      "roi": -0.0746,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 51,
+        "won": 27,
+        "lost": 24,
+        "said": 0.5453,
+        "hit": 0.5294,
+        "units": -2.47
+       },
+       {
+        "label": "60\u201370%",
+        "n": 12,
+        "won": 6,
+        "lost": 6,
+        "said": 0.6157,
+        "hit": 0.5,
+        "units": -2.23
+       }
+      ]
+     },
+     {
+      "name": "Threes",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 74,
+      "won": 43,
+      "lost": 31,
+      "said": 0.566,
+      "hit": 0.5811,
+      "units": -0.75,
+      "roi": -0.0102,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 57,
+        "won": 35,
+        "lost": 22,
+        "said": 0.5457,
+        "hit": 0.614,
+        "units": 3.74
+       },
+       {
+        "label": "60\u201370%",
+        "n": 17,
+        "won": 8,
+        "lost": 9,
+        "said": 0.6341,
+        "hit": 0.4706,
+        "units": -4.49
+       }
+      ]
+     },
+     {
+      "name": "Pts+Reb+Ast",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 75,
+      "won": 43,
+      "lost": 32,
+      "said": 0.5481,
+      "hit": 0.5733,
+      "units": 5.13,
+      "roi": 0.0684,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 70,
+        "won": 42,
+        "lost": 28,
+        "said": 0.5434,
+        "hit": 0.6,
+        "units": 8.31
+       },
+       {
+        "label": "60\u201370%",
+        "n": 5,
+        "won": 1,
+        "lost": 4,
+        "said": 0.614,
+        "hit": 0.2,
+        "units": -3.18
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-11"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.35116968,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.60295,
+       "units": -3.93,
+       "roi": -0.6549999999999999
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.36326325499999995,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.21486918168,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.12455449569920314,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.07191583439505604,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.04061879041372501,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 11-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.0025215761717871195,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.17843059570284,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: straight (all suggestions)",
+       "bets": 6,
+       "won": 3,
+       "lost": 3,
+       "hit": 0.5,
+       "exp_hit": 0.6436333333333333,
+       "units": -1.17,
+       "roi": -0.19466030323024594
+      },
+      {
+       "group": "Most likely to hit: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 2,
+       "lost": 4,
+       "hit": 0.3333333333333333,
+       "exp_hit": 0.3965424733333333,
+       "units": -0.07,
+       "roi": -0.011208764671100177
+      },
+      {
+       "group": "Most likely to hit: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.23912229068699997,
+       "units": -1.84,
+       "roi": -0.3065086657008302
+      },
+      {
+       "group": "Most likely to hit: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.1434195952144364,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.0848904791198229,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.049239447663481185,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 11-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.0032609517988773044,
+       "units": -6.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   },
+   "w:2026-11-16": {
+    "days": [
+     "2026-11-16",
+     "2026-11-17"
+    ],
+    "groups": [
+     {
+      "group": "Value legs",
+      "bets": 31,
+      "won": 14,
+      "lost": 17,
+      "hit": 0.452,
+      "units": -4.17,
+      "roi": -0.135,
+      "exp_hit": 0.575,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Suggested-parlay legs",
+      "bets": 4,
+      "won": 3,
+      "lost": 1,
+      "hit": 0.75,
+      "units": 2.09,
+      "roi": 0.522,
+      "exp_hit": 0.573,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "All +edge legs",
+      "bets": 208,
+      "won": 96,
+      "lost": 112,
+      "hit": 0.462,
+      "units": -20.35,
+      "roi": -0.098,
+      "exp_hit": 0.54,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Negative-edge legs (control)",
+      "bets": 2643,
+      "won": 1641,
+      "lost": 1002,
+      "hit": 0.621,
+      "units": -115.06,
+      "roi": -0.044,
+      "exp_hit": 0.598,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "by_kind": [
+     {
+      "group": "Assists",
+      "bets": 7,
+      "won": 6,
+      "lost": 1,
+      "hit": 0.857,
+      "units": 4.66,
+      "roi": 0.666,
+      "exp_hit": 0.573,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Points",
+      "bets": 6,
+      "won": 3,
+      "lost": 3,
+      "hit": 0.5,
+      "units": -0.3,
+      "roi": -0.05,
+      "exp_hit": 0.571,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Pts+Reb+Ast",
+      "bets": 11,
+      "won": 3,
+      "lost": 8,
+      "hit": 0.273,
+      "units": -5.39,
+      "roi": -0.49,
+      "exp_hit": 0.572,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Rebounds",
+      "bets": 4,
+      "won": 1,
+      "lost": 3,
+      "hit": 0.25,
+      "units": -2.04,
+      "roi": -0.51,
+      "exp_hit": 0.579,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     },
+     {
+      "group": "Threes",
+      "bets": 3,
+      "won": 1,
+      "lost": 2,
+      "hit": 0.333,
+      "units": -1.11,
+      "roi": -0.369,
+      "exp_hit": 0.597,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game.",
+      "n": 13,
+      "won": 7,
+      "lost": 6,
+      "said": 0.6616,
+      "hit": 0.5385,
+      "units": -2.31,
+      "roi": -0.1775,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 3,
+        "won": 2,
+        "lost": 1,
+        "said": 0.5608,
+        "hit": 0.6667,
+        "units": 0.43
+       },
+       {
+        "label": "60\u201370%",
+        "n": 5,
+        "won": 3,
+        "lost": 2,
+        "said": 0.6312,
+        "hit": 0.6,
+        "units": -0.36
+       },
+       {
+        "label": "70\u201380%",
+        "n": 5,
+        "won": 2,
+        "lost": 3,
+        "said": 0.7525,
+        "hit": 0.4,
+        "units": -2.38
+       }
+      ]
+     },
+     {
+      "name": "Spreads",
+      "note": "The side the board favored on each DraftKings spread.",
+      "n": 13,
+      "won": 5,
+      "lost": 8,
+      "said": 0.5176,
+      "hit": 0.3846,
+      "units": -3.47,
+      "roi": -0.2668,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 13,
+        "won": 5,
+        "lost": 8,
+        "said": 0.5176,
+        "hit": 0.3846,
+        "units": -3.47
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever the board favored.",
+      "n": 13,
+      "won": 6,
+      "lost": 7,
+      "said": 0.5142,
+      "hit": 0.4615,
+      "units": -1.62,
+      "roi": -0.1243,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 13,
+        "won": 6,
+        "lost": 7,
+        "said": 0.5142,
+        "hit": 0.4615,
+        "units": -1.62
+       }
+      ]
+     },
+     {
+      "name": "Points",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 164,
+      "won": 88,
+      "lost": 76,
+      "said": 0.5271,
+      "hit": 0.5366,
+      "units": -1.13,
+      "roi": -0.0069,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 164,
+        "won": 88,
+        "lost": 76,
+        "said": 0.5271,
+        "hit": 0.5366,
+        "units": -1.13
+       }
+      ]
+     },
+     {
+      "name": "Rebounds",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 153,
+      "won": 71,
+      "lost": 82,
+      "said": 0.5446,
+      "hit": 0.4641,
+      "units": -27.92,
+      "roi": -0.1825,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 147,
+        "won": 70,
+        "lost": 77,
+        "said": 0.5419,
+        "hit": 0.4762,
+        "units": -23.48
+       },
+       {
+        "label": "60\u201370%",
+        "n": 6,
+        "won": 1,
+        "lost": 5,
+        "said": 0.6097,
+        "hit": 0.1667,
+        "units": -4.44
+       }
+      ]
+     },
+     {
+      "name": "Assists",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 117,
+      "won": 70,
+      "lost": 47,
+      "said": 0.5522,
+      "hit": 0.5983,
+      "units": 4.88,
+      "roi": 0.0417,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 106,
+        "won": 65,
+        "lost": 41,
+        "said": 0.5456,
+        "hit": 0.6132,
+        "units": 7.98
+       },
+       {
+        "label": "60\u201370%",
+        "n": 11,
+        "won": 5,
+        "lost": 6,
+        "said": 0.6158,
+        "hit": 0.4545,
+        "units": -3.1
+       }
+      ]
+     },
+     {
+      "name": "Threes",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 133,
+      "won": 70,
+      "lost": 63,
+      "said": 0.5697,
+      "hit": 0.5263,
+      "units": -17.34,
+      "roi": -0.1303,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 104,
+        "won": 51,
+        "lost": 53,
+        "said": 0.5546,
+        "hit": 0.4904,
+        "units": -17.38
+       },
+       {
+        "label": "60\u201370%",
+        "n": 28,
+        "won": 19,
+        "lost": 9,
+        "said": 0.621,
+        "hit": 0.6786,
+        "units": 1.04
+       },
+       {
+        "label": "70\u201380%",
+        "n": 1,
+        "won": 0,
+        "lost": 1,
+        "said": 0.7092,
+        "hit": 0.0,
+        "units": -1.0
+       }
+      ]
+     },
+     {
+      "name": "Pts+Reb+Ast",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 131,
+      "won": 60,
+      "lost": 71,
+      "said": 0.5281,
+      "hit": 0.458,
+      "units": -19.89,
+      "roi": -0.1519,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 131,
+        "won": 60,
+        "lost": 71,
+        "said": 0.5281,
+        "hit": 0.458,
+        "units": -19.89
+       }
+      ]
+     },
+     {
+      "name": "Alt lines",
+      "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
+      "n": 1398,
+      "won": 1014,
+      "lost": 384,
+      "said": 0.6921,
+      "hit": 0.7253,
+      "units": -49.58,
+      "roi": -0.0355,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 402,
+        "won": 224,
+        "lost": 178,
+        "said": 0.5489,
+        "hit": 0.5572,
+        "units": -24.99
+       },
+       {
+        "label": "60\u201370%",
+        "n": 313,
+        "won": 224,
+        "lost": 89,
+        "said": 0.6489,
+        "hit": 0.7157,
+        "units": 4.9
+       },
+       {
+        "label": "70\u201380%",
+        "n": 350,
+        "won": 278,
+        "lost": 72,
+        "said": 0.7484,
+        "hit": 0.7943,
+        "units": -10.76
+       },
+       {
+        "label": "80\u201390%",
+        "n": 323,
+        "won": 279,
+        "lost": 44,
+        "said": 0.8446,
+        "hit": 0.8638,
+        "units": -18.01
+       },
+       {
+        "label": "90\u2013100%",
+        "n": 10,
+        "won": 9,
+        "lost": 1,
+        "said": 0.9057,
+        "hit": 0.9,
+        "units": -0.72
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-16",
+      "2026-11-17"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 1,
+       "won": 1,
+       "lost": 0,
+       "hit": 1.0,
+       "exp_hit": 0.18318537923,
+       "units": 7.24,
+       "roi": 7.243365384615384
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 6,
+       "won": 4,
+       "lost": 2,
+       "hit": 0.6666666666666666,
+       "exp_hit": 0.5879833333333333,
+       "units": 2.05,
+       "roi": 0.3419395785732419
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 6,
+       "won": 2,
+       "lost": 4,
+       "hit": 0.3333333333333333,
+       "exp_hit": 0.3318841666666667,
+       "units": 1.91,
+       "roi": 0.3177642077394553
+      },
+      {
+       "group": "Best value: 3-leg (all suggestions)",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.19313556273733334,
+       "units": 2.24,
+       "roi": 0.3738942307692306
+      },
+      {
+       "group": "Best value: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.10936458768701228,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.062661847796977,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.03443994074166475,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 11-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.002013350883004967,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: \u2605 suggestion",
+       "bets": 2,
+       "won": 0,
+       "lost": 2,
+       "hit": 0.0,
+       "exp_hit": 0.53197699,
+       "units": -2.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: straight (all suggestions)",
+       "bets": 12,
+       "won": 6,
+       "lost": 6,
+       "hit": 0.5,
+       "exp_hit": 0.61795,
+       "units": -2.49,
+       "roi": -0.20731241804450687
+      },
+      {
+       "group": "Most likely to hit: 2-leg (all suggestions)",
+       "bets": 12,
+       "won": 3,
+       "lost": 9,
+       "hit": 0.25,
+       "exp_hit": 0.3634791625,
+       "units": -4.18,
+       "roi": -0.348321217201391
+      },
+      {
+       "group": "Most likely to hit: 3-leg (all suggestions)",
+       "bets": 12,
+       "won": 1,
+       "lost": 11,
+       "hit": 0.08333333333333333,
+       "exp_hit": 0.2839386369405,
+       "units": -7.39,
+       "roi": -0.6160532870157961
+      },
+      {
+       "group": "Most likely to hit: 4-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.22273959004614863,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 5-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.1373939569300861,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 6-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.08413838944899284,
+       "units": -6.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 11-leg (all suggestions)",
+       "bets": 6,
+       "won": 0,
+       "lost": 6,
+       "hit": 0.0,
+       "exp_hit": 0.007857204731798044,
+       "units": -6.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   },
+   "w:2026-11-09": {
+    "days": [
+     "2026-11-11",
+     "2026-11-12",
+     "2026-11-13",
+     "2026-11-14",
+     "2026-11-15"
+    ],
+    "groups": [
+     {
+      "group": "Value legs",
+      "bets": 200,
+      "won": 91,
+      "lost": 109,
+      "hit": 0.455,
+      "units": -30.89,
+      "roi": -0.154,
+      "exp_hit": 0.589,
+      "clv_n": 77,
+      "beat": 0.545,
+      "lost_clv": 0.273
+     },
+     {
+      "group": "Suggested-parlay legs",
+      "bets": 20,
+      "won": 10,
+      "lost": 10,
+      "hit": 0.5,
+      "units": -1.19,
+      "roi": -0.059,
+      "exp_hit": 0.602,
+      "clv_n": 8,
+      "beat": 0.5,
+      "lost_clv": 0.125
+     },
+     {
+      "group": "All +edge legs",
+      "bets": 881,
+      "won": 404,
+      "lost": 477,
+      "hit": 0.459,
+      "units": -103.95,
+      "roi": -0.118,
+      "exp_hit": 0.546,
+      "clv_n": 344,
+      "beat": 0.462,
+      "lost_clv": 0.308
+     },
+     {
+      "group": "Negative-edge legs (control)",
+      "bets": 3858,
+      "won": 2216,
+      "lost": 1642,
+      "hit": 0.574,
+      "units": -171.89,
+      "roi": -0.045,
+      "exp_hit": 0.545,
+      "clv_n": 1137,
+      "beat": 0.339,
+      "lost_clv": 0.388
+     }
+    ],
+    "by_kind": [
+     {
+      "group": "Assists",
+      "bets": 21,
+      "won": 13,
+      "lost": 8,
+      "hit": 0.619,
+      "units": 2.77,
+      "roi": 0.132,
+      "exp_hit": 0.597,
+      "clv_n": 8,
+      "beat": 0.5,
+      "lost_clv": 0.375
+     },
+     {
+      "group": "Points",
+      "bets": 65,
+      "won": 25,
+      "lost": 40,
+      "hit": 0.385,
+      "units": -18.04,
+      "roi": -0.278,
+      "exp_hit": 0.582,
+      "clv_n": 26,
+      "beat": 0.654,
+      "lost_clv": 0.269
+     },
+     {
+      "group": "Pts+Reb+Ast",
+      "bets": 59,
+      "won": 26,
+      "lost": 33,
+      "hit": 0.441,
+      "units": -10.04,
+      "roi": -0.17,
+      "exp_hit": 0.582,
+      "clv_n": 23,
+      "beat": 0.478,
+      "lost_clv": 0.348
+     },
+     {
+      "group": "Rebounds",
+      "bets": 35,
+      "won": 21,
+      "lost": 14,
+      "hit": 0.6,
+      "units": 3.78,
+      "roi": 0.108,
+      "exp_hit": 0.597,
+      "clv_n": 16,
+      "beat": 0.562,
+      "lost_clv": 0.188
+     },
+     {
+      "group": "Spread",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "units": -1.0,
+      "roi": -1.0,
+      "exp_hit": 0.578,
+      "clv_n": 1,
+      "beat": 0.0,
+      "lost_clv": 0.0
+     },
+     {
+      "group": "Threes",
+      "bets": 17,
+      "won": 6,
+      "lost": 11,
+      "hit": 0.353,
+      "units": -6.36,
+      "roi": -0.374,
+      "exp_hit": 0.613,
+      "clv_n": 3,
+      "beat": 0.333,
+      "lost_clv": 0.0
+     },
+     {
+      "group": "Total",
+      "bets": 2,
+      "won": 0,
+      "lost": 2,
+      "hit": 0.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "exp_hit": 0.584,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game.",
+      "n": 33,
+      "won": 26,
+      "lost": 7,
+      "said": 0.7024,
+      "hit": 0.7879,
+      "units": 3.0,
+      "roi": 0.0909,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 8,
+        "won": 7,
+        "lost": 1,
+        "said": 0.5621,
+        "hit": 0.875,
+        "units": 3.98
+       },
+       {
+        "label": "60\u201370%",
+        "n": 9,
+        "won": 6,
+        "lost": 3,
+        "said": 0.6548,
+        "hit": 0.6667,
+        "units": -0.28
+       },
+       {
+        "label": "70\u201380%",
+        "n": 9,
+        "won": 7,
+        "lost": 2,
+        "said": 0.7482,
+        "hit": 0.7778,
+        "units": -0.33
+       },
+       {
+        "label": "80\u201390%",
+        "n": 7,
+        "won": 6,
+        "lost": 1,
+        "said": 0.8649,
+        "hit": 0.8571,
+        "units": -0.37
+       }
+      ]
+     },
+     {
+      "name": "Spreads",
+      "note": "The side the board favored on each DraftKings spread.",
+      "n": 33,
+      "won": 18,
+      "lost": 15,
+      "said": 0.5242,
+      "hit": 0.5455,
+      "units": 1.01,
+      "roi": 0.0305,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 33,
+        "won": 18,
+        "lost": 15,
+        "said": 0.5242,
+        "hit": 0.5455,
+        "units": 1.01
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever the board favored.",
+      "n": 33,
+      "won": 15,
+      "lost": 18,
+      "said": 0.5238,
+      "hit": 0.4545,
+      "units": -4.54,
+      "roi": -0.1377,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 33,
+        "won": 15,
+        "lost": 18,
+        "said": 0.5238,
+        "hit": 0.4545,
+        "units": -4.54
+       }
+      ]
+     },
+     {
+      "name": "Points",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 390,
+      "won": 195,
+      "lost": 195,
+      "said": 0.5382,
+      "hit": 0.5,
+      "units": -25.46,
+      "roi": -0.0653,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 378,
+        "won": 189,
+        "lost": 189,
+        "said": 0.5358,
+        "hit": 0.5,
+        "units": -24.31
+       },
+       {
+        "label": "60\u201370%",
+        "n": 12,
+        "won": 6,
+        "lost": 6,
+        "said": 0.6127,
+        "hit": 0.5,
+        "units": -1.15
+       }
+      ]
+     },
+     {
+      "name": "Rebounds",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 364,
+      "won": 194,
+      "lost": 170,
+      "said": 0.5484,
+      "hit": 0.533,
+      "units": -19.76,
+      "roi": -0.0543,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 339,
+        "won": 180,
+        "lost": 159,
+        "said": 0.543,
+        "hit": 0.531,
+        "units": -17.99
+       },
+       {
+        "label": "60\u201370%",
+        "n": 25,
+        "won": 14,
+        "lost": 11,
+        "said": 0.6217,
+        "hit": 0.56,
+        "units": -1.77
+       }
+      ]
+     },
+     {
+      "name": "Assists",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 289,
+      "won": 151,
+      "lost": 138,
+      "said": 0.5554,
+      "hit": 0.5225,
+      "units": -26.96,
+      "roi": -0.0933,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 242,
+        "won": 124,
+        "lost": 118,
+        "said": 0.5428,
+        "hit": 0.5124,
+        "units": -23.26
+       },
+       {
+        "label": "60\u201370%",
+        "n": 47,
+        "won": 27,
+        "lost": 20,
+        "said": 0.6203,
+        "hit": 0.5745,
+        "units": -3.69
+       }
+      ]
+     },
+     {
+      "name": "Threes",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 315,
+      "won": 165,
+      "lost": 150,
+      "said": 0.5704,
+      "hit": 0.5238,
+      "units": -36.46,
+      "roi": -0.1157,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 242,
+        "won": 131,
+        "lost": 111,
+        "said": 0.5509,
+        "hit": 0.5413,
+        "units": -15.93
+       },
+       {
+        "label": "60\u201370%",
+        "n": 72,
+        "won": 34,
+        "lost": 38,
+        "said": 0.634,
+        "hit": 0.4722,
+        "units": -19.52
+       },
+       {
+        "label": "70\u201380%",
+        "n": 1,
+        "won": 0,
+        "lost": 1,
+        "said": 0.7056,
+        "hit": 0.0,
+        "units": -1.0
+       }
+      ]
+     },
+     {
+      "name": "Pts+Reb+Ast",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 307,
+      "won": 160,
+      "lost": 147,
+      "said": 0.5415,
+      "hit": 0.5212,
+      "units": -7.56,
+      "roi": -0.0246,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 295,
+        "won": 156,
+        "lost": 139,
+        "said": 0.5384,
+        "hit": 0.5288,
+        "units": -3.01
+       },
+       {
+        "label": "60\u201370%",
+        "n": 12,
+        "won": 4,
+        "lost": 8,
+        "said": 0.6158,
+        "hit": 0.3333,
+        "units": -4.54
+       }
+      ]
+     },
+     {
+      "name": "Alt lines",
+      "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
+      "n": 1115,
+      "won": 809,
+      "lost": 306,
+      "said": 0.6868,
+      "hit": 0.7256,
+      "units": -55.61,
+      "roi": -0.0499,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 317,
+        "won": 186,
+        "lost": 131,
+        "said": 0.5472,
+        "hit": 0.5868,
+        "units": -11.73
+       },
+       {
+        "label": "60\u201370%",
+        "n": 278,
+        "won": 184,
+        "lost": 94,
+        "said": 0.6521,
+        "hit": 0.6619,
+        "units": -24.95
+       },
+       {
+        "label": "70\u201380%",
+        "n": 293,
+        "won": 236,
+        "lost": 57,
+        "said": 0.751,
+        "hit": 0.8055,
+        "units": -11.23
+       },
+       {
+        "label": "80\u201390%",
+        "n": 226,
+        "won": 202,
+        "lost": 24,
+        "said": 0.8408,
+        "hit": 0.8938,
+        "units": -7.72
+       },
+       {
+        "label": "90\u2013100%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.9054,
+        "hit": 1.0,
+        "units": 0.02
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-13",
+      "2026-11-14",
+      "2026-11-15"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 5,
+       "won": 0,
+       "lost": 5,
+       "hit": 0.0,
+       "exp_hit": 0.357212716,
+       "units": -5.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 30,
+       "won": 11,
+       "lost": 19,
+       "hit": 0.36666666666666664,
+       "exp_hit": 0.6051566666666666,
+       "units": -8.86,
+       "roi": -0.2953261149840586
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 30,
+       "won": 4,
+       "lost": 26,
+       "hit": 0.13333333333333333,
+       "exp_hit": 0.3656710756666667,
+       "units": -16.28,
+       "roi": -0.5426669118358537
+      },
+      {
+       "group": "Best value: 3-leg (all suggestions)",
+       "bets": 30,
+       "won": 0,
+       "lost": 30,
+       "hit": 0.0,
+       "exp_hit": 0.2143413831358,
+       "units": -30.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 4-leg (all suggestions)",
+       "bets": 27,
+       "won": 0,
+       "lost": 27,
+       "hit": 0.0,
+       "exp_hit": 0.12528415804788984,
+       "units": -27.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 5-leg (all suggestions)",
+       "bets": 25,
+       "won": 0,
+       "lost": 25,
+       "hit": 0.0,
+       "exp_hit": 0.07370894637716822,
+       "units": -25.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 6-leg (all suggestions)",
+       "bets": 27,
+       "won": 0,
+       "lost": 27,
+       "hit": 0.0,
+       "exp_hit": 0.04162279395875969,
+       "units": -27.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 11-leg (all suggestions)",
+       "bets": 23,
+       "won": 0,
+       "lost": 23,
+       "hit": 0.0,
+       "exp_hit": 0.0026563754014834566,
+       "units": -23.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: \u2605 suggestion",
+       "bets": 5,
+       "won": 0,
+       "lost": 5,
+       "hit": 0.0,
+       "exp_hit": 0.3039638431111408,
+       "units": -5.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: straight (all suggestions)",
+       "bets": 30,
+       "won": 11,
+       "lost": 19,
+       "hit": 0.36666666666666664,
+       "exp_hit": 0.6506533333333333,
+       "units": -11.68,
+       "roi": -0.38949224338201677
+      },
+      {
+       "group": "Most likely to hit: 2-leg (all suggestions)",
+       "bets": 30,
+       "won": 4,
+       "lost": 26,
+       "hit": 0.13333333333333333,
+       "exp_hit": 0.40476524166666666,
+       "units": -17.11,
+       "roi": -0.5704195503689834
+      },
+      {
+       "group": "Most likely to hit: 3-leg (all suggestions)",
+       "bets": 30,
+       "won": 2,
+       "lost": 28,
+       "hit": 0.06666666666666667,
+       "exp_hit": 0.24773711251623334,
+       "units": -19.21,
+       "roi": -0.6401903374449744
+      },
+      {
+       "group": "Most likely to hit: 4-leg (all suggestions)",
+       "bets": 29,
+       "won": 0,
+       "lost": 29,
+       "hit": 0.0,
+       "exp_hit": 0.14792773064894205,
+       "units": -29.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 5-leg (all suggestions)",
+       "bets": 26,
+       "won": 0,
+       "lost": 26,
+       "hit": 0.0,
+       "exp_hit": 0.09013123559911963,
+       "units": -26.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 6-leg (all suggestions)",
+       "bets": 28,
+       "won": 0,
+       "lost": 28,
+       "hit": 0.0,
+       "exp_hit": 0.05145755042738818,
+       "units": -28.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 11-leg (all suggestions)",
+       "bets": 22,
+       "won": 0,
+       "lost": 22,
+       "hit": 0.0,
+       "exp_hit": 0.004168243834159684,
+       "units": -22.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   },
+   "m:2026-11": {
+    "days": [
+     "2026-11-11",
+     "2026-11-12",
+     "2026-11-13",
+     "2026-11-14",
+     "2026-11-15",
+     "2026-11-16",
+     "2026-11-17"
+    ],
+    "groups": [
+     {
+      "group": "Value legs",
+      "bets": 231,
+      "won": 105,
+      "lost": 126,
+      "hit": 0.455,
+      "units": -35.06,
+      "roi": -0.152,
+      "exp_hit": 0.587,
+      "clv_n": 77,
+      "beat": 0.545,
+      "lost_clv": 0.273
+     },
+     {
+      "group": "Suggested-parlay legs",
+      "bets": 24,
+      "won": 13,
+      "lost": 11,
+      "hit": 0.542,
+      "units": 0.9,
+      "roi": 0.038,
+      "exp_hit": 0.597,
+      "clv_n": 8,
+      "beat": 0.5,
+      "lost_clv": 0.125
+     },
+     {
+      "group": "All +edge legs",
+      "bets": 1089,
+      "won": 500,
+      "lost": 589,
+      "hit": 0.459,
+      "units": -124.29,
+      "roi": -0.114,
+      "exp_hit": 0.544,
+      "clv_n": 344,
+      "beat": 0.462,
+      "lost_clv": 0.308
+     },
+     {
+      "group": "Negative-edge legs (control)",
+      "bets": 6501,
+      "won": 3857,
+      "lost": 2644,
+      "hit": 0.593,
+      "units": -286.95,
+      "roi": -0.044,
+      "exp_hit": 0.566,
+      "clv_n": 1137,
+      "beat": 0.339,
+      "lost_clv": 0.388
+     }
+    ],
+    "by_kind": [
+     {
+      "group": "Assists",
+      "bets": 28,
+      "won": 19,
+      "lost": 9,
+      "hit": 0.679,
+      "units": 7.43,
+      "roi": 0.265,
+      "exp_hit": 0.591,
+      "clv_n": 8,
+      "beat": 0.5,
+      "lost_clv": 0.375
+     },
+     {
+      "group": "Points",
+      "bets": 71,
+      "won": 28,
+      "lost": 43,
+      "hit": 0.394,
+      "units": -18.34,
+      "roi": -0.258,
+      "exp_hit": 0.581,
+      "clv_n": 26,
+      "beat": 0.654,
+      "lost_clv": 0.269
+     },
+     {
+      "group": "Pts+Reb+Ast",
+      "bets": 70,
+      "won": 29,
+      "lost": 41,
+      "hit": 0.414,
+      "units": -15.43,
+      "roi": -0.22,
+      "exp_hit": 0.58,
+      "clv_n": 23,
+      "beat": 0.478,
+      "lost_clv": 0.348
+     },
+     {
+      "group": "Rebounds",
+      "bets": 39,
+      "won": 22,
+      "lost": 17,
+      "hit": 0.564,
+      "units": 1.74,
+      "roi": 0.045,
+      "exp_hit": 0.596,
+      "clv_n": 16,
+      "beat": 0.562,
+      "lost_clv": 0.188
+     },
+     {
+      "group": "Spread",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "units": -1.0,
+      "roi": -1.0,
+      "exp_hit": 0.578,
+      "clv_n": 1,
+      "beat": 0.0,
+      "lost_clv": 0.0
+     },
+     {
+      "group": "Threes",
+      "bets": 20,
+      "won": 7,
+      "lost": 13,
+      "hit": 0.35,
+      "units": -7.46,
+      "roi": -0.373,
+      "exp_hit": 0.61,
+      "clv_n": 3,
+      "beat": 0.333,
+      "lost_clv": 0.0
+     },
+     {
+      "group": "Total",
+      "bets": 2,
+      "won": 0,
+      "lost": 2,
+      "hit": 0.0,
+      "units": -2.0,
+      "roi": -1.0,
+      "exp_hit": 0.584,
+      "clv_n": 0,
+      "beat": null,
+      "lost_clv": null
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game.",
+      "n": 46,
+      "won": 33,
+      "lost": 13,
+      "said": 0.6908,
+      "hit": 0.7174,
+      "units": 0.69,
+      "roi": 0.0151,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 11,
+        "won": 9,
+        "lost": 2,
+        "said": 0.5618,
+        "hit": 0.8182,
+        "units": 4.41
+       },
+       {
+        "label": "60\u201370%",
+        "n": 14,
+        "won": 9,
+        "lost": 5,
+        "said": 0.6464,
+        "hit": 0.6429,
+        "units": -0.64
+       },
+       {
+        "label": "70\u201380%",
+        "n": 14,
+        "won": 9,
+        "lost": 5,
+        "said": 0.7497,
+        "hit": 0.6429,
+        "units": -2.7
+       },
+       {
+        "label": "80\u201390%",
+        "n": 7,
+        "won": 6,
+        "lost": 1,
+        "said": 0.8649,
+        "hit": 0.8571,
+        "units": -0.37
+       }
+      ]
+     },
+     {
+      "name": "Spreads",
+      "note": "The side the board favored on each DraftKings spread.",
+      "n": 46,
+      "won": 23,
+      "lost": 23,
+      "said": 0.5223,
+      "hit": 0.5,
+      "units": -2.46,
+      "roi": -0.0535,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 46,
+        "won": 23,
+        "lost": 23,
+        "said": 0.5223,
+        "hit": 0.5,
+        "units": -2.46
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever the board favored.",
+      "n": 46,
+      "won": 21,
+      "lost": 25,
+      "said": 0.5211,
+      "hit": 0.4565,
+      "units": -6.16,
+      "roi": -0.1339,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 46,
+        "won": 21,
+        "lost": 25,
+        "said": 0.5211,
+        "hit": 0.4565,
+        "units": -6.16
+       }
+      ]
+     },
+     {
+      "name": "Points",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 554,
+      "won": 283,
+      "lost": 271,
+      "said": 0.5349,
+      "hit": 0.5108,
+      "units": -26.59,
+      "roi": -0.048,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 542,
+        "won": 277,
+        "lost": 265,
+        "said": 0.5332,
+        "hit": 0.5111,
+        "units": -25.44
+       },
+       {
+        "label": "60\u201370%",
+        "n": 12,
+        "won": 6,
+        "lost": 6,
+        "said": 0.6127,
+        "hit": 0.5,
+        "units": -1.15
+       }
+      ]
+     },
+     {
+      "name": "Rebounds",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 517,
+      "won": 265,
+      "lost": 252,
+      "said": 0.5473,
+      "hit": 0.5126,
+      "units": -47.68,
+      "roi": -0.0922,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 486,
+        "won": 250,
+        "lost": 236,
+        "said": 0.5427,
+        "hit": 0.5144,
+        "units": -41.47
+       },
+       {
+        "label": "60\u201370%",
+        "n": 31,
+        "won": 15,
+        "lost": 16,
+        "said": 0.6194,
+        "hit": 0.4839,
+        "units": -6.2
+       }
+      ]
+     },
+     {
+      "name": "Assists",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 406,
+      "won": 221,
+      "lost": 185,
+      "said": 0.5545,
+      "hit": 0.5443,
+      "units": -22.08,
+      "roi": -0.0544,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 348,
+        "won": 189,
+        "lost": 159,
+        "said": 0.5437,
+        "hit": 0.5431,
+        "units": -15.29
+       },
+       {
+        "label": "60\u201370%",
+        "n": 58,
+        "won": 32,
+        "lost": 26,
+        "said": 0.6195,
+        "hit": 0.5517,
+        "units": -6.8
+       }
+      ]
+     },
+     {
+      "name": "Threes",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 448,
+      "won": 235,
+      "lost": 213,
+      "said": 0.5702,
+      "hit": 0.5246,
+      "units": -53.79,
+      "roi": -0.1201,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 346,
+        "won": 182,
+        "lost": 164,
+        "said": 0.552,
+        "hit": 0.526,
+        "units": -33.31
+       },
+       {
+        "label": "60\u201370%",
+        "n": 100,
+        "won": 53,
+        "lost": 47,
+        "said": 0.6304,
+        "hit": 0.53,
+        "units": -18.48
+       },
+       {
+        "label": "70\u201380%",
+        "n": 2,
+        "won": 0,
+        "lost": 2,
+        "said": 0.7074,
+        "hit": 0.0,
+        "units": -2.0
+       }
+      ]
+     },
+     {
+      "name": "Pts+Reb+Ast",
+      "note": "Over or Under on the main DraftKings line, whichever the board favored.",
+      "n": 438,
+      "won": 220,
+      "lost": 218,
+      "said": 0.5375,
+      "hit": 0.5023,
+      "units": -27.45,
+      "roi": -0.0627,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 426,
+        "won": 216,
+        "lost": 210,
+        "said": 0.5353,
+        "hit": 0.507,
+        "units": -22.91
+       },
+       {
+        "label": "60\u201370%",
+        "n": 12,
+        "won": 4,
+        "lost": 8,
+        "said": 0.6158,
+        "hit": 0.3333,
+        "units": -4.54
+       }
+      ]
+     },
+     {
+      "name": "Alt lines",
+      "note": "Every alt-line rung offered as a parlay leg (overs only, so chances run the full range).",
+      "n": 2513,
+      "won": 1823,
+      "lost": 690,
+      "said": 0.6897,
+      "hit": 0.7254,
+      "units": -105.19,
+      "roi": -0.0419,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 719,
+        "won": 410,
+        "lost": 309,
+        "said": 0.5482,
+        "hit": 0.5702,
+        "units": -36.72
+       },
+       {
+        "label": "60\u201370%",
+        "n": 591,
+        "won": 408,
+        "lost": 183,
+        "said": 0.6504,
+        "hit": 0.6904,
+        "units": -20.05
+       },
+       {
+        "label": "70\u201380%",
+        "n": 643,
+        "won": 514,
+        "lost": 129,
+        "said": 0.7496,
+        "hit": 0.7994,
+        "units": -22.0
+       },
+       {
+        "label": "80\u201390%",
+        "n": 549,
+        "won": 481,
+        "lost": 68,
+        "said": 0.843,
+        "hit": 0.8761,
+        "units": -25.73
+       },
+       {
+        "label": "90\u2013100%",
+        "n": 11,
+        "won": 10,
+        "lost": 1,
+        "said": 0.9057,
+        "hit": 0.9091,
+        "units": -0.69
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-13",
+      "2026-11-14",
+      "2026-11-15",
+      "2026-11-16",
+      "2026-11-17"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 6,
+       "won": 1,
+       "lost": 5,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.3282081598716667,
+       "units": 2.24,
+       "roi": 0.3738942307692306
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 36,
+       "won": 15,
+       "lost": 21,
+       "hit": 0.4166666666666667,
+       "exp_hit": 0.6022944444444445,
+       "units": -6.81,
+       "roi": -0.18911516605784184
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 36,
+       "won": 6,
+       "lost": 30,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.36003992416666664,
+       "units": -14.37,
+       "roi": -0.39926172523996883
+      },
+      {
+       "group": "Best value: 3-leg (all suggestions)",
+       "bets": 36,
+       "won": 1,
+       "lost": 35,
+       "hit": 0.027777777777777776,
+       "exp_hit": 0.21080707973605556,
+       "units": -27.76,
+       "roi": -0.7710176282051282
+      },
+      {
+       "group": "Best value: 4-leg (all suggestions)",
+       "bets": 33,
+       "won": 0,
+       "lost": 33,
+       "hit": 0.0,
+       "exp_hit": 0.12238969070954847,
+       "units": -33.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 5-leg (all suggestions)",
+       "bets": 31,
+       "won": 0,
+       "lost": 31,
+       "hit": 0.0,
+       "exp_hit": 0.07157079826487316,
+       "units": -31.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 6-leg (all suggestions)",
+       "bets": 33,
+       "won": 0,
+       "lost": 33,
+       "hit": 0.0,
+       "exp_hit": 0.040316820646560614,
+       "units": -33.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 11-leg (all suggestions)",
+       "bets": 29,
+       "won": 0,
+       "lost": 29,
+       "hit": 0.0,
+       "exp_hit": 0.002523335845936183,
+       "units": -29.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: \u2605 suggestion",
+       "bets": 7,
+       "won": 0,
+       "lost": 7,
+       "hit": 0.0,
+       "exp_hit": 0.3691104565079577,
+       "units": -7.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: straight (all suggestions)",
+       "bets": 42,
+       "won": 17,
+       "lost": 25,
+       "hit": 0.40476190476190477,
+       "exp_hit": 0.6413095238095238,
+       "units": -14.17,
+       "roi": -0.3374408647141568
+      },
+      {
+       "group": "Most likely to hit: 2-leg (all suggestions)",
+       "bets": 42,
+       "won": 7,
+       "lost": 35,
+       "hit": 0.16666666666666666,
+       "exp_hit": 0.392969219047619,
+       "units": -21.29,
+       "roi": -0.5069628837496712
+      },
+      {
+       "group": "Most likely to hit: 3-leg (all suggestions)",
+       "bets": 42,
+       "won": 3,
+       "lost": 39,
+       "hit": 0.07142857142857142,
+       "exp_hit": 0.2580804052088809,
+       "units": -26.6,
+       "roi": -0.6332940373223521
+      },
+      {
+       "group": "Most likely to hit: 4-leg (all suggestions)",
+       "bets": 35,
+       "won": 0,
+       "lost": 35,
+       "hit": 0.0,
+       "exp_hit": 0.1607526208313203,
+       "units": -35.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 5-leg (all suggestions)",
+       "bets": 32,
+       "won": 0,
+       "lost": 32,
+       "hit": 0.0,
+       "exp_hit": 0.09899299584867584,
+       "units": -32.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 6-leg (all suggestions)",
+       "bets": 34,
+       "won": 0,
+       "lost": 34,
+       "hit": 0.0,
+       "exp_hit": 0.057224757313553705,
+       "units": -34.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Most likely to hit: 11-leg (all suggestions)",
+       "bets": 28,
+       "won": 0,
+       "lost": 28,
+       "hit": 0.0,
+       "exp_hit": 0.004958735455082189,
+       "units": -28.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   }
+  }
+ },
+ "pending": {
+  "push": true,
+  "g": [],
+  "c": [],
+  "per": {},
+  "days": {},
+  "legs": [],
+  "parlays": []
+ }
+}

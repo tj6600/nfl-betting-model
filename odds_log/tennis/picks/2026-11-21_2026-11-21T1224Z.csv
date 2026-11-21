@@ -1,0 +1,9 @@
+id,gid,game,start,tour,event,round,market,side,label,p,pm,price,cat,pick,bpick,flagged,pb,edge,ev
+187528-p1,187528,Carlos Alcaraz vs Ben Shelton,2026-11-21T13:30:00Z,atp,Nitto ATP Finals,Semifinal,pick,p1,Carlos Alcaraz to win,0.793,0.795,-488.0,,True,True,False,,,
+187527-p1,187527,Alexander Zverev vs Daniil Medvedev,2026-11-21T19:30:00Z,atp,Nitto ATP Finals,Semifinal,pick,p1,Alexander Zverev to win,0.608,0.634,-169.0,,True,True,False,,,
+186811-p1,186811,Leyre Romero Gormaz vs Lucia Bronzetti,2026-11-21T20:00:00Z,wta,LP Open by IND,Semifinal,pick,p1,Leyre Romero Gormaz to win,0.613,0.613,,,True,True,False,,,
+186810-p1,186810,Guiomar Maristany Zuleta De Reales vs Rebeka Masarova,2026-11-21T21:30:00Z,wta,LP Open by IND,Semifinal,pick,p1,Guiomar Maristany Zuleta De Reales to win,0.576,0.576,,,True,True,False,,,
+187528-p1,187528,Carlos Alcaraz vs Ben Shelton,2026-11-21T13:30:00Z,atp,Nitto ATP Finals,,moneyline,p1,Carlos Alcaraz to win,0.7929,0.7954,-488.0,,True,True,False,0.7921,-3.7,-4.5
+187528-p2,187528,Carlos Alcaraz vs Ben Shelton,2026-11-21T13:30:00Z,atp,Nitto ATP Finals,,moneyline,p2,Ben Shelton to win,0.2071,0.2046,359.0,,False,False,False,0.2079,-1.1,-4.9
+187527-p1,187527,Alexander Zverev vs Daniil Medvedev,2026-11-21T19:30:00Z,atp,Nitto ATP Finals,,moneyline,p1,Alexander Zverev to win,0.6078,0.6335,-169.0,,True,True,False,0.5992,-2.0,-3.3
+187527-p2,187527,Alexander Zverev vs Daniil Medvedev,2026-11-21T19:30:00Z,atp,Nitto ATP Finals,,moneyline,p2,Daniil Medvedev to win,0.3922,0.3665,138.0,,False,False,False,0.4008,-2.8,-6.7
