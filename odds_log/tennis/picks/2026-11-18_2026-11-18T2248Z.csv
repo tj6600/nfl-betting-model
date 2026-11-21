@@ -1,0 +1,18 @@
+id,gid,game,start,tour,event,round,market,side,label,p,pm,price,cat,pick,bpick,flagged,pb,edge,ev
+186802-p1,186802,Ariana Geerlings vs Laura Samson,2026-11-18T22:50:00Z,wta,LP Open by IND,Round 2,pick,p1,Ariana Geerlings to win,0.515,0.515,,,True,True,False,,,
+187507-p1,187507,Ben Shelton vs Rafael Jodar,2026-11-19T13:00:00Z,atp,Nitto ATP Finals,Group Stage,pick,p1,Ben Shelton to win,0.651,0.619,-227.0,,True,True,False,,,
+186809-p1,186809,Lucia Bronzetti vs Carole Monnet,2026-11-19T14:30:00Z,wta,LP Open by IND,Round 2,pick,p1,Lucia Bronzetti to win,0.51,0.51,,,True,True,False,,,
+186808-p2,186808,Valeriya Strakhova vs Veronika Erjavec,2026-11-19T16:00:00Z,wta,LP Open by IND,Round 2,pick,p2,Veronika Erjavec to win,0.662,0.6619999999999999,,,True,True,False,,,
+186806-p2,186806,Anastasia Zolotareva vs Irene Burillo,2026-11-19T18:30:00Z,wta,LP Open by IND,Round 2,pick,p2,Irene Burillo to win,0.5,0.5,,,True,True,False,,,
+187504-p1,187504,Alexander Zverev vs Arthur Fils,2026-11-19T19:30:00Z,atp,Nitto ATP Finals,Group Stage,pick,p1,Alexander Zverev to win,0.676,0.641,-258.0,,True,True,False,,,
+186804-p2,186804,Fernanda Labrana vs Andrea Lazaro Garcia,2026-11-19T22:00:00Z,wta,LP Open by IND,Round 2,pick,p2,Andrea Lazaro Garcia to win,0.786,0.786,,,True,True,False,,,
+187510-p1,187510,Carlos Alcaraz vs Flavio Cobolli,2026-11-20T13:00:00Z,atp,Nitto ATP Finals,Group Stage,pick,p1,Carlos Alcaraz to win,0.862,0.913,-770.0,,True,True,False,,,
+187513-p1,187513,Daniil Medvedev vs Frances Tiafoe,2026-11-20T19:30:00Z,atp,Nitto ATP Finals,Group Stage,pick,p1,Daniil Medvedev to win,0.647,0.592,-231.0,,True,True,False,,,
+187507-p1,187507,Ben Shelton vs Rafael Jodar,2026-11-19T13:00:00Z,atp,Nitto ATP Finals,,moneyline,p1,Ben Shelton to win,0.6512,0.6192,-227.0,,True,True,False,0.6619,-4.3,-6.2
+187507-p2,187507,Ben Shelton vs Rafael Jodar,2026-11-19T13:00:00Z,atp,Nitto ATP Finals,,moneyline,p2,Rafael Jodar to win,0.3488,0.3808,182.0,,False,False,False,0.3381,-0.6,-1.6
+187504-p1,187504,Alexander Zverev vs Arthur Fils,2026-11-19T19:30:00Z,atp,Nitto ATP Finals,,moneyline,p1,Alexander Zverev to win,0.6756,0.6407,-258.0,,True,True,False,0.6873,-4.5,-6.2
+187504-p2,187504,Alexander Zverev vs Arthur Fils,2026-11-19T19:30:00Z,atp,Nitto ATP Finals,,moneyline,p2,Arthur Fils to win,0.3244,0.3593,205.0,,False,False,False,0.3127,-0.4,-1.1
+187510-p1,187510,Carlos Alcaraz vs Flavio Cobolli,2026-11-20T13:00:00Z,atp,Nitto ATP Finals,,moneyline,p1,Carlos Alcaraz to win,0.8618,0.9133,-770.0,,True,True,False,0.8446,-2.3,-2.6
+187510-p2,187510,Carlos Alcaraz vs Flavio Cobolli,2026-11-20T13:00:00Z,atp,Nitto ATP Finals,,moneyline,p2,Flavio Cobolli to win,0.1382,0.0867,514.0,,False,False,False,0.1554,-2.5,-15.1
+187513-p1,187513,Daniil Medvedev vs Frances Tiafoe,2026-11-20T19:30:00Z,atp,Nitto ATP Finals,,moneyline,p1,Daniil Medvedev to win,0.647,0.5916,-231.0,,True,True,False,0.6654,-5.1,-7.3
+187513-p2,187513,Daniil Medvedev vs Frances Tiafoe,2026-11-20T19:30:00Z,atp,Nitto ATP Finals,,moneyline,p2,Frances Tiafoe to win,0.353,0.4084,185.0,,False,False,False,0.3346,0.2,0.6

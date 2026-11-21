@@ -1,0 +1,1182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1f6b3a">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="GoonerGamble">
+<script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
+<title>Tennis Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: a game strip across the top, a filter bar, then a ranked board of player rows that open into a detail panel. */
+:root {
+  --bg: #f5f7f4; --panel: #ffffff; --ink: #18211b; --muted: #5d6b61; --line: #dde3dd;
+  --turf: #1f6b3a; --turf-soft: #e3efe6; --gold: #a86a00; --gold-soft: #fbf0d9; --risk: #8a5a9e; --risk-soft: #f1e8f5;
+  --bar: #cfe3d5; --tick: #18211b; --pos: #1f6b3a; --neg: #b03a2e;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1511; --panel: #161e18; --ink: #e6ece7; --muted: #95a399; --line: #27322a;
+  --turf: #5fc27f; --turf-soft: #1c3324; --gold: #e3ac4a; --gold-soft: #33280f; --risk: #c79bdb; --risk-soft: #2b2032;
+  --bar: #24412d; --tick: #e6ece7; --pos: #5fc27f; --neg: #ef8a7d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1511; --panel: #161e18; --ink: #e6ece7; --muted: #95a399; --line: #27322a;
+  --turf: #5fc27f; --turf-soft: #1c3324; --gold: #e3ac4a; --gold-soft: #33280f; --risk: #c79bdb; --risk-soft: #2b2032;
+  --bar: #24412d; --tick: #e6ece7; --pos: #5fc27f; --neg: #ef8a7d; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 24px 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 20px; }
+header { display: flex; flex-direction: column; gap: 6px; }
+.eyebrow { font-family: var(--display); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: 13px; color: var(--turf); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 6vw, 52px); line-height: 1; margin: 0; letter-spacing: .01em; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 68ch; margin: 0; }
+.tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--line); overflow-x: auto; }
+.tab { font: 700 18px var(--display); letter-spacing: .03em; text-transform: uppercase; border: 0; background: transparent; color: var(--muted); padding: 8px 14px 10px; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--turf); }
+.range { position: absolute; top: 2px; bottom: 2px; background: var(--bar); border-radius: 3px; }
+.mark { position: absolute; top: -4px; bottom: -4px; width: 3px; border-radius: 2px; background: var(--turf); }
+.line { position: absolute; top: -6px; bottom: -6px; width: 2px; background: var(--tick); }
+.side { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: .03em; text-transform: uppercase; }
+.side.over { color: var(--pos); } .side.under { color: var(--gold); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+ul.notes { margin: 0; padding: 10px 18px 14px 34px; line-height: 1.5; font-size: 14px; } ul.notes li { margin: 5px 0; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.tile .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.tile .big { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tile .s { font-size: 13px; color: var(--muted); }
+.tablewrap { overflow-x: auto; }
+table.res { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+table.res td { padding: 7px 14px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.res td.num { text-align: right; }
+/* column names follow the reader down long tables, and the first column stays put when a table scrolls sideways (stickyHeads below) */
+table.res th.stuck { position: relative; z-index: 3; box-shadow: 0 1px 0 var(--line), 0 4px 6px -4px rgba(0,0,0,.25); }
+table.res tr > :first-child, table.res tr > th.stuck:first-child { position: sticky; left: 0; z-index: 2; }
+table.res tr > th.stuck:first-child { z-index: 4; }
+.tablewrap.xs table.res tr > :first-child { background-color: var(--stick-bg); box-shadow: 1px 0 0 var(--line), 4px 0 6px -4px rgba(0,0,0,.25); }
+.tablewrap.xs table.res tr.hl > td:first-child { background-image: linear-gradient(var(--turf-soft), var(--turf-soft)); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 600 14px var(--body); border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 6px 12px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: baseline; }
+.chip b { font-family: var(--display); font-size: 16px; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--turf); outline-offset: 2px; }
+.strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.game { flex: 0 0 auto; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: var(--r); padding: 8px 12px; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 2px; min-width: 118px; font: inherit; }
+.game .m { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: .02em; }
+.game .t { font-size: 12px; color: var(--muted); }
+.game[aria-pressed="true"] { border-color: var(--turf); box-shadow: inset 0 0 0 1px var(--turf); background: var(--turf-soft); }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.bar input[type="search"] { flex: 1 1 220px; min-width: 0; font: inherit; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--panel); }
+.seg button { font: 600 13px var(--body); border: 0; background: transparent; color: var(--ink); padding: 8px 11px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+select { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); }
+label.tog { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-size: 14px; cursor: pointer; }
+.count { color: var(--muted); font-size: 13px; }
+.cols { display: grid; gap: 16px; grid-template-columns: 1fr; }
+.cols.two { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.col { display: flex; flex-direction: column; gap: 0; min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.colhead { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.colhead h2 { font-family: var(--display); font-size: 22px; margin: 0; letter-spacing: .02em; }
+.colhead span { color: var(--muted); font-size: 13px; }
+.row { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.6fr) auto; gap: 12px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); cursor: pointer; background: transparent; border-left: 0; border-right: 0; border-top: 0; width: 100%; text-align: left; font: inherit; color: inherit; }
+.row:hover { background: var(--turf-soft); }
+.row[aria-expanded="true"] { background: var(--turf-soft); }
+.who { display: flex; flex-direction: column; min-width: 0; }
+.who .n { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.who .s { font-size: 12px; color: var(--muted); }
+.meter { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.track { position: relative; height: 10px; background: var(--bg); border-radius: 5px; border: 1px solid var(--line); }
+.fill { position: absolute; inset: 0 auto 0 0; background: var(--turf); border-radius: 5px; opacity: .85; }
+.tick { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--tick); border-radius: 1px; }
+.meter .l { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.meter .l b { color: var(--ink); font-size: 14px; }
+.price { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; font-variant-numeric: tabular-nums; }
+.price .o { font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1; }
+.price .e { font-size: 12px; }
+.pos { color: var(--pos); } .neg { color: var(--neg); } .dim { color: var(--muted); }
+.pill { font: 600 11px var(--body); text-transform: uppercase; letter-spacing: .06em; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
+.pill.value { background: var(--gold-soft); color: var(--gold); }
+.pill.likely { background: var(--turf-soft); color: var(--turf); }
+.pill.check { background: var(--risk-soft); color: var(--risk); }
+.detail { padding: 14px; border-bottom: 1px solid var(--line); background: var(--bg); display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.detail h3 { font-family: var(--display); font-size: 15px; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 6px; color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.stat { display: flex; flex-direction: column; }
+.stat b { font-family: var(--display); font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); }
+.books { display: flex; flex-direction: column; gap: 4px; font-variant-numeric: tabular-nums; }
+.books div { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--line); padding-bottom: 3px; }
+.books .best { color: var(--pos); font-weight: 600; }
+.why { margin: 0; max-width: 60ch; }
+.note { color: var(--muted); font-size: 13px; max-width: 72ch; margin: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); align-items: center; }
+.legend i { display: inline-block; vertical-align: middle; margin-right: 5px; }
+.ladder { display: flex; flex-wrap: wrap; gap: 4px; }
+.step { font-size: 12px; font-variant-numeric: tabular-nums; padding: 2px 7px; border-radius: 6px; border: 1px solid var(--line); background: color-mix(in srgb, var(--turf) var(--a), var(--panel)); color: var(--ink); white-space: nowrap; }
+.step b { font-family: var(--display); font-size: 14px; }
+.step.hot { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.detail.one { grid-template-columns: 1fr; }
+table.res th { padding: 6px 14px; text-align: left; font: 600 12px var(--body); text-transform: uppercase; letter-spacing: .05em; color: var(--muted); border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.res th.num { text-align: right; }
+table.res tr.hl td { background: var(--turf-soft); font-weight: 600; }
+.cols.pl { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); align-items: start; }
+.plctl { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); align-items: center; }
+.plctl input[type="search"] { flex: 1 1 200px; min-width: 0; font: inherit; padding: 7px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+.pllist { max-height: 70vh; overflow-y: auto; }
+.leg { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 14px; border-bottom: 1px solid var(--line); }
+.add { font: 600 13px var(--body); border: 1px solid var(--turf); color: var(--turf); background: transparent; border-radius: 8px; padding: 5px 10px; cursor: pointer; min-width: 64px; }
+.add.on { background: var(--turf); color: var(--bg); }
+.slip { position: sticky; top: 12px; }
+.acts { display: inline-flex; gap: 12px; }
+.lnk { border: 0; background: none; color: var(--turf); font: 600 13px var(--body); cursor: pointer; padding: 0; }
+.slipl { padding: 10px 14px; }
+.slipl small { color: var(--muted); font-weight: 400; }
+.slipl > div { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px; }
+.slipl small { display: block; font-size: 12px; }
+.slipl .num { font-size: 13px; white-space: nowrap; }
+.x { border: 0; background: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 2px; line-height: 1; }
+.placeat { margin: 0 14px 10px; padding: 8px 12px; border: 1px solid var(--turf); border-radius: 8px; display: flex; flex-direction: column; gap: 2px; font-size: 13px; color: var(--muted); }
+.placeat b { font-family: var(--display); font-size: 19px; color: var(--ink); letter-spacing: .02em; }
+.slip .colhead { flex-wrap: wrap; gap: 8px; }
+.lnk.sugb { background: var(--turf); color: var(--bg); padding: 5px 10px; border-radius: 8px; }
+.sugnote { padding: 10px 14px 0; }
+.sidebox { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; font-variant-numeric: tabular-nums; }
+.sidebox .e { font-size: 12px; }
+.seg.sides button { display: inline-flex; align-items: baseline; gap: 2px; padding: 6px 10px; }
+.seg.sides small { font-weight: 400; opacity: .8; }
+.warnc { color: var(--gold); }
+.leanmark { font-style: normal; color: var(--gold); font-size: 11px; margin-left: 3px; }
+.likemark { font-style: normal; color: #3fa66b; font-size: 12px; font-weight: 700; margin-left: 3px; }
+.logbtn { margin-top: 10px; font: 600 13px var(--body); border: 1px solid var(--turf); color: var(--turf); background: transparent; border-radius: 8px; padding: 6px 12px; cursor: pointer; justify-self: start; }
+.namebtn { border: 0; background: none; padding: 0; font: inherit; font-weight: 600; color: var(--ink); text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.namebtn:hover { text-decoration-color: var(--turf); color: var(--turf); }
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; z-index: 50; }
+.logpanel { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r); width: 100%; max-width: 720px; display: flex; flex-direction: column; }
+.loghead { display: flex; justify-content: space-between; align-items: flex-start; padding: 14px 14px 6px; }
+.loghead h2 { font-family: var(--display); font-size: 26px; margin: 0; }
+.loghead .dim { font-size: 13px; }
+.move { margin: 0 14px 10px; padding: 10px 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; border-left: 4px solid var(--line); background: var(--bg); }
+.move b { font-family: var(--display); font-size: 18px; letter-spacing: .02em; }
+.move.up { border-left-color: var(--pos); } .move.down { border-left-color: var(--neg); } .move.flat { border-left-color: var(--gold); }
+.loghit { margin: 0 14px 10px; padding: 8px 12px; background: var(--turf-soft); border-radius: 8px; font-weight: 600; }
+.logfoot { padding: 10px 14px 14px; }
+.pin { display: flex; gap: 8px; align-items: center; padding: 0 14px 10px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.pin input { width: 90px; font: inherit; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--ink); }
+.stats.pad { padding: 4px 14px 12px; }
+.dkrow { margin: 0 14px 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13px; }
+.dkrow a.dkbtn { text-decoration: none; display: inline-block; }
+.verdict { margin: 0 14px 12px; padding: 10px 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
+.verdict b { font-family: var(--display); font-size: 20px; letter-spacing: .02em; }
+.verdict.good { background: var(--turf-soft); color: var(--ink); } .verdict.good b { color: var(--turf); }
+.verdict.warn { background: var(--gold-soft); } .verdict.warn b { color: var(--gold); }
+.verdict.bad { background: var(--risk-soft); } .verdict.bad b { color: var(--risk); }
+.warns { margin: 0; padding: 0 14px 14px 30px; font-size: 13px; display: flex; flex-direction: column; gap: 4px; }
+.warns .bad { color: var(--risk); } .warns .warn { color: var(--gold); } .warns .info { color: var(--muted); }
+.leg .who .n { white-space: normal; }
+@media (max-width: 520px) { .leg { grid-template-columns: minmax(0, 1fr) auto; } .leg .who { grid-column: 1 / -1; } .leg .price, .leg .sidebox { align-items: flex-start; } }
+@media (max-width: 720px) { .slip { position: static; } }
+/* the leg list scrolls inside its box only on wide screens; on phones and tablets the page itself scrolls */
+@media (max-width: 1024px) { .pllist { max-height: none; overflow: visible; } }
+.mgrp { border-bottom: 1px solid var(--line); }
+.mgrp > summary { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px; cursor: pointer; list-style: none; font-weight: 600; min-height: 44px; }
+.mgrp > summary::-webkit-details-marker { display: none; }
+.mgrp > summary::after { content: '▾'; margin-left: 4px; transition: transform .15s; }
+.mgrp[open] > summary::after { transform: rotate(180deg); }
+.mgrp > summary .dim { font-weight: 400; margin-left: auto; font-size: 13px; }
+.mgrp[open] > summary { position: sticky; top: 0; z-index: 2; background: var(--panel); border-bottom: 1px solid var(--line); }
+.lnk.more { display: block; width: 100%; padding: 14px; text-align: center; font-size: 14px; }
+.empty { padding: 24px 14px; color: var(--muted); }
+@media (max-width: 560px) {
+  .row { grid-template-columns: minmax(0, 1fr) auto; }
+  .row .meter { grid-column: 1 / -1; grid-row: 2; }
+  .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: no-preference) { .fill { transition: width .25s ease; } }
+.sugnav { display: flex; align-items: center; gap: 10px; padding: 10px 14px 0; flex-wrap: wrap; }
+.sugnav .lnk { font-size: 22px; line-height: 1; padding: 0 6px; }
+.sugnav .seg button { padding: 6px 10px; }
+.suglab { font: 600 14px var(--body); min-width: 130px; text-align: center; }
+.sugbest { font-size: 12px; }
+.savedrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px 0; }
+.savedrow .lnk { font-size: 13px; }
+.savedchip { display: inline-flex; align-items: center; gap: 2px; }
+.savedchip .chip { padding: 4px 10px; font-size: 13px; }
+.lnk.althint { font-size: 12px; font-weight: 600; text-align: right; white-space: normal; }
+.game .t.wxbad { color: var(--gold); font-weight: 600; }
+.seglab { flex-basis: 100%; font-size: 12px; margin-bottom: -4px; }
+/* Phones: nothing should need a sideways swipe except a wide table. Tabs, game buttons and button groups wrap
+   onto extra lines instead of scrolling (clipped .seg groups used to hide filters past the screen edge). */
+.tablewrap { -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+@media (max-width: 640px) {
+  .wrap { gap: 14px; padding-block: 14px 36px; }
+  .tabs { flex-wrap: wrap; overflow: visible; gap: 2px 4px; }
+  .tab { font-size: 15px; padding: 6px 9px 7px; }
+  .strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); overflow: visible; gap: 6px; padding-bottom: 0; }
+  .game { min-width: 0; padding: 6px 8px; }
+  .game .m { font-size: 16px; white-space: nowrap; }
+  .game .t { font-size: 11px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; border: 0; background: none; overflow: visible; border-radius: 0; }
+  .seg button, .seg.sides button { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 7px 10px; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"], .seg.sides button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .bar input[type="search"], .plctl input[type="search"] { flex-basis: 100%; }
+  input, select { font-size: 16px; }   /* iOS zooms the page into any field under 16px */
+  .chip { font-size: 13px; padding: 5px 10px; }
+  .pllist { max-height: none; overflow: visible; }
+  table.res td, table.res th { padding: 6px 8px; white-space: normal; font-size: 13px; letter-spacing: 0; }
+  table.res td:first-child, table.res th:first-child { padding-left: 12px; }
+  .overlay { padding: 12px 8px; }
+  .loghead h2 { font-size: 22px; }
+  .colhead { flex-wrap: wrap; gap: 4px 8px; }
+  .detail { grid-template-columns: 1fr; padding: 12px; }
+  .stats { gap: 6px; }
+  .stat b { font-size: 19px; }
+  .sugnav { gap: 6px; }
+  .suglab { min-width: 0; flex: 1 1 auto; }
+  .detail.one { padding: 10px 6px; }
+  table.res .pill { font-size: 10px; padding: 2px 5px; letter-spacing: .02em; }
+  .opt { display: none; }   /* secondary table columns (milestone ladder: model, books, fair price) */
+  .logpanel table.res td, .logpanel table.res th { padding: 5px 6px; font-size: 13px; letter-spacing: 0; }
+  .logpanel table.res td:first-child, .logpanel table.res th:first-child { padding-left: 10px; }
+}
+
+/* Model record calibration bars (calib.py): solid bar = how often the side won, dashed line = the chance the board gave */
+.calgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.calkey { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+.calkey i { display: inline-block; vertical-align: -2px; margin-right: 6px; }
+.calkey .k-bar { width: 22px; height: 12px; background: var(--turf); border-radius: 0 4px 4px 0; }
+.calkey .k-dash { width: 0; height: 16px; border-left: 2px dashed var(--ink); }
+.calsec .calsum { padding: 10px 14px 4px; font-size: 14px; }
+.calsec .calsum b { font-family: var(--display); font-size: 20px; margin-right: 6px; font-variant-numeric: tabular-nums; }
+.calsec .calsum .pos { color: var(--pos); } .calsec .calsum .neg { color: var(--neg); }
+.calrows { padding: 6px 14px 4px; display: flex; flex-direction: column; gap: 10px; }
+.calrow { display: grid; grid-template-columns: 62px 1fr 92px; gap: 10px; align-items: center; font-size: 13px; }
+.calrow.few { opacity: .55; }
+.calrow .lab { font-weight: 600; font-variant-numeric: tabular-nums; }
+.caltrack { position: relative; height: 18px; border-radius: 0 4px 4px 0; border-left: 1px solid var(--line);
+  background: repeating-linear-gradient(to right, transparent 0, transparent calc(25% - 1px), var(--line) calc(25% - 1px), var(--line) 25%); }
+.calfill { position: absolute; left: 0; top: 2px; bottom: 2px; background: var(--turf); border-radius: 0 4px 4px 0; min-width: 2px; }
+.calsaid { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px dashed var(--ink); margin-left: -1px; }
+.calrow .val { text-align: right; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.calrow .val small { display: block; color: var(--muted); font-size: 11.5px; }
+.calaxis { display: grid; grid-template-columns: 62px 1fr 92px; gap: 10px; padding: 0 14px 4px; font-size: 11px; color: var(--muted); }
+.calaxis span { display: flex; justify-content: space-between; }
+.calsec .calnote { padding: 4px 14px 12px; margin: 0; font-size: 12.5px; color: var(--muted); }
+@media (max-width: 560px) { .calgrid { grid-template-columns: 1fr; } .calrow, .calaxis { grid-template-columns: 54px 1fr 84px; gap: 8px; } }
+
+/* Model record menus (Thomas, 2026-11-18): period picker (all time / day / week / month), section picker, refresh */
+.recbar { min-width: 0; display: flex; flex-direction: column; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; margin-bottom: 16px; }
+.recrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.recrow .grow { flex: 1 1 auto; }
+.recnav { display: flex; gap: 6px; align-items: center; flex: 1 1 260px; min-width: 0; }
+.recnav select { flex: 1 1 auto; min-width: 0; font: 600 15px var(--body); padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+.recnav .arrow { font: 700 18px var(--body); width: 40px; height: 38px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); cursor: pointer; flex: 0 0 auto; }
+.recnav .arrow:disabled { opacity: .35; cursor: default; }
+.recviews { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.recviews .chip { flex: 0 0 auto; padding: 6px 12px; }
+.recviews .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.recsum { font-size: 13px; color: var(--muted); margin: 0; }
+.refbtn { font: 600 14px var(--body); border: 1px solid var(--turf); color: var(--turf); background: transparent; border-radius: 8px; padding: 8px 12px; cursor: pointer; white-space: nowrap; display: inline-flex; gap: 6px; align-items: center; }
+.refbtn[aria-busy="true"] .ico { animation: recspin 1s linear infinite; }
+@keyframes recspin { to { transform: rotate(360deg); } }
+.refstatus { font-size: 13px; color: var(--muted); margin: 0; }
+.refstatus.bad { color: var(--neg); font-weight: 600; } .refstatus.ok { color: var(--pos); font-weight: 600; }
+@media (max-width: 560px) { .recbar { padding: 10px; } .recrow > .seg { flex: 1 1 100%; } .recrow > .seg button { flex: 1 1 0; padding: 9px 4px; } .refbtn { flex: 1 1 100%; justify-content: center; } .recrow .grow { display: none; } }
+</style>
+<script>
+// Model record calibration sections (calib.py), shared by the NFL, NBA and NHL pages
+function renderCalibration(secs, title) {
+  const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  const pc = (x) => `${Math.round(x * 100)}%`;
+  const wrap = mk('div', 'calwrap');
+  const head = mk('div', 'colhead'); head.style.border = '0'; head.style.padding = '0 0 6px';
+  head.append(mk('h2', null, title || 'How often the picks were right'), mk('span', null, 'by the chance the board gave')); wrap.append(head);
+  const key = mk('p', 'calkey');
+  const a = mk('span'); a.append(mk('i', 'k-bar'), 'How often it was right');
+  const b = mk('span'); b.append(mk('i', 'k-dash'), 'The chance the board gave');
+  key.append(a, b, mk('span', null, 'Faded rows have under 20 bets, so they are mostly luck.')); wrap.append(key);
+  const grid = mk('div', 'calgrid');
+  for (const s of secs) {
+    const c = mk('section', 'col calsec');
+    const h = mk('div', 'colhead'); h.append(mk('h2', null, s.name), mk('span', null, `${s.n} bet${s.n === 1 ? '' : 's'}`)); c.append(h);
+    const sum = mk('div', 'calsum'); sum.append(mk('b', null, `${s.won}–${s.lost}`));
+    sum.append(`right ${pc(s.hit)}, board said ${pc(s.said)} · `);
+    sum.append(mk('span', s.units >= 0 ? 'pos' : 'neg', `${s.units >= 0 ? '+' : ''}${s.units.toFixed(2)} units`)); c.append(sum);
+    const rows = mk('div', 'calrows');
+    for (const k of s.buckets) {
+      const r = mk('div', 'calrow' + (k.n < 20 ? ' few' : ''));
+      r.title = `Board said ${k.label}: ${k.won} of ${k.n} won (${pc(k.hit)}); the board's average chance was ${(k.said * 100).toFixed(1)}%. ${k.units >= 0 ? '+' : ''}${k.units.toFixed(2)} units at DraftKings.`;
+      const t = mk('div', 'caltrack'); const f = mk('div', 'calfill'); f.style.width = `${k.hit * 100}%`;
+      const d = mk('div', 'calsaid'); d.style.left = `${k.said * 100}%`; t.append(f, d);
+      const v = mk('div', 'val', `${pc(k.hit)} · ${k.won}/${k.n}`); v.append(mk('small', null, `said ${pc(k.said)}`));
+      r.append(mk('span', 'lab', k.label), t, v); rows.append(r);
+    }
+    c.append(rows);
+    const ax = mk('div', 'calaxis'); const sp = mk('span'); ['0', '25', '50', '75', '100%'].forEach((x) => sp.append(mk('em', null, x)));
+    ax.append(mk('i'), sp, mk('i')); ax.querySelectorAll('em').forEach((e) => { e.style.fontStyle = 'normal'; }); c.append(ax);
+    if (s.note) c.append(mk('p', 'calnote', s.note));
+    grid.append(c);
+  }
+  wrap.append(grid); return wrap;
+}
+
+// ---- Model record menus (Thomas, 2026-11-18): pick all time, a day, a week or a month, and which sections to show ----
+// src.by_period = { menu: {day|week|month: [{key, label}] newest first}, reports: {key: report} } (calib.by_period).
+// The chosen period's report replaces the all-time fields, so each page's own record code draws it unchanged.
+const REC_KINDS = [['all', 'All time'], ['day', 'Day'], ['week', 'Week'], ['month', 'Month']];
+function recLoad(sport) { try { return JSON.parse(localStorage.getItem('gg-rec-' + sport) || '{}') || {}; } catch (e) { return {}; } }
+function recSave(sport, st) { try { localStorage.setItem('gg-rec-' + sport, JSON.stringify(st)); } catch (e) { /* storage unavailable */ } }
+function recordMenus(o) {
+  // o: {sport, src, views: [[key, label]], rerender, weekNote}; returns {bar, rep, view, show(v), label, empty}
+  const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  o = Object.assign({}, o, { src: liveSrc(o.sport, o.src), raw: o.src });
+  const bp = (o.src && o.src.by_period) || { menu: { day: [], week: [], month: [] }, reports: {} };
+  const st = Object.assign({ kind: 'all', keys: {}, view: 'all' }, recLoad(o.sport));
+  if (!o.views.some(([k]) => k === st.view)) st.view = 'all';
+  const list = st.kind === 'all' ? null : (bp.menu[st.kind] || []);
+  if (list && !list.length) st.kind = 'all';
+  let key = null, label = 'All time';
+  if (st.kind !== 'all') {
+    const l = bp.menu[st.kind]; let i = l.findIndex((x) => x.key === st.keys[st.kind]); if (i < 0) i = 0;
+    key = l[i].key; label = l[i].label; st.keys[st.kind] = key;
+  }
+  recSave(o.sport, st);
+  const sub = key ? bp.reports[key] : null;
+  const rep = sub ? Object.assign({}, o.src, sub) : o.src;
+  const redo = () => { recSave(o.sport, st); o.rerender(); };
+  const bar = mk('div', 'recbar');
+  const r1 = mk('div', 'recrow'); const seg = mk('div', 'seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'Time period');
+  for (const [k, lab] of REC_KINDS) {
+    const b = mk('button', null, lab); b.type = 'button'; b.setAttribute('aria-pressed', st.kind === k);
+    const n = k === 'all' ? 1 : (bp.menu[k] || []).length; if (!n) { b.disabled = true; b.title = 'Nothing graded yet'; }
+    b.onclick = () => { if (st.kind !== k) { st.kind = k; redo(); } }; seg.append(b);
+  }
+  r1.append(seg, mk('span', 'grow'), refreshButton({ sport: o.sport, src: o.raw, rerender: o.rerender }, bar)); bar.append(r1);
+  const lv = o.src && o.src._live;
+  const stx = REC_STATUS.text || (lv ? `Includes ${lv.legs} bet${lv.legs === 1 ? '' : 's'}${lv.parlays ? ` and ${lv.parlays} parlay${lv.parlays === 1 ? '' : 's'}` : ''} checked live on ESPN at ${new Date(lv.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}. The overnight grading makes them official.` : '');
+  if (stx) bar.append(mk('p', 'refstatus ' + (REC_STATUS.text ? REC_STATUS.cls : ''), stx));
+  if (st.kind !== 'all') {
+    const l = bp.menu[st.kind]; const i = l.findIndex((x) => x.key === key);
+    const nav = mk('div', 'recnav');
+    const prev = mk('button', 'arrow', '‹'); prev.type = 'button'; prev.setAttribute('aria-label', 'Earlier'); prev.disabled = i >= l.length - 1;
+    const next = mk('button', 'arrow', '›'); next.type = 'button'; next.setAttribute('aria-label', 'Later'); next.disabled = i <= 0;
+    const sel = mk('select'); sel.setAttribute('aria-label', 'Choose the ' + st.kind);
+    l.forEach((x) => { const op = mk('option', null, x.label); op.value = x.key; if (x.key === key) op.selected = true; sel.append(op); });
+    sel.onchange = () => { st.keys[st.kind] = sel.value; redo(); };
+    prev.onclick = () => { st.keys[st.kind] = l[i + 1].key; redo(); };
+    next.onclick = () => { st.keys[st.kind] = l[i - 1].key; redo(); };
+    nav.append(prev, sel, next); const r2 = mk('div', 'recrow'); r2.append(nav); bar.append(r2);
+    if (st.kind === 'day' && o.dayNote) bar.append(mk('p', 'recsum', o.dayNote));
+    if (st.kind === 'week' && o.weekNote) bar.append(mk('p', 'recsum', o.weekNote));
+  }
+  const vs = mk('div', 'recviews'); vs.setAttribute('role', 'group'); vs.setAttribute('aria-label', 'Sections');
+  for (const [k, lab] of o.views) {
+    const b = mk('button', 'chip', lab); b.type = 'button'; b.setAttribute('aria-pressed', st.view === k);
+    b.onclick = () => { if (st.view !== k) { st.view = k; redo(); } }; vs.append(b);
+  }
+  bar.append(vs);
+  return { bar, rep, view: st.view, kind: st.kind, label, period: key, show: (v) => st.view === 'all' || st.view === v };
+}
+
+// ---- Refresh results (Thomas, 2026-11-18): the page grades the bets still waiting on a result itself, from ESPN's free
+// scoreboard and box scores (no odds credits, no keys), and adds them to the record. src.pending (calib.Pending) lists each
+// waiting leg with the groups, chance-check sections and day/week/month reports it belongs to. The next grading run
+// (2:43 AM, 8:13 AM) makes the results official and they drop out of the waiting list.
+const ESPN = 'https://site.api.espn.com/apis/site/v2/sports/';
+const ESPN_SPORT = { nba: 'basketball/nba', nhl: 'hockey/nhl', nfl: 'football/nfl', cfb: 'football/college-football' };
+const NFL_ESPN_ABBR = { LA: 'LAR', WAS: 'WSH' };
+const REC_PICK = [[0, .6], [.6, .7], [.7, .8], [.8, .9], [.9, 1.01]];
+const REC_ALL = [[0, .1], [.1, .2], [.2, .3], [.3, .4], [.4, .5], [.5, .6], [.6, .7], [.7, .8], [.8, .9], [.9, 1.01]];
+const recDec = (a) => a > 0 ? 1 + a / 100 : 1 + 100 / -a;
+const recNorm = (n) => String(n || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]/g, '').replace(/(jr|sr|ii|iii|iv)$/, '');
+function liveLoad(sport) { try { return JSON.parse(localStorage.getItem('gg-live-' + sport) || 'null'); } catch (e) { return null; } }
+function liveSave(sport, v) { try { localStorage.setItem('gg-live-' + sport, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+
+// the record with the live results added (a copy; the page's own data is untouched)
+function liveSrc(sport, src) {
+  const P = src && src.pending, st = liveLoad(sport);
+  if (!P || !st || !st.res) return src;
+  const res = st.res;
+  if (!P.legs.some((L) => res[L[0]]) ) return src;
+  const R = JSON.parse(JSON.stringify(src));
+  const bp = R.by_period = R.by_period || { menu: { day: [], week: [], month: [] }, reports: {} };
+  const kindOf = { d: 'day', w: 'week', m: 'month' };
+  const rep = (key) => {
+    if (!bp.reports[key]) {
+      bp.reports[key] = { days: [], groups: [], by_kind: [], cal_sections: [], cal: [], picks: [], legs: [], parlays: { days: [], groups: [] } };
+      const l = bp.menu[kindOf[key[0]]]; l.push({ key, label: P.per[key] || key }); l.sort((a, b) => (a.key < b.key ? 1 : -1));
+    }
+    return bp.reports[key];
+  };
+  const targets = (day) => [R].concat(((P.days || {})[day] || []).map(rep));
+  const arr = (T, path) => { const ps = path.split('.'); let o = T; for (let i = 0; i < ps.length - 1; i++) o = o[ps[i]] = o[ps[i]] || {}; return o[ps.at(-1)] = o[ps.at(-1)] || []; };
+  const addGroup = (T, path, name, r, p, u, pushCounts) => {
+    if (r === 'push' && !pushCounts) return;
+    const A = arr(T, path); let g = A.find((x) => x.group === name);
+    if (!g) { g = { group: name, bets: 0, won: 0, lost: 0, hit: 0, exp_hit: 0, units: 0, roi: 0 }; A.push(g); }
+    g.exp_hit = ((g.exp_hit || 0) * g.bets + p) / (g.bets + 1); g.bets += 1;
+    if (r === 'win') g.won += 1; else if (r === 'loss') g.lost += 1;
+    g.hit = g.won / Math.max(1, g.won + g.lost); g._u = (g._u ?? g.units) + u; g.units = Math.round(g._u * 100) / 100; g.roi = g._u / g.bets; g.live = (g.live || 0) + 1;
+  };
+  const addCal = (T, [path, name, picked, note], p, won, u) => {
+    const A = arr(T, path); let c = A.find((x) => x.name === name);
+    if (!c) { c = { name, note, n: 0, won: 0, lost: 0, said: 0, hit: 0, units: 0, roi: 0, buckets: [] }; A.push(c); }
+    const upd = (o) => { o.said = (o.said * o.n + p) / (o.n + 1); o.n += 1; if (won) o.won += 1; else o.lost += 1; o.hit = o.won / o.n; o._u = (o._u ?? o.units) + u; o.units = Math.round(o._u * 100) / 100; };
+    upd(c); c.roi = c._u / c.n;
+    const [lo, hi] = (picked ? REC_PICK : REC_ALL).find(([a, b]) => a <= p && p < b) || [0.9, 1.01];
+    const label = `${picked && lo === 0 ? 50 : Math.round(lo * 100)}–${Math.min(100, Math.round(hi * 100))}%`;
+    let k = c.buckets.find((x) => x.label === label);
+    if (!k) { k = { label, n: 0, won: 0, lost: 0, said: 0, hit: 0, units: 0 }; c.buckets.push(k); c.buckets.sort((a, b) => parseInt(a.label) - parseInt(b.label)); }
+    upd(k);
+  };
+  let nl = 0, np = 0;
+  for (const [key, day, , price, p, gs, cs] of P.legs) {
+    const r = res[key]; if (!r || r === 'void') continue;
+    const u = r === 'win' ? Math.round((recDec(price) - 1) * 1000) / 1000 : r === 'loss' ? -1 : 0; nl += 1;   // the graders round a win's profit to 3 places
+    for (const T of targets(day)) {
+      if (T.days && !T.days.includes(day) && T !== R) T.days.push(day);
+      for (const gi of gs) addGroup(T, P.g[gi][0], P.g[gi][1], r, p, u, P.push);
+      if (r !== 'push') for (const ci of cs) addCal(T, P.c[ci], p, r === 'win', u);
+    }
+  }
+  for (const [day, legs, gs, p] of P.parlays) {
+    const rs = legs.map(([k, known]) => known || res[k] || null);
+    let r, u;
+    if (rs.includes('loss')) { r = 'loss'; u = -1; }
+    else if (rs.includes(null)) continue;
+    else {
+      const live = legs.filter((_, i) => rs[i] === 'win'); if (!live.length) continue;   // every leg pushed or voided
+      r = 'win'; u = live.reduce((a, [, , pr]) => a * recDec(pr), 1) - 1;
+    }
+    np += 1;
+    for (const T of targets(day)) {
+      if (T.parlays && T.parlays.days && !T.parlays.days.includes(day) && T !== R) T.parlays.days.push(day);
+      for (const gi of gs) addGroup(T, P.g[gi][0], P.g[gi][1], r, p, u, false);
+    }
+  }
+  R._live = { legs: nl, parlays: np, at: st.at };
+  return R;
+}
+
+// ESPN box scores -> a result for each waiting leg whose game is final
+async function liveCheck(sport, P, say, store) {   // store: localStorage name for the results (default: the sport's own)
+  const get = async (u) => { const r = await fetch(u, { cache: 'no-store' }); if (!r.ok) throw new Error(r.status); return r.json(); };
+  const base = ESPN + ESPN_SPORT[sport];
+  const st = liveLoad(store || sport) || {}; const res = Object.assign({}, st.res || {});
+  const todayET = new Date().toLocaleDateString('en-CA', { timeZone: 'America/New_York' });
+  const want = P.legs.filter((L) => !res[L[0]] && L[1] && L[1] <= todayET);
+  if (!want.length) { say('Nothing is waiting on a result right now.', 'ok'); return 0; }
+  // which ESPN games to read
+  const evOf = new Map();
+  if (sport === 'nfl') {
+    const weeks = [...new Set(want.map((L) => L[2][6].slice(0, 2).join('-')))];
+    for (const w of weeks) {
+      const [se, wk] = w.split('-');
+      const sb = await get(`${base}/scoreboard?seasontype=2&week=${wk}&dates=${se}`);
+      for (const e of sb.events || []) {
+        const c = e.competitions[0].competitors; const h = c.find((x) => x.homeAway === 'home').team.abbreviation, a = c.find((x) => x.homeAway === 'away').team.abbreviation;
+        evOf.set(`${w}|${a}|${h}`, e.id);
+      }
+    }
+    for (const L of want) { const [se, wk, a, h] = L[2][6]; L._ev = evOf.get(`${se}-${wk}|${NFL_ESPN_ABBR[a] || a}|${NFL_ESPN_ABBR[h] || h}`); }
+  } else for (const L of want) L._ev = L[2][0];
+  const evs = [...new Set(want.map((L) => L._ev).filter(Boolean))];
+  say(`Checking ${evs.length} game${evs.length === 1 ? '' : 's'} on ESPN…`);
+  const box = {}; let failed = 0;
+  await Promise.all(evs.map(async (id) => {
+    try {
+      const d = await get(`${base}/summary?event=${id}`);
+      const comp = d.header.competitions[0];
+      if (!comp.status.type.completed) return;
+      const sc = {}; comp.competitors.forEach((c) => { sc[c.homeAway] = Number(c.score); });
+      const byId = {}, byName = {}, byCat = {};
+      for (const t of (d.boxscore && d.boxscore.players) || []) {
+        let goalie = 0;
+        for (const cat of t.statistics || []) {
+          const keys = cat.keys || [];
+          for (const a of cat.athletes || []) {
+            const v = {}; keys.forEach((k, i) => { v[k] = a.stats ? a.stats[i] : undefined; });
+            const rec = byId[a.athlete.id] = byId[a.athlete.id] || { dnp: false, s: {} };
+            if (a.didNotPlay || !a.stats || !a.stats.length) rec.dnp = true;
+            const n = (x) => { const y = parseFloat(String(x).split(/[-/]/)[0]); return isNaN(y) ? 0 : y; };
+            if (sport === 'nba') Object.assign(rec.s, { min: n(v.minutes), pts: n(v.points), reb: n(v.rebounds), ast: n(v.assists), fg3m: n(v['threePointFieldGoalsMade-threePointFieldGoalsAttempted']) });
+            if (sport === 'nhl') { if (cat.name === 'goalies') { rec.s.saves = n(v.saves); rec.s.starter = goalie === 0; goalie += 1; } else rec.s.sog = n(v.shotsTotal); }
+            if (sport === 'nfl') {
+              if (cat.name === 'passing') rec.s.pass = n(v.passingYards);
+              if (cat.name === 'rushing') { rec.s.rush = n(v.rushingYards); rec.s.td = (rec.s.td || 0) + n(v.rushingTouchdowns); }
+              if (cat.name === 'receiving') { rec.s.rec = n(v.receivingYards); rec.s.recs = n(v.receptions); rec.s.td = (rec.s.td || 0) + n(v.receivingTouchdowns); }
+            }
+            if (sport === 'nhl') { const t = String(a.athlete.displayName).split(' '); (byCat[{ goalies: 'G', defenses: 'D' }[cat.name] || 'F'] ||= []).push({ f: recNorm(t[0]), l: recNorm(t.at(-1)), rec }); }
+            const nk = recNorm(a.athlete.displayName);   // two players with one name (VAN's two Elias Petterssons): leave the bet waiting
+            if (byName[nk] && byName[nk] !== rec) byName[nk] = 'twice'; else byName[nk] = rec;
+          }
+        }
+      }
+      box[id] = { sc, byId, byName, byCat };
+    } catch (e) { failed += 1; /* this game's box score didn't load: it stays waiting */ }
+  }));
+  let n = 0;
+  for (const L of want) {
+    const b = box[L._ev]; if (!b) continue;
+    const [, m, stat, sd, ln, who] = L[2]; let x;
+    const hm = b.sc.home - b.sc.away;
+    if (m === 'ml') x = sd === 'home' ? hm : -hm;
+    else if (m === 'sp') x = (sd === 'home' ? hm : -hm) + ln;
+    else if (m === 'tot') x = (b.sc.home + b.sc.away - ln) * (sd === 'Over' ? 1 : -1);
+    else {
+      let p = (sport === 'nba' ? b.byId[who] : null) || b.byName[recNorm(who)];
+      if (sport === 'nhl') {   // match within the player's group (forward, defenseman, goalie) by first and last name
+        const t = String(who).split(' '), f = recNorm(t[0]), l = recNorm(t.at(-1));
+        const c = L[2][6] ? (b.byCat[L[2][6]] || []).filter((x) => x.f === f && x.l === l) : [];
+        if (c.length) p = c.length === 1 ? c[0].rec : 'twice';
+      }
+      if (p === 'twice') continue;
+      if (!p && sport !== 'nba') continue;   // name not in ESPN's box score: leave it for the grading run rather than guess void
+      let v = p && !p.dnp ? (stat === 'pra' ? p.s.pts + p.s.reb + p.s.ast : p.s[stat]) : undefined;
+      if (sport === 'nba' && p && !(p.s.min > 0)) v = undefined;
+      if (sport === 'nhl' && stat === 'saves' && p && !p.s.starter) v = undefined;
+      if (stat === 'td' && p && v === undefined) v = 0;   // listed in the box score with no touches: an anytime TD loses
+      if (v === undefined && sport === 'nfl') continue;   // no line for this stat in ESPN's box: leave it for the grading run
+      if (v === undefined) { res[L[0]] = 'void'; n += 1; continue; }
+      x = (v - ln) * (sd === 'Over' ? 1 : -1);
+    }
+    res[L[0]] = x > 0 ? 'win' : x < 0 ? 'loss' : 'push'; n += 1;
+  }
+  if (evs.length && failed === evs.length) { say('Could not reach ESPN. Check the connection and try again.', 'bad'); return 0; }
+  liveSave(store || sport, { res, at: Date.now() });
+  const left = want.length - n, fin = Object.keys(box).length;
+  say(n ? `Graded ${n} bet${n === 1 ? '' : 's'} from ${fin} finished game${fin === 1 ? '' : 's'}.${left ? ` ${left} still waiting for their games to finish or for the overnight grading.` : ''}`
+    : fin ? 'No new results yet.' : 'No games have finished yet. Try again after they end.', n ? 'ok' : '');
+  return n;
+}
+
+function refreshButton(o, bar) {
+  const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  const b = mk('button', 'refbtn'); b.type = 'button'; b.append(mk('span', 'ico', '↻'), mk('span', null, 'Refresh results'));
+  const P = o.src && o.src.pending;
+  if (!P) { b.disabled = true; b.title = 'Available after the next grading run'; }
+  b.onclick = async () => {
+    if (b.getAttribute('aria-busy') === 'true') return;
+    b.setAttribute('aria-busy', 'true');
+    const say = (t, c) => { REC_STATUS.text = t; REC_STATUS.cls = c || ''; let s = bar.querySelector('.refstatus'); if (!s) { s = mk('p'); bar.children[0].after(s); } s.textContent = t; s.className = 'refstatus ' + (c || ''); };
+    try { await liveCheck(o.sport, P, say); } catch (e) { say('Could not reach ESPN. Check the connection and try again.', 'bad'); }
+    b.setAttribute('aria-busy', 'false'); o.rerender();
+  };
+  return b;
+}
+// Keep each table's column-name row in view while scrolling through its rows (page or popup), and its first column in view
+// when the table scrolls sideways (CSS sticky, with a solid background added here once it has moved).
+// .tablewrap scrolls sideways, which stops CSS position: sticky from working, so the row is shifted in JS.
+(function stickyHeads() {
+  let queued = false;
+  const bgOf = (n) => { for (; n && n.nodeType === 1; n = n.parentElement) { const c = getComputedStyle(n).backgroundColor; if (c && c !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(c)) return c; } return ''; };
+  const headRow = (t) => (t.tHead && t.tHead.rows[0]) || Array.from(t.rows).find((r) => r.cells.length && Array.from(r.cells).every((c) => c.tagName === 'TH'));
+  const set = (hr, s) => {
+    if ((+hr.dataset.shift || 0) === s) return;
+    hr.dataset.shift = s;
+    let bg = '';
+    if (s) bg = bgOf(hr.closest('table').parentElement);
+    for (const c of hr.cells) { c.style.transform = s ? `translateY(${s}px)` : ''; c.classList.toggle('stuck', !!s); c.style.background = s ? bg : ''; }
+  };
+  const update = () => {
+    queued = false;
+    for (const w of document.querySelectorAll('.tablewrap')) {   // first column: give it a solid background once the table scrolls sideways
+      const on = w.scrollLeft > 0;
+      if (on && !w.classList.contains('xs')) w.style.setProperty('--stick-bg', bgOf(w) || getComputedStyle(document.body).backgroundColor);
+      w.classList.toggle('xs', on);
+    }
+    for (const t of document.querySelectorAll('table.res')) {
+      const hr = headRow(t); if (!hr) continue;
+      if (!t.offsetParent) { set(hr, 0); continue; }
+      // measure from layout (offsetTop/offsetHeight), which the shift itself never moves, so it can't feed back into itself
+      const tr = t.getBoundingClientRect(), hh = hr.offsetHeight, top = tr.top + hr.offsetTop;
+      const last = t.rows[t.rows.length - 1], lh = last && last !== hr ? last.offsetHeight : 0;
+      set(hr, Math.round(Math.max(0, Math.min(-top, tr.bottom - top - hh - lh))));
+    }
+  };
+  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+  document.addEventListener('scroll', queue, { capture: true, passive: true });
+  addEventListener('resize', queue);
+  const go = () => new MutationObserver(queue).observe(document.body, { childList: true, subtree: true });
+  if (document.body) go(); else document.addEventListener('DOMContentLoaded', go);
+})();
+const REC_STATUS = { text: '', cls: '' };
+</script>
+<script src="share.js"></script>
+<script src="sim_tables.js"></script>
+<script src="sim.js"></script>
+<script src="lines.js"></script>
+<style>
+.sportnav { display: flex; gap: 6px; max-width: 1080px; margin: 0 auto; padding: 14px max(16px, env(safe-area-inset-left, 0px)) 0; flex-wrap: wrap; }
+.sportnav a { font: 700 15px var(--display, sans-serif); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; background: var(--panel); }
+.sportnav a[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.sportnav a.bell { margin-left: auto; padding: 6px 12px; }
+</style>
+<style>
+.gcards { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); }
+@media (max-width: 400px) { .gcards { grid-template-columns: 1fr; } }
+.gcard .colhead h2 { font-size: 24px; }
+.gcard table.res td, .gcard table.res th { padding: 6px 8px; font-size: 14px; }
+.gcard table.res td:first-child, .gcard table.res th:first-child { padding-left: 14px; white-space: normal; }
+.gcard .add { min-width: 0; padding: 4px 8px; }
+.gcard .outs { padding: 8px 14px 12px; font-size: 13px; color: var(--muted); }
+.gcard .proj { padding: 10px 14px 4px; display: flex; gap: 18px; flex-wrap: wrap; }
+.gcard .proj div { display: flex; flex-direction: column; }
+.gcard .proj b { font-family: var(--display); font-size: 22px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.gcard .proj span { font-size: 12px; color: var(--muted); }
+.track .range { position: absolute; top: 1px; bottom: 1px; background: var(--bar); border-radius: 4px; }
+.track .mark { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1px; border-radius: 2px; background: var(--turf); }
+.track .line { position: absolute; top: -6px; bottom: -6px; width: 2px; margin-left: -1px; background: var(--tick); }
+table.log td, table.log th { padding: 5px 10px; }
+table.log td.hit { color: var(--pos); font-weight: 600; }
+table.log td.miss { color: var(--neg); font-weight: 600; }
+.logpanel .tablewrap { padding: 0 6px 6px; }
+.lchips { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 14px 10px; }
+.sugnav { display: flex; align-items: center; gap: 10px; padding: 10px 14px 0; flex-wrap: wrap; }
+.sugnav .lnk:not(.sugb) { font-size: 22px; line-height: 1; padding: 0 6px; }
+.suglab { font: 600 14px var(--body); min-width: 130px; text-align: center; }
+.sugnav .sugb { margin-left: auto; }
+.savedrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 14px 0; }
+.savedchip { display: inline-flex; align-items: center; gap: 2px; }
+.savedchip .chip { padding: 4px 10px; font-size: 13px; }
+.sugnav .seg button { padding: 6px 10px; }
+.sugbest { font-size: 12px; }
+.gcard .colhead h2 { font-size: 20px; }
+.gcard .proj { gap: 14px; }
+.gcard .proj b { font-size: 19px; }
+.pill.value { font-size: 11px; vertical-align: middle; }
+.sugnav .lnk.sugb { font-size: 13px; line-height: 1.3; padding: 5px 10px; }
+.gcard .picks { color: var(--ink); font-size: 14px; padding-top: 0; }
+.pill.pk { font-size: 11px; vertical-align: middle; background: var(--turf-soft); color: var(--turf); }
+.tcard { margin-bottom: 16px; }
+.tmatch td b { display: block; font-weight: 600; }
+.tmatch .tsub { display: block; font-size: 12px; }
+.tmatch .ponly { display: none; }
+@media (max-width: 640px) {
+  .tmatch th:nth-child(2), .tmatch td:nth-child(2), .tmatch th:nth-child(3), .tmatch td:nth-child(3), .tmatch th:nth-child(6), .tmatch td:nth-child(6) { display: none; }
+  .tmatch .ponly { display: block; font-size: 13px; margin-top: 2px; }
+  .tmatch td { padding-left: 8px; padding-right: 8px; }
+}
+</style>
+</head>
+<body>
+<nav class="sportnav" aria-label="Sport"><a href="index.html">NFL</a><a href="cfb.html">College</a><a href="nhl.html">NHL</a><a href="tennis.html" aria-current="page">Tennis</a><a href="bank.html">Bank Builder</a><a href="friends.html">Friends</a><a class="bell" href="alerts.html" aria-label="Alerts" title="Alerts">&#128276;</a></nav>
+<div class="wrap">
+  <header>
+    <span class="eyebrow" id="eyebrow">Tennis</span>
+    <h1>Tennis Board</h1>
+    <p class="lede" id="lede"></p>
+  </header>
+  <div class="tabs" id="tabs" role="tablist" aria-label="Board section"></div>
+  <div class="strip" id="games" role="group" aria-label="Games"></div>
+  <div class="bar" id="bar">
+    <input type="search" id="q" placeholder="Search a player or team" aria-label="Search a player or team">
+    <div class="seg" id="pos" role="group" aria-label="Position"></div>
+    <select id="sort" aria-label="Sort players"></select>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div id="board"></div>
+  <p class="note" id="foot"></p>
+</div>
+<script type="application/json" id="tennis-data">{"day":"2026-11-20","dayLabel":"Friday, November 20","book":"DraftKings","built":"2026-11-20T2248Z","demo":false,"through":"2026-11-20","priced":true,"snap":"Fri 5:48 PM","matches":[{"id":"186798","game":"Rebeka Masarova vs Laura Samson","tour":"wta","event":"LP Open by IND","round":"Quarterfinal","rnd":"QF","qual":false,"surface":"Hard","bo5":false,"start":"2026-11-20T22:50:00Z","time":"Fri 5:50 PM","court":"Center Court","p1":"Rebeka Masarova","p2":"Laura Samson","elo1":1597,"elo2":1623,"pm1":0.462,"n1":260,"n2":58,"legs":[],"pick":"p2","pick_p":0.538,"pick_name":"Laura Samson"},{"id":"187528","game":"Carlos Alcaraz vs Ben Shelton","tour":"atp","event":"Nitto ATP Finals","round":"Semifinal","rnd":"SF","qual":false,"surface":"Hard","bo5":false,"start":"2026-11-21T13:30:00Z","time":"Sat 8:30 AM","court":"Inalpi Arena","p1":"Carlos Alcaraz","p2":"Ben Shelton","elo1":2153,"elo2":1917,"pm1":0.795,"n1":386,"n2":249,"legs":["187528-p1","187528-p2"],"dk1":-349,"dk2":269,"pb1":0.741,"p1p":0.755,"pick":"p1","pick_p":0.755,"pick_name":"Carlos Alcaraz"},{"id":"187527","game":"Alexander Zverev vs Daniil Medvedev","tour":"atp","event":"Nitto ATP Finals","round":"Semifinal","rnd":"SF","qual":false,"surface":"Hard","bo5":false,"start":"2026-11-21T19:30:00Z","time":"Sat 2:30 PM","court":"Inalpi Arena","p1":"Alexander Zverev","p2":"Daniil Medvedev","elo1":1995,"elo2":1900,"pm1":0.634,"n1":428,"n2":424,"legs":["187527-p1","187527-p2"],"dk1":-170,"dk2":139,"pb1":0.601,"p1p":0.609,"pick":"p1","pick_p":0.609,"pick_name":"Alexander Zverev"},{"id":"186811","game":"Leyre Romero Gormaz vs Lucia Bronzetti","tour":"wta","event":"LP Open by IND","round":"Semifinal","rnd":"SF","qual":false,"surface":"Hard","bo5":false,"start":"2026-11-21T20:00:00Z","time":"Sat 3:00 PM","court":"Center Court","p1":"Leyre Romero Gormaz","p2":"Lucia Bronzetti","elo1":1667,"elo2":1587,"pm1":0.613,"n1":145,"n2":305,"legs":[],"pick":"p1","pick_p":0.613,"pick_name":"Leyre Romero Gormaz"}],"legs":[{"id":"187528-p1","gid":"187528","game":"Carlos Alcaraz vs Ben Shelton","kind":"Winner","market":"moneyline","side":"p1","line":null,"label":"Carlos Alcaraz to win","who":"Carlos Alcaraz","pid":"atp3782","tour":"atp","event":"Nitto ATP Finals","price":-349,"p":0.755,"pm":0.7954,"pb":0.7415,"edge":-2.2,"ev":-2.9,"flags":[],"sid":"0ML87336782_1","start":"2026-11-21T13:30:00Z","pick":true,"bpick":true,"cat":""},{"id":"187528-p2","gid":"187528","game":"Carlos Alcaraz vs Ben Shelton","kind":"Winner","market":"moneyline","side":"p2","line":null,"label":"Ben Shelton to win","who":"Ben Shelton","pid":"atp9250","tour":"atp","event":"Nitto ATP Finals","price":269,"p":0.245,"pm":0.2046,"pb":0.2585,"edge":-2.6,"ev":-9.6,"flags":[],"sid":"0ML87336782_3","start":"2026-11-21T13:30:00Z","pick":false,"bpick":false,"cat":""},{"id":"187527-p1","gid":"187527","game":"Alexander Zverev vs Daniil Medvedev","kind":"Winner","market":"moneyline","side":"p1","line":null,"label":"Alexander Zverev to win","who":"Alexander Zverev","pid":"atp2375","tour":"atp","event":"Nitto ATP Finals","price":-170,"p":0.609,"pm":0.6335,"pb":0.6008,"edge":-2.1,"ev":-3.3,"flags":[],"sid":"0ML87349832_1","start":"2026-11-21T19:30:00Z","pick":true,"bpick":true,"cat":""},{"id":"187527-p2","gid":"187527","game":"Alexander Zverev vs Daniil Medvedev","kind":"Winner","market":"moneyline","side":"p2","line":null,"label":"Daniil Medvedev to win","who":"Daniil Medvedev","pid":"atp2383","tour":"atp","event":"Nitto ATP Finals","price":139,"p":0.391,"pm":0.3665,"pb":0.3992,"edge":-2.7,"ev":-6.5,"flags":[],"sid":"0ML87349832_3","start":"2026-11-21T19:30:00Z","pick":false,"bpick":false,"cat":""}],"pool":[],"events":[{"tour":"atp","name":"Nitto ATP Finals"},{"tour":"wta","name":"LP Open by IND"}],"live":{"days":["2026-11-18","2026-11-19","2026-11-20"],"groups":[{"group":"Board picks (every match)","bets":23,"won":20,"lost":3,"hit":0.8695652173913043,"exp_hit":0.6704347826086956,"units":3.09,"roi":0.3085222761404451},{"group":"Board picks, main draw","bets":23,"won":20,"lost":3,"hit":0.8695652173913043,"exp_hit":0.6704347826086956,"units":3.09,"roi":0.3085222761404451},{"group":"Board picks DraftKings priced","bets":10,"won":10,"lost":0,"hit":1.0,"exp_hit":0.7287,"units":3.09,"roi":0.3085222761404451},{"group":"Value legs (blend EV 3%+)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.3232,"units":-3.0,"roi":-1.0}],"cal_sections":[{"name":"Board picks","note":"The player the board gave the better chance, every match.","n":23,"won":20,"lost":3,"said":0.6704,"hit":0.8696,"units":3.09,"roi":0.1341,"buckets":[{"label":"50\u201360%","n":5,"won":4,"lost":1,"said":0.507,"hit":0.8,"units":0.0},{"label":"60\u201370%","n":13,"won":11,"lost":2,"said":0.6693,"hit":0.8462,"units":2.74},{"label":"70\u201380%","n":2,"won":2,"lost":0,"said":0.786,"hit":1.0,"units":0.0},{"label":"80\u201390%","n":3,"won":3,"lost":0,"said":0.8707,"hit":1.0,"units":0.34}]}],"parlays":{"days":["2026-11-18","2026-11-19","2026-11-20"],"groups":[{"group":"Best value: \u2605 suggestion","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.31805,"units":-2.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.3232,"units":-3.0,"roi":-1.0},{"group":"Best value: 2-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.1009171,"units":-1.0,"roi":-1.0}]},"by_period":{"menu":{"day":[{"key":"d:2026-11-20","label":"Fri Nov 20"},{"key":"d:2026-11-19","label":"Thu Nov 19"},{"key":"d:2026-11-18","label":"Wed Nov 18"}],"week":[{"key":"w:2026-11-16","label":"Nov 16 \u2013 22"}],"month":[{"key":"m:2026-11","label":"November 2026"}]},"reports":{"d:2026-11-20":{"days":["2026-11-20"],"groups":[{"group":"Board picks (every match)","bets":4,"won":4,"lost":0,"hit":1.0,"exp_hit":0.7232500000000001,"units":0.49,"roi":0.24315738025415445},{"group":"Board picks, main draw","bets":4,"won":4,"lost":0,"hit":1.0,"exp_hit":0.7232500000000001,"units":0.49,"roi":0.24315738025415445},{"group":"Board picks DraftKings priced","bets":2,"won":2,"lost":0,"hit":1.0,"exp_hit":0.771,"units":0.49,"roi":0.24315738025415445},{"group":"Value legs (blend EV 3%+)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.3335,"units":-1.0,"roi":-1.0}],"cal_sections":[{"name":"Board picks","note":"The player the board gave the better chance, every match.","n":4,"won":4,"lost":0,"said":0.7233,"hit":1.0,"units":0.49,"roi":0.1216,"buckets":[{"label":"60\u201370%","n":3,"won":3,"lost":0,"said":0.6727,"hit":1.0,"units":0.38},{"label":"80\u201390%","n":1,"won":1,"lost":0,"said":0.875,"hit":1.0,"units":0.11}]}],"parlays":{"days":["2026-11-20"],"groups":[{"group":"Best value: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.3335,"units":-1.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.3335,"units":-1.0,"roi":-1.0}]}},"d:2026-11-19":{"days":["2026-11-19"],"groups":[{"group":"Board picks (every match)","bets":10,"won":9,"lost":1,"hit":0.9,"exp_hit":0.6718,"units":1.21,"roi":0.3020029761348849},{"group":"Board picks, main draw","bets":10,"won":9,"lost":1,"hit":0.9,"exp_hit":0.6718,"units":1.21,"roi":0.3020029761348849},{"group":"Board picks DraftKings priced","bets":4,"won":4,"lost":0,"hit":1.0,"exp_hit":0.72725,"units":1.21,"roi":0.3020029761348849},{"group":"Value legs (blend EV 3%+)","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.31805,"units":-2.0,"roi":-1.0}],"cal_sections":[{"name":"Board picks","note":"The player the board gave the better chance, every match.","n":10,"won":9,"lost":1,"said":0.6718,"hit":0.9,"units":1.21,"roi":0.1208,"buckets":[{"label":"50\u201360%","n":2,"won":2,"lost":0,"said":0.505,"hit":1.0,"units":0.0},{"label":"60\u201370%","n":6,"won":5,"lost":1,"said":0.6745,"hit":0.8333,"units":1.1},{"label":"70\u201380%","n":1,"won":1,"lost":0,"said":0.786,"hit":1.0,"units":0.0},{"label":"80\u201390%","n":1,"won":1,"lost":0,"said":0.875,"hit":1.0,"units":0.11}]}],"parlays":{"days":["2026-11-19"],"groups":[{"group":"Best value: \u2605 suggestion","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.3026,"units":-1.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.31805,"units":-2.0,"roi":-1.0},{"group":"Best value: 2-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.1009171,"units":-1.0,"roi":-1.0}]}},"d:2026-11-18":{"days":["2026-11-18"],"groups":[{"group":"Board picks (every match)","bets":9,"won":7,"lost":2,"hit":0.7777777777777778,"exp_hit":0.6454444444444445,"units":1.39,"roi":0.3477240240891506},{"group":"Board picks, main draw","bets":9,"won":7,"lost":2,"hit":0.7777777777777778,"exp_hit":0.6454444444444445,"units":1.39,"roi":0.3477240240891506},{"group":"Board picks DraftKings priced","bets":4,"won":4,"lost":0,"hit":1.0,"exp_hit":0.7090000000000001,"units":1.39,"roi":0.3477240240891506}],"cal_sections":[{"name":"Board picks","note":"The player the board gave the better chance, every match.","n":9,"won":7,"lost":2,"said":0.6454,"hit":0.7778,"units":1.39,"roi":0.1545,"buckets":[{"label":"50\u201360%","n":3,"won":2,"lost":1,"said":0.5083,"hit":0.6667,"units":0.0},{"label":"60\u201370%","n":4,"won":3,"lost":1,"said":0.659,"hit":0.75,"units":1.26},{"label":"70\u201380%","n":1,"won":1,"lost":0,"said":0.786,"hit":1.0,"units":0.0},{"label":"80\u201390%","n":1,"won":1,"lost":0,"said":0.862,"hit":1.0,"units":0.13}]}],"parlays":{"days":[],"groups":[]}},"w:2026-11-16":{"days":["2026-11-18","2026-11-19","2026-11-20"],"groups":[{"group":"Board picks (every match)","bets":23,"won":20,"lost":3,"hit":0.8695652173913043,"exp_hit":0.6704347826086956,"units":3.09,"roi":0.3085222761404451},{"group":"Board picks, main draw","bets":23,"won":20,"lost":3,"hit":0.8695652173913043,"exp_hit":0.6704347826086956,"units":3.09,"roi":0.3085222761404451},{"group":"Board picks DraftKings priced","bets":10,"won":10,"lost":0,"hit":1.0,"exp_hit":0.7287,"units":3.09,"roi":0.3085222761404451},{"group":"Value legs (blend EV 3%+)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.3232,"units":-3.0,"roi":-1.0}],"cal_sections":[{"name":"Board picks","note":"The player the board gave the better chance, every match.","n":23,"won":20,"lost":3,"said":0.6704,"hit":0.8696,"units":3.09,"roi":0.1341,"buckets":[{"label":"50\u201360%","n":5,"won":4,"lost":1,"said":0.507,"hit":0.8,"units":0.0},{"label":"60\u201370%","n":13,"won":11,"lost":2,"said":0.6693,"hit":0.8462,"units":2.74},{"label":"70\u201380%","n":2,"won":2,"lost":0,"said":0.786,"hit":1.0,"units":0.0},{"label":"80\u201390%","n":3,"won":3,"lost":0,"said":0.8707,"hit":1.0,"units":0.34}]}],"parlays":{"days":["2026-11-19","2026-11-20"],"groups":[{"group":"Best value: \u2605 suggestion","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.31805,"units":-2.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.3232,"units":-3.0,"roi":-1.0},{"group":"Best value: 2-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.1009171,"units":-1.0,"roi":-1.0}]}},"m:2026-11":{"days":["2026-11-18","2026-11-19","2026-11-20"],"groups":[{"group":"Board picks (every match)","bets":23,"won":20,"lost":3,"hit":0.8695652173913043,"exp_hit":0.6704347826086956,"units":3.09,"roi":0.3085222761404451},{"group":"Board picks, main draw","bets":23,"won":20,"lost":3,"hit":0.8695652173913043,"exp_hit":0.6704347826086956,"units":3.09,"roi":0.3085222761404451},{"group":"Board picks DraftKings priced","bets":10,"won":10,"lost":0,"hit":1.0,"exp_hit":0.7287,"units":3.09,"roi":0.3085222761404451},{"group":"Value legs (blend EV 3%+)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.3232,"units":-3.0,"roi":-1.0}],"cal_sections":[{"name":"Board picks","note":"The player the board gave the better chance, every match.","n":23,"won":20,"lost":3,"said":0.6704,"hit":0.8696,"units":3.09,"roi":0.1341,"buckets":[{"label":"50\u201360%","n":5,"won":4,"lost":1,"said":0.507,"hit":0.8,"units":0.0},{"label":"60\u201370%","n":13,"won":11,"lost":2,"said":0.6693,"hit":0.8462,"units":2.74},{"label":"70\u201380%","n":2,"won":2,"lost":0,"said":0.786,"hit":1.0,"units":0.0},{"label":"80\u201390%","n":3,"won":3,"lost":0,"said":0.8707,"hit":1.0,"units":0.34}]}],"parlays":{"days":["2026-11-19","2026-11-20"],"groups":[{"group":"Best value: \u2605 suggestion","bets":2,"won":0,"lost":2,"hit":0.0,"exp_hit":0.31805,"units":-2.0,"roi":-1.0},{"group":"Best value: straight (all suggestions)","bets":3,"won":0,"lost":3,"hit":0.0,"exp_hit":0.3232,"units":-3.0,"roi":-1.0},{"group":"Best value: 2-leg (all suggestions)","bets":1,"won":0,"lost":1,"hit":0.0,"exp_hit":0.1009171,"units":-1.0,"roi":-1.0}]}}}}},"backtest":{"built":"2026-11-18","since":"2024-01-01","elo":{"atp":{"n":8030,"hit":0.648,"logloss":0.6195,"bands":[{"band":"50-60%","n":2802,"hit":0.535,"avg_p":0.549},{"band":"60-70%","n":2326,"hit":0.623,"avg_p":0.649},{"band":"70-80%","n":1746,"hit":0.733,"avg_p":0.746},{"band":"80-90%","n":862,"hit":0.82,"avg_p":0.842},{"band":"90-100%","n":294,"hit":0.905,"avg_p":0.934}],"by_surface":{"Clay":{"n":2292,"hit":0.643},"Grass":{"n":739,"hit":0.666},"Hard":{"n":4999,"hit":0.647}}},"wta":{"n":12165,"hit":0.642,"logloss":0.6277,"bands":[{"band":"50-60%","n":4918,"hit":0.545,"avg_p":0.548},{"band":"60-70%","n":3912,"hit":0.643,"avg_p":0.647},{"band":"70-80%","n":2252,"hit":0.748,"avg_p":0.744},{"band":"80-90%","n":939,"hit":0.848,"avg_p":0.841},{"band":"90-100%","n":144,"hit":0.944,"avg_p":0.922}],"by_surface":{"Clay":{"n":2673,"hit":0.652},"Grass":{"n":937,"hit":0.665},"Hard":{"n":8555,"hit":0.637}}},"all":{"n":20195,"hit":0.644,"logloss":0.6244,"bands":[{"band":"50-60%","n":7720,"hit":0.541,"avg_p":0.548},{"band":"60-70%","n":6238,"hit":0.636,"avg_p":0.648},{"band":"70-80%","n":3998,"hit":0.742,"avg_p":0.745},{"band":"80-90%","n":1801,"hit":0.835,"avg_p":0.841},{"band":"90-100%","n":438,"hit":0.918,"avg_p":0.93}],"by_surface":{"Clay":{"n":4965,"hit":0.648},"Grass":{"n":1676,"hit":0.665},"Hard":{"n":13554,"hit":0.64}}}},"market":null},"w_model":0.25,"value_ev":3.0,"ratings":{"atp":[{"rank":1,"name":"Carlos Alcaraz","elo":2171,"hard":2153,"clay":2143,"grass":2110,"matches":386},{"rank":2,"name":"Alexander Zverev","elo":2009,"hard":1995,"clay":1991,"grass":1965,"matches":428},{"rank":3,"name":"Novak Djokovic","elo":1982,"hard":1979,"clay":1953,"grass":1989,"matches":292},{"rank":4,"name":"Ben Shelton","elo":1920,"hard":1917,"clay":1845,"grass":1871,"matches":249},{"rank":5,"name":"Taylor Fritz","elo":1913,"hard":1900,"clay":1837,"grass":1910,"matches":429},{"rank":6,"name":"Daniil Medvedev","elo":1902,"hard":1900,"clay":1862,"grass":1868,"matches":424},{"rank":7,"name":"Arthur Fils","elo":1899,"hard":1880,"clay":1887,"grass":1842,"matches":209},{"rank":8,"name":"Tommy Paul","elo":1879,"hard":1869,"clay":1854,"grass":1824,"matches":372},{"rank":9,"name":"Alex de Minaur","elo":1873,"hard":1870,"clay":1838,"grass":1848,"matches":385},{"rank":10,"name":"Lorenzo Musetti","elo":1864,"hard":1846,"clay":1862,"grass":1814,"matches":343},{"rank":11,"name":"Alejandro Davidovich Fokina","elo":1859,"hard":1851,"clay":1799,"grass":1825,"matches":323},{"rank":12,"name":"Jack Draper","elo":1859,"hard":1859,"clay":1821,"grass":1814,"matches":184},{"rank":13,"name":"Felix Auger-Aliassime","elo":1854,"hard":1848,"clay":1804,"grass":1813,"matches":365},{"rank":14,"name":"Casper Ruud","elo":1836,"hard":1809,"clay":1851,"grass":1773,"matches":372},{"rank":15,"name":"Rafael Jodar","elo":1835,"hard":1811,"clay":1844,"grass":1838,"matches":75},{"rank":16,"name":"Frances Tiafoe","elo":1834,"hard":1821,"clay":1788,"grass":1813,"matches":345},{"rank":17,"name":"Jiri Lehecka","elo":1829,"hard":1817,"clay":1793,"grass":1786,"matches":267},{"rank":18,"name":"Valentin Vacherot","elo":1824,"hard":1808,"clay":1770,"grass":1725,"matches":89},{"rank":19,"name":"Joao Fonseca","elo":1820,"hard":1820,"clay":1793,"grass":1734,"matches":94},{"rank":20,"name":"Holger Rune","elo":1810,"hard":1801,"clay":1810,"grass":1767,"matches":308},{"rank":21,"name":"Alexander Bublik","elo":1806,"hard":1799,"clay":1760,"grass":1805,"matches":333},{"rank":22,"name":"Hubert Hurkacz","elo":1804,"hard":1790,"clay":1782,"grass":1801,"matches":313},{"rank":23,"name":"Jakub Mensik","elo":1799,"hard":1791,"clay":1798,"grass":1744,"matches":164},{"rank":24,"name":"Learner Tien","elo":1790,"hard":1783,"clay":1767,"grass":1732,"matches":135},{"rank":25,"name":"Stefanos Tsitsipas","elo":1789,"hard":1780,"clay":1796,"grass":1739,"matches":385},{"rank":26,"name":"Alex Michelsen","elo":1779,"hard":1777,"clay":1713,"grass":1726,"matches":200},{"rank":27,"name":"Arthur Gea","elo":1776,"hard":1780,"clay":1667,"grass":1702,"matches":45},{"rank":28,"name":"Brandon Nakashima","elo":1771,"hard":1764,"clay":1715,"grass":1725,"matches":306},{"rank":29,"name":"Francisco Cerundolo","elo":1768,"hard":1763,"clay":1764,"grass":1689,"matches":310},{"rank":30,"name":"Flavio Cobolli","elo":1766,"hard":1740,"clay":1766,"grass":1728,"matches":237}],"wta":[{"rank":1,"name":"Elena Rybakina","elo":2096,"hard":2094,"clay":2036,"grass":2008,"matches":375},{"rank":2,"name":"Aryna Sabalenka","elo":2073,"hard":2069,"clay":2040,"grass":2009,"matches":409},{"rank":3,"name":"Coco Gauff","elo":2053,"hard":2038,"clay":2022,"grass":1960,"matches":397},{"rank":4,"name":"Iga Swiatek","elo":2037,"hard":2025,"clay":2029,"grass":1984,"matches":417},{"rank":5,"name":"Mirra Andreeva","elo":2036,"hard":2023,"clay":2015,"grass":1928,"matches":210},{"rank":6,"name":"Jessica Pegula","elo":2030,"hard":2017,"clay":1966,"grass":1967,"matches":392},{"rank":7,"name":"Elina Svitolina","elo":1997,"hard":1977,"clay":1982,"grass":1914,"matches":278},{"rank":8,"name":"Karolina Muchova","elo":1978,"hard":1961,"clay":1922,"grass":1931,"matches":220},{"rank":9,"name":"Naomi Osaka","elo":1964,"hard":1943,"clay":1908,"grass":1915,"matches":183},{"rank":10,"name":"Linda Noskova","elo":1960,"hard":1929,"clay":1879,"grass":1933,"matches":234},{"rank":11,"name":"Amanda Anisimova","elo":1951,"hard":1939,"clay":1869,"grass":1898,"matches":233},{"rank":12,"name":"Zheng Qinwen","elo":1938,"hard":1939,"clay":1905,"grass":1815,"matches":255},{"rank":13,"name":"Diana Shnaider","elo":1923,"hard":1910,"clay":1885,"grass":1841,"matches":253},{"rank":14,"name":"Marta Kostyuk","elo":1921,"hard":1886,"clay":1919,"grass":1842,"matches":289},{"rank":15,"name":"Madison Keys","elo":1920,"hard":1898,"clay":1888,"grass":1890,"matches":274},{"rank":16,"name":"Iva Jovic","elo":1903,"hard":1885,"clay":1834,"grass":1849,"matches":109},{"rank":17,"name":"Belinda Bencic","elo":1879,"hard":1866,"clay":1849,"grass":1840,"matches":250},{"rank":18,"name":"Sonay Kartal","elo":1871,"hard":1860,"clay":1738,"grass":1799,"matches":92},{"rank":19,"name":"Anna Kalinskaya","elo":1866,"hard":1853,"clay":1826,"grass":1788,"matches":282},{"rank":20,"name":"Alexandra Eala","elo":1863,"hard":1844,"clay":1748,"grass":1835,"matches":184},{"rank":21,"name":"Sorana Cirstea","elo":1858,"hard":1841,"clay":1825,"grass":1764,"matches":288},{"rank":22,"name":"Maja Chwalinska","elo":1847,"hard":1819,"clay":1834,"grass":1735,"matches":138},{"rank":23,"name":"Leylah Fernandez","elo":1838,"hard":1832,"clay":1776,"grass":1768,"matches":302},{"rank":24,"name":"Barbora Krejcikova","elo":1836,"hard":1828,"clay":1778,"grass":1833,"matches":258},{"rank":25,"name":"Jasmine Paolini","elo":1836,"hard":1821,"clay":1824,"grass":1806,"matches":329},{"rank":26,"name":"Nikola Bartunkova","elo":1836,"hard":1815,"clay":1737,"grass":1815,"matches":82},{"rank":27,"name":"Elise Mertens","elo":1834,"hard":1816,"clay":1801,"grass":1804,"matches":326},{"rank":28,"name":"Emma Navarro","elo":1832,"hard":1793,"clay":1796,"grass":1816,"matches":256},{"rank":29,"name":"Taylor Townsend","elo":1830,"hard":1825,"clay":1761,"grass":1752,"matches":159},{"rank":30,"name":"Katerina Siniakova","elo":1822,"hard":1810,"clay":1766,"grass":1791,"matches":298}]}}</script>
+<script>
+const D = JSON.parse(document.getElementById('tennis-data').textContent);
+// games that have started: DraftKings pulls pregame lines at the start, so their legs leave suggestions and the DraftKings link
+const STARTS = {}; (D.matches || []).forEach((g) => { if (g.start) STARTS[g.game] = g.start; });
+const started = (game) => !!STARTS[game] && Date.parse(STARTS[game]) <= Date.now();
+const LEG = Object.fromEntries(D.legs.map((l) => [l.id, l]));
+const TABS = [['games', 'Matches'], ['parlay', 'Parlay builder'], ['ratings', 'Player ratings'], ['record', 'Model record']];
+const state = { tab: 'games', game: 'all', filt: 'all', q: '', pmin: 0.25, pq: '', rtour: 'atp' };
+const GAME = Object.fromEntries((D.matches || []).map((g) => [g.id, g]));
+// "Price changed?" (board/site/lines.js, Thomas 2026-11-19): match winners have no line, so the user enters DraftKings' new
+// price and the leg's chance (Elo model blended with the new no-vig price), edge and EV are recomputed here.
+function patchTennis() {
+  for (const m of D.matches) {
+    for (const L of m.legs.map((id) => LEG[id]).filter(Boolean)) { if (L.side === 'p1') m.dk1 = L.price; else m.dk2 = L.price; if (L.side === m.pick) m.pick_p = L.p; }
+  }
+}
+LineEdit.setup({ sport: 'tennis', stamp: [D.day, D.built].join('|'), legs: D.legs, name: (L) => L.label, lineOf: () => null,
+  bar: (r) => r.p >= 0.55 && r.edge >= 0 && r.price >= -200, barText: '55%+ to hit, fair price or better, -200 or longer',
+  inSlip: (L) => slip.includes(L.id), swap: (a, b) => { slip = slip.map((i) => (i === a ? b : i)); sugIdx = -1; saveSlip(); render(); },
+  sibling: (L) => D.legs.find((x) => x.id !== L.id && x.gid === L.gid) || null,
+  weight: () => D.w_model, onChange: () => { patchTennis(); render(); } });
+patchTennis();
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+const fmt = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
+const pct = (p) => p == null ? '—' : p < 0.01 ? (p * 100).toFixed(2) + '%' : Math.round(p * 100) + '%';
+const sgn = (x) => (x > 0 ? '+' : '') + x;
+const dec = (a) => a > 0 ? 1 + a / 100 : 1 + 100 / -a;
+const toAm = (d) => d >= 2 ? Math.round((d - 1) * 100) : Math.round(-100 / (d - 1));
+const $ = (id) => document.getElementById(id);
+let slip = [];
+try { slip = JSON.parse(localStorage.getItem('tennis-slip-' + D.day) || '[]').filter((id) => LEG[id]); } catch (e) { slip = []; }
+const saveSlip = () => { try { localStorage.setItem('tennis-slip-' + D.day, JSON.stringify(slip)); } catch (e) {} };
+// suggested parlays are built here so the leg count can be chosen: best remaining legs, 1 per game and 1 per player,
+// no leg reused across suggestions (same rule as scripts/nhl_board.py)
+// two ways to build: 'value' = biggest edge first (scripts/nhl_board.py pool); 'likely' = most likely to hit first,
+// among legs that still pay more than they risk on average (edge 1+ pt) and carry no flags
+// alternate lines (alt: true, Over only, e.g. "25+ points") as in the NFL builder: a shaky Over main line (under 60%) gives way to
+// the same player's likeliest fairly priced alt line at 60%+, and Most likely to hit slips of 3+ legs lead with alt lines
+// that are 70%+, cost at most 3 pts of juice and are priced -500 or longer, likeliest first (parlays.py uses the same rules)
+// Thomas, 2026-11-16: no leg heavier than -200 and at most 3 legs (live grading: 3+ leg parlays 0 for ~200 on NBA), 'likely' legs judged on
+// their chance at no worse than DraftKings' usual juice (edge -3+) instead of a model edge (parlays.py likely(), MAX_JUICE, SHORT_SIZES)
+const SECURE = 0.6, ALT_FIRST_P = 0.7, ALT_FIRST_SIZE = 3, ALT_JUICE = 3, ALT_MIN_PRICE = -200, MAX_LEGS = 3;
+const ALT_BY = {};
+for (const l of D.legs) if (l.alt && !l.flags.length && l.p >= SECURE && l.edge >= -3 && l.price >= ALT_MIN_PRICE) (ALT_BY[l.pid + '|' + l.market] = ALT_BY[l.pid + '|' + l.market] || []).push(l);
+Object.values(ALT_BY).forEach((xs) => xs.sort((a, b) => b.p - a.p));
+const safer = (l) => (l.alt || l.side !== 'Over' || l.p >= SECURE) ? l : ((ALT_BY[l.pid + '|' + l.market] || []).find((a) => a.p > l.p) || l);
+const dedupe = (xs) => { const s = new Set(); return xs.filter((l) => !s.has(l.id) && s.add(l.id)); };
+const ALT_FIRST = D.legs.filter((l) => l.alt && !l.flags.length && l.p >= ALT_FIRST_P && l.edge >= -ALT_JUICE && l.price >= ALT_MIN_PRICE).sort((a, b) => b.p - a.p || b.edge - a.edge);
+const capped = (xs) => xs.filter((l) => l.price >= ALT_MIN_PRICE);
+const VALUE_POOL = capped(dedupe((D.pool || []).map((id) => LEG[id]).filter(Boolean).map(safer)));
+// NHL: the board's winner picks count as "likely" even without an edge (Thomas wants correct picks more than edge),
+// but nothing priced shorter than -200, so no leg risks much more than it pays
+const LIKELY_POOL = capped(dedupe(D.legs.filter((l) => (l.edge >= -3 || l.pick) && l.p >= 0.55 && l.price >= ALT_MIN_PRICE && !l.flags.length).sort((a, b) => b.p - a.p || b.edge - a.edge).map(safer)));
+let mode;
+// tennis opens on Most likely to hit (Thomas values picks that hit over edge)
+mode = 'likely';
+try { mode = localStorage.getItem('tennis-mode') === 'value' ? 'value' : 'likely'; } catch (e) {}
+let POOL = mode === 'likely' ? LIKELY_POOL : VALUE_POOL;
+// market filter: pick any mix of markets (e.g. Points + Assists); none picked = every market. Suggestions follow it.
+let KINDS = new Set();
+const OPEN = new Set(), GLIM = {};
+try { KINDS = new Set(JSON.parse(localStorage.getItem('tennis-kinds') || '[]')); } catch (e) {}
+const kindOk = (L) => !KINDS.size || KINDS.has(L.kind);
+const MKTS = [...new Set(D.legs.map((L) => L.kind))];
+// markets DraftKings won't take in a same-game parlay: such a leg can't share its game with any other leg
+const NO_SGP = new Set();
+// market family, for mixing markets within a slip (alt and main lines of a stat are one family)
+function fam(L) {
+  if (L.kind === 'Milestone') return (L.key || '').split('-').pop().toLowerCase();
+  let k = L.kind.toLowerCase(); if (k.startsWith('alt ')) k = k.slice(4);
+  return k === 'shots on goal' ? 'shots' : k;
+}
+// up to n slips: at most half of a slip from one market family when the pool allows; legs are used once across the
+// suggestions first, then (least-used first) a leg may appear in up to 3, so each size shows n different slips
+// whenever the pool allows. Same rule as parlays.py many(). pick(pool, size, allowed, cap) -> array of legs or null
+function many(pool, size, n, pick) {
+  const out = [], uses = {}, seen = new Set(), cap = size < 2 ? size : Math.ceil(size / 2);
+  for (let s = 0; s < n; s++) {
+    let slip = null;
+    for (const [mx, c] of [[0, cap], [0, size], [1, cap], [1, size], [2, cap], [2, size]]) {
+      const cand = mx ? pool.map((L, i) => [L, i]).sort((a, b) => (uses[a[0].id] || 0) - (uses[b[0].id] || 0) || a[1] - b[1]).map((x) => x[0]) : pool;
+      const t = pick(cand, size, (L) => (uses[L.id] || 0) <= mx, c);
+      if (t && !seen.has(t.map((L) => L.id).sort().join('|'))) { slip = t; break; }
+    }
+    if (!slip) break;
+    seen.add(slip.map((L) => L.id).sort().join('|')); out.push(slip.map((L) => L.id));
+    slip.forEach((L) => { uses[L.id] = (uses[L.id] || 0) + 1; });
+  }
+  return out;
+}
+// one market of one game (of one player for props): a slip never holds two of them, e.g. both teams to win
+const sideKey = (L) => `${L.game}|${L.market}|${L.pid && L.kind !== 'Winner' ? L.pid : ''}`;
+// the usual pool for a slip of this size (relax 0 in buildSlips)
+const usualPool = (size) => (mode === 'likely' && size >= ALT_FIRST_SIZE ? dedupe(ALT_FIRST.concat(POOL)) : POOL).filter((L) => kindOk(L) && !started(L.game));
+// next-best legs (Thomas, 2026-11-19): every other leg not yet started, ranked like the mode (chance for Most likely to hit, edge for
+// Best value), with legs that carry no flags, are priced no shorter than ALT_MIN_PRICE and are 40%+ to hit ahead of the rest
+// fill order (Thomas, 2026-11-19): alt-line rungs that are 60%+ to hit and priced -500 or longer go first (likeliest first, since
+// they hit more often than next-best main lines), then the next-best legs. Boards with no alt lines saved go straight to next-best.
+const FILL_ALT_P = 0.6, FILL_ALT_MIN = -500;
+const fillTag = (L) => (L.alt ? 'alt line' : 'next-best');
+const HAS_ALT = D.legs.some((L) => L.alt);
+// "2 alt lines and 1 next-best leg" for the warnings and the share card
+function fillWords(ls) {
+  const a = ls.filter((l) => l.alt).length, b = ls.length - a, w = [];
+  if (a) w.push(`${a} alt line${a === 1 ? '' : 's'}`); if (b) w.push(`${b} next-best leg${b === 1 ? '' : 's'}`);
+  return w.join(' and ');
+}
+const fillHow = () => (HAS_ALT ? 'likely alt lines first (60%+ to hit), then next-best legs' : 'the next-best legs');
+function fillPool() {
+  const by = mode === 'likely' ? (a, b) => b.p - a.p || b.edge - a.edge : (a, b) => b.edge - a.edge || b.p - a.p;
+  const ls = D.legs.filter((L) => kindOk(L) && !started(L.game));
+  const ok = (L) => !L.flags.length && L.price >= ALT_MIN_PRICE && L.p >= 0.4;
+  const alt = ls.filter((L) => L.alt && !L.flags.length && L.p >= FILL_ALT_P && L.price >= FILL_ALT_MIN).sort((a, b) => b.p - a.p || b.edge - a.edge);
+  const rest = ls.filter((L) => !alt.includes(L));
+  return alt.concat(rest.filter(ok).sort(by), rest.filter((L) => !ok(L)).sort(by));
+}
+// relax: 0 = usual rules; 1 = next-best legs fill in after the usual ones; 2 = also any number of legs per game and market;
+// 3 = also more than one leg per player; 4 = as many legs as the slate has (a shorter slip than asked when it runs out)
+function buildSlips(size, n = 6, relax = 0) {
+  let pool = usualPool(size);
+  if (relax) pool = dedupe(pool.concat(fillPool()));
+  const nG = new Set(pool.map((L) => L.game)).size;
+  const perGame = relax >= 2 ? size : Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / Math.max(1, nG))));   // more per game only when the slate is too small
+  return many(pool, size, n, (pool, size, allowed, cap) => {
+    if (relax >= 2) cap = size;
+    const slip = [], g = {}, pl = new Set(), fm = {}, sk = new Set();
+    for (const L of pool) {
+      if (sk.has(sideKey(L))) continue;   // never both sides (or two lines) of one market
+      if (!allowed(L) || (g[L.game] || 0) >= perGame || (relax < 3 && L.pid && pl.has(L.pid)) || (fm[fam(L)] || 0) >= cap) continue;
+      if ((g[L.game] || 0) && (NO_SGP.has(L.kind) || slip.some((x) => x.game === L.game && NO_SGP.has(x.kind)))) continue;
+      slip.push(L); sk.add(sideKey(L)); g[L.game] = (g[L.game] || 0) + 1; fm[fam(L)] = (fm[fam(L)] || 0) + 1; if (L.pid) pl.add(L.pid);
+      if (slip.length >= size) return slip;
+    }
+    return relax >= 4 && slip.length ? slip : null;
+  });
+}
+// growth score: Kelly bankroll growth of the slip, with each leg's chance cut 2 points for model error
+function growth(ids) {
+  const p = ids.reduce((a, id) => a * Math.max(0.01, LEG[id].p - 0.02), 1), b = ids.reduce((a, id) => a * dec(LEG[id].price), 1) - 1;
+  const f = (b * p - (1 - p)) / b; if (f <= 0) return 0;
+  return p * Math.log(1 + f * b) + (1 - p) * Math.log(1 - f);
+}
+// Legs picker (Thomas, 2026-11-19): any size from 1 to 12 from a menu. A size the usual rules can't fill is still built, with the
+// next-best legs (relax levels in buildSlips); those legs are marked and warned about. ★ marks the best size among the usual ones.
+const MAX_PICK = 12;
+let SIZES = [], BEST = null, OK_SIZES = new Set(), FILL = 0;
+// best parlay size by growth; when no parlay has positive growth (or none can be built), suggest a straight bet
+function sizesFor() {
+  OK_SIZES = new Set(Array.from({ length: MAX_PICK }, (_, i) => i + 1).filter((k) => buildSlips(k, 1).length));
+  SIZES = [...OK_SIZES].filter((k) => k <= MAX_LEGS);
+  const PS = SIZES.filter((k) => k > 1 && growth(buildSlips(k, 1)[0]) > 0);
+  BEST = PS.length ? PS.reduce((a, k) => (growth(buildSlips(k, 1)[0]) > growth(buildSlips(a, 1)[0]) ? k : a), PS[0]) : SIZES.includes(1) ? 1 : null;
+}
+sizesFor();
+const sizeName = (k) => (k === 1 ? 'Straight' : String(k));
+let legCount = null;
+try { legCount = +localStorage.getItem('tennis-legs') || null; } catch (e) {}
+if (!(legCount >= 1 && legCount <= MAX_PICK)) legCount = BEST || 1;
+let SLIPS = [];
+const setMode = (m) => {
+  mode = m; POOL = m === 'likely' ? LIKELY_POOL : VALUE_POOL; try { localStorage.setItem('tennis-mode', m); } catch (e) {}
+  sizesFor(); if (!legCount) legCount = BEST || 1;
+};
+const setSize = (k) => { legCount = k; try { localStorage.setItem('tennis-legs', k); } catch (e) {} SLIPS = !k ? [] : slipsFor(k); };
+// the first relax level that builds at least one slip of k legs (FILL says which); the saved suggestions as a last resort
+function slipsFor(k) {
+  for (let r = 0; r <= 4; r++) { const s = buildSlips(k, 6, r); if (s.length) { FILL = r; return s; } }
+  FILL = 0; return D.slips || [];
+}
+const sizeOpt = (k) => (k === 1 ? '1 · straight bet' : `${k} legs`) + (k === BEST ? ' ★' : '') + (OK_SIZES.has(k) ? '' : ' ⚠');
+setSize(legCount);
+let sugIdx = -1;   // which suggestion is loaded (-1 = own slip)
+let saved = [];
+try { saved = JSON.parse(localStorage.getItem('tennis-saved-' + D.day) || '[]').map((s) => ({ ...s, legs: s.legs.filter((id) => LEG[id]) })).filter((s) => s.legs.length); } catch (e) { saved = []; }
+const saveSaved = () => { try { localStorage.setItem('tennis-saved-' + D.day, JSON.stringify(saved)); } catch (e) {} };
+const loadSug = (i) => { sugIdx = (i + SLIPS.length) % SLIPS.length; slip = SLIPS[sugIdx].slice(); saveSlip(); render(); };function addBtn(id) {
+  const on = slip.includes(id);
+  const b = el('button', 'add' + (on ? ' on' : ''), on ? 'Added' : 'Add');
+  b.onclick = () => { slip = on ? slip.filter((x) => x !== id) : slip.concat(id); sugIdx = -1; saveSlip(); render(); };
+  return b;
+}
+
+function boardParlay() {
+  const B = $('board'); B.innerHTML = '';
+  const cols = el('div', 'cols pl');
+  const list = el('div', 'col');
+  const h = el('div', 'colhead'); h.append(el('h2', null, 'Legs'), el('span', null, mode === 'likely' ? 'Ranked by chance to hit, DraftKings prices' : 'Ranked by edge, DraftKings prices')); list.append(h);
+  const ctl = el('div', 'plctl');
+  const q = el('input'); q.type = 'search'; q.placeholder = 'Search legs'; q.value = state.pq; q.oninput = (e) => { state.pq = e.target.value.toLowerCase(); drawList(); };
+  const kl = el('span', 'dim seglab', 'Markets: tap one or more');
+  const kinds = el('div', 'seg'); kinds.setAttribute('aria-label', 'Markets (pick one or more)');
+  [['all', 'All']].concat(MKTS.map((k) => [k, k])).forEach(([k, l]) => {
+    const b = el('button', null, l); b.setAttribute('aria-pressed', k === 'all' ? !KINDS.size : KINDS.has(k));
+    b.onclick = () => {
+      if (k === 'all') KINDS.clear(); else if (KINDS.has(k)) KINDS.delete(k); else KINDS.add(k);
+      try { localStorage.setItem('tennis-kinds', JSON.stringify([...KINDS])); } catch (e) {}
+      sizesFor(); if (!legCount) legCount = BEST || 1; setSize(legCount); sugIdx = -1; render();
+    };
+    kinds.append(b);
+  });
+  const mins = el('div', 'seg'); [[0.25, '25%+'], [0.4, '40%+'], [0.55, '55%+']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', state.pmin === k); b.onclick = () => { state.pmin = k; render(); }; mins.append(b); });
+  ctl.append(q, kl, kinds, mins); list.append(ctl);
+  const pl = el('div', 'pllist'); list.append(pl);
+  function drawList() {
+    pl.innerHTML = '';
+    let ls = D.legs.filter((l) => l.p >= state.pmin);
+    ls = ls.filter(kindOk);
+    if (state.pq) ls = ls.filter((l) => (l.label + ' ' + l.game).toLowerCase().includes(state.pq));
+    ls.sort(mode === 'likely' ? (a, b) => (b.edge >= 1) - (a.edge >= 1) || b.p - a.p : (a, b) => b.edge - a.edge);
+    if (!ls.length) pl.append(el('div', 'empty', 'No legs match.'));
+    const row = (L) => {
+      const r = el('div', 'leg'); const who = el('div', 'who');
+      who.append(legLabel(L, 'n'), el('span', 's', `${L.kind} · ${L.game}${L.flags.length ? ' · ' + L.flags.join('; ') : ''}`));
+      const sb = el('div', 'sidebox'); sb.append(el('span', 'o', fmt(L.price)), el('span', 'e ' + (L.edge > 0 ? 'pos' : 'neg'), `${pct(L.p)} · ${sgn(L.edge)}`));
+      r.append(who, sb, addBtn(L.id)); return r;
+    };
+    // phones and tablets: one tap-to-open section per market, so you can jump between markets without scrolling past every leg
+    if (matchMedia('(max-width: 1024px)').matches) {
+      const ks = MKTS.filter((k) => ls.some((L) => L.kind === k));
+      ks.forEach((k) => {
+        const gl = ls.filter((L) => L.kind === k), lim = GLIM[k] || 25;
+        const d = el('details', 'mgrp'); d.open = OPEN.has(k) || ks.length === 1 || !!state.pq;
+        const sm = el('summary'); sm.append(el('span', 'mname', k), el('span', 'dim', `${gl.length} leg${gl.length > 1 ? 's' : ''} · best ${mode === 'likely' ? pct(gl[0].p) : sgn(gl[0].edge)}`));
+        d.append(sm); d.ontoggle = () => { if (d.open) OPEN.add(k); else OPEN.delete(k); };
+        gl.slice(0, lim).forEach((L) => d.append(row(L)));
+        if (gl.length > lim) { const m = el('button', 'lnk more', `Show more ${k} (${gl.length - lim} left)`); m.type = 'button'; m.onclick = () => { GLIM[k] = lim + 25; OPEN.add(k); drawList(); }; d.append(m); }
+        pl.append(d);
+      });
+      return;
+    }
+    ls.slice(0, 200).forEach((L) => pl.append(row(L)));
+  }
+  drawList();
+  const sl = el('div', 'col slip');
+  const sh = el('div', 'colhead'); sh.append(el('h2', null, 'Slip'));
+  const acts = el('span', 'acts');
+  const clr = el('button', 'lnk', 'Clear'); clr.onclick = () => { slip = []; sugIdx = -1; saveSlip(); render(); };
+  acts.append(clr); sh.append(acts); sl.append(sh);
+  {
+    const md = el('div', 'sugnav');
+    md.append(el('b', null, 'Build for'));
+    const seg = el('div', 'seg');
+    [['value', 'Best value'], ['likely', 'Most likely to hit']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', mode === k); b.onclick = () => { setMode(k); setSize(legCount); if (SLIPS.length) loadSug(0); else { sugIdx = -1; render(); } }; seg.append(b); });
+    md.append(seg);
+    md.append(el('span', 'dim sugbest', (mode === 'likely' ? 'Highest-chance legs: board winner picks and other legs 55%+ to hit at DraftKings\' usual juice or better, nothing shorter than -200, up to 3 legs, one per match' : `Value first: winners whose blended chance beats DraftKings' price by ${D.value_ev}%+ in expected value; nothing shorter than -200, one leg per match`) + (KINDS.size ? `. Only ${[...KINDS].join(' + ')} legs (market filter).` : '')));
+    sl.append(md);
+  }
+  if (D.legs.length) {
+    const lc = el('div', 'sugnav');
+    lc.append(el('b', null, 'Legs'));
+    const sel = el('select', 'legsel'); sel.setAttribute('aria-label', 'Number of legs');
+    for (let k = 1; k <= MAX_PICK; k++) sel.append(new Option(sizeOpt(k), k));
+    sel.value = legCount; sel.onchange = () => { setSize(+sel.value); if (SLIPS.length) loadSug(0); else { sugIdx = -1; render(); } };
+    lc.append(sel);
+    lc.append(el('span', 'dim sugbest', (BEST == null ? 'No leg meets the usual bar today' : BEST === 1 ? '★ No parlay is worth it today: take a straight bet' : `★ ${BEST} legs is best today`) + '. ⚠ = needs alt lines or next-best legs.'));
+    sl.append(lc);
+    const fw = fillWarn(); if (fw) sl.append(fw);
+  }
+  if (SLIPS.length) {
+    const nav = el('div', 'sugnav');
+    const prev = el('button', 'lnk', '‹'); prev.setAttribute('aria-label', 'Previous suggestion'); prev.onclick = () => loadSug(sugIdx < 0 ? SLIPS.length - 1 : sugIdx - 1);
+    const lab = el('span', 'suglab', sugIdx >= 0 ? `${legCount === 1 ? 'Straight bet' : 'Suggestion'} ${sugIdx + 1} of ${SLIPS.length}` : `${SLIPS.length} suggested parlays`);
+    const next = el('button', 'lnk', '›'); next.setAttribute('aria-label', 'Next suggestion'); next.onclick = () => loadSug(sugIdx + 1);
+    const shuf = el('button', 'lnk sugb', sugIdx < 0 ? 'Load suggested' : 'Shuffle');
+    shuf.onclick = () => { if (sugIdx < 0 || SLIPS.length < 2) return loadSug(0); let k = sugIdx; while (k === sugIdx) k = Math.floor(Math.random() * SLIPS.length); loadSug(k); };
+    nav.append(prev, lab, next, shuf); sl.append(nav);
+  }
+  if (saved.length || slip.length) {
+    const sv = el('div', 'savedrow');
+    if (slip.length) {
+      const sb = el('button', 'lnk', 'Save this slip');
+      sb.onclick = () => { const key = slip.slice().sort().join('|'); if (!saved.some((s) => s.legs.slice().sort().join('|') === key)) { saved.push({ name: sugIdx >= 0 ? `Suggestion ${sugIdx + 1}` : `My slip ${saved.length + 1}`, legs: slip.slice() }); saveSaved(); } render(); };
+      sv.append(sb);
+    }
+    saved.forEach((s, i) => {
+      const on = s.legs.slice().sort().join('|') === slip.slice().sort().join('|');
+      const c = el('button', 'chip', s.name); c.setAttribute('aria-pressed', on); c.onclick = () => { slip = s.legs.slice(); sugIdx = -1; saveSlip(); render(); };
+      const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Delete ' + s.name); x.onclick = () => { saved.splice(i, 1); saveSaved(); render(); };
+      const w = el('span', 'savedchip'); w.append(c, x); sv.append(w);
+    });
+    sl.append(sv);
+  }
+  const legs = slip.map((id) => LEG[id]).filter(Boolean);
+  if (!legs.length) sl.append(el('div', 'empty', SLIPS.length ? 'Add legs, or load a suggested parlay. Use the arrows or Shuffle to flip between suggestions, and Save to keep one.' : mode === 'likely' ? (D.legs.length ? 'Add legs from the list. No leg is 55%+ to hit at -200 or longer on this slate.' : 'No DraftKings prices on this board yet, so there are no legs to add.') : (D.legs.length ? 'Add legs from the list. No leg meets the value rule on this slate.' : 'No DraftKings prices on this board yet, so there are no legs to add.')));
+  const box = el('div', 'slipl'), FL = fillers(legs);
+  legs.forEach((L) => { const d = el('div'); const n = el('span'); n.append(legLabel(L), el('small', null, `${L.game} · ${pct(L.p)}`)); if (FL.has(L.id)) { const m = el('small', null, L.alt ? '⚠ Alt line, added to fill the slip' : '⚠ Next-best leg, below the usual bar'); m.style.color = 'var(--gold)'; n.append(m); } { const t = LineEdit.tag(L); if (t) n.append(t); n.append(LineEdit.btn(L)); } const x = el('button', 'x', '×'); x.setAttribute('aria-label', 'Remove'); x.onclick = () => { slip = slip.filter((i) => i !== L.id); sugIdx = -1; saveSlip(); render(); }; d.append(n, el('span', 'num', fmt(L.price)), x); box.append(d); });
+  if (legs.length) {
+    sl.append(box);
+    { const bn = LineEdit.banner(); if (bn) sl.append(bn); }
+    const p = legs.reduce((a, l) => a * l.p, 1), d = legs.reduce((a, l) => a * dec(l.price), 1), ev = p * d - 1;
+    const st = el('div', 'stats pad');
+    [[pct(p), 'Hit chance'], [fmt(toAm(d)), 'Payout'], [sgn(Math.round(ev * 100)) + '%', 'Expected value']].forEach(([v, k]) => { const s = el('div', 'stat'); s.append(el('b', null, v), el('span', null, k)); st.append(s); });
+    sl.append(st);
+    // DraftKings betslip link: every leg's DraftKings outcome id, so the slip opens in DraftKings ready to place
+    const sids = legs.filter((l) => !started(l.game)).map((l) => l.sid).filter(Boolean);
+    const dk = el('div', 'dkrow');
+    if (sids.length) {
+      const a = el('a', 'lnk sugb dkbtn', sids.length === legs.length ? 'Open in DraftKings' : `Open ${sids.length} of ${legs.length} legs in DraftKings`);
+      a.href = 'https://sportsbook.draftkings.com/?outcomes=' + sids.map(encodeURIComponent).join('+'); a.target = '_blank'; a.rel = 'noopener';
+      dk.append(a, el('span', 'dim', sids.length === legs.length ? 'Loads these legs into your DraftKings betslip. Sign in, check the prices, and place it.' : 'The other legs have no DraftKings link (match started, or none on this pull); add them by hand.'));
+    } else dk.append(el('span', 'dim', 'No DraftKings link for these legs yet: links come with the next odds pull.'));
+    sl.append(dk);
+    // Share (Thomas, 2026-11-19): a compact card of the slip for a screenshot or a text (board/site/share.js)
+    const shr = el('div', 'dkrow'), shb = el('button', 'lnk sugb', 'Share slip'); shb.type = 'button';
+    shb.onclick = () => window.shareSlip && window.shareSlip({ title: `Tennis · ${legs.length === 1 ? 'straight bet' : legs.length + '-leg parlay'}`,
+      legs: legs.map((l) => ({ label: l.label, sub: l.game, odds: fmt(l.price), tag: [FL.has(l.id) ? '⚠ ' + fillTag(l) : '', LineEdit.shareTag(l)].filter(Boolean).join(' · ') })),
+      odds: fmt(toAm(d)), chance: pct(p), pays: '$' + (10 * d).toFixed(2),
+      warn: FL.size ? `⚠ ${fillWords(legs.filter((l) => FL.has(l.id)))} added to fill the slip` : '' });
+    shr.append(shb, el('span', 'dim', 'A compact card of this slip to screenshot or send to a friend.')); sl.append(shr);
+    const games = {}; legs.forEach((l) => { games[l.game] = (games[l.game] || 0) + 1; });
+    const warns = [];
+    Object.entries(games).filter(([, n]) => n > 1).forEach(([g, n]) => {
+      const bad = legs.filter((l) => l.game === g && NO_SGP.has(l.kind));
+      if (bad.length) warns.push(['bad', `DraftKings won't put goalie saves in a same-game parlay: ${bad.map((l) => l.label).join(', ')} can't be combined with the other ${g} leg${n > 2 ? 's' : ''}. Keep one leg from that game.`]);
+      else warns.push(['warn', `${n} legs from ${g}: both players can't win. Keep one.`]);
+    });
+    legs.filter((l) => started(l.game)).forEach((l) => warns.push(['bad', `${l.game} has started: DraftKings has pulled its pregame lines, so ${l.label} won't load. Swap it out.`]));
+    { const fa = legs.filter((l) => FL.has(l.id) && l.alt), fb = legs.filter((l) => FL.has(l.id) && !l.alt);
+      if (fa.length) warns.push(['warn', `Alt lines, added to reach ${nLegs(legCount)}: ${fa.map((l) => l.label).join(', ')}. Likelier to hit, but they pay less and aren't the board's usual picks.`]);
+      if (fb.length) warns.push(['warn', `Next-best legs, added to reach ${nLegs(legCount)}: ${fb.map((l) => l.label).join(', ')}. They miss the usual bar for ${mode === 'likely' ? 'Most likely to hit' : 'Best value'}.`]); }
+    legs.filter((l) => l.edge < 0).forEach((l) => warns.push(['bad', `${l.label} has negative edge.`]));
+    legs.filter((l) => l.flags.length).forEach((l) => warns.push(['warn', `${l.label}: ${l.flags.join('; ')}.`]));
+    const good = ev > 0 && !warns.some((w) => w[0] === 'bad');
+    const v = el('div', 'verdict ' + (good ? 'good' : ev > -0.1 ? 'warn' : 'bad'));
+    v.append(el('b', null, good ? 'Positive expected value' : ev > -0.1 ? 'Close to break-even' : 'Long shot'), el('span', null, `${legs.length} leg${legs.length > 1 ? "s" : ""}. Chance assumes the legs are independent.`));
+    sl.append(v);
+    if (warns.length) { const ul = el('ul', 'warns'); warns.forEach(([c, t]) => ul.append(el('li', c, t))); sl.append(ul); }
+  }
+  cols.append(list, sl); B.append(cols);
+  $('foot').textContent = 'Edge is the leg\'s chance minus the break-even of its DraftKings price, in percentage points. Ranking by edge rather than payout keeps long shots from crowding the top. ★ marks the leg count whose top suggestion grows a bankroll fastest (Kelly growth, with each leg\'s chance cut 2 points for model error): more legs raise the payout, but every leg compounds the chance of being wrong. Your slip is saved in this browser.';
+}
+
+function legLabel(L, cls) { return el('span', cls, L.label); }
+const TOURN = { atp: 'ATP', wta: 'WTA' };
+const oddsNote = () => D.priced ? `DraftKings prices pulled ${D.snap}.` : D.demo ? 'Page check with stand-in prices (not DraftKings).' : 'No DraftKings prices pulled for this board, so it shows the model\'s pick for each match without legs.';
+
+const nLegs = (k) => `${k} leg${k === 1 ? '' : 's'}`;
+// warning under the Legs menu when the chosen size needs next-best legs or goes past the usual cap
+function fillWarn() {
+  const t = [];
+  const got = SLIPS.length ? SLIPS[0].length : 0;
+  if (FILL >= 4) t.push(`Only ${got} leg${got === 1 ? '' : 's'} can go in one slip on this slate, so this parlay has ${got}, not ${nLegs(legCount)}.`);
+  else if (FILL) t.push(`Not enough legs meet the usual bar for ${nLegs(legCount)}, so this parlay is filled with ${fillHow()} (marked ⚠ below)${HAS_ALT ? '' : '. No alt lines are on this board yet'}${FILL >= 2 ? ', with more legs from the same game, market or player than usual' : ''}. Expect a lower hit chance and value.`);
+  if (legCount > MAX_LEGS) t.push(`${nLegs(legCount)} is past the usual ${MAX_LEGS}-leg cap: every extra leg multiplies the chance of a miss.`);
+  if (!t.length) return null;
+  const ul = el('ul', 'warns'); ul.style.paddingTop = '8px'; ul.style.paddingBottom = '0'; t.forEach((x) => ul.append(el('li', 'warn', '⚠ ' + x))); return ul;
+}
+// legs of a loaded suggestion that came from the next-best fill, not the usual pool
+const fillers = (legs) => { if (sugIdx < 0 || !FILL) return new Set(); const u = new Set(usualPool(legCount).map((L) => L.id)); return new Set(legs.filter((L) => !u.has(L.id)).map((L) => L.id)); };
+
+function header() {
+  $('eyebrow').textContent = `Tennis · ${D.dayLabel}`;
+  $('lede').textContent = 'Today\'s and tomorrow\'s ATP and WTA singles matches with a pick to win in each. The model rates every player from their results since 2021, overall and on each surface (Elo). ' + oddsNote();
+  const t = $('tabs'); t.innerHTML = '';
+  TABS.forEach(([k, label]) => { const b = el('button', 'tab', label); b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', state.tab === k); b.onclick = () => { state.tab = k; render(); }; t.append(b); });
+}
+
+function strip() { $('games').style.display = 'none'; }
+
+function bar() {
+  const show = state.tab === 'games';
+  $('bar').style.display = show ? '' : 'none'; $('legend').style.display = 'none';
+  if (!show) return;
+  const pos = $('pos'); pos.innerHTML = '';
+  [['all', 'All'], ['atp', 'ATP'], ['wta', 'WTA'], ['main', 'Main draw'], ['likely', 'Picks 70%+'], ['priced', 'DK priced'], ['value', 'Value']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', state.filt === k); b.onclick = () => { state.filt = k; render(); }; pos.append(b); });
+  $('sort').style.display = 'none';
+  const q = $('q'); q.placeholder = 'Search a player or tournament'; q.setAttribute('aria-label', 'Search a player or tournament');
+  q.oninput = (e) => { state.q = e.target.value.toLowerCase(); boardGames(); };
+}
+
+function matchRows() {
+  let ms = D.matches.slice();
+  const f = state.filt;
+  if (f === 'atp' || f === 'wta') ms = ms.filter((m) => m.tour === f);
+  if (f === 'main') ms = ms.filter((m) => !m.qual);
+  if (f === 'likely') ms = ms.filter((m) => m.pick_p >= 0.7);
+  if (f === 'priced') ms = ms.filter((m) => m.legs.length);
+  if (f === 'value') ms = ms.filter((m) => m.legs.some((id) => LEG[id].cat === 'Value'));
+  if (state.q) ms = ms.filter((m) => `${m.p1} ${m.p2} ${m.event}`.toLowerCase().includes(state.q));
+  return ms;
+}
+
+function boardGames() {
+  const B = $('board'); B.innerHTML = '';
+  const ms = matchRows();
+  $('count').textContent = `${ms.length} match${ms.length === 1 ? '' : 'es'}`;
+  if (!ms.length) {
+    B.append(el('div', 'empty', D.matches.length ? 'No matches match.' : 'No ATP or WTA singles matches scheduled today or tomorrow. The tour is in its off-season until the United Cup and Brisbane start around December 28.'));
+  }
+  const byEv = {};
+  ms.forEach((m) => { const k = `${TOURN[m.tour]} · ${m.event}`; (byEv[k] = byEv[k] || []).push(m); });
+  Object.entries(byEv).forEach(([ev, xs]) => {
+    const c = el('div', 'col tcard');
+    const h = el('div', 'colhead'); h.append(el('h2', null, ev), el('span', null, `${xs[0].surface}${xs[0].bo5 ? ' · best of 5' : ''} · ${xs.length} match${xs.length === 1 ? '' : 'es'}`)); c.append(h);
+    const tw = el('div', 'tablewrap'); const t = el('table', 'res tmatch');
+    const hr = el('tr'); ['Match', 'Pick to win', 'Model', 'DK', 'Chance', 'Edge', ''].forEach((x, i) => hr.append(el('th', i > 1 ? 'num' : null, x))); t.append(hr);
+    xs.forEach((m) => {
+      const L = m.legs.map((id) => LEG[id]).find((l) => l.side === m.pick);
+      const tr = el('tr'); if (L && L.cat === 'Value') tr.className = 'hl';
+      const who = el('td'); who.append(el('b', null, `${m.p1} vs ${m.p2}`), el('small', 'dim tsub', `${m.rnd} · ${m.time}${m.court ? ' · ' + m.court : ''}`));
+      const fl = (L && L.flags.length) ? L.flags : (m.n1 < 10 || m.n2 < 10) ? ['few rated matches'] : [];
+      if (fl.length) who.append(el('small', 'dim tsub', fl.join('; ')));
+      const pmPick = m.pick === 'p1' ? m.pm1 : 1 - m.pm1;
+      // phones: the Pick, Model and Edge columns fold into one line under the match
+      const po = el('span', 'ponly'); po.append(el('b', null, 'Pick: ' + m.pick_name));
+      if (L && L.cat === 'Value') po.append(document.createTextNode(' '), el('span', 'pill value', 'Value'));
+      po.append(el('span', 'dim', ` · model ${pct(pmPick)}${L ? ' · edge ' + sgn(L.edge) : ''}`)); who.append(po);
+      const pk = el('td'); pk.append(document.createTextNode(m.pick_name));
+      if (L && L.cat === 'Value') pk.append(document.createTextNode(' '), el('span', 'pill value', 'Value'));
+      tr.append(who, pk, el('td', 'num', pct(pmPick)), el('td', 'num', L ? fmt(L.price) : '—'), el('td', 'num', pct(m.pick_p)),
+        el('td', 'num ' + (L ? (L.edge > 0 ? 'pos' : 'neg') : ''), L ? sgn(L.edge) : '—'));
+      const td = el('td', 'num lecell'); if (L) td.append(addBtn(L.id), LineEdit.btn(L)); tr.append(td);
+      if (L) { const tg = LineEdit.tag(L); if (tg) who.append(tg); }
+      t.append(tr);
+      const O = m.legs.map((id) => LEG[id]).find((l) => l.side !== m.pick);
+      if (O && (O.cat === 'Value' || slip.includes(O.id))) {
+        const tr2 = el('tr', O.cat === 'Value' ? 'hl' : ''); const a = el('td', 'dim'); a.textContent = 'Other side';
+        const po2 = el('span', 'ponly'); po2.append(el('b', null, O.who)); if (O.cat === 'Value') po2.append(document.createTextNode(' '), el('span', 'pill value', 'Value'));
+        po2.append(el('span', 'dim', ` · model ${pct(O.pm)} · edge ${sgn(O.edge)}`)); a.append(po2);
+        const b = el('td'); b.append(document.createTextNode(O.who)); if (O.cat === 'Value') b.append(document.createTextNode(' '), el('span', 'pill value', 'Value'));
+        tr2.append(a, b, el('td', 'num', pct(O.pm)), el('td', 'num', fmt(O.price)), el('td', 'num', pct(O.p)), el('td', 'num ' + (O.edge > 0 ? 'pos' : 'neg'), sgn(O.edge)));
+        const td2 = el('td', 'num lecell'); td2.append(addBtn(O.id), LineEdit.btn(O)); tr2.append(td2); t.append(tr2);
+      { const tg = LineEdit.tag(O); if (tg) a.append(tg); }
+      }
+    });
+    tw.append(t); c.append(tw); B.append(c);
+  });
+  $('foot').textContent = `Pick to win: the player with the higher chance. Model = the Elo model alone; Chance = ${Math.round(D.w_model * 100)}% model and ${100 - Math.round(D.w_model * 100)}% DraftKings' no-vig price when DraftKings has priced the match (betting markets are usually sharper than ratings in tennis), else the model alone. Edge = chance minus the break-even of DraftKings' price, in points. Value = expected value ${D.value_ev}%+ at DraftKings' price, -200 or longer. Results through ${D.through} from ESPN.`;
+}
+
+function boardRatings() {
+  const B = $('board'); B.innerHTML = '';
+  const sg = el('div', 'seg'); [['atp', 'ATP'], ['wta', 'WTA']].forEach(([k, l]) => { const b = el('button', null, l); b.setAttribute('aria-pressed', state.rtour === k); b.onclick = () => { state.rtour = k; boardRatings(); }; sg.append(b); });
+  const top = el('div', 'plctl'); top.append(sg); B.append(top);
+  const c = el('div', 'col'); const h = el('div', 'colhead'); h.append(el('h2', null, `${TOURN[state.rtour]} Elo ratings`), el('span', null, 'Top 30 who played in the last 120 days')); c.append(h);
+  const tw = el('div', 'tablewrap'); const t = el('table', 'res');
+  const hr = el('tr'); ['#', 'Player', 'Overall', 'Hard', 'Clay', 'Grass', 'Matches'].forEach((x, i) => hr.append(el('th', i > 1 ? 'num' : null, x))); t.append(hr);
+  (D.ratings[state.rtour] || []).forEach((r) => { const tr = el('tr'); [r.rank, r.name, r.elo, r.hard, r.clay, r.grass, r.matches].forEach((x, i) => tr.append(el('td', i > 1 ? 'num' : null, String(x)))); t.append(tr); });
+  tw.append(t); c.append(tw); B.append(c);
+  $('foot').textContent = 'A 100-point gap means the higher-rated player wins about 64% of the time; 200 points, about 76%. The surface columns blend 70% overall rating with 30% results on that surface, as the match picks do. New players start at 1500.';
+}
+
+function boardRecord() {
+  const B = $('board'); B.innerHTML = '';
+  const M = recordMenus({ sport: 'tennis', src: D.live, rerender: boardRecord,
+    views: [['all', 'Everything'], ['bets', 'Picks'], ['parlays', 'Parlays'], ['chance', 'Chance check'], ['tests', 'Backtest']] });
+  B.append(M.bar);
+  const lv = M.rep;
+  if (lv && (lv.cal_sections || []).length && M.show('chance')) { const cw = renderCalibration(lv.cal_sections); cw.style.marginBottom = '8px'; B.append(cw); }
+  const fmtp = (x) => x == null ? '—' : (x * 100).toFixed(1) + '%';
+  const roi = (x) => x == null ? '—' : sgn(Math.round(x * 1000) / 10) + '%';
+  const mk = (title, head, rows, note) => { const c = el('div', 'col'); c.style.marginTop = '16px'; const h = el('div', 'colhead'); h.append(el('h2', null, title)); c.append(h); const tw = el('div', 'tablewrap'); const t = el('table', 'res'); const hr = el('tr'); head.forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr); rows.forEach((r) => { const tr = el('tr'); r.forEach((x, i) => tr.append(el('td', i ? 'num' : null, String(x)))); t.append(tr); }); tw.append(t); c.append(tw); if (note) c.append(el('p', 'note logfoot', note)); B.append(c); };
+  if (!(lv && lv.groups && lv.groups.length) && M.show('bets')) B.append(el('div', 'empty', M.period ? `Nothing graded for ${M.label} yet.` : 'No live picks graded yet: each board run logs its picks, and they are graded once the matches finish.'));
+  if (lv && lv.groups && lv.groups.length && M.show('bets'))
+    mk('Live record', ['Group', 'Picks', 'W-L', 'Hit', 'Expected', 'Units', 'ROI'], lv.groups.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), fmtp(g.exp_hit), g.units == null ? '—' : sgn(g.units), roi(g.roi)]),
+       'Every match\'s pick is logged when the board is built and graded once from ESPN\'s result. Units and ROI count only picks DraftKings priced, 1 unit each at that price. Walkovers and retirements are left out.');
+  const pz = lv && lv.parlays && lv.parlays.groups.filter((g) => g.bets);
+  if (pz && pz.length && M.show('parlays')) mk('Suggested parlays at DraftKings', ['Parlays', 'Count', 'W-L', 'Hit', 'Expected', 'Units', 'ROI'], pz.map((g) => [g.group, g.bets, `${g.won}-${g.lost}`, fmtp(g.hit), fmtp(g.exp_hit), sgn(g.units), roi(g.roi)]),
+     'The first build of each day saves its suggested parlays, graded as whole parlays at DraftKings prices, 1 unit each.');
+  if (!M.show('tests')) { $('foot').textContent = 'Grading uses ESPN\'s free results, so it costs no odds credits.'; return; }
+  const bt = D.backtest;
+  if (bt && bt.elo) {
+    for (const [k, name] of [['atp', 'ATP'], ['wta', 'WTA']]) {
+      const e = bt.elo[k]; if (!e) continue;
+      mk(`${name} picks by how sure the model was (main draw, ${bt.since.slice(0, 4)} on)`, ['Model chance', 'Matches', 'Pick won', 'Model said'],
+         e.bands.map((b) => [b.band, b.n, fmtp(b.hit), fmtp(b.avg_p)]).concat([['All', e.n, fmtp(e.hit), '']]),
+         `Out of sample: each match was predicted from earlier results only. By surface: ${Object.entries(e.by_surface).map(([s, v]) => `${s} ${fmtp(v.hit)}`).join(', ')}.`);
+    }
+    if (bt.market) {
+      const m = bt.market;
+      mk('Against closing odds', ['Test', 'Result'], [['Matches with odds', m.n], ['Market favourite won', fmtp(m.fav_hit)], ['Model pick won', fmtp(m.elo_hit)]]
+        .concat(Object.entries(m.rules).map(([k, v]) => [k, `${v.n} bets, ${fmtp(v.hit)}, ROI ${roi(v.roi)}`])), `Odds: ${m.odds}, from tennis-data.co.uk.`);
+    } else B.append(el('p', 'note', 'Not yet tested against betting odds: that needs past closing prices (tennis-data.co.uk files).'));
+  } else B.append(el('div', 'empty', 'No backtest yet.'));
+  $('foot').textContent = 'Backtest: scripts/tennis_backtest.py on ESPN results (free).';
+}
+
+function render() {
+  header(); strip(); bar();
+  if (state.tab === 'games') boardGames();
+  else if (state.tab === 'parlay') boardParlay();
+  else if (state.tab === 'ratings') boardRatings();
+  else boardRecord();
+}
+render();
+</script>
+</body>
+</html>

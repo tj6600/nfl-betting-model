@@ -1,0 +1,272 @@
+{
+ "pass": {
+  "buckets": {
+   "cold <35F": {
+    "n": 73,
+    "games": 38,
+    "ratio": 1.005
+   },
+   "indoor": {
+    "n": 621,
+    "games": 307,
+    "ratio": 1.013
+   },
+   "outdoor fair": {
+    "n": 817,
+    "games": 409,
+    "ratio": 1.01
+   },
+   "rain": {
+    "n": 130,
+    "games": 66,
+    "ratio": 0.945
+   },
+   "wind 10-15": {
+    "n": 207,
+    "games": 102,
+    "ratio": 0.95
+   },
+   "wind 15+": {
+    "n": 43,
+    "games": 22,
+    "ratio": 0.971
+   }
+  },
+  "coef": {
+   "wind12": {
+    "est": -0.0483,
+    "lo": -0.1201,
+    "hi": 0.0169,
+    "use": false
+   },
+   "rain": {
+    "est": -0.066,
+    "lo": -0.1225,
+    "hi": -0.0063,
+    "use": true
+   },
+   "cold": {
+    "est": -0.0426,
+    "lo": -0.0771,
+    "hi": -0.0049,
+    "use": true
+   }
+  }
+ },
+ "rec": {
+  "buckets": {
+   "cold <35F": {
+    "n": 541,
+    "games": 38,
+    "ratio": 1.014
+   },
+   "indoor": {
+    "n": 4245,
+    "games": 307,
+    "ratio": 1.04
+   },
+   "outdoor fair": {
+    "n": 5849,
+    "games": 409,
+    "ratio": 1.014
+   },
+   "rain": {
+    "n": 930,
+    "games": 66,
+    "ratio": 0.939
+   },
+   "wind 10-15": {
+    "n": 1463,
+    "games": 103,
+    "ratio": 0.954
+   },
+   "wind 15+": {
+    "n": 305,
+    "games": 22,
+    "ratio": 0.958
+   }
+  },
+  "coef": {
+   "wind12": {
+    "est": -0.0724,
+    "lo": -0.1321,
+    "hi": 0.0,
+    "use": false
+   },
+   "rain": {
+    "est": -0.0776,
+    "lo": -0.1284,
+    "hi": -0.0172,
+    "use": true
+   },
+   "cold": {
+    "est": -0.0429,
+    "lo": -0.0828,
+    "hi": -0.0064,
+    "use": true
+   }
+  }
+ },
+ "recs": {
+  "buckets": {
+   "cold <35F": {
+    "n": 541,
+    "games": 38,
+    "ratio": 0.989
+   },
+   "indoor": {
+    "n": 4245,
+    "games": 307,
+    "ratio": 1.022
+   },
+   "outdoor fair": {
+    "n": 5849,
+    "games": 409,
+    "ratio": 1.003
+   },
+   "rain": {
+    "n": 930,
+    "games": 66,
+    "ratio": 0.967
+   },
+   "wind 10-15": {
+    "n": 1463,
+    "games": 103,
+    "ratio": 0.983
+   },
+   "wind 15+": {
+    "n": 305,
+    "games": 22,
+    "ratio": 0.946
+   }
+  },
+  "coef": {
+   "wind12": {
+    "est": -0.0621,
+    "lo": -0.109,
+    "hi": -0.0018,
+    "use": true
+   },
+   "rain": {
+    "est": -0.0426,
+    "lo": -0.0982,
+    "hi": 0.0054,
+    "use": false
+   },
+   "cold": {
+    "est": -0.0301,
+    "lo": -0.056,
+    "hi": 0.0012,
+    "use": false
+   }
+  }
+ },
+ "rush": {
+  "buckets": {
+   "cold <35F": {
+    "n": 184,
+    "games": 38,
+    "ratio": 1.038
+   },
+   "indoor": {
+    "n": 1371,
+    "games": 307,
+    "ratio": 0.997
+   },
+   "outdoor fair": {
+    "n": 1888,
+    "games": 409,
+    "ratio": 0.987
+   },
+   "rain": {
+    "n": 311,
+    "games": 66,
+    "ratio": 0.933
+   },
+   "wind 10-15": {
+    "n": 479,
+    "games": 103,
+    "ratio": 0.967
+   },
+   "wind 15+": {
+    "n": 103,
+    "games": 22,
+    "ratio": 1.018
+   }
+  },
+  "coef": {
+   "wind12": {
+    "est": -0.0011,
+    "lo": -0.0826,
+    "hi": 0.0674,
+    "use": false
+   },
+   "rain": {
+    "est": -0.0714,
+    "lo": -0.1472,
+    "hi": 0.007,
+    "use": false
+   },
+   "cold": {
+    "est": 0.0562,
+    "lo": 0.0196,
+    "hi": 0.094,
+    "use": true
+   }
+  }
+ },
+ "td": {
+  "buckets": {
+   "cold <35F": {
+    "n": 741,
+    "games": 38,
+    "ratio": 1.058
+   },
+   "indoor": {
+    "n": 5703,
+    "games": 307,
+    "ratio": 1.027
+   },
+   "outdoor fair": {
+    "n": 7737,
+    "games": 409,
+    "ratio": 1.061
+   },
+   "rain": {
+    "n": 1242,
+    "games": 66,
+    "ratio": 0.872
+   },
+   "wind 10-15": {
+    "n": 1971,
+    "games": 103,
+    "ratio": 0.98
+   },
+   "wind 15+": {
+    "n": 412,
+    "games": 22,
+    "ratio": 0.998
+   }
+  },
+  "coef": {
+   "wind12": {
+    "est": -0.0387,
+    "lo": -0.1797,
+    "hi": 0.1007,
+    "use": false
+   },
+   "rain": {
+    "est": -0.1678,
+    "lo": -0.2603,
+    "hi": -0.0546,
+    "use": true
+   },
+   "cold": {
+    "est": -0.0051,
+    "lo": -0.0671,
+    "hi": 0.0609,
+    "use": false
+   }
+  }
+ }
+}

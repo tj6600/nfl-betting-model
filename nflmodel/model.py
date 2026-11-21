@@ -1,5 +1,5 @@
 import numpy as np, pandas as pd
-from scipy.stats import norm
+from .stats import norm
 import os
 GAMES_URL = 'https://github.com/nflverse/nfldata/raw/master/data/games.csv'
 G = pd.read_csv(os.environ.get('NFL_GAMES_CSV', GAMES_URL), parse_dates=['gameday'])
@@ -51,3 +51,22 @@ def annotate(p):
     p['p_home_win']=1-norm.cdf(0, p.pred_margin, SD_M)
     p['mkt_home_win']=novig(p.home_moneyline,p.away_moneyline)
     return p
+
+
+def current_week(games=None, now=None):
+    """(season, week) the weekly picks should price: the earliest regular-season week with an unplayed game.
+
+    A week whose only unplayed games are today or earlier (ET date) is skipped, so a Monday afternoon run
+    prices the coming week instead of re-pricing the week whose Monday night game hasn't kicked off yet.
+    Sunday evening the Monday game is still ahead, so the week stays. Returns None when nothing is left."""
+    g = G if games is None else games
+    now = pd.Timestamp.now(tz='America/New_York') if now is None else pd.Timestamp(now)
+    today = (now.tz_convert('America/New_York') if now.tzinfo else now).tz_localize(None).normalize()
+    up = g[(g.game_type == 'REG') & g.result.isna() & (pd.to_datetime(g.gameday) >= today - pd.Timedelta(days=1))]
+    for (s, w), d in up.groupby(['season', 'week']):
+        if (pd.to_datetime(d.gameday) > today).any():
+            return int(s), int(w)
+    if len(up):
+        s, w = up.sort_values(['season', 'week']).iloc[0][['season', 'week']]
+        return int(s), int(w)
+    return None

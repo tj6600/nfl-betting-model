@@ -1,0 +1,420 @@
+"""Suggested parlays, logged when a board builds and graded later as whole parlays.
+
+The board pages build their suggestions in the browser (board/nba_app.js, board/nhl_app.js); suggest() is the
+same rule in Python so each day's suggestions can be saved and graded:
+  * pools: 'value' = the board's pool (Value legs by edge, then near-value);
+           'likely' = legs 55%+ to hit that still pay more than they risk (edge 1+ pt), no flags, by chance.
+  * a slip takes the best remaining legs: one per player, up to perGame legs a game (1 unless the slate is too
+    small to fill the slip), at most half the slip from one market family when the pool allows, and legs in no_sgp
+    markets never share a game. Legs are used once across the 6 suggestions; when that runs out a leg may appear in up
+    to 3, so each size shows 6 different slips whenever the pool allows (see many()).
+  * best = the leg count whose first suggestion has the highest Kelly growth with each chance cut 2 pts
+    (1 = straight bet when no parlay grows a bankroll).
+
+Grading: a parlay loses if any leg loses; otherwise it wins at the product of its winning legs' DraftKings prices
+(push and void legs drop out, as books do). Units are per 1 unit staked.
+"""
+import os, json, glob, math
+
+SIZES = [1, 2, 3, 4, 5, 6, 11]
+# NBA/NHL (Thomas, 2026-11-16): live grading had 3+ leg NBA parlays 0 for ~200 and every leg's chance overrated, so
+# NBA/NHL suggestions stop at 3 legs, no leg is heavier than -200, and 'likely' legs are judged on their chance at a
+# normal price (edge >= -3 pts, i.e. no worse than DraftKings' usual juice) instead of a model edge
+SHORT_SIZES = [1, 2, 3]
+MAX_JUICE = -200
+
+
+def likely(L):
+    """NBA/NHL Most likely to hit pool: 55%+ to hit, -200 or longer, normal juice at most, no flags (NHL adds winner picks)."""
+    return L['p'] >= 0.55 and L['price'] >= MAX_JUICE and L['edge'] >= -3 and not L['flags']
+
+
+def dec(a): return 1 + a / 100 if a > 0 else 1 + 100 / -a
+
+
+def growth(slip, sim=None):
+    p = sim.p(slip, 0.02) if sim else math.prod(max(0.01, L['p'] - 0.02) for L in slip); b = math.prod(dec(L['price']) for L in slip) - 1
+    f = (b * p - (1 - p)) / b
+    return 0.0 if f <= 0 else p * math.log(1 + f * b) + (1 - p) * math.log(1 - f)
+
+
+# ---- game simulation (Thomas, 2026-11-21): same rules as board/site/sim.js, so the builders and these logs pick the same legs ----
+_RHO = {}
+
+
+def _rho_table(sport):
+    if sport not in _RHO:
+        f = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'nflmodel', f'sim_{sport}.json')
+        _RHO[sport] = json.load(open(f))['rho'] if os.path.exists(f) else {}
+    return _RHO[sport]
+
+
+_NFL_POS = {'pass': 'QB', 'rush': 'RB', 'rec': 'WR', 'recs': 'WR', 'td': 'WR'}
+
+
+class Sim:
+    """Same-game links and parlay chances for one board. sport 'nfl' or 'nhl'; legs: every leg on the board (for each game's
+    favorite); pos: {pid: position} (NFL QB/RB/WR/TE, NHL F/D). Off (every link 1, chances multiplied) without tables."""
+
+    def __init__(self, sport, legs, pos=None):
+        self.sport, self.R, self.pos, self.fav, self._lk = sport, _rho_table(sport), {str(k): v for k, v in (pos or {}).items()}, {}, {}
+        if sport == 'nfl':
+            import re
+            for L in legs:
+                m = re.match(r'^(\S+) (-?[\d.]+)', str(L.get('sl', '')))
+                if L['kind'] == 'Game' and str(L.get('key', '')).endswith('-spread') and m and float(m.group(2)) < 0:
+                    self.fav[L['game']] = m.group(1) == L['game'].split(' @ ')[1]
+            for L in legs:
+                if L['kind'] == 'Game' and str(L.get('key', '')).endswith('-moneyline') and L['game'] not in self.fav and L.get('price', 0) < -100:
+                    self.fav[L['game']] = L['sl'] == L['game'].split(' @ ')[1]
+        else:
+            for L in legs:
+                if L['kind'] == 'Moneyline' and L['p'] > 0.5: self.fav[L['game']] = L['side'] == L['game'].split(' @ ')[1]
+
+    def var(self, L):
+        home = L['game'].split(' @ ')[1]; fh = self.fav.get(L['game'])
+        if self.sport == 'nfl':
+            if L['kind'] == 'Game':
+                if str(L.get('key', '')).endswith('-total'): return dict(stat='tot', dir=-1 if L['sl'] == 'Under' else 1, fav=fh)
+                return dict(stat='mar', dir=1 if str(L['sl']).split(' ')[0] == home else -1, fav=fh)
+            stat = 'td' if L['kind'] == 'TD' else L['key'].rsplit('-', 1)[-1].lower() if L['kind'] == 'Milestone' else L['kind'].lower()
+            ps = self.pos.get(str(L.get('pid'))) or _NFL_POS.get(stat)
+            if ps not in ('QB', 'RB', 'WR', 'TE'): ps = _NFL_POS.get(stat)
+            return dict(stat=stat, pos=ps, pid=L.get('pid'), team=L.get('team'), home=L.get('team') == home,
+                        dir=1 if L.get('alt') or L.get('sl') in ('Over', 'Yes') else -1)
+        if L['kind'] in ('Moneyline', 'Puck line'): return dict(stat='mar', dir=1 if L['side'] == home else -1, fav=fh)
+        if L['kind'] == 'Total': return dict(stat='tot', dir=-1 if L['side'] == 'Under' else 1, fav=fh)
+        stat = 'saves' if 'saves' in L['kind'].lower() else 'sog'
+        return dict(stat=stat, pos='G' if stat == 'saves' else 'D' if self.pos.get(str(L.get('pid'))) == 'D' else 'F', pid=L.get('pid'),
+                    team=L.get('team'), home=L.get('team') == home, dir=-1 if L.get('side') == 'Under' else 1)
+
+    def rho(self, a, b):
+        R, g = self.R, lambda x: x in ('mar', 'tot')
+        if g(a['stat']) and not g(b['stat']): a, b = b, a
+        if g(a['stat']):
+            if a['stat'] == b['stat']: return 0.999
+            m = a if a['stat'] == 'mar' else b
+            return 0.0 if m.get('fav') is None else R.get('mar:fav|tot|g', 0.0) * (1 if m['fav'] else -1)
+        if b['stat'] == 'mar': return R.get(f"{a['stat']}:{a['pos']}|mar|tm", 0.0) * (1 if a['home'] else -1)
+        if b['stat'] == 'tot': return R.get(f"{a['stat']}:{a['pos']}|tot|g", 0.0)
+        if a['pid'] == b['pid'] and a['stat'] == b['stat']: return 0.999
+        rel = 'self' if a['pid'] == b['pid'] else 'tm' if a['team'] == b['team'] else 'opp'
+        return R.get('|'.join(sorted([f"{a['stat']}:{a['pos']}", f"{b['stat']}:{b['pos']}"])) + '|' + rel, 0.0)
+
+    def link(self, a, b):
+        """P(both hit) / (P(a) x P(b)) for two legs of one game (1 for different games or without tables)."""
+        if a['game'] != b['game'] or not self.R: return 1.0
+        k = tuple(sorted([(a['id'], a['p']), (b['id'], b['p'])]))
+        if k not in self._lk:
+            from nflmodel.sim import bvn_upper, ndtri
+            pa, pb = (min(0.99, max(0.01, x['p'])) for x in (a, b)); va, vb = self.var(a), self.var(b)
+            r = max(-0.999, min(0.999, self.rho(va, vb) * va['dir'] * vb['dir']))
+            self._lk[k] = float(bvn_upper(ndtri(1 - pa), ndtri(1 - pb), r)) / (pa * pb)
+        return self._lk[k]
+
+    def p(self, slip, shade=0.0):
+        """Chance the whole slip hits: same-game legs simulated together, different games multiplied (sim.js parlay())."""
+        import numpy as np
+        from nflmodel.sim import joint
+        by = {}
+        for L in slip: by.setdefault(L['game'], []).append(L)
+        out = 1.0
+        for xs in by.values():
+            ps = [max(0.01, L['p'] - shade) for L in xs]
+            if len(xs) == 1 or not self.R: out *= math.prod(ps); continue
+            vs = [self.var(L) for L in xs]; k = len(xs); C = np.eye(k)
+            for i in range(k):
+                for j in range(i + 1, k): C[i, j] = C[j, i] = self.rho(vs[i], vs[j])
+            out *= joint(ps, [v['dir'] for v in vs], C)
+        return out
+
+
+LINK_W, LINK_EPS = 6, 0.005
+
+
+def linked_pick(c, slip, metric, sim):
+    """board/app.js linkedPick(): of the next few legs that fit (c, in the mode's order), the mode's own first leg unless another
+    is at least half a point better once the slip's same-game legs are linked in (sim.link)."""
+    if not slip or len(c) < 2 or sim is None: return c[0]
+
+    def gain(L):
+        r = math.prod(sim.link(L, x) for x in slip if x['game'] == L['game']); return min(1.0, L['p'] * r) - L['p']
+    best, bg = c[0], gain(c[0])
+    for L in c[1:]:
+        g = gain(L)
+        if g > bg + LINK_EPS and metric(L) + g > metric(best) + bg + LINK_EPS: best, bg = L, g
+    return best
+
+
+def greedy(pool, size, fits, push, metric, sim):
+    """Fill a slip: each step takes linked_pick() of the first LINK_W legs that fits(slip, L) allows."""
+    slip = []
+    while len(slip) < size:
+        c = []
+        for L in pool:
+            if fits(slip, L):
+                c.append(L)
+                if len(c) >= LINK_W: break
+        if not c: break
+        L = linked_pick(c, slip, metric, sim); slip.append(L); push(L)
+    return slip if len(slip) >= size else None
+
+
+def fam(L):
+    """Market family, for mixing markets within a slip (alt and main lines of a stat are the same family)."""
+    if L['kind'] == 'Milestone': return L['key'].rsplit('-', 1)[-1].lower()             # NFL alt ladders: key 'pid-Rec'
+    k = L['kind'].lower(); k = k[4:] if k.startswith('alt ') else k
+    return 'shots' if k == 'shots on goal' else k
+
+
+def many(pool, size, n, pick):
+    """Up to n slips. Each slip mixes markets (at most half its legs from one market family) when the pool allows it.
+    Legs are used once across the n suggestions first; when that runs out, a leg may appear in up to 3 suggestions
+    (least-used legs first) so each size still shows n different slips when the pool allows (Thomas, 2026-11-14).
+    pick(pool, size, allowed(L) -> bool, cap) returns a slip (list of legs) or None."""
+    out, uses, seen = [], {}, set()
+    cap = size if size < 2 else math.ceil(size / 2)
+    for _ in range(n):
+        slip = None
+        for mx, c in ((0, cap), (0, size), (1, cap), (1, size), (2, cap), (2, size)):
+            cand = sorted(pool, key=lambda L: uses.get(L['id'], 0)) if mx else pool
+            s = pick(cand, size, lambda L, mx=mx: uses.get(L['id'], 0) <= mx, c)
+            if s and frozenset(L['id'] for L in s) not in seen:
+                slip = s; break
+        if not slip: break
+        seen.add(frozenset(L['id'] for L in slip)); out.append(slip)
+        for L in slip: uses[L['id']] = uses.get(L['id'], 0) + 1
+    return out
+
+
+def build(pool, size, n=6, no_sgp=(), metric=lambda L: L['p'], sim=None):
+    nG = len({L['game'] for L in pool})
+    per = min(3, max(3 if size > 6 else 1, math.ceil(size / max(1, nG))))
+
+    def pick(pool, size, allowed, cap):
+        g, pl, fm = {}, set(), {}
+
+        def fits(slip, L):
+            if not allowed(L) or g.get(L['game'], 0) >= per or (L.get('pid') and L['pid'] in pl) or fm.get(fam(L), 0) >= cap: return False
+            return not (g.get(L['game'], 0) and (L['kind'] in no_sgp or any(x['game'] == L['game'] and x['kind'] in no_sgp for x in slip)))
+
+        def push(L):
+            g[L['game']] = g.get(L['game'], 0) + 1; fm[fam(L)] = fm.get(fam(L), 0) + 1
+            if L.get('pid'): pl.add(L['pid'])
+        return greedy(pool, size, fits, push, metric, sim)
+    return many(pool, size, n, pick)
+
+
+SECURE = 0.60   # an Over main line under 60% gives way to the same player's likeliest fairly priced alt line at 60%+ (as for NFL)
+
+
+def _alt_tools(legs):
+    """NBA/NHL alt lines (alt=True, Over only, edge in points): the safer() swap and the 70%+ alt-first list."""
+    alts = {}
+    for L in legs:
+        if L.get('alt') and not L.get('flags') and L['p'] >= SECURE and L['edge'] >= -3 and L['price'] >= MAX_JUICE:
+            alts.setdefault((L.get('pid'), L.get('market')), []).append(L)
+    for xs in alts.values(): xs.sort(key=lambda x: -x['p'])
+
+    def safer(L):
+        if L.get('alt') or L.get('side') != 'Over' or L['p'] >= SECURE: return L
+        return next((a for a in alts.get((L.get('pid'), L.get('market')), []) if a['p'] > L['p']), L)
+    first = sorted([L for L in legs if L.get('alt') and not L.get('flags') and L['p'] >= ALT_FIRST_P and L['edge'] >= -ALT_JUICE_PTS and L['price'] >= MAX_JUICE],
+                   key=lambda L: (-L['p'], -L['edge']))
+    return safer, first
+
+
+def _dedupe(xs):
+    seen = set(); return [L for L in xs if not (L['id'] in seen or seen.add(L['id']))]
+
+
+def suggest(legs, pool_ids, likely, no_sgp=(), sim=None):
+    """legs: the board's legs; pool_ids: the value pool in order; likely(L) -> bool for the likely pool.
+    Same as the page (board/nba_app.js, nhl_app.js): shaky Overs swap to a safer alt line, and Most likely to hit
+    slips of 3+ legs lead with alt lines that are 70%+ (up to 3 pts juice, -500 or longer)."""
+    by = {L['id']: L for L in legs}
+    safer, first = _alt_tools(legs)
+    pools = {'value': _dedupe([safer(by[i]) for i in pool_ids if i in by]),
+             'likely': _dedupe([safer(L) for L in sorted([L for L in legs if likely(L)], key=lambda L: (-L['p'], -L['edge']))])}
+    pools = {k: [L for L in v if L['price'] >= MAX_JUICE] for k, v in pools.items()}   # no leg heavier than -200
+
+    def builder(pool, k):
+        lk = pool is pools['likely']
+        if lk and k >= ALT_FIRST_SIZE: pool = _dedupe(first + pool)
+        return build(pool, k, no_sgp=no_sgp, metric=(lambda L: L['p']) if lk else (lambda L: L['edge'] / 100), sim=sim)
+    return _pack(pools, builder, SHORT_SIZES, sim)
+
+
+# ---- NFL: the same rules as board/app.js (sugPool, safer, buildSlips) for the whole week and every market ----
+def nfl_pools(legs):
+    legs = [dict(L, price=L['offers']['DraftKings']) for L in legs if 'DraftKings' in L['offers']]
+    ok = lambda L: not L.get('flag')
+    alts = {}
+    for L in legs:
+        if L.get('alt') and ok(L) and L['p'] >= 0.55 and L['edge'] >= -0.02: alts.setdefault(L['key'], []).append(L)
+    for xs in alts.values(): xs.sort(key=lambda x: -x['p'])
+
+    def safer(L):   # a shaky Over (under 60%) gives way to the same player's 60%+ fairly priced alt line
+        if L.get('alt') or L['kind'] not in ('Rush', 'Rec', 'Recs', 'Pass') or L['sl'] != 'Over' or L['p'] >= 0.6: return L
+        return next((a for a in alts.get(L['key'], []) if a['p'] >= 0.6 and a['edge'] >= 0 and a['p'] > L['p']), L)
+
+    def dedupe(xs):
+        seen = set(); return [L for L in xs if not (L['id'] in seen or seen.add(L['id']))]
+    likely = sorted([safer(L) for L in legs if ok(L) and L['p'] >= 0.55 and (L['edge'] >= 0 if L.get('alt') else L['edge'] >= 0.01)],
+                    key=lambda L: (-L['p'], -L['edge']))
+    v = sorted([L for L in legs if ok(L) and L['p'] >= 0.55 and L['edge'] >= 0.03], key=lambda L: -L['edge'])
+    nv = sorted([L for L in legs if ok(L) and not (L['p'] >= 0.55 and L['edge'] >= 0.03) and L['p'] >= 0.52 and L['edge'] >= 0.015], key=lambda L: -L['edge'])
+    pools = {'value': dedupe([safer(L) for L in v + nv]), 'likely': dedupe(likely)}
+    # 3+ leg slips lead with alternate lines that are 70%+ (up to 3 pts juice, -500 or longer), likeliest first (Thomas, 2026-11-13: bigger
+    # 'Most likely to hit' parlays should be built from alt lines so each leg is likely to hit); the mode's own pool fills in after them
+    pools['_alt_first'] = sorted([L for L in legs if L.get('alt') and ok(L) and L['p'] >= ALT_FIRST_P and L['edge'] >= -ALT_JUICE_PTS / 100 and L['price'] >= ALT_MIN_PRICE], key=lambda L: (-L['p'], -L['edge']))
+    return pools
+
+
+ALT_FIRST_P, ALT_FIRST_SIZE = 0.70, 3
+# Thomas, 2026-11-15: DraftKings' 70%+ alt rungs are almost never fairly priced, so allow up to 3 pts of juice
+# (NBA/NHL edges are in points, NFL's are fractions), but no shorter than -500 so each rung still adds payout
+ALT_JUICE_PTS, ALT_MIN_PRICE = 3, -500
+
+
+def nfl_build(pool, size, n=6, metric=lambda L: L['p'], sim=None):
+    nG = len({L['game'] for L in pool}); one = nG == 1
+    per = size if one else min(3, max(3 if size > 6 else 1, math.ceil(size / max(1, nG))))
+
+    def pick(pool, size, allowed, cap):
+        g, gl, team, fm = {}, set(), {}, {}
+
+        def fits(out, L):
+            if not allowed(L) or g.get(L['game'], 0) >= per or fm.get(fam(L), 0) >= cap: return False
+            if any(x['key'] == L['key'] or (x['kind'] != 'Game' and L['kind'] != 'Game' and x['who'] == L['who']) for x in out): return False
+            if L['kind'] == 'Game': return L['game'] not in gl
+            return not (one and size <= 3 and team.get(L.get('team') or '', 0) >= 2)
+
+        def push(L):
+            if L['kind'] == 'Game': gl.add(L['game'])
+            elif one and size <= 3: t = L.get('team') or ''; team[t] = team.get(t, 0) + 1
+            g[L['game']] = g.get(L['game'], 0) + 1; fm[fam(L)] = fm.get(fam(L), 0) + 1
+        return greedy(pool, size, fits, push, metric, sim)
+    return many(pool, size, n, pick)
+
+
+def nfl_suggest(legs, pos=None):
+    pools = nfl_pools(legs); alt_first = pools.pop('_alt_first')
+    sim = Sim('nfl', [dict(L, price=L['offers'].get('DraftKings', 0)) for L in legs], pos)
+    def builder(pool, size, n=6):
+        lk = pool is pools['likely']
+        if lk and size >= ALT_FIRST_SIZE:   # Most likely to hit only; Best value is unchanged
+            seen = set(); pool = [L for L in alt_first + pool if not (L['id'] in seen or seen.add(L['id']))]
+        return nfl_build(pool, size, n, metric=(lambda L: L['p']) if lk else (lambda L: L['edge']), sim=sim)
+    return _pack(pools, builder, SIZES, sim)
+
+
+def _name(L): return L['label'] if L['kind'] == 'Game' or not L.get('who') else f"{L['who']} {L['label']}"
+
+
+def _pack(pools, builder, sizes_=SIZES, sim=None):
+    """sp: each slip's simulated chance (same-game legs together), by size, in slip order (logs from 2026-11-21 on)."""
+    out = {}
+    for mode, pool in pools.items():
+        slips = {k: builder(pool, k) for k in sizes_}
+        sizes = [k for k in sizes_ if slips[k]]
+        ps = [k for k in sizes if k > 1 and growth(slips[k][0], sim) > 0]
+        best = max(ps, key=lambda k: growth(slips[k][0], sim)) if ps else (1 if 1 in sizes else None)
+        out[mode] = dict(best=best, slips={str(k): [[dict(id=L['id'], label=_name(L), game=L['game'], price=int(L['price']), p=L['p']) for L in s]
+                                                    for s in slips[k]] for k in sizes},
+                         sp={str(k): [round(sim.p(s), 4) if sim else round(math.prod(L['p'] for L in s), 4) for s in slips[k]] for k in sizes})
+    return out
+
+
+def _slip_p(m, k, i, s):
+    """A logged slip's chance: the simulated one when the log has it, else its legs multiplied (older logs)."""
+    sp = (m.get('sp') or {}).get(k)
+    return sp[i] if sp and i < len(sp) else math.prod(L['p'] for L in s)
+
+
+CAL_BINS = [(0, .45), (.45, .5), (.5, .55), (.55, .6), (.6, .65), (.65, .7), (.7, .8), (.8, .9), (.9, 1.01)]
+
+
+def calibration(ps, wins):
+    """Do the board's chances match what happened? ps: chances given, wins: 1/0 results (graded legs, both sides of
+    every line). One row per chance bucket; a well calibrated board hits about as often as it said (Thomas, 2026-11-16)."""
+    out = []
+    for lo, hi in CAL_BINS:
+        xs = [(p, w) for p, w in zip(ps, wins) if lo <= p < hi]
+        if xs:
+            out.append(dict(bucket=f'{round(lo * 100)}-{min(100, round(hi * 100))}%', n=len(xs), said=sum(p for p, _ in xs) / len(xs),
+                            hit=sum(w for _, w in xs) / len(xs)))
+    return out
+
+
+def log(dirpath, day, stamp, legs, pool_ids=None, likely=None, no_sgp=(), nfl=False, pos=None, sim=None):
+    """Write <dirpath>/parlays/<day>_<stamp>.json once per odds snapshot (NFL: day = '2026_wk10'). pos: {pid: position} for
+    the game simulation (NFL); sim: a Sim for NBA/NHL boards (None = legs multiplied, as before)."""
+    d = os.path.join(dirpath, 'parlays'); os.makedirs(d, exist_ok=True)
+    f = os.path.join(d, f'{day}_{stamp}.json')
+    if not os.path.exists(f):
+        json.dump(nfl_suggest(legs, pos) if nfl else suggest(legs, pool_ids, likely, no_sgp, sim), open(f, 'w'))
+    return f
+
+
+def grade(dirpath, results, dates=None, when=None):
+    """results: {(day, leg_id): 'win'|'loss'|'push'|'void'} for graded legs.
+    Uses the earliest parlay log of each day. Returns a report dict for the Model record tab.
+    dates: keep only parlays whose date is in this set (the Model record's day/week/month menus); the date is
+    when(day, slip) if given (NFL: the day of the slip's last game), else the log's day."""
+    logs = {}
+    for f in sorted(glob.glob(os.path.join(dirpath, 'parlays', '*.json'))):
+        logs.setdefault(os.path.basename(f).rsplit('_', 1)[0], f)
+    rows = []
+    for day, f in logs.items():
+        S = json.load(open(f))
+        for mode, m in S.items():
+            for k, slips in m['slips'].items():
+                for i, s in enumerate(slips):
+                    res = [results.get((day, L['id'])) for L in s]
+                    if 'loss' in res: out, units = 'lost', -1.0
+                    elif any(r is None for r in res): continue          # not graded yet
+                    else:
+                        live = [L for L, r in zip(s, res) if r == 'win']
+                        out, units = ('push', 0.0) if not live else ('won', math.prod(dec(L['price']) for L in live) - 1)
+                    if dates is not None and (when(day, s) if when else day) not in dates: continue
+                    rows.append(dict(day=day, mode=mode, size=int(k), idx=i, best=int(k) == m['best'], result=out, units=units,
+                                     p=_slip_p(m, k, i, s), payout=math.prod(dec(L['price']) for L in s) - 1))
+    groups = []
+
+    def grp(name, x):
+        x = [r for r in x if r['result'] != 'push']
+        if not x: return
+        w = sum(r['result'] == 'won' for r in x); u = sum(r['units'] for r in x)
+        groups.append(dict(group=name, bets=len(x), won=w, lost=len(x) - w, hit=w / len(x), exp_hit=sum(r['p'] for r in x) / len(x),
+                           units=round(u, 2), roi=u / len(x)))
+    for mode, name in [('value', 'Best value'), ('likely', 'Most likely to hit')]:
+        grp(f'{name}: ★ suggestion', [r for r in rows if r['mode'] == mode and r['best'] and r['idx'] == 0])
+        for k in SIZES:
+            grp(f'{name}: {"straight" if k == 1 else f"{k}-leg"} (all suggestions)', [r for r in rows if r['mode'] == mode and r['size'] == k])
+    return dict(days=sorted({r['day'] for r in rows}) if dates is not None else sorted(logs), groups=groups)
+
+
+def pending(dirpath, results, PD, leg_key=lambda day, L: f"{day}|{L['id']}", when=None, add_leg=None, week_of=None, since=None):
+    """Add each suggested parlay that is still waiting on a leg to PD (calib.Pending), with the record groups grade() puts
+    it in. leg_key names a leg as the page's waiting legs do; add_leg(day, L) registers a waiting leg the page must grade."""
+    import calib as CAL
+    logs = {}
+    for f in sorted(glob.glob(os.path.join(dirpath, 'parlays', '*.json'))):
+        logs.setdefault(os.path.basename(f).rsplit('_', 1)[0], f)
+    for day, f in logs.items():
+        S = json.load(open(f))
+        for mode, m in S.items():
+            name = {'value': 'Best value', 'likely': 'Most likely to hit'}[mode]
+            for k, slips in m['slips'].items():
+                for i, s in enumerate(slips):
+                    res = [results.get((day, L['id'])) for L in s]
+                    if 'loss' in res or all(r is not None for r in res): continue
+                    d = when(day, s) if when else day
+                    if since and (not d or d < since): continue
+                    for L, r in zip(s, res):
+                        if r is None and add_leg: add_leg(day, L)
+                    g = [('parlays.groups', f'{name}: {"straight" if int(k) == 1 else f"{k}-leg"} (all suggestions)')]
+                    if int(k) == m['best'] and i == 0: g.append(('parlays.groups', f'{name}: ★ suggestion'))
+                    PD.add_parlay(d, [(leg_key(day, L), r, L['price']) for L, r in zip(s, res)], g, _slip_p(m, k, i, s),
+                                  **({'week_of': week_of} if week_of else {}))

@@ -2,3 +2,12 @@ __pycache__/
 *.pyc
 .venv/
 data/
+nhl_data/raw/
+
+# Android signing keys: never commit (keep a backup somewhere safe instead)
+*.keystore
+*.jks
+*.aab
+*.apk
+android/build/
+output/tennis_demo.html

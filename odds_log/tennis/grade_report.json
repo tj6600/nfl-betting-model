@@ -1,0 +1,781 @@
+{
+ "days": [
+  "2026-11-18",
+  "2026-11-19",
+  "2026-11-20"
+ ],
+ "groups": [
+  {
+   "group": "Board picks (every match)",
+   "bets": 23,
+   "won": 20,
+   "lost": 3,
+   "hit": 0.8695652173913043,
+   "exp_hit": 0.6704347826086956,
+   "units": 3.09,
+   "roi": 0.3085222761404451
+  },
+  {
+   "group": "Board picks, main draw",
+   "bets": 23,
+   "won": 20,
+   "lost": 3,
+   "hit": 0.8695652173913043,
+   "exp_hit": 0.6704347826086956,
+   "units": 3.09,
+   "roi": 0.3085222761404451
+  },
+  {
+   "group": "Board picks DraftKings priced",
+   "bets": 10,
+   "won": 10,
+   "lost": 0,
+   "hit": 1.0,
+   "exp_hit": 0.7287,
+   "units": 3.09,
+   "roi": 0.3085222761404451
+  },
+  {
+   "group": "Value legs (blend EV 3%+)",
+   "bets": 3,
+   "won": 0,
+   "lost": 3,
+   "hit": 0.0,
+   "exp_hit": 0.3232,
+   "units": -3.0,
+   "roi": -1.0
+  }
+ ],
+ "cal_sections": [
+  {
+   "name": "Board picks",
+   "note": "The player the board gave the better chance, every match.",
+   "n": 23,
+   "won": 20,
+   "lost": 3,
+   "said": 0.6704,
+   "hit": 0.8696,
+   "units": 3.09,
+   "roi": 0.1341,
+   "buckets": [
+    {
+     "label": "50\u201360%",
+     "n": 5,
+     "won": 4,
+     "lost": 1,
+     "said": 0.507,
+     "hit": 0.8,
+     "units": 0.0
+    },
+    {
+     "label": "60\u201370%",
+     "n": 13,
+     "won": 11,
+     "lost": 2,
+     "said": 0.6693,
+     "hit": 0.8462,
+     "units": 2.74
+    },
+    {
+     "label": "70\u201380%",
+     "n": 2,
+     "won": 2,
+     "lost": 0,
+     "said": 0.786,
+     "hit": 1.0,
+     "units": 0.0
+    },
+    {
+     "label": "80\u201390%",
+     "n": 3,
+     "won": 3,
+     "lost": 0,
+     "said": 0.8707,
+     "hit": 1.0,
+     "units": 0.34
+    }
+   ]
+  }
+ ],
+ "parlays": {
+  "days": [
+   "2026-11-18",
+   "2026-11-19",
+   "2026-11-20"
+  ],
+  "groups": [
+   {
+    "group": "Best value: \u2605 suggestion",
+    "bets": 2,
+    "won": 0,
+    "lost": 2,
+    "hit": 0.0,
+    "exp_hit": 0.31805,
+    "units": -2.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Best value: straight (all suggestions)",
+    "bets": 3,
+    "won": 0,
+    "lost": 3,
+    "hit": 0.0,
+    "exp_hit": 0.3232,
+    "units": -3.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Best value: 2-leg (all suggestions)",
+    "bets": 1,
+    "won": 0,
+    "lost": 1,
+    "hit": 0.0,
+    "exp_hit": 0.1009171,
+    "units": -1.0,
+    "roi": -1.0
+   }
+  ]
+ },
+ "by_period": {
+  "menu": {
+   "day": [
+    {
+     "key": "d:2026-11-20",
+     "label": "Fri Nov 20"
+    },
+    {
+     "key": "d:2026-11-19",
+     "label": "Thu Nov 19"
+    },
+    {
+     "key": "d:2026-11-18",
+     "label": "Wed Nov 18"
+    }
+   ],
+   "week": [
+    {
+     "key": "w:2026-11-16",
+     "label": "Nov 16 \u2013 22"
+    }
+   ],
+   "month": [
+    {
+     "key": "m:2026-11",
+     "label": "November 2026"
+    }
+   ]
+  },
+  "reports": {
+   "d:2026-11-20": {
+    "days": [
+     "2026-11-20"
+    ],
+    "groups": [
+     {
+      "group": "Board picks (every match)",
+      "bets": 4,
+      "won": 4,
+      "lost": 0,
+      "hit": 1.0,
+      "exp_hit": 0.7232500000000001,
+      "units": 0.49,
+      "roi": 0.24315738025415445
+     },
+     {
+      "group": "Board picks, main draw",
+      "bets": 4,
+      "won": 4,
+      "lost": 0,
+      "hit": 1.0,
+      "exp_hit": 0.7232500000000001,
+      "units": 0.49,
+      "roi": 0.24315738025415445
+     },
+     {
+      "group": "Board picks DraftKings priced",
+      "bets": 2,
+      "won": 2,
+      "lost": 0,
+      "hit": 1.0,
+      "exp_hit": 0.771,
+      "units": 0.49,
+      "roi": 0.24315738025415445
+     },
+     {
+      "group": "Value legs (blend EV 3%+)",
+      "bets": 1,
+      "won": 0,
+      "lost": 1,
+      "hit": 0.0,
+      "exp_hit": 0.3335,
+      "units": -1.0,
+      "roi": -1.0
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Board picks",
+      "note": "The player the board gave the better chance, every match.",
+      "n": 4,
+      "won": 4,
+      "lost": 0,
+      "said": 0.7233,
+      "hit": 1.0,
+      "units": 0.49,
+      "roi": 0.1216,
+      "buckets": [
+       {
+        "label": "60\u201370%",
+        "n": 3,
+        "won": 3,
+        "lost": 0,
+        "said": 0.6727,
+        "hit": 1.0,
+        "units": 0.38
+       },
+       {
+        "label": "80\u201390%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.875,
+        "hit": 1.0,
+        "units": 0.11
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-20"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.3335,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.3335,
+       "units": -1.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   },
+   "d:2026-11-19": {
+    "days": [
+     "2026-11-19"
+    ],
+    "groups": [
+     {
+      "group": "Board picks (every match)",
+      "bets": 10,
+      "won": 9,
+      "lost": 1,
+      "hit": 0.9,
+      "exp_hit": 0.6718,
+      "units": 1.21,
+      "roi": 0.3020029761348849
+     },
+     {
+      "group": "Board picks, main draw",
+      "bets": 10,
+      "won": 9,
+      "lost": 1,
+      "hit": 0.9,
+      "exp_hit": 0.6718,
+      "units": 1.21,
+      "roi": 0.3020029761348849
+     },
+     {
+      "group": "Board picks DraftKings priced",
+      "bets": 4,
+      "won": 4,
+      "lost": 0,
+      "hit": 1.0,
+      "exp_hit": 0.72725,
+      "units": 1.21,
+      "roi": 0.3020029761348849
+     },
+     {
+      "group": "Value legs (blend EV 3%+)",
+      "bets": 2,
+      "won": 0,
+      "lost": 2,
+      "hit": 0.0,
+      "exp_hit": 0.31805,
+      "units": -2.0,
+      "roi": -1.0
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Board picks",
+      "note": "The player the board gave the better chance, every match.",
+      "n": 10,
+      "won": 9,
+      "lost": 1,
+      "said": 0.6718,
+      "hit": 0.9,
+      "units": 1.21,
+      "roi": 0.1208,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 2,
+        "won": 2,
+        "lost": 0,
+        "said": 0.505,
+        "hit": 1.0,
+        "units": 0.0
+       },
+       {
+        "label": "60\u201370%",
+        "n": 6,
+        "won": 5,
+        "lost": 1,
+        "said": 0.6745,
+        "hit": 0.8333,
+        "units": 1.1
+       },
+       {
+        "label": "70\u201380%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.786,
+        "hit": 1.0,
+        "units": 0.0
+       },
+       {
+        "label": "80\u201390%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.875,
+        "hit": 1.0,
+        "units": 0.11
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-19"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.3026,
+       "units": -1.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 2,
+       "won": 0,
+       "lost": 2,
+       "hit": 0.0,
+       "exp_hit": 0.31805,
+       "units": -2.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.1009171,
+       "units": -1.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   },
+   "d:2026-11-18": {
+    "days": [
+     "2026-11-18"
+    ],
+    "groups": [
+     {
+      "group": "Board picks (every match)",
+      "bets": 9,
+      "won": 7,
+      "lost": 2,
+      "hit": 0.7777777777777778,
+      "exp_hit": 0.6454444444444445,
+      "units": 1.39,
+      "roi": 0.3477240240891506
+     },
+     {
+      "group": "Board picks, main draw",
+      "bets": 9,
+      "won": 7,
+      "lost": 2,
+      "hit": 0.7777777777777778,
+      "exp_hit": 0.6454444444444445,
+      "units": 1.39,
+      "roi": 0.3477240240891506
+     },
+     {
+      "group": "Board picks DraftKings priced",
+      "bets": 4,
+      "won": 4,
+      "lost": 0,
+      "hit": 1.0,
+      "exp_hit": 0.7090000000000001,
+      "units": 1.39,
+      "roi": 0.3477240240891506
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Board picks",
+      "note": "The player the board gave the better chance, every match.",
+      "n": 9,
+      "won": 7,
+      "lost": 2,
+      "said": 0.6454,
+      "hit": 0.7778,
+      "units": 1.39,
+      "roi": 0.1545,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 3,
+        "won": 2,
+        "lost": 1,
+        "said": 0.5083,
+        "hit": 0.6667,
+        "units": 0.0
+       },
+       {
+        "label": "60\u201370%",
+        "n": 4,
+        "won": 3,
+        "lost": 1,
+        "said": 0.659,
+        "hit": 0.75,
+        "units": 1.26
+       },
+       {
+        "label": "70\u201380%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.786,
+        "hit": 1.0,
+        "units": 0.0
+       },
+       {
+        "label": "80\u201390%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.862,
+        "hit": 1.0,
+        "units": 0.13
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [],
+     "groups": []
+    }
+   },
+   "w:2026-11-16": {
+    "days": [
+     "2026-11-18",
+     "2026-11-19",
+     "2026-11-20"
+    ],
+    "groups": [
+     {
+      "group": "Board picks (every match)",
+      "bets": 23,
+      "won": 20,
+      "lost": 3,
+      "hit": 0.8695652173913043,
+      "exp_hit": 0.6704347826086956,
+      "units": 3.09,
+      "roi": 0.3085222761404451
+     },
+     {
+      "group": "Board picks, main draw",
+      "bets": 23,
+      "won": 20,
+      "lost": 3,
+      "hit": 0.8695652173913043,
+      "exp_hit": 0.6704347826086956,
+      "units": 3.09,
+      "roi": 0.3085222761404451
+     },
+     {
+      "group": "Board picks DraftKings priced",
+      "bets": 10,
+      "won": 10,
+      "lost": 0,
+      "hit": 1.0,
+      "exp_hit": 0.7287,
+      "units": 3.09,
+      "roi": 0.3085222761404451
+     },
+     {
+      "group": "Value legs (blend EV 3%+)",
+      "bets": 3,
+      "won": 0,
+      "lost": 3,
+      "hit": 0.0,
+      "exp_hit": 0.3232,
+      "units": -3.0,
+      "roi": -1.0
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Board picks",
+      "note": "The player the board gave the better chance, every match.",
+      "n": 23,
+      "won": 20,
+      "lost": 3,
+      "said": 0.6704,
+      "hit": 0.8696,
+      "units": 3.09,
+      "roi": 0.1341,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 5,
+        "won": 4,
+        "lost": 1,
+        "said": 0.507,
+        "hit": 0.8,
+        "units": 0.0
+       },
+       {
+        "label": "60\u201370%",
+        "n": 13,
+        "won": 11,
+        "lost": 2,
+        "said": 0.6693,
+        "hit": 0.8462,
+        "units": 2.74
+       },
+       {
+        "label": "70\u201380%",
+        "n": 2,
+        "won": 2,
+        "lost": 0,
+        "said": 0.786,
+        "hit": 1.0,
+        "units": 0.0
+       },
+       {
+        "label": "80\u201390%",
+        "n": 3,
+        "won": 3,
+        "lost": 0,
+        "said": 0.8707,
+        "hit": 1.0,
+        "units": 0.34
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-19",
+      "2026-11-20"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 2,
+       "won": 0,
+       "lost": 2,
+       "hit": 0.0,
+       "exp_hit": 0.31805,
+       "units": -2.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 3,
+       "won": 0,
+       "lost": 3,
+       "hit": 0.0,
+       "exp_hit": 0.3232,
+       "units": -3.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.1009171,
+       "units": -1.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   },
+   "m:2026-11": {
+    "days": [
+     "2026-11-18",
+     "2026-11-19",
+     "2026-11-20"
+    ],
+    "groups": [
+     {
+      "group": "Board picks (every match)",
+      "bets": 23,
+      "won": 20,
+      "lost": 3,
+      "hit": 0.8695652173913043,
+      "exp_hit": 0.6704347826086956,
+      "units": 3.09,
+      "roi": 0.3085222761404451
+     },
+     {
+      "group": "Board picks, main draw",
+      "bets": 23,
+      "won": 20,
+      "lost": 3,
+      "hit": 0.8695652173913043,
+      "exp_hit": 0.6704347826086956,
+      "units": 3.09,
+      "roi": 0.3085222761404451
+     },
+     {
+      "group": "Board picks DraftKings priced",
+      "bets": 10,
+      "won": 10,
+      "lost": 0,
+      "hit": 1.0,
+      "exp_hit": 0.7287,
+      "units": 3.09,
+      "roi": 0.3085222761404451
+     },
+     {
+      "group": "Value legs (blend EV 3%+)",
+      "bets": 3,
+      "won": 0,
+      "lost": 3,
+      "hit": 0.0,
+      "exp_hit": 0.3232,
+      "units": -3.0,
+      "roi": -1.0
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Board picks",
+      "note": "The player the board gave the better chance, every match.",
+      "n": 23,
+      "won": 20,
+      "lost": 3,
+      "said": 0.6704,
+      "hit": 0.8696,
+      "units": 3.09,
+      "roi": 0.1341,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 5,
+        "won": 4,
+        "lost": 1,
+        "said": 0.507,
+        "hit": 0.8,
+        "units": 0.0
+       },
+       {
+        "label": "60\u201370%",
+        "n": 13,
+        "won": 11,
+        "lost": 2,
+        "said": 0.6693,
+        "hit": 0.8462,
+        "units": 2.74
+       },
+       {
+        "label": "70\u201380%",
+        "n": 2,
+        "won": 2,
+        "lost": 0,
+        "said": 0.786,
+        "hit": 1.0,
+        "units": 0.0
+       },
+       {
+        "label": "80\u201390%",
+        "n": 3,
+        "won": 3,
+        "lost": 0,
+        "said": 0.8707,
+        "hit": 1.0,
+        "units": 0.34
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026-11-19",
+      "2026-11-20"
+     ],
+     "groups": [
+      {
+       "group": "Best value: \u2605 suggestion",
+       "bets": 2,
+       "won": 0,
+       "lost": 2,
+       "hit": 0.0,
+       "exp_hit": 0.31805,
+       "units": -2.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 3,
+       "won": 0,
+       "lost": 3,
+       "hit": 0.0,
+       "exp_hit": 0.3232,
+       "units": -3.0,
+       "roi": -1.0
+      },
+      {
+       "group": "Best value: 2-leg (all suggestions)",
+       "bets": 1,
+       "won": 0,
+       "lost": 1,
+       "hit": 0.0,
+       "exp_hit": 0.1009171,
+       "units": -1.0,
+       "roi": -1.0
+      }
+     ]
+    }
+   }
+  }
+ }
+}
