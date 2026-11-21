@@ -37,10 +37,35 @@
     }
     return L;
   }
+  // P(X > a, Y > b) for standard normals with correlation rho: exact (Gauss-Legendre, 40 nodes, as nflmodel/sim.py's
+  // bvn_upper), so two-leg chances and the builders' leg links match the Python logs exactly
+  const GL = (() => {   // Legendre nodes and weights on [-1, 1]
+    const n = 40, x = [], w = [];
+    for (let i = 1; i <= n; i++) {
+      let z = Math.cos(Math.PI * (i - 0.25) / (n + 0.5)), dp = 0;
+      for (let it = 0; it < 100; it++) {
+        let p0 = 1, p1 = z; for (let k = 2; k <= n; k++) { const p2 = ((2 * k - 1) * z * p1 - (k - 1) * p0) / k; p0 = p1; p1 = p2; }
+        dp = n * (z * p1 - p0) / (z * z - 1); const dz = p1 / dp; z -= dz; if (Math.abs(dz) < 1e-15) break;
+      }
+      x.push(z); w.push(2 / ((1 - z * z) * dp * dp));
+    }
+    return { x, w };
+  })();
+  function erf(x) {   // Abramowitz-Stegun 7.1.26, as sim.py
+    const s = Math.sign(x); x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x);
+    return s * (1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x));
+  }
+  const Phi = (x) => 0.5 * (1 + erf(x / Math.SQRT2)), phi = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+  function bvnUpper(a, b, rho) {
+    const lo = Math.min(8, Math.max(-8, a)), hi = 8, s = Math.sqrt(Math.max(1 - rho * rho, 1e-12)); let t = 0;
+    for (let i = 0; i < GL.x.length; i++) { const x = (hi - lo) / 2 * GL.x[i] + (hi + lo) / 2; t += GL.w[i] * phi(x) * (1 - Phi((b - rho * x) / s)); }
+    return (hi - lo) / 2 * t;
+  }
   // chance every leg hits. ps: each leg's chance; dirs: +1 = hits on a high number (Over, Yes, the home side), -1 = low;
   // C: correlations of the legs' hidden numbers before direction
   function joint(ps, dirs, C) {
     const k = ps.length; if (!k) return 1; if (k === 1) return ps[0];
+    if (k === 2) { const r = Math.max(-0.999, Math.min(0.999, C[0][1] * dirs[0] * dirs[1])); return bvnUpper(ndtri(1 - ps[0]), ndtri(1 - ps[1]), r); }
     let A = C.map((r, i) => r.map((v, j) => (i === j ? 1 : v * dirs[i] * dirs[j]))), L = chol(A);
     for (let t = 0; !L && t < 40; t++) { A = A.map((r, i) => r.map((v, j) => (i === j ? 1 : v * 0.95))); L = chol(A); }   // shrink until consistent
     if (!L) return ps.reduce((a, p) => a * p, 1);
@@ -131,5 +156,28 @@
     if (!NFAV) { NFAV = {}; for (const l of all || ls) if (l.kind === 'Moneyline' && l.p > 0.5) NFAV[l.game] = l.side === l.game.split(' @ ')[1]; }
     return parlay(ls.map((l) => ({ id: l.id, game: l.game, p: Math.max(0.01, l.p - shade), v: nhlVar(l, posOf ? posOf(l) : null, NFAV[l.game]) })), tableRho('nhl'));
   }
-  window.GameSim = { joint, parlay, ndtri, nfl: { parlay: nflParlay, rho: nflRho, v: nflVar }, nhl: { parlay: nhlParlay }, ready: (s) => !!(T[s] && T[s].rho), games: (s) => (T[s] || {}).games || 0 };
+  // how much two same-game legs help each other: P(both) / (P(a) x P(b)); 1 for different games. The builders use it to
+  // pick legs that rise together and skip legs that work against each other (Thomas, 2026-11-21)
+  const LK = {};
+  function linkOf(sport, a, b, va, vb, rho) {
+    if (a.game !== b.game) return 1;
+    const key = sport + '|' + [a.id + ':' + a.p, b.id + ':' + b.p].sort().join('|');
+    if (!(key in LK)) {
+      const pa = Math.max(0.01, Math.min(0.99, a.p)), pb = Math.max(0.01, Math.min(0.99, b.p));
+      LK[key] = joint([pa, pb], [va.dir, vb.dir], [[1, rho(va, vb)], [rho(va, vb), 1]]) / (pa * pb);
+    }
+    return LK[key];
+  }
+  function nflLink(a, b, all, posOf) {
+    if (a.game !== b.game) return 1; FAV = FAV || nflFavs(all || [a, b]);
+    const v = (l) => nflVar(l, posOf ? posOf(l) : l.pos, FAV[l.game]);
+    return linkOf('nfl', a, b, v(a), v(b), nflRho);
+  }
+  function nhlLink(a, b, all, posOf) {
+    if (a.game !== b.game) return 1;
+    if (!NFAV) { NFAV = {}; for (const l of all || [a, b]) if (l.kind === 'Moneyline' && l.p > 0.5) NFAV[l.game] = l.side === l.game.split(' @ ')[1]; }
+    const v = (l) => nhlVar(l, posOf ? posOf(l) : null, NFAV[l.game]);
+    return linkOf('nhl', a, b, v(a), v(b), tableRho('nhl'));
+  }
+  window.GameSim = { joint, parlay, ndtri, nfl: { parlay: nflParlay, rho: nflRho, v: nflVar, link: nflLink }, nhl: { parlay: nhlParlay, link: nhlLink }, ready: (s) => !!(T[s] && T[s].rho), games: (s) => (T[s] || {}).games || 0 };
 })();

@@ -817,18 +817,36 @@ function buildSlips(size, n = 6, relax = 0) {
   if (relax) pool = dedupe(pool.concat(fillPool()));
   const nG = new Set(pool.map((L) => L.game)).size;
   const perGame = relax >= 2 ? size : Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / Math.max(1, nG))));   // more per game only when the slate is too small
+  const metric = mode === 'likely' ? (L) => L.p : (L) => L.edge / 100;
   return many(pool, size, n, (pool, size, allowed, cap) => {
     if (relax >= 2) cap = size;
     const slip = [], g = {}, pl = new Set(), fm = {}, sk = new Set();
-    for (const L of pool) {
-      if (sk.has(sideKey(L))) continue;   // never both sides (or two lines) of one market
-      if (!allowed(L) || (g[L.game] || 0) >= perGame || (relax < 3 && L.pid && pl.has(L.pid)) || (fm[fam(L)] || 0) >= cap) continue;
-      if ((g[L.game] || 0) && (NO_SGP.has(L.kind) || slip.some((x) => x.game === L.game && NO_SGP.has(x.kind)))) continue;
+    const fits = (L) => {
+      if (sk.has(sideKey(L))) return false;   // never both sides (or two lines) of one market
+      if (!allowed(L) || (g[L.game] || 0) >= perGame || (relax < 3 && L.pid && pl.has(L.pid)) || (fm[fam(L)] || 0) >= cap) return false;
+      return !((g[L.game] || 0) && (NO_SGP.has(L.kind) || slip.some((x) => x.game === L.game && NO_SGP.has(x.kind))));
+    };
+    while (slip.length < size) {
+      const c = []; for (const L of pool) if (fits(L) && c.push(L) >= LINK_W) break;
+      if (!c.length) break;
+      const L = linkedPick(c, slip, metric, simLink);
       slip.push(L); sk.add(sideKey(L)); g[L.game] = (g[L.game] || 0) + 1; fm[fam(L)] = (fm[fam(L)] || 0) + 1; if (L.pid) pl.add(L.pid);
-      if (slip.length >= size) return slip;
     }
-    return relax >= 4 && slip.length ? slip : null;
+    return slip.length >= size || (relax >= 4 && slip.length) ? slip : null;
   });
+}
+// Builders use the game simulation (Thomas, 2026-11-21): each next leg is chosen from the next few legs that fit (LINK_W, in
+// the mode's order) by its chance given the slip's other legs from its game (goalie saves rise with the other team's shots,
+// and so on). The mode's own leg stays first unless another one is at least half a point better after the links. Legs from
+// different games are unaffected. Same rule as parlays.py linked_pick().
+const LINK_W = 6, LINK_EPS = 0.005;
+const simLink = (a, b) => (window.GameSim && GameSim.ready('nhl') && GameSim.nhl.link ? GameSim.nhl.link(a, b, D.legs || [], (l) => SIM_POS[String(l.pid)]) : 1);
+function linkedPick(c, slip, metric, link) {
+  if (!slip.length || c.length < 2) return c[0];
+  const gain = (L) => { let r = 1; for (const x of slip) if (x.game === L.game) r *= link(L, x); return Math.min(1, L.p * r) - L.p; };   // extra chance
+  let best = c[0], bg = gain(best);
+  for (const L of c.slice(1)) { const g = gain(L); if (g > bg + LINK_EPS && metric(L) + g > metric(best) + bg + LINK_EPS) { best = L; bg = g; } }
+  return best;
 }
 // growth score: Kelly bankroll growth of the slip, with each leg's chance cut 2 points for model error
 // Game simulation (board/site/sim.js, Thomas 2026-11-19): same-game legs are drawn together with correlations measured on
