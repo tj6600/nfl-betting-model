@@ -11,7 +11,7 @@ const headStep = (p) => {
 };
 const MS = (D.milestones || []).map((p) => { const h = headStep(p); return { ...p, head: h, p: h.p, ev: Math.max(...p.steps.map((x) => x.ev)) }; });
 const state = { tab: 'td', cat: 'all', game: 'all', win: 'all', pos: 'all', q: '', sort: null, small: true, open: null };
-const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(YD.some((p) => p.market === 'recs') ? [['recs', 'Receptions']] : []).concat(YD.some((p) => p.market === 'pass') ? [['pass', 'Passing yards']] : []).concat(MS.length ? [['ms', 'Milestones']] : []).concat(D.legs ? [['parlay', 'Parlay builder']] : []).concat(D.record ? [['record', 'Model record']] : []).concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
+const TABS = [['td', 'Touchdowns'], ['rush', 'Rushing yards'], ['rec', 'Receiving yards']].concat(YD.some((p) => p.market === 'recs') ? [['recs', 'Receptions']] : []).concat(YD.some((p) => p.market === 'pass') ? [['pass', 'Passing yards']] : []).concat(MS.length ? [['ms', 'Milestones']] : []).concat(D.legs ? [['parlay', 'Parlay builder'], ['sim', 'Simulation']] : []).concat(D.record ? [['record', 'Model record']] : []).concat(D.blind ? [['test', `Week ${D.blind.week} test`]] : []);
 const PILL = { 'TD value': 'value', 'Value': 'value', 'Most likely': 'likely', 'Check role': 'check', 'Likely hit': 'likely' };
 const fmtOdds = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
@@ -1015,10 +1015,29 @@ function renderParlay() {
   board.append(pick, sl);
   document.getElementById('foot').textContent = 'Legs are ranked by edge: our chance minus the break-even chance the price implies. EV alone favors long shots, because a small overestimate of a 5% chance turns into a huge EV at +2500; edge in percentage points does not, so it rewards legs that are both likely and underpriced. Each leg\'s chance blends our model with the books\' own chance, 50/50 for normal prices and leaning more on the books for long shots (down to 20% model below about a 12% book chance), since the model is least reliable in the tails. Game lines are blended too, because on past closing lines the spread model showed no edge by itself. Only DraftKings is used: each leg is DraftKings\' own number and price, and the parlay is priced at DraftKings. The parlay chance comes from a game simulation: legs from the same game are drawn together 20,000 times with the correlations measured on 2021–25 games (a QB\'s yards and his receivers\' yards rise together, a team that wins big runs more, and so on), so same-game legs that tend to hit together get a higher chance than multiplying them, and legs that work against each other a lower one; each leg keeps its own chance. Legs from different games multiply. On 2024–25 games the simulated chances matched how often same-game parlays hit far better than multiplying (see Backtests). EV uses that book\'s price unless you enter the parlay price your app shows (books sometimes boost or trim parlay payouts). None of these leg types has been graded against real lines yet, so treat the EV as the model\'s opinion, not a promise. Tracking only, not betting advice.';
 }
+// ---- Simulation tab (Thomas, 2026-11-21): each game's simulation (board/site/sim.js renderTab), from the board's chances ----
+function renderSim() {
+  document.getElementById('lede').textContent = 'Each game simulated 20,000 times with the correlations measured on past games: the game lines\' chances, how each player\'s chance moves if each team wins or the game goes over or under, the likeliest same-game parlays, and the legs that rise and fall together. Tap Build to open a parlay in the builder.';
+  for (const id of ['cats', 'games', 'legend']) document.getElementById(id).replaceChildren();
+  document.querySelector('.bar').style.display = 'none';
+  const board = document.getElementById('board'); board.replaceChildren(); board.className = 'cols';
+  if (!(window.GameSim && GameSim.ready('nfl') && GameSim.renderTab)) { board.append(el('div', 'empty', 'The simulation tables did not load. Refresh the page.')); return; }
+  const dk = (l) => l.offers.DraftKings;
+  GameSim.renderTab(board, {
+    sport: 'nfl', all: LEGS, posOf, starts: STARTS, legs: LEGS.filter((l) => dk(l) != null),
+    name: legName, price: dk, side: (l) => String(l.sl || ''), team: (l) => String(l.sl).split(' ')[0],
+    role: (l) => (l.kind !== 'Game' ? 'player' : /-moneyline$/.test(l.key) ? 'win' : /-total$/.test(l.key) ? 'total' : 'line'),
+    main: (l) => !l.alt, slot: (l) => l.key, who: (l) => (l.kind === 'Game' ? '' : l.who),
+    ok: (l) => !l.flag && l.p >= 0.5 && dk(l) >= ALT_MIN_PRICE,
+    onBuild: (ids) => { slip = ids.slice(); SS.idx = -1; PS.price = ''; PS.note = ''; saveSlip(); state.tab = 'parlay'; state.game = LEG[ids[0]].game; render(); window.scrollTo(0, 0); },
+  });
+  document.getElementById('foot').textContent = 'The simulation keeps each leg\'s own chance from the board and only models how legs move together (scripts/sim_fit.py, 2021\u20132025 games). Chances are not a promise, and DraftKings prices same-game parlays itself. These are tracking picks, not betting advice.';
+}
 function render() {
   if (state.tab === 'test') { renderTabs(); renderTest(); return; }
   if (state.tab === 'record') { renderTabs(); renderRecord(); return; }
   if (state.tab === 'parlay') { renderTabs(); renderParlay(); return; }
+  if (state.tab === 'sim') { renderTabs(); renderSim(); return; }
   document.querySelector('.bar').style.display = '';
   const cf = CONF[state.tab];
   document.getElementById('lede').textContent = cf.lede;

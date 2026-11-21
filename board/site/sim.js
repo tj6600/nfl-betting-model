@@ -179,5 +179,116 @@
     const v = (l) => nhlVar(l, posOf ? posOf(l) : null, NFAV[l.game]);
     return linkOf('nhl', a, b, v(a), v(b), tableRho('nhl'));
   }
-  window.GameSim = { joint, parlay, ndtri, nfl: { parlay: nflParlay, rho: nflRho, v: nflVar, link: nflLink }, nhl: { parlay: nhlParlay, link: nhlLink }, ready: (s) => !!(T[s] && T[s].rho), games: (s) => (T[s] || {}).games || 0 };
+  // ---- Simulation tab (Thomas, 2026-11-21): each game's simulation on one card ----
+  // cfg: { sport: 'nfl'|'nhl', legs: DraftKings-priced legs, all: every board leg, posOf, name(l), price(l), ok(l) (fit for
+  //        a same-game parlay), role(l): 'win' | 'total' | 'line' | 'player', main(l) (a main line, not an alt rung),
+  //        slot(l) (one leg per slot in a parlay), who(l) (player id, '' for game lines), starts {game: iso}, onBuild(ids) }
+  // A card shows: the game lines' chances; the game script (each player's chance if each team wins, and if the game goes over
+  // or under); the likeliest same-game parlays (simulated vs multiplied); the legs that move together or against each other.
+  // Every number is from the board's own chances and the correlations, so nothing here costs odds credits.
+  function gameView(cfg, game) {
+    const link = cfg.sport === 'nfl' ? (a, b) => nflLink(a, b, cfg.all, cfg.posOf) : (a, b) => nhlLink(a, b, cfg.all, cfg.posOf);
+    const parl = cfg.sport === 'nfl' ? (ls) => nflParlay(ls, cfg.all, cfg.posOf) : (ls) => nhlParlay(ls, cfg.all, cfg.posOf);
+    const ls = cfg.legs.filter((l) => l.game === game), home = game.split(' @ ')[1];
+    const wins = ls.filter((l) => cfg.role(l) === 'win').sort((a, b) => b.p - a.p);
+    const tots = ls.filter((l) => cfg.role(l) === 'total' && cfg.main(l));
+    const over = tots.find((l) => /^Over/.test(cfg.side(l))), under = tots.find((l) => /^Under/.test(cfg.side(l)));
+    const lines = ls.filter((l) => cfg.role(l) !== 'player' && cfg.main(l)).sort((a, b) => b.p - a.p);
+    // game script: one row per player market (its Over / Yes side, main line), chance overall and in each scenario
+    const cond = (l, a) => { if (!a) return null; const j = l.p * a.p * link(l, a); return { hit: j / a.p, miss: (l.p - j) / (1 - a.p) }; };
+    const fav = wins[0], pl = {};
+    for (const l of ls) if (cfg.role(l) === 'player' && cfg.main(l) && /^(Over|Yes)/.test(cfg.side(l))) { const k = cfg.slot(l); if (!pl[k] || Math.abs(l.p - 0.5) < Math.abs(pl[k].p - 0.5)) pl[k] = l; }
+    const script = Object.values(pl).map((l) => {
+      const w = cond(l, fav), t = cond(l, over);
+      return { l, p: l.p, favWin: w && w.hit, dogWin: w && w.miss, over: t && t.hit, under: t && t.miss, swing: Math.max(w ? Math.abs(w.hit - w.miss) : 0, t ? Math.abs(t.hit - t.miss) : 0) };
+    }).sort((a, b) => b.swing - a.swing);
+    // likeliest same-game parlays from the legs fit for one (2 and 3 legs), screened on pair links, then simulated
+    const pool = ls.filter(cfg.ok).sort((a, b) => b.p - a.p).slice(0, 14), fits = (xs) => {
+      const sl = new Set(), wh = new Set(); let g = 0;
+      for (const x of xs) { if (sl.has(cfg.slot(x))) return false; sl.add(cfg.slot(x)); const w = cfg.who(x); if (w) { if (wh.has(w)) return false; wh.add(w); } else if (++g > 1) return false; }
+      return true;
+    };
+    const pairs = [];
+    for (let i = 0; i < pool.length; i++) for (let j = i + 1; j < pool.length; j++) {
+      const a = pool[i], b = pool[j]; if (!fits([a, b])) continue;
+      const r = link(a, b); pairs.push({ ids: [a.id, b.id], ls: [a, b], r, p: a.p * b.p * r, pInd: a.p * b.p });
+    }
+    const top2 = pairs.slice().sort((a, b) => b.p - a.p).slice(0, 3);
+    const tri = [];
+    for (let i = 0; i < pool.length; i++) for (let j = i + 1; j < pool.length; j++) for (let k = j + 1; k < pool.length; k++) {
+      const xs = [pool[i], pool[j], pool[k]]; if (!fits(xs)) continue;
+      tri.push({ xs, est: xs[0].p * xs[1].p * xs[2].p * link(xs[0], xs[1]) * link(xs[0], xs[2]) * link(xs[1], xs[2]) });
+    }
+    const top3 = tri.sort((a, b) => b.est - a.est).slice(0, 12).map((t) => { const r = parl(t.xs); return { ids: t.xs.map((x) => x.id), ls: t.xs, p: r.p, pInd: r.pInd }; })
+      .sort((a, b) => b.p - a.p).slice(0, 3);
+    const big = pairs.filter((x) => x.ls.every((l) => l.p >= 0.3));
+    const together = big.filter((x) => x.r > 1.03).sort((a, b) => b.r - a.r).slice(0, 3);
+    const against = big.filter((x) => x.r < 0.97).sort((a, b) => a.r - b.r).slice(0, 3);
+    return { game, home, wins, over, under, lines, fav, script, top2, top3, together, against };
+  }
+  const SIM_CSS = `.simcard{margin-bottom:16px}.simlines{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px}
+.simchip{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:13px;white-space:nowrap}
+.simchip b{font-variant-numeric:tabular-nums}.simh{font-size:14px;margin:12px 14px 2px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.simcard .note{margin:0 14px 6px;font-size:13px;color:var(--muted)}td.simlegs{white-space:normal;min-width:180px;line-height:1.35}
+.simcard table.res td,.simcard table.res th{padding:7px 8px}.simpairs{margin:4px 14px 12px;padding-left:18px;font-size:14px;line-height:1.45}.simpairs b{margin-right:4px;font-variant-numeric:tabular-nums}`;
+  function renderTab(box, cfg) {
+    if (!document.getElementById('sim-css')) { const st = document.createElement('style'); st.id = 'sim-css'; st.textContent = SIM_CSS; document.head.append(st); }
+    const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+    const pc = (p) => (p == null ? '—' : p < 0.1 ? (p * 100).toFixed(1) + '%' : Math.round(p * 100) + '%');
+    const dec = (a) => (a > 0 ? 1 + a / 100 : 1 + 100 / -a), am = (d) => (d >= 2 ? '+' + Math.round((d - 1) * 100) : String(Math.round(-100 / (d - 1))));
+    const now = Date.now(), games = [...new Set(cfg.legs.map((l) => l.game))]
+      .filter((g) => !(cfg.starts[g] && Date.parse(cfg.starts[g]) <= now))
+      .sort((a, b) => (Date.parse(cfg.starts[a] || 0) || 0) - (Date.parse(cfg.starts[b] || 0) || 0));
+    box.replaceChildren();
+    if (!games.length) { box.append(el('div', 'empty', 'No upcoming games with DraftKings prices on this board.')); return; }
+    const when = (g) => { const t = cfg.starts[g]; return t ? new Date(t).toLocaleString('en-US', { weekday: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'America/New_York' }) + ' ET' : ''; };
+    for (const g of games) {
+      const V = gameView(cfg, g), c = el('section', 'col simcard');
+      const h = el('div', 'colhead'); h.append(el('h2', null, g), el('span', null, when(g))); c.append(h);
+      const chips = el('div', 'simlines');
+      for (const l of V.lines.slice(0, 6)) { const ch = el('span', 'simchip'); ch.append(el('b', null, pc(l.p)), el('span', null, ' ' + cfg.name(l))); chips.append(ch); }
+      c.append(chips);
+      // game script
+      if (V.script.length && (V.fav || V.over)) {
+        const fT = V.fav ? cfg.team(V.fav) : '', dT = V.fav ? (fT === V.home ? g.split(' @ ')[0] : V.home) : '';
+        c.append(el('h3', 'simh', 'Game script'), el('p', 'note', 'Each player’s chance overall and if the game goes each way, from 20,000 simulated games.'));
+        const tw = el('div', 'tablewrap'), t = el('table', 'res'), hr = el('tr');
+        ['Leg', 'Overall'].concat(V.fav ? [`${fT} wins`, `${dT} wins`] : []).concat(V.over ? ['Over', 'Under'] : []).forEach((x, i) => hr.append(el('th', i ? 'num' : null, x)));
+        t.append(hr);
+        for (const r of V.script.slice(0, 8)) {
+          const tr = el('tr'); tr.append(el('td', null, cfg.name(r.l)), el('td', 'num', pc(r.p)));
+          const cell = (x) => { const d = el('td', 'num ' + (x - r.p > 0.03 ? 'pos' : x - r.p < -0.03 ? 'neg' : 'dim'), pc(x)); tr.append(d); };
+          if (V.fav) { cell(r.favWin); cell(r.dogWin); } if (V.over) { cell(r.over); cell(r.under); }
+          t.append(tr);
+        }
+        tw.append(t); c.append(tw);
+      }
+      // likeliest same-game parlays
+      const sg = V.top2.concat(V.top3);
+      if (sg.length) {
+        c.append(el('h3', 'simh', 'Likeliest same-game parlays'), el('p', 'note', 'Simulated chance vs the legs multiplied as if unrelated. DraftKings prices same-game parlays itself, usually below the multiplied payout shown.'));
+        const tw = el('div', 'tablewrap'), t = el('table', 'res'), hr = el('tr');
+        ['Legs', 'Simulated', 'Multiplied', 'Payout', ''].forEach((x, i) => hr.append(el('th', i ? 'num' : null, x))); t.append(hr);
+        for (const x of sg) {
+          const tr = el('tr'), d = x.ls.reduce((a, l) => a * dec(cfg.price(l)), 1);
+          const nm = el('td', 'simlegs'); x.ls.forEach((l, i) => { if (i) nm.append(el('br')); nm.append(document.createTextNode(cfg.name(l))); });
+          const b = el('button', 'lnk', 'Build'); b.type = 'button'; b.onclick = () => cfg.onBuild(x.ids);
+          const bt = el('td', 'num'); bt.append(b);
+          tr.append(nm, el('td', 'num ' + (x.p - x.pInd >= 0.01 ? 'pos' : x.p - x.pInd <= -0.01 ? 'neg' : ''), pc(x.p)), el('td', 'num dim', pc(x.pInd)), el('td', 'num', am(d)), bt);
+          t.append(tr);
+        }
+        tw.append(t); c.append(tw);
+      }
+      // legs that move together / against each other
+      if (V.together.length || V.against.length) {
+        c.append(el('h3', 'simh', 'Legs that move together'));
+        const ul = el('ul', 'simpairs');
+        const li = (x, up) => { const i = el('li'); i.append(el('b', up ? 'pos' : 'neg', (up ? '+' : '−') + Math.round(Math.abs(x.r - 1) * 100) + '%'), document.createTextNode(` ${cfg.name(x.ls[0])} + ${cfg.name(x.ls[1])}: both hit ${pc(x.p)} vs ${pc(x.pInd)} if unrelated`)); ul.append(i); };
+        V.together.forEach((x) => li(x, true)); V.against.forEach((x) => li(x, false));
+        c.append(ul);
+      }
+      box.append(c);
+    }
+  }
+  window.GameSim = { joint, parlay, ndtri, nfl: { parlay: nflParlay, rho: nflRho, v: nflVar, link: nflLink }, nhl: { parlay: nhlParlay, link: nhlLink }, ready: (s) => !!(T[s] && T[s].rho), gameView, renderTab, games: (s) => (T[s] || {}).games || 0 };
 })();
