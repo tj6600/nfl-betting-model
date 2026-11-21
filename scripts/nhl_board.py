@@ -270,7 +270,8 @@ if legs and not args.no_log:
                   | {'alt': bool(l.get('alt')), 'flagged': bool(l['flags']), 'pick': l['pick']} for l in legs]).to_csv(lf, index=False)
     # suggested parlays as the page builds them (both modes, every leg count), graded by scripts/nhl_grade.py
     PZ.log(O.DIR, day, stamp, legs, [l['id'] for l in pool],
-           lambda L: PZ.likely(L) or (L.get('pick') and L['p'] >= 0.55 and L['price'] >= PZ.MAX_JUICE and not L['flags']), no_sgp={'Saves', 'Alt saves'})
+           lambda L: PZ.likely(L) or (L.get('pick') and L['p'] >= 0.55 and L['price'] >= PZ.MAX_JUICE and not L['flags']), no_sgp={'Saves', 'Alt saves'},
+           sim=PZ.Sim('nhl', legs, {x['id']: x['pos'] for x in players}))
 
 # ---------- backtest summary for the Model record tab ----------
 bt = {}

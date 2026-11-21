@@ -1203,6 +1203,20 @@ const legName = (l) => (l.kind === 'Game' ? (/^(Over|Under)/.test(l.label) ? `${
 // with his team losing big less often. Legs from different games multiply as before. null when sim.js didn't load.
 const posOf = (l) => l.pos || (LOGS[l.pid] || {}).pos;
 const simOf = (ls, shade = 0) => (window.GameSim && GameSim.ready('nfl') ? GameSim.nfl.parlay(ls, LEGS, posOf, shade) : null);
+// Builders use the game simulation (Thomas, 2026-11-21): each next leg is chosen from the next few legs that fit (LINK_W, in
+// the mode's order) by its chance given the legs already on the slip from its game. A leg that rises with them (a QB's yards and
+// his receiver's, a favorite covering and its running back's yards) gains that extra chance; one that works against them loses it.
+// The mode's own leg stays first unless another one is at least half a point better after the links. Legs from different
+// games are unaffected, so multi-game slips are built as before. Same rule as parlays.py linked_pick().
+const LINK_W = 6, LINK_EPS = 0.005;
+const simLink = (a, b) => (window.GameSim && GameSim.ready('nfl') && GameSim.nfl.link ? GameSim.nfl.link(a, b, LEGS, posOf) : 1);
+function linkedPick(c, slip, metric, link) {
+  if (!slip.length || c.length < 2) return c[0];
+  const gain = (l) => { let r = 1; for (const x of slip) if (x.game === l.game) r *= link(l, x); return Math.min(1, l.p * r) - l.p; };   // extra chance
+  let best = c[0], bg = gain(best);
+  for (const l of c.slice(1)) { const g = gain(l); if (g > bg + LINK_EPS && metric(l) + g > metric(best) + bg + LINK_EPS) { best = l; bg = g; } }
+  return best;
+}
 function parlayMath(ids, priceOverride) {
   const ls = ids.map((i) => LEG[i]);
   const pInd = ls.reduce((a, l) => a * l.p, 1), sim = simOf(ls), p = sim ? sim.p : pInd;
@@ -1351,18 +1365,25 @@ function buildSlips(size, n = 6, relax = 0) {
   const nG = new Set(pool.map((l) => l.game)).size, one = state.game !== 'all' || nG === 1;   // a window can hold just one game
   // across games: 1 leg per game, more only when the scope has too few games to fill the slip (max 3 per game)
   const perGame = one || relax >= 2 ? size : Math.min(3, Math.max(size > 6 ? 3 : 1, Math.ceil(size / nG)));
+  const metric = PS.mode === 'likely' ? (l) => l.p : (l) => l.edge;
   return many(pool, size, n, (pool, size, allowed, cap) => {
     if (relax >= 2) cap = size;
     const pick = [], g = {}, gl = {}, team = {}, fm = {};
-    for (const l of pool) {
-      if (!allowed(l) || (g[l.game] || 0) >= perGame || (fm[fam(l)] || 0) >= cap) continue;
-      if (pick.some((x) => x.key === l.key || (relax < 3 && x.kind !== 'Game' && l.kind !== 'Game' && x.who === l.who))) continue;
-      if (l.kind === 'Game') { if (gl[l.game]) continue; gl[l.game] = 1; }
-      else if (one && size <= 3 && relax < 2) { const t = l.team || ''; if ((team[t] || 0) >= 2) continue; team[t] = (team[t] || 0) + 1; }
+    const fits = (l) => {
+      if (!allowed(l) || (g[l.game] || 0) >= perGame || (fm[fam(l)] || 0) >= cap) return false;
+      if (pick.some((x) => x.key === l.key || (relax < 3 && x.kind !== 'Game' && l.kind !== 'Game' && x.who === l.who))) return false;
+      if (l.kind === 'Game') return !gl[l.game];
+      return !(one && size <= 3 && relax < 2 && (team[l.team || ''] || 0) >= 2);
+    };
+    while (pick.length < size) {
+      const c = []; for (const l of pool) if (fits(l) && c.push(l) >= LINK_W) break;
+      if (!c.length) break;
+      const l = linkedPick(c, pick, metric, simLink);
+      if (l.kind === 'Game') gl[l.game] = 1;
+      else if (one && size <= 3 && relax < 2) team[l.team || ''] = (team[l.team || ''] || 0) + 1;
       pick.push(l); g[l.game] = (g[l.game] || 0) + 1; fm[fam(l)] = (fm[fam(l)] || 0) + 1;
-      if (pick.length >= size) return pick;
     }
-    return relax >= 4 && pick.length ? pick : null;
+    return pick.length >= size || (relax >= 4 && pick.length) ? pick : null;
   });
 }
 // the first relax level that builds at least one slip of k legs, and which level it was
