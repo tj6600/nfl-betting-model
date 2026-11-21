@@ -1,70 +1,71 @@
 {
  "days": [
   "2026-11-18",
-  "2026-11-19"
+  "2026-11-19",
+  "2026-11-20"
  ],
  "groups": [
   {
    "group": "Board winner picks",
-   "bets": 3,
-   "won": 1,
-   "lost": 2,
-   "hit": 0.3333333333333333,
-   "exp_hit": 0.5875333333333334,
-   "units": -1.3,
-   "roi": -0.431924882629108
+   "bets": 9,
+   "won": 6,
+   "lost": 3,
+   "hit": 0.6666666666666666,
+   "exp_hit": 0.7147555555555556,
+   "units": -0.87,
+   "roi": -0.09658959507248858
   },
   {
    "group": "Board spread picks",
-   "bets": 3,
-   "won": 0,
-   "lost": 3,
-   "hit": 0.0,
-   "exp_hit": 0.5256,
-   "units": -3.0,
-   "roi": -1.0
+   "bets": 9,
+   "won": 2,
+   "lost": 7,
+   "hit": 0.2222222222222222,
+   "exp_hit": 0.5299333333333334,
+   "units": -5.18,
+   "roi": -0.5753393144697493
   },
   {
    "group": "Board total picks",
+   "bets": 9,
+   "won": 5,
+   "lost": 4,
+   "hit": 0.5555555555555556,
+   "exp_hit": 0.5024111111111111,
+   "units": 0.53,
+   "roi": 0.05880230880230883
+  },
+  {
+   "group": "Value spreads (model 3+ points off the line)",
    "bets": 3,
    "won": 1,
    "lost": 2,
    "hit": 0.3333333333333333,
-   "exp_hit": 0.5086666666666666,
-   "units": -1.11,
-   "roi": -0.36904761904761907
-  },
-  {
-   "group": "Value spreads (model 3+ points off the line)",
-   "bets": 1,
-   "won": 0,
-   "lost": 1,
-   "hit": 0.0,
-   "exp_hit": 0.5338,
-   "units": -1.0,
-   "roi": -1.0
+   "exp_hit": 0.5522666666666667,
+   "units": -1.13,
+   "roi": -0.3768115942028986
   }
  ],
  "cal_sections": [
   {
    "name": "Moneyline picks",
    "note": "The team the board gave the better chance to win, every game.",
-   "n": 3,
-   "won": 1,
-   "lost": 2,
-   "said": 0.5875,
-   "hit": 0.3333,
-   "units": -1.3,
-   "roi": -0.4319,
+   "n": 9,
+   "won": 6,
+   "lost": 3,
+   "said": 0.7148,
+   "hit": 0.6667,
+   "units": -0.87,
+   "roi": -0.0966,
    "buckets": [
     {
      "label": "50\u201360%",
-     "n": 2,
-     "won": 1,
+     "n": 3,
+     "won": 2,
      "lost": 1,
-     "said": 0.5723,
-     "hit": 0.5,
-     "units": -0.3
+     "said": 0.5577,
+     "hit": 0.6667,
+     "units": 0.5
     },
     {
      "label": "60\u201370%",
@@ -74,50 +75,77 @@
      "said": 0.6179,
      "hit": 0.0,
      "units": -1.0
+    },
+    {
+     "label": "70\u201380%",
+     "n": 2,
+     "won": 1,
+     "lost": 1,
+     "said": 0.7601,
+     "hit": 0.5,
+     "units": -0.67
+    },
+    {
+     "label": "80\u201390%",
+     "n": 2,
+     "won": 2,
+     "lost": 0,
+     "said": 0.8507,
+     "hit": 1.0,
+     "units": 0.25
+    },
+    {
+     "label": "90\u2013100%",
+     "n": 1,
+     "won": 1,
+     "lost": 0,
+     "said": 0.9204,
+     "hit": 1.0,
+     "units": 0.05
     }
    ]
   },
   {
    "name": "Spreads",
    "note": "The side the board favored on each DraftKings spread (half model, half DraftKings).",
-   "n": 3,
-   "won": 0,
-   "lost": 3,
-   "said": 0.5256,
-   "hit": 0.0,
-   "units": -3.0,
-   "roi": -1.0,
+   "n": 9,
+   "won": 2,
+   "lost": 7,
+   "said": 0.5299,
+   "hit": 0.2222,
+   "units": -5.18,
+   "roi": -0.5753,
    "buckets": [
     {
      "label": "50\u201360%",
-     "n": 3,
-     "won": 0,
-     "lost": 3,
-     "said": 0.5256,
-     "hit": 0.0,
-     "units": -3.0
+     "n": 9,
+     "won": 2,
+     "lost": 7,
+     "said": 0.5299,
+     "hit": 0.2222,
+     "units": -5.18
     }
    ]
   },
   {
    "name": "Totals",
    "note": "Over or Under, whichever DraftKings' no-vig price favored (the board uses DraftKings' chances for totals).",
-   "n": 3,
-   "won": 1,
-   "lost": 2,
-   "said": 0.5087,
-   "hit": 0.3333,
-   "units": -1.11,
-   "roi": -0.369,
+   "n": 9,
+   "won": 6,
+   "lost": 3,
+   "said": 0.5034,
+   "hit": 0.6667,
+   "units": 2.42,
+   "roi": 0.2691,
    "buckets": [
     {
      "label": "50\u201360%",
-     "n": 3,
-     "won": 1,
-     "lost": 2,
-     "said": 0.5087,
-     "hit": 0.3333,
-     "units": -1.11
+     "n": 9,
+     "won": 6,
+     "lost": 3,
+     "said": 0.5034,
+     "hit": 0.6667,
+     "units": 2.42
     }
    ]
   }
@@ -128,13 +156,33 @@
   ],
   "groups": [
    {
-    "group": "Best value: 3-leg (all suggestions)",
+    "group": "Best value: straight (all suggestions)",
+    "bets": 2,
+    "won": 1,
+    "lost": 1,
+    "hit": 0.5,
+    "exp_hit": 0.5615,
+    "units": -0.13,
+    "roi": -0.0652173913043479
+   },
+   {
+    "group": "Best value: 2-leg (all suggestions)",
     "bets": 1,
     "won": 0,
     "lost": 1,
     "hit": 0.0,
-    "exp_hit": 0.156753231168,
+    "exp_hit": 0.3096273,
     "units": -1.0,
+    "roi": -1.0
+   },
+   {
+    "group": "Best value: 3-leg (all suggestions)",
+    "bets": 2,
+    "won": 0,
+    "lost": 2,
+    "hit": 0.0,
+    "exp_hit": 0.16510322231400001,
+    "units": -2.0,
     "roi": -1.0
    },
    {
@@ -173,6 +221,10 @@
   "menu": {
    "day": [
     {
+     "key": "d:2026-11-20",
+     "label": "Fri Nov 20"
+    },
+    {
      "key": "d:2026-11-19",
      "label": "Thu Nov 19"
     },
@@ -195,6 +247,165 @@
    ]
   },
   "reports": {
+   "d:2026-11-20": {
+    "days": [
+     "2026-11-20"
+    ],
+    "groups": [
+     {
+      "group": "Board winner picks",
+      "bets": 6,
+      "won": 5,
+      "lost": 1,
+      "hit": 0.8333333333333334,
+      "exp_hit": 0.7783666666666668,
+      "units": 0.43,
+      "roi": 0.07107804870582113
+     },
+     {
+      "group": "Board spread picks",
+      "bets": 6,
+      "won": 2,
+      "lost": 4,
+      "hit": 0.3333333333333333,
+      "exp_hit": 0.5321,
+      "units": -2.18,
+      "roi": -0.36300897170462393
+     },
+     {
+      "group": "Board total picks",
+      "bets": 6,
+      "won": 4,
+      "lost": 2,
+      "hit": 0.6666666666666666,
+      "exp_hit": 0.4992833333333333,
+      "units": 1.64,
+      "roi": 0.27272727272727276
+     },
+     {
+      "group": "Value spreads (model 3+ points off the line)",
+      "bets": 2,
+      "won": 1,
+      "lost": 1,
+      "hit": 0.5,
+      "exp_hit": 0.5615,
+      "units": -0.13,
+      "roi": -0.0652173913043479
+     }
+    ],
+    "cal_sections": [
+     {
+      "name": "Moneyline picks",
+      "note": "The team the board gave the better chance to win, every game.",
+      "n": 6,
+      "won": 5,
+      "lost": 1,
+      "said": 0.7784,
+      "hit": 0.8333,
+      "units": 0.43,
+      "roi": 0.0711,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.5283,
+        "hit": 1.0,
+        "units": 0.8
+       },
+       {
+        "label": "70\u201380%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.7601,
+        "hit": 0.5,
+        "units": -0.67
+       },
+       {
+        "label": "80\u201390%",
+        "n": 2,
+        "won": 2,
+        "lost": 0,
+        "said": 0.8507,
+        "hit": 1.0,
+        "units": 0.25
+       },
+       {
+        "label": "90\u2013100%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.9204,
+        "hit": 1.0,
+        "units": 0.05
+       }
+      ]
+     },
+     {
+      "name": "Spreads",
+      "note": "The side the board favored on each DraftKings spread (half model, half DraftKings).",
+      "n": 6,
+      "won": 2,
+      "lost": 4,
+      "said": 0.5321,
+      "hit": 0.3333,
+      "units": -2.18,
+      "roi": -0.363,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 6,
+        "won": 2,
+        "lost": 4,
+        "said": 0.5321,
+        "hit": 0.3333,
+        "units": -2.18
+       }
+      ]
+     },
+     {
+      "name": "Totals",
+      "note": "Over or Under, whichever DraftKings' no-vig price favored (the board uses DraftKings' chances for totals).",
+      "n": 6,
+      "won": 5,
+      "lost": 1,
+      "said": 0.5007,
+      "hit": 0.8333,
+      "units": 3.53,
+      "roi": 0.5882,
+      "buckets": [
+       {
+        "label": "50\u201360%",
+        "n": 6,
+        "won": 5,
+        "lost": 1,
+        "said": 0.5007,
+        "hit": 0.8333,
+        "units": 3.53
+       }
+      ]
+     }
+    ],
+    "parlays": {
+     "days": [
+      "2026_wk12"
+     ],
+     "groups": [
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 2,
+       "won": 1,
+       "lost": 1,
+       "hit": 0.5,
+       "exp_hit": 0.5615,
+       "units": -0.13,
+       "roi": -0.0652173913043479
+      }
+     ]
+    }
+   },
    "d:2026-11-19": {
     "days": [
      "2026-11-19"
@@ -448,70 +659,71 @@
    "w:2026-11-16": {
     "days": [
      "2026-11-18",
-     "2026-11-19"
+     "2026-11-19",
+     "2026-11-20"
     ],
     "groups": [
      {
       "group": "Board winner picks",
-      "bets": 3,
-      "won": 1,
-      "lost": 2,
-      "hit": 0.3333333333333333,
-      "exp_hit": 0.5875333333333334,
-      "units": -1.3,
-      "roi": -0.431924882629108
+      "bets": 9,
+      "won": 6,
+      "lost": 3,
+      "hit": 0.6666666666666666,
+      "exp_hit": 0.7147555555555556,
+      "units": -0.87,
+      "roi": -0.09658959507248858
      },
      {
       "group": "Board spread picks",
-      "bets": 3,
-      "won": 0,
-      "lost": 3,
-      "hit": 0.0,
-      "exp_hit": 0.5256,
-      "units": -3.0,
-      "roi": -1.0
+      "bets": 9,
+      "won": 2,
+      "lost": 7,
+      "hit": 0.2222222222222222,
+      "exp_hit": 0.5299333333333334,
+      "units": -5.18,
+      "roi": -0.5753393144697493
      },
      {
       "group": "Board total picks",
+      "bets": 9,
+      "won": 5,
+      "lost": 4,
+      "hit": 0.5555555555555556,
+      "exp_hit": 0.5024111111111111,
+      "units": 0.53,
+      "roi": 0.05880230880230883
+     },
+     {
+      "group": "Value spreads (model 3+ points off the line)",
       "bets": 3,
       "won": 1,
       "lost": 2,
       "hit": 0.3333333333333333,
-      "exp_hit": 0.5086666666666666,
-      "units": -1.11,
-      "roi": -0.36904761904761907
-     },
-     {
-      "group": "Value spreads (model 3+ points off the line)",
-      "bets": 1,
-      "won": 0,
-      "lost": 1,
-      "hit": 0.0,
-      "exp_hit": 0.5338,
-      "units": -1.0,
-      "roi": -1.0
+      "exp_hit": 0.5522666666666667,
+      "units": -1.13,
+      "roi": -0.3768115942028986
      }
     ],
     "cal_sections": [
      {
       "name": "Moneyline picks",
       "note": "The team the board gave the better chance to win, every game.",
-      "n": 3,
-      "won": 1,
-      "lost": 2,
-      "said": 0.5875,
-      "hit": 0.3333,
-      "units": -1.3,
-      "roi": -0.4319,
+      "n": 9,
+      "won": 6,
+      "lost": 3,
+      "said": 0.7148,
+      "hit": 0.6667,
+      "units": -0.87,
+      "roi": -0.0966,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 2,
-        "won": 1,
+        "n": 3,
+        "won": 2,
         "lost": 1,
-        "said": 0.5723,
-        "hit": 0.5,
-        "units": -0.3
+        "said": 0.5577,
+        "hit": 0.6667,
+        "units": 0.5
        },
        {
         "label": "60\u201370%",
@@ -521,50 +733,77 @@
         "said": 0.6179,
         "hit": 0.0,
         "units": -1.0
+       },
+       {
+        "label": "70\u201380%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.7601,
+        "hit": 0.5,
+        "units": -0.67
+       },
+       {
+        "label": "80\u201390%",
+        "n": 2,
+        "won": 2,
+        "lost": 0,
+        "said": 0.8507,
+        "hit": 1.0,
+        "units": 0.25
+       },
+       {
+        "label": "90\u2013100%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.9204,
+        "hit": 1.0,
+        "units": 0.05
        }
       ]
      },
      {
       "name": "Spreads",
       "note": "The side the board favored on each DraftKings spread (half model, half DraftKings).",
-      "n": 3,
-      "won": 0,
-      "lost": 3,
-      "said": 0.5256,
-      "hit": 0.0,
-      "units": -3.0,
-      "roi": -1.0,
+      "n": 9,
+      "won": 2,
+      "lost": 7,
+      "said": 0.5299,
+      "hit": 0.2222,
+      "units": -5.18,
+      "roi": -0.5753,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 3,
-        "won": 0,
-        "lost": 3,
-        "said": 0.5256,
-        "hit": 0.0,
-        "units": -3.0
+        "n": 9,
+        "won": 2,
+        "lost": 7,
+        "said": 0.5299,
+        "hit": 0.2222,
+        "units": -5.18
        }
       ]
      },
      {
       "name": "Totals",
       "note": "Over or Under, whichever DraftKings' no-vig price favored (the board uses DraftKings' chances for totals).",
-      "n": 3,
-      "won": 1,
-      "lost": 2,
-      "said": 0.5087,
-      "hit": 0.3333,
-      "units": -1.11,
-      "roi": -0.369,
+      "n": 9,
+      "won": 6,
+      "lost": 3,
+      "said": 0.5034,
+      "hit": 0.6667,
+      "units": 2.42,
+      "roi": 0.2691,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 3,
-        "won": 1,
-        "lost": 2,
-        "said": 0.5087,
-        "hit": 0.3333,
-        "units": -1.11
+        "n": 9,
+        "won": 6,
+        "lost": 3,
+        "said": 0.5034,
+        "hit": 0.6667,
+        "units": 2.42
        }
       ]
      }
@@ -574,6 +813,16 @@
       "2026_wk12"
      ],
      "groups": [
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 2,
+       "won": 1,
+       "lost": 1,
+       "hit": 0.5,
+       "exp_hit": 0.5615,
+       "units": -0.13,
+       "roi": -0.0652173913043479
+      },
       {
        "group": "Most likely to hit: straight (all suggestions)",
        "bets": 1,
@@ -590,70 +839,71 @@
    "m:2026-11": {
     "days": [
      "2026-11-18",
-     "2026-11-19"
+     "2026-11-19",
+     "2026-11-20"
     ],
     "groups": [
      {
       "group": "Board winner picks",
-      "bets": 3,
-      "won": 1,
-      "lost": 2,
-      "hit": 0.3333333333333333,
-      "exp_hit": 0.5875333333333334,
-      "units": -1.3,
-      "roi": -0.431924882629108
+      "bets": 9,
+      "won": 6,
+      "lost": 3,
+      "hit": 0.6666666666666666,
+      "exp_hit": 0.7147555555555556,
+      "units": -0.87,
+      "roi": -0.09658959507248858
      },
      {
       "group": "Board spread picks",
-      "bets": 3,
-      "won": 0,
-      "lost": 3,
-      "hit": 0.0,
-      "exp_hit": 0.5256,
-      "units": -3.0,
-      "roi": -1.0
+      "bets": 9,
+      "won": 2,
+      "lost": 7,
+      "hit": 0.2222222222222222,
+      "exp_hit": 0.5299333333333334,
+      "units": -5.18,
+      "roi": -0.5753393144697493
      },
      {
       "group": "Board total picks",
+      "bets": 9,
+      "won": 5,
+      "lost": 4,
+      "hit": 0.5555555555555556,
+      "exp_hit": 0.5024111111111111,
+      "units": 0.53,
+      "roi": 0.05880230880230883
+     },
+     {
+      "group": "Value spreads (model 3+ points off the line)",
       "bets": 3,
       "won": 1,
       "lost": 2,
       "hit": 0.3333333333333333,
-      "exp_hit": 0.5086666666666666,
-      "units": -1.11,
-      "roi": -0.36904761904761907
-     },
-     {
-      "group": "Value spreads (model 3+ points off the line)",
-      "bets": 1,
-      "won": 0,
-      "lost": 1,
-      "hit": 0.0,
-      "exp_hit": 0.5338,
-      "units": -1.0,
-      "roi": -1.0
+      "exp_hit": 0.5522666666666667,
+      "units": -1.13,
+      "roi": -0.3768115942028986
      }
     ],
     "cal_sections": [
      {
       "name": "Moneyline picks",
       "note": "The team the board gave the better chance to win, every game.",
-      "n": 3,
-      "won": 1,
-      "lost": 2,
-      "said": 0.5875,
-      "hit": 0.3333,
-      "units": -1.3,
-      "roi": -0.4319,
+      "n": 9,
+      "won": 6,
+      "lost": 3,
+      "said": 0.7148,
+      "hit": 0.6667,
+      "units": -0.87,
+      "roi": -0.0966,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 2,
-        "won": 1,
+        "n": 3,
+        "won": 2,
         "lost": 1,
-        "said": 0.5723,
-        "hit": 0.5,
-        "units": -0.3
+        "said": 0.5577,
+        "hit": 0.6667,
+        "units": 0.5
        },
        {
         "label": "60\u201370%",
@@ -663,50 +913,77 @@
         "said": 0.6179,
         "hit": 0.0,
         "units": -1.0
+       },
+       {
+        "label": "70\u201380%",
+        "n": 2,
+        "won": 1,
+        "lost": 1,
+        "said": 0.7601,
+        "hit": 0.5,
+        "units": -0.67
+       },
+       {
+        "label": "80\u201390%",
+        "n": 2,
+        "won": 2,
+        "lost": 0,
+        "said": 0.8507,
+        "hit": 1.0,
+        "units": 0.25
+       },
+       {
+        "label": "90\u2013100%",
+        "n": 1,
+        "won": 1,
+        "lost": 0,
+        "said": 0.9204,
+        "hit": 1.0,
+        "units": 0.05
        }
       ]
      },
      {
       "name": "Spreads",
       "note": "The side the board favored on each DraftKings spread (half model, half DraftKings).",
-      "n": 3,
-      "won": 0,
-      "lost": 3,
-      "said": 0.5256,
-      "hit": 0.0,
-      "units": -3.0,
-      "roi": -1.0,
+      "n": 9,
+      "won": 2,
+      "lost": 7,
+      "said": 0.5299,
+      "hit": 0.2222,
+      "units": -5.18,
+      "roi": -0.5753,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 3,
-        "won": 0,
-        "lost": 3,
-        "said": 0.5256,
-        "hit": 0.0,
-        "units": -3.0
+        "n": 9,
+        "won": 2,
+        "lost": 7,
+        "said": 0.5299,
+        "hit": 0.2222,
+        "units": -5.18
        }
       ]
      },
      {
       "name": "Totals",
       "note": "Over or Under, whichever DraftKings' no-vig price favored (the board uses DraftKings' chances for totals).",
-      "n": 3,
-      "won": 1,
-      "lost": 2,
-      "said": 0.5087,
-      "hit": 0.3333,
-      "units": -1.11,
-      "roi": -0.369,
+      "n": 9,
+      "won": 6,
+      "lost": 3,
+      "said": 0.5034,
+      "hit": 0.6667,
+      "units": 2.42,
+      "roi": 0.2691,
       "buckets": [
        {
         "label": "50\u201360%",
-        "n": 3,
-        "won": 1,
-        "lost": 2,
-        "said": 0.5087,
-        "hit": 0.3333,
-        "units": -1.11
+        "n": 9,
+        "won": 6,
+        "lost": 3,
+        "said": 0.5034,
+        "hit": 0.6667,
+        "units": 2.42
        }
       ]
      }
@@ -716,6 +993,16 @@
       "2026_wk12"
      ],
      "groups": [
+      {
+       "group": "Best value: straight (all suggestions)",
+       "bets": 2,
+       "won": 1,
+       "lost": 1,
+       "hit": 0.5,
+       "exp_hit": 0.5615,
+       "units": -0.13,
+       "roi": -0.0652173913043479
+      },
       {
        "group": "Most likely to hit: straight (all suggestions)",
        "bets": 1,
@@ -804,17 +1091,11 @@
    ]
   ],
   "per": {
-   "d:2026-11-20": "Fri Nov 20",
+   "d:2026-11-21": "Sat Nov 21",
    "w:2026-11-16": "Nov 16 \u2013 22",
-   "m:2026-11": "November 2026",
-   "d:2026-11-21": "Sat Nov 21"
+   "m:2026-11": "November 2026"
   },
   "days": {
-   "2026-11-20": [
-    "d:2026-11-20",
-    "w:2026-11-16",
-    "m:2026-11"
-   ],
    "2026-11-21": [
     "d:2026-11-21",
     "w:2026-11-16",
@@ -822,403 +1103,6 @@
    ]
   },
   "legs": [
-   [
-    "2026_wk12|401856869-sp-away",
-    "2026-11-20",
-    [
-     "401856869",
-     "sp",
-     null,
-     "away",
-     2.5,
-     null,
-     null
-    ],
-    -115,
-    0.5296,
-    [
-     0
-    ],
-    [
-     0
-    ]
-   ],
-   [
-    "2026_wk12|401856869-ml-home",
-    "2026-11-20",
-    [
-     "401856869",
-     "ml",
-     null,
-     "home",
-     null,
-     null,
-     null
-    ],
-    -125,
-    0.5283,
-    [
-     1
-    ],
-    [
-     1
-    ]
-   ],
-   [
-    "2026_wk12|401856869-to-Over",
-    "2026-11-20",
-    [
-     "401856869",
-     "tot",
-     null,
-     "Over",
-     48.5,
-     null,
-     null
-    ],
-    -110,
-    0.5,
-    [
-     2
-    ],
-    [
-     2
-    ]
-   ],
-   [
-    "2026_wk12|401858303-sp-away",
-    "2026-11-20",
-    [
-     "401858303",
-     "sp",
-     null,
-     "away",
-     13.5,
-     null,
-     null
-    ],
-    -115,
-    0.5696,
-    [
-     0,
-     3
-    ],
-    [
-     0
-    ]
-   ],
-   [
-    "2026_wk12|401858303-ml-home",
-    "2026-11-20",
-    [
-     "401858303",
-     "ml",
-     null,
-     "home",
-     null,
-     null,
-     null
-    ],
-    -535,
-    0.7828,
-    [
-     1
-    ],
-    [
-     1
-    ]
-   ],
-   [
-    "2026_wk12|401858303-to-Over",
-    "2026-11-20",
-    [
-     "401858303",
-     "tot",
-     null,
-     "Over",
-     40.5,
-     null,
-     null
-    ],
-    -108,
-    0.4957,
-    [
-     2
-    ],
-    []
-   ],
-   [
-    "2026_wk12|401858303-to-Under",
-    "2026-11-20",
-    [
-     "401858303",
-     "tot",
-     null,
-     "Under",
-     40.5,
-     null,
-     null
-    ],
-    -112,
-    0.5043,
-    [],
-    [
-     2
-    ]
-   ],
-   [
-    "2026_wk12|401866468-sp-home",
-    "2026-11-20",
-    [
-     "401866468",
-     "sp",
-     null,
-     "home",
-     -16.5,
-     null,
-     null
-    ],
-    -105,
-    0.5011,
-    [
-     0
-    ],
-    [
-     0
-    ]
-   ],
-   [
-    "2026_wk12|401866468-ml-home",
-    "2026-11-20",
-    [
-     "401866468",
-     "ml",
-     null,
-     "home",
-     null,
-     null,
-     null
-    ],
-    -750,
-    0.8508,
-    [
-     1
-    ],
-    [
-     1
-    ]
-   ],
-   [
-    "2026_wk12|401866468-to-Over",
-    "2026-11-20",
-    [
-     "401866468",
-     "tot",
-     null,
-     "Over",
-     48.5,
-     null,
-     null
-    ],
-    -110,
-    0.5,
-    [
-     2
-    ],
-    [
-     2
-    ]
-   ],
-   [
-    "2026_wk12|401858529-sp-home",
-    "2026-11-20",
-    [
-     "401858529",
-     "sp",
-     null,
-     "home",
-     16.5,
-     null,
-     null
-    ],
-    -105,
-    0.5179,
-    [
-     0
-    ],
-    [
-     0
-    ]
-   ],
-   [
-    "2026_wk12|401858529-ml-away",
-    "2026-11-20",
-    [
-     "401858529",
-     "ml",
-     null,
-     "away",
-     null,
-     null,
-     null
-    ],
-    -850,
-    0.8505,
-    [
-     1
-    ],
-    [
-     1
-    ]
-   ],
-   [
-    "2026_wk12|401858529-to-Over",
-    "2026-11-20",
-    [
-     "401858529",
-     "tot",
-     null,
-     "Over",
-     44.5,
-     null,
-     null
-    ],
-    -110,
-    0.5,
-    [
-     2
-    ],
-    [
-     2
-    ]
-   ],
-   [
-    "2026_wk12|401864545-sp-away",
-    "2026-11-20",
-    [
-     "401864545",
-     "sp",
-     null,
-     "away",
-     23.5,
-     null,
-     null
-    ],
-    -112,
-    0.521,
-    [
-     0
-    ],
-    [
-     0
-    ]
-   ],
-   [
-    "2026_wk12|401864545-ml-home",
-    "2026-11-20",
-    [
-     "401864545",
-     "ml",
-     null,
-     "home",
-     null,
-     null,
-     null
-    ],
-    -2100,
-    0.9204,
-    [
-     1
-    ],
-    [
-     1
-    ]
-   ],
-   [
-    "2026_wk12|401864545-to-Over",
-    "2026-11-20",
-    [
-     "401864545",
-     "tot",
-     null,
-     "Over",
-     47.5,
-     null,
-     null
-    ],
-    -110,
-    0.5,
-    [
-     2
-    ],
-    [
-     2
-    ]
-   ],
-   [
-    "2026_wk12|401864542-sp-away",
-    "2026-11-20",
-    [
-     "401864542",
-     "sp",
-     null,
-     "away",
-     -7.5,
-     null,
-     null
-    ],
-    -105,
-    0.5534,
-    [
-     0,
-     3
-    ],
-    [
-     0
-    ]
-   ],
-   [
-    "2026_wk12|401864542-ml-away",
-    "2026-11-20",
-    [
-     "401864542",
-     "ml",
-     null,
-     "away",
-     null,
-     null,
-     null
-    ],
-    -305,
-    0.7374,
-    [
-     1
-    ],
-    [
-     1
-    ]
-   ],
-   [
-    "2026_wk12|401864542-to-Over",
-    "2026-11-20",
-    [
-     "401864542",
-     "tot",
-     null,
-     "Over",
-     37.5,
-     null,
-     null
-    ],
-    -110,
-    0.5,
-    [
-     2
-    ],
-    [
-     2
-    ]
-   ],
    [
     "2026_wk12|401862835-sp-away",
     "2026-11-21",
@@ -5158,6 +5042,27 @@
      2
     ],
     []
+   ],
+   [
+    "2026_wk12|401856750-ml-home",
+    "2026-11-21",
+    [
+     "401856750",
+     "ml",
+     null,
+     "home",
+     null,
+     null,
+     null
+    ],
+    -3600,
+    0.9532,
+    [
+     1
+    ],
+    [
+     1
+    ]
    ]
   ],
   "parlays": [
@@ -5174,20 +5079,6 @@
      4
     ],
     0.5739
-   ],
-   [
-    "2026-11-20",
-    [
-     [
-      "2026_wk12|401858303-sp-away",
-      null,
-      -115
-     ]
-    ],
-    [
-     4
-    ],
-    0.5696
    ],
    [
     "2026-11-21",
@@ -5232,20 +5123,6 @@
     0.5595
    ],
    [
-    "2026-11-20",
-    [
-     [
-      "2026_wk12|401864542-sp-away",
-      null,
-      -105
-     ]
-    ],
-    [
-     4
-    ],
-    0.5534
-   ],
-   [
     "2026-11-21",
     [
      [
@@ -5255,7 +5132,7 @@
      ],
      [
       "2026_wk12|401858303-sp-away",
-      null,
+      "win",
       -115
      ]
     ],
@@ -5283,25 +5160,6 @@
      5
     ],
     0.32127
-   ],
-   [
-    "2026-11-21",
-    [
-     [
-      "2026_wk12|401858308-sp-home",
-      null,
-      -110
-     ],
-     [
-      "2026_wk12|401864542-sp-away",
-      null,
-      -105
-     ]
-    ],
-    [
-     5
-    ],
-    0.30963
    ],
    [
     "2026-11-21",
@@ -5370,7 +5228,7 @@
      ],
      [
       "2026_wk12|401858303-sp-away",
-      null,
+      "win",
       -115
      ],
      [
@@ -5383,30 +5241,6 @@
      7
     ],
     0.18747
-   ],
-   [
-    "2026-11-21",
-    [
-     [
-      "2026_wk12|401858527-sp-home",
-      null,
-      -110
-     ],
-     [
-      "2026_wk12|401858308-sp-home",
-      null,
-      -110
-     ],
-     [
-      "2026_wk12|401864542-sp-away",
-      null,
-      -105
-     ]
-    ],
-    [
-     7
-    ],
-    0.17345
    ],
    [
     "2026-11-21",
@@ -5580,7 +5414,7 @@
      ],
      [
       "2026_wk12|401858303-sp-away",
-      null,
+      "win",
       -115
      ]
     ],
@@ -5685,7 +5519,7 @@
      ],
      [
       "2026_wk12|401858303-sp-away",
-      null,
+      "win",
       -115
      ]
     ],

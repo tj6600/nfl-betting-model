@@ -1,0 +1,343 @@
+id,gid,game,start,kind,market,side,team,line,label,price,p,pm,pb,edge,ev,pts,cat,flagged,pick,bpick
+401856866-sp-home,401856866,BYU @ KU,2026-11-21T17:00:00Z,Spread,spread,home,KU,5.5,Kansas +5.5,-115,0.5076,0.5043,0.5108,-2.7,-5.1,0.2,,False,False,True
+401856866-sp-away,401856866,BYU @ KU,2026-11-21T17:00:00Z,Spread,spread,away,BYU,-5.5,BYU -5.5,-105,0.4924,0.4957,0.4892,-2.0,-3.9,-0.2,,False,False,False
+401856866-ml-home,401856866,BYU @ KU,2026-11-21T17:00:00Z,Moneyline,moneyline,home,KU,,Kansas to win,180,0.3482,0.3654,0.3425,-0.9,-2.5,,,False,False,False
+401856866-ml-away,401856866,BYU @ KU,2026-11-21T17:00:00Z,Moneyline,moneyline,away,BYU,,BYU to win,-218,0.6518,0.6346,0.6575,-3.4,-4.9,,,False,True,True
+401856866-to-Over,401856866,BYU @ KU,2026-11-21T17:00:00Z,Total,total,Over,,46.5,Over 46.5 (BYU @ KU),-115,0.5108,0.5171,0.5108,-2.4,-4.5,,,False,False,True
+401856866-to-Under,401856866,BYU @ KU,2026-11-21T17:00:00Z,Total,total,Under,,46.5,Under 46.5 (BYU @ KU),-105,0.4892,0.4829,0.4892,-2.3,-4.5,,,False,False,False
+401858310-sp-home,401858310,WAKE @ GT,2026-11-21T17:00:00Z,Spread,spread,home,GT,21.0,Georgia Tech +21,-105,0.5638,0.6384,0.4892,5.2,10.1,5.5,Value,False,False,True
+401858310-sp-away,401858310,WAKE @ GT,2026-11-21T17:00:00Z,Spread,spread,away,WAKE,-21.0,Wake Forest -21,-115,0.4362,0.3616,0.5108,-9.9,-18.4,-5.5,,False,False,False
+401858310-ml-home,401858310,WAKE @ GT,2026-11-21T17:00:00Z,Moneyline,moneyline,home,GT,,Georgia Tech to win,950,0.1084,0.1585,0.0917,1.3,13.8,,,False,False,False
+401858310-ml-away,401858310,WAKE @ GT,2026-11-21T17:00:00Z,Moneyline,moneyline,away,WAKE,,Wake Forest to win,-1650,0.8916,0.8415,0.9083,-5.1,-5.4,,,False,True,True
+401858310-to-Over,401858310,WAKE @ GT,2026-11-21T17:00:00Z,Total,total,Over,,55.5,Over 55.5 (WAKE @ GT),-112,0.5043,0.5175,0.5043,-2.4,-4.5,,,False,False,True
+401858310-to-Under,401858310,WAKE @ GT,2026-11-21T17:00:00Z,Total,total,Under,,55.5,Under 55.5 (WAKE @ GT),-108,0.4957,0.4825,0.4957,-2.4,-4.5,,,False,False,False
+401858531-sp-home,401858531,OSU @ NEB,2026-11-21T17:00:00Z,Spread,spread,home,NEB,3.5,Nebraska +3.5,-112,0.4439,0.3835,0.5043,-8.4,-16.0,-4.6,,False,False,False
+401858531-sp-away,401858531,OSU @ NEB,2026-11-21T17:00:00Z,Spread,spread,away,OSU,-3.5,Ohio State -3.5,-108,0.5561,0.6165,0.4957,3.7,7.1,4.6,Value,False,False,True
+401858531-ml-home,401858531,OSU @ NEB,2026-11-21T17:00:00Z,Moneyline,moneyline,home,NEB,,Nebraska to win,140,0.3755,0.3008,0.4004,-4.1,-9.9,,,False,False,False
+401858531-ml-away,401858531,OSU @ NEB,2026-11-21T17:00:00Z,Moneyline,moneyline,away,OSU,,Ohio State to win,-166,0.6245,0.6992,0.5996,0.0,0.1,,,False,True,True
+401858531-to-Over,401858531,OSU @ NEB,2026-11-21T17:00:00Z,Total,total,Over,,41.5,Over 41.5 (OSU @ NEB),-110,0.5,0.701,0.5,-2.4,-4.5,,,False,False,True
+401858531-to-Under,401858531,OSU @ NEB,2026-11-21T17:00:00Z,Total,total,Under,,41.5,Under 41.5 (OSU @ NEB),-110,0.5,0.299,0.5,-2.4,-4.5,,,False,False,False
+401856748-sp-home,401856748,VAN @ FLA,2026-11-21T17:00:00Z,Spread,spread,home,FLA,-13.5,Florida -13.5,-105,0.4821,0.475,0.4892,-3.0,-5.9,-1.0,,False,False,False
+401856748-sp-away,401856748,VAN @ FLA,2026-11-21T17:00:00Z,Spread,spread,away,VAN,13.5,Vanderbilt +13.5,-115,0.5179,0.525,0.5108,-1.7,-3.2,1.0,,False,False,True
+401856748-ml-home,401856748,VAN @ FLA,2026-11-21T17:00:00Z,Moneyline,moneyline,home,FLA,,Florida to win,-535,0.8038,0.7906,0.8082,-3.9,-4.6,,,False,True,True
+401856748-ml-away,401856748,VAN @ FLA,2026-11-21T17:00:00Z,Moneyline,moneyline,away,VAN,,Vanderbilt to win,400,0.1962,0.2094,0.1918,-0.4,-1.9,,,False,False,False
+401856748-to-Over,401856748,VAN @ FLA,2026-11-21T17:00:00Z,Total,total,Over,,46.5,Over 46.5 (VAN @ FLA),-112,0.5043,0.6495,0.5043,-2.4,-4.5,,,False,False,True
+401856748-to-Under,401856748,VAN @ FLA,2026-11-21T17:00:00Z,Total,total,Under,,46.5,Under 46.5 (VAN @ FLA),-108,0.4957,0.3505,0.4957,-2.4,-4.5,,,False,False,False
+401856749-sp-home,401856749,WOF @ MISS,2026-11-21T17:00:00Z,Spread,spread,home,MISS,-49.5,Ole Miss -49.5,-108,0.5439,0.5922,0.4957,2.5,4.8,3.6,,True,False,True
+401856749-sp-away,401856749,WOF @ MISS,2026-11-21T17:00:00Z,Spread,spread,away,WOF,49.5,Wofford +49.5,-112,0.4561,0.4078,0.5043,-7.2,-13.7,-3.6,,True,False,False
+401856749-to-Over,401856749,WOF @ MISS,2026-11-21T17:00:00Z,Total,total,Over,,59.5,Over 59.5 (WOF @ MISS),-112,0.5043,0.4734,0.5043,-2.4,-4.5,,,True,False,False
+401856749-to-Under,401856749,WOF @ MISS,2026-11-21T17:00:00Z,Total,total,Under,,59.5,Under 59.5 (WOF @ MISS),-108,0.4957,0.5266,0.4957,-2.4,-4.5,,,True,False,True
+401856867-sp-home,401856867,COLO @ CIN,2026-11-21T17:00:00Z,Spread,spread,home,CIN,-3.0,Cincinnati -3,-112,0.5296,0.5548,0.5043,0.1,0.2,2.1,,False,False,True
+401856867-sp-away,401856867,COLO @ CIN,2026-11-21T17:00:00Z,Spread,spread,away,COLO,3.0,Colorado +3,-108,0.4704,0.4452,0.4957,-4.9,-9.4,-2.1,,False,False,False
+401856867-ml-home,401856867,COLO @ CIN,2026-11-21T17:00:00Z,Moneyline,moneyline,home,CIN,,Cincinnati to win,-155,0.5947,0.6298,0.583,-1.3,-2.2,,,False,True,True
+401856867-ml-away,401856867,COLO @ CIN,2026-11-21T17:00:00Z,Moneyline,moneyline,away,COLO,,Colorado to win,130,0.4053,0.3702,0.417,-2.9,-6.8,,,False,False,False
+401856867-to-Over,401856867,COLO @ CIN,2026-11-21T17:00:00Z,Total,total,Over,,57.5,Over 57.5 (COLO @ CIN),-110,0.5,0.3617,0.5,-2.4,-4.5,,,False,False,False
+401856867-to-Under,401856867,COLO @ CIN,2026-11-21T17:00:00Z,Total,total,Under,,57.5,Under 57.5 (COLO @ CIN),-110,0.5,0.6383,0.5,-2.4,-4.5,,,False,False,True
+401858309-sp-home,401858309,SYR @ BC,2026-11-21T17:00:00Z,Spread,spread,home,BC,3.0,Boston College +3,-112,0.5212,0.538,0.5043,-0.7,-1.4,1.5,,False,False,True
+401858309-sp-away,401858309,SYR @ BC,2026-11-21T17:00:00Z,Spread,spread,away,SYR,-3.0,Syracuse -3,-108,0.4788,0.462,0.4957,-4.0,-7.8,-1.5,,False,False,False
+401858309-ml-home,401858309,SYR @ BC,2026-11-21T17:00:00Z,Moneyline,moneyline,home,BC,,Boston College to win,130,0.428,0.4609,0.417,-0.7,-1.6,,,False,False,False
+401858309-ml-away,401858309,SYR @ BC,2026-11-21T17:00:00Z,Moneyline,moneyline,away,SYR,,Syracuse to win,-155,0.572,0.5391,0.583,-3.6,-5.9,,,False,True,True
+401858309-to-Over,401858309,SYR @ BC,2026-11-21T17:00:00Z,Total,total,Over,,52.5,Over 52.5 (SYR @ BC),-105,0.4892,0.4597,0.4892,-2.3,-4.5,,,False,False,False
+401858309-to-Under,401858309,SYR @ BC,2026-11-21T17:00:00Z,Total,total,Under,,52.5,Under 52.5 (SYR @ BC),-115,0.5108,0.5403,0.5108,-2.4,-4.5,,,False,False,True
+401858530-sp-home,401858530,NU @ MINN,2026-11-21T17:00:00Z,Spread,spread,home,MINN,2.5,Minnesota +2.5,-112,0.4606,0.4168,0.5043,-6.8,-12.8,-3.3,,False,False,False
+401858530-sp-away,401858530,NU @ MINN,2026-11-21T17:00:00Z,Spread,spread,away,NU,-2.5,Northwestern -2.5,-108,0.5394,0.5832,0.4957,2.0,3.9,3.3,Value,False,False,True
+401858530-ml-home,401858530,NU @ MINN,2026-11-21T17:00:00Z,Moneyline,moneyline,home,MINN,,Minnesota to win,110,0.4317,0.3552,0.4573,-4.4,-9.3,,,False,False,False
+401858530-ml-away,401858530,NU @ MINN,2026-11-21T17:00:00Z,Moneyline,moneyline,away,NU,,Northwestern to win,-130,0.5683,0.6448,0.5427,0.3,0.5,,,False,True,True
+401858530-to-Over,401858530,NU @ MINN,2026-11-21T17:00:00Z,Total,total,Over,,41.5,Over 41.5 (NU @ MINN),-110,0.5,0.6226,0.5,-2.4,-4.5,,,False,False,True
+401858530-to-Under,401858530,NU @ MINN,2026-11-21T17:00:00Z,Total,total,Under,,41.5,Under 41.5 (NU @ MINN),-110,0.5,0.3774,0.5,-2.4,-4.5,,,False,False,False
+401858533-sp-home,401858533,WIS @ PUR,2026-11-21T17:00:00Z,Spread,spread,home,PUR,6.0,Purdue +6,-110,0.5174,0.5348,0.5,-0.6,-1.2,1.4,,False,False,True
+401858533-sp-away,401858533,WIS @ PUR,2026-11-21T17:00:00Z,Spread,spread,away,WIS,-6.0,Wisconsin -6,-110,0.4826,0.4652,0.5,-4.1,-7.9,-1.4,,False,False,False
+401858533-ml-home,401858533,WIS @ PUR,2026-11-21T17:00:00Z,Moneyline,moneyline,home,PUR,,Purdue to win,190,0.3438,0.3822,0.331,-0.1,-0.3,,,False,False,False
+401858533-ml-away,401858533,WIS @ PUR,2026-11-21T17:00:00Z,Moneyline,moneyline,away,WIS,,Wisconsin to win,-230,0.6562,0.6178,0.669,-4.1,-5.8,,,False,True,True
+401858533-to-Over,401858533,WIS @ PUR,2026-11-21T17:00:00Z,Total,total,Over,,46.5,Over 46.5 (WIS @ PUR),-108,0.4957,0.5003,0.4957,-2.4,-4.5,,,False,False,True
+401858533-to-Under,401858533,WIS @ PUR,2026-11-21T17:00:00Z,Total,total,Under,,46.5,Under 46.5 (WIS @ PUR),-112,0.5043,0.4997,0.5043,-2.4,-4.5,,,False,False,False
+401862831-sp-home,401862831,ECU @ ARMY,2026-11-21T17:00:00Z,Spread,spread,home,ARMY,-6.0,Army -6,-110,0.5119,0.5237,0.5,-1.2,-2.3,0.9,,False,False,True
+401862831-sp-away,401862831,ECU @ ARMY,2026-11-21T17:00:00Z,Spread,spread,away,ECU,6.0,East Carolina +6,-110,0.4881,0.4763,0.5,-3.6,-6.8,-0.9,,False,False,False
+401862831-ml-home,401862831,ECU @ ARMY,2026-11-21T17:00:00Z,Moneyline,moneyline,home,ARMY,,Army to win,-238,0.6744,0.6724,0.675,-3.0,-4.2,,,False,True,True
+401862831-ml-away,401862831,ECU @ ARMY,2026-11-21T17:00:00Z,Moneyline,moneyline,away,ECU,,East Carolina to win,195,0.3256,0.3276,0.325,-1.3,-3.9,,,False,False,False
+401862831-to-Over,401862831,ECU @ ARMY,2026-11-21T17:00:00Z,Total,total,Over,,46.5,Over 46.5 (ECU @ ARMY),-108,0.4957,0.5121,0.4957,-2.4,-4.5,,,False,False,True
+401862831-to-Under,401862831,ECU @ ARMY,2026-11-21T17:00:00Z,Total,total,Under,,46.5,Under 46.5 (ECU @ ARMY),-112,0.5043,0.4879,0.5043,-2.4,-4.5,,,False,False,False
+401862834-sp-home,401862834,MEM @ NAVY,2026-11-21T17:00:00Z,Spread,spread,home,NAVY,2.5,Navy +2.5,-105,0.4932,0.4973,0.4892,-1.9,-3.7,-0.1,,False,False,False
+401862834-sp-away,401862834,MEM @ NAVY,2026-11-21T17:00:00Z,Spread,spread,away,MEM,-2.5,Memphis -2.5,-115,0.5068,0.5027,0.5108,-2.8,-5.3,0.1,,False,False,True
+401862834-ml-home,401862834,MEM @ NAVY,2026-11-21T17:00:00Z,Moneyline,moneyline,home,NAVY,,Navy to win,124,0.4293,0.4332,0.4279,-1.7,-3.8,,,False,False,False
+401862834-ml-away,401862834,MEM @ NAVY,2026-11-21T17:00:00Z,Moneyline,moneyline,away,MEM,,Memphis to win,-148,0.5707,0.5668,0.5721,-2.6,-4.4,,,False,True,True
+401862834-to-Over,401862834,MEM @ NAVY,2026-11-21T17:00:00Z,Total,total,Over,,67.5,Over 67.5 (MEM @ NAVY),-112,0.5043,0.3321,0.5043,-2.4,-4.5,,,False,False,False
+401862834-to-Under,401862834,MEM @ NAVY,2026-11-21T17:00:00Z,Total,total,Under,,67.5,Under 67.5 (MEM @ NAVY),-108,0.4957,0.6679,0.4957,-2.4,-4.5,,,False,False,True
+401862835-sp-home,401862835,UNT @ TULN,2026-11-21T17:00:00Z,Spread,spread,home,TULN,6.5,Tulane +6.5,-108,0.4776,0.4595,0.4957,-4.2,-8.0,-1.6,,False,False,False
+401862835-sp-away,401862835,UNT @ TULN,2026-11-21T17:00:00Z,Spread,spread,away,UNT,-6.5,North Texas -6.5,-112,0.5224,0.5405,0.5043,-0.6,-1.1,1.6,,False,False,True
+401862835-ml-home,401862835,UNT @ TULN,2026-11-21T17:00:00Z,Moneyline,moneyline,home,TULN,,Tulane to win,205,0.3112,0.3011,0.3146,-1.7,-5.1,,,False,False,False
+401862835-ml-away,401862835,UNT @ TULN,2026-11-21T17:00:00Z,Moneyline,moneyline,away,UNT,,North Texas to win,-250,0.6888,0.6989,0.6854,-2.6,-3.6,,,False,True,True
+401862835-to-Over,401862835,UNT @ TULN,2026-11-21T17:00:00Z,Total,total,Over,,55.5,Over 55.5 (UNT @ TULN),-115,0.5108,0.6869,0.5108,-2.4,-4.5,,,False,False,True
+401862835-to-Under,401862835,UNT @ TULN,2026-11-21T17:00:00Z,Total,total,Under,,55.5,Under 55.5 (UNT @ TULN),-105,0.4892,0.3131,0.4892,-2.3,-4.5,,,False,False,False
+401858305-sp-home,401858305,UNC @ UVA,2026-11-21T17:30:00Z,Spread,spread,home,UVA,-1.5,Virginia -1.5,-112,0.5008,0.4972,0.5043,-2.8,-5.2,-0.1,,False,False,True
+401858305-sp-away,401858305,UNC @ UVA,2026-11-21T17:30:00Z,Spread,spread,away,UNC,1.5,North Carolina +1.5,-108,0.4992,0.5028,0.4957,-2.0,-3.9,0.1,,False,False,False
+401858305-ml-home,401858305,UNC @ UVA,2026-11-21T17:30:00Z,Moneyline,moneyline,home,UVA,,Virginia to win,-125,0.5333,0.5358,0.5325,-2.2,-4.0,,,False,True,True
+401858305-ml-away,401858305,UNC @ UVA,2026-11-21T17:30:00Z,Moneyline,moneyline,away,UNC,,North Carolina to win,105,0.4667,0.4642,0.4675,-2.1,-4.3,,,False,False,False
+401858305-to-Over,401858305,UNC @ UVA,2026-11-21T17:30:00Z,Total,total,Over,,41.5,Over 41.5 (UNC @ UVA),-112,0.5043,0.5445,0.5043,-2.4,-4.5,,,False,False,True
+401858305-to-Under,401858305,UNC @ UVA,2026-11-21T17:30:00Z,Total,total,Under,,41.5,Under 41.5 (UNC @ UVA),-108,0.4957,0.4555,0.4957,-2.4,-4.5,,,False,False,False
+401871080-sp-home,401871080,WKU @ LIB,2026-11-21T18:00:00Z,Spread,spread,home,LIB,-17.5,Liberty -17.5,-112,0.5002,0.4962,0.5043,-2.8,-5.3,-0.1,,False,False,True
+401871080-sp-away,401871080,WKU @ LIB,2026-11-21T18:00:00Z,Spread,spread,away,WKU,17.5,Western KY +17.5,-108,0.4998,0.5038,0.4957,-1.9,-3.8,0.1,,False,False,False
+401871080-ml-home,401871080,WKU @ LIB,2026-11-21T18:00:00Z,Moneyline,moneyline,home,LIB,,Liberty to win,-1000,0.8712,0.8685,0.8721,-3.8,-4.2,,,False,True,True
+401871080-ml-away,401871080,WKU @ LIB,2026-11-21T18:00:00Z,Moneyline,moneyline,away,WKU,,Western KY to win,650,0.1288,0.1315,0.1279,-0.5,-3.4,,,False,False,False
+401871080-to-Over,401871080,WKU @ LIB,2026-11-21T18:00:00Z,Total,total,Over,,53.5,Over 53.5 (WKU @ LIB),-110,0.5,0.4802,0.5,-2.4,-4.5,,,False,False,False
+401871080-to-Under,401871080,WKU @ LIB,2026-11-21T18:00:00Z,Total,total,Under,,53.5,Under 53.5 (WKU @ LIB),-110,0.5,0.5198,0.5,-2.4,-4.5,,,False,False,True
+401856750-sp-home,401856750,TNTC @ MSST,2026-11-21T18:00:00Z,Spread,spread,home,MSST,-31.5,Mississippi St -31.5,-110,0.5898,0.6796,0.5,6.6,12.6,7.2,,True,False,True
+401856750-sp-away,401856750,TNTC @ MSST,2026-11-21T18:00:00Z,Spread,spread,away,TNTC,31.5,Tennessee Tech +31.5,-110,0.4102,0.3204,0.5,-11.4,-21.7,-7.2,,True,False,False
+401856750-ml-home,401856750,TNTC @ MSST,2026-11-21T18:00:00Z,Moneyline,moneyline,home,MSST,,Mississippi St to win,-3600,0.9532,0.9938,0.9396,-2.0,-2.0,,,True,True,True
+401856750-ml-away,401856750,TNTC @ MSST,2026-11-21T18:00:00Z,Moneyline,moneyline,away,TNTC,,Tennessee Tech to win,1500,0.0468,0.0062,0.0604,-1.6,-25.1,,,True,False,False
+401856750-to-Over,401856750,TNTC @ MSST,2026-11-21T18:00:00Z,Total,total,Over,,59.5,Over 59.5 (TNTC @ MSST),-112,0.5043,0.4982,0.5043,-2.4,-4.5,,,True,False,False
+401856750-to-Under,401856750,TNTC @ MSST,2026-11-21T18:00:00Z,Total,total,Under,,59.5,Under 59.5 (TNTC @ MSST),-108,0.4957,0.5018,0.4957,-2.4,-4.5,,,True,False,True
+401856868-sp-home,401856868,HOU @ WVU,2026-11-21T18:00:00Z,Spread,spread,home,WVU,7.0,West Virginia +7,-110,0.5117,0.5234,0.5,-1.2,-2.3,0.9,,False,False,True
+401856868-sp-away,401856868,HOU @ WVU,2026-11-21T18:00:00Z,Spread,spread,away,HOU,-7.0,Houston -7,-110,0.4883,0.4766,0.5,-3.5,-6.8,-0.9,,False,False,False
+401856868-ml-home,401856868,HOU @ WVU,2026-11-21T18:00:00Z,Moneyline,moneyline,home,WVU,,West Virginia to win,230,0.3046,0.3472,0.2905,0.2,0.5,,,False,False,False
+401856868-ml-away,401856868,HOU @ WVU,2026-11-21T18:00:00Z,Moneyline,moneyline,away,HOU,,Houston to win,-285,0.6954,0.6528,0.7095,-4.5,-6.1,,,False,True,True
+401856868-to-Over,401856868,HOU @ WVU,2026-11-21T18:00:00Z,Total,total,Over,,70.5,Over 70.5 (HOU @ WVU),-115,0.5108,0.3336,0.5108,-2.4,-4.5,,,False,False,False
+401856868-to-Under,401856868,HOU @ WVU,2026-11-21T18:00:00Z,Total,total,Under,,70.5,Under 70.5 (HOU @ WVU),-105,0.4892,0.6664,0.4892,-2.3,-4.5,,,False,False,True
+401856746-sp-home,401856746,UTC @ ALA,2026-11-21T19:00:00Z,Spread,spread,home,ALA,-48.5,Alabama -48.5,-112,0.6213,0.7383,0.5043,9.3,17.6,9.9,,True,False,True
+401856746-sp-away,401856746,UTC @ ALA,2026-11-21T19:00:00Z,Spread,spread,away,UTC,48.5,Chattanooga +48.5,-108,0.3787,0.2617,0.4957,-14.1,-27.1,-9.9,,True,False,False
+401856746-to-Over,401856746,UTC @ ALA,2026-11-21T19:00:00Z,Total,total,Over,,58.5,Over 58.5 (UTC @ ALA),-105,0.4892,0.4335,0.4892,-2.3,-4.5,,,True,False,False
+401856746-to-Under,401856746,UTC @ ALA,2026-11-21T19:00:00Z,Total,total,Under,,58.5,Under 58.5 (UTC @ ALA),-115,0.5108,0.5665,0.5108,-2.4,-4.5,,,True,False,True
+401862832-sp-home,401862832,CLT @ TLSA,2026-11-21T19:00:00Z,Spread,spread,home,TLSA,-22.5,Tulsa -22.5,-110,0.5075,0.5149,0.5,-1.6,-3.1,0.6,,False,False,True
+401862832-sp-away,401862832,CLT @ TLSA,2026-11-21T19:00:00Z,Spread,spread,away,CLT,22.5,Charlotte +22.5,-110,0.4925,0.4851,0.5,-3.1,-6.0,-0.6,,False,False,False
+401862832-ml-home,401862832,CLT @ TLSA,2026-11-21T19:00:00Z,Moneyline,moneyline,home,TLSA,,Tulsa to win,-2100,0.9227,0.9318,0.9197,-3.2,-3.3,,,False,True,True
+401862832-ml-away,401862832,CLT @ TLSA,2026-11-21T19:00:00Z,Moneyline,moneyline,away,CLT,,Charlotte to win,1100,0.0773,0.0682,0.0803,-0.6,-7.3,,,False,False,False
+401862832-to-Over,401862832,CLT @ TLSA,2026-11-21T19:00:00Z,Total,total,Over,,51.5,Over 51.5 (CLT @ TLSA),-115,0.5108,0.5001,0.5108,-2.4,-4.5,,,False,False,True
+401862832-to-Under,401862832,CLT @ TLSA,2026-11-21T19:00:00Z,Total,total,Under,,51.5,Under 51.5 (CLT @ TLSA),-105,0.4892,0.4999,0.4892,-2.3,-4.5,,,False,False,False
+401871079-sp-home,401871079,MOST @ JXST,2026-11-21T19:00:00Z,Spread,spread,home,JXST,-10.5,Jax State -10.5,-110,0.5187,0.5374,0.5,-0.5,-1.0,1.5,,False,False,True
+401871079-sp-away,401871079,MOST @ JXST,2026-11-21T19:00:00Z,Spread,spread,away,MOST,10.5,Missouri St +10.5,-110,0.4813,0.4626,0.5,-4.3,-8.1,-1.5,,False,False,False
+401871079-ml-home,401871079,MOST @ JXST,2026-11-21T19:00:00Z,Moneyline,moneyline,home,JXST,,Jax State to win,-410,0.7736,0.7798,0.7715,-3.0,-3.8,,,False,True,True
+401871079-ml-away,401871079,MOST @ JXST,2026-11-21T19:00:00Z,Moneyline,moneyline,away,MOST,,Missouri St to win,320,0.2264,0.2202,0.2285,-1.2,-4.9,,,False,False,False
+401871079-to-Over,401871079,MOST @ JXST,2026-11-21T19:00:00Z,Total,total,Over,,52.5,Over 52.5 (MOST @ JXST),-112,0.5043,0.5212,0.5043,-2.4,-4.5,,,False,False,True
+401871079-to-Under,401871079,MOST @ JXST,2026-11-21T19:00:00Z,Total,total,Under,,52.5,Under 52.5 (MOST @ JXST),-108,0.4957,0.4788,0.4957,-2.4,-4.5,,,False,False,False
+401871081-sp-home,401871081,MTSU @ SHSU,2026-11-21T19:00:00Z,Spread,spread,home,SHSU,6.5,Sam Houston +6.5,-110,0.546,0.592,0.5,2.2,4.2,3.6,Value,False,False,True
+401871081-sp-away,401871081,MTSU @ SHSU,2026-11-21T19:00:00Z,Spread,spread,away,MTSU,-6.5,MTSU -6.5,-110,0.454,0.408,0.5,-7.0,-13.3,-3.6,,False,False,False
+401871081-ml-home,401871081,MTSU @ SHSU,2026-11-21T19:00:00Z,Moneyline,moneyline,home,SHSU,,Sam Houston to win,190,0.3547,0.4259,0.331,1.0,2.9,,,False,False,False
+401871081-ml-away,401871081,MTSU @ SHSU,2026-11-21T19:00:00Z,Moneyline,moneyline,away,MTSU,,MTSU to win,-230,0.6453,0.5741,0.669,-5.2,-7.4,,,False,True,True
+401871081-to-Over,401871081,MTSU @ SHSU,2026-11-21T19:00:00Z,Total,total,Over,,48.5,Over 48.5 (MTSU @ SHSU),-105,0.4892,0.552,0.4892,-2.3,-4.5,,,False,False,True
+401871081-to-Under,401871081,MTSU @ SHSU,2026-11-21T19:00:00Z,Total,total,Under,,48.5,Under 48.5 (MTSU @ SHSU),-115,0.5108,0.448,0.5108,-2.4,-4.5,,,False,False,False
+401858527-sp-home,401858527,IOWA @ ILL,2026-11-21T19:30:00Z,Spread,spread,home,ILL,8.5,Illinois +8.5,-110,0.5615,0.623,0.5,3.8,7.2,4.9,Value,False,False,True
+401858527-sp-away,401858527,IOWA @ ILL,2026-11-21T19:30:00Z,Spread,spread,away,IOWA,-8.5,Iowa -8.5,-110,0.4385,0.377,0.5,-8.5,-16.3,-4.9,,False,False,False
+401858527-ml-home,401858527,IOWA @ ILL,2026-11-21T19:30:00Z,Moneyline,moneyline,home,ILL,,Illinois to win,260,0.3016,0.4071,0.2665,2.4,8.6,,,False,False,False
+401858527-ml-away,401858527,IOWA @ ILL,2026-11-21T19:30:00Z,Moneyline,moneyline,away,IOWA,,Iowa to win,-325,0.6984,0.5929,0.7335,-6.6,-8.7,,,False,True,True
+401858527-to-Over,401858527,IOWA @ ILL,2026-11-21T19:30:00Z,Total,total,Over,,40.5,Over 40.5 (IOWA @ ILL),-118,0.5174,0.5555,0.5174,-2.4,-4.4,,,False,False,True
+401858527-to-Under,401858527,IOWA @ ILL,2026-11-21T19:30:00Z,Total,total,Under,,40.5,Under 40.5 (IOWA @ ILL),-102,0.4826,0.4445,0.4826,-2.2,-4.4,,,False,False,False
+401862833-sp-home,401862833,USF @ FAU,2026-11-21T19:30:00Z,Spread,spread,home,FAU,1.5,FAU +1.5,-112,0.5001,0.4958,0.5043,-2.8,-5.3,-0.2,,False,False,True
+401862833-sp-away,401862833,USF @ FAU,2026-11-21T19:30:00Z,Spread,spread,away,USF,-1.5,South Florida -1.5,-108,0.4999,0.5042,0.4957,-1.9,-3.7,0.2,,False,False,False
+401862833-ml-home,401862833,USF @ FAU,2026-11-21T19:30:00Z,Moneyline,moneyline,home,FAU,,FAU to win,-105,0.4812,0.4573,0.4892,-3.1,-6.1,,,False,False,False
+401862833-ml-away,401862833,USF @ FAU,2026-11-21T19:30:00Z,Moneyline,moneyline,away,USF,,South Florida to win,-115,0.5188,0.5427,0.5108,-1.6,-3.0,,,False,True,True
+401862833-to-Over,401862833,USF @ FAU,2026-11-21T19:30:00Z,Total,total,Over,,63.5,Over 63.5 (USF @ FAU),-112,0.5043,0.4937,0.5043,-2.4,-4.5,,,False,False,False
+401862833-to-Under,401862833,USF @ FAU,2026-11-21T19:30:00Z,Total,total,Under,,63.5,Under 63.5 (USF @ FAU),-108,0.4957,0.5063,0.4957,-2.4,-4.5,,,False,False,True
+401869929-sp-home,401869929,ULM @ APP,2026-11-21T19:30:00Z,Spread,spread,home,APP,-14.0,App State -14,-108,0.5106,0.5256,0.4957,-0.9,-1.7,1.0,,False,False,True
+401869929-sp-away,401869929,ULM @ APP,2026-11-21T19:30:00Z,Spread,spread,away,ULM,14.0,UL Monroe +14,-112,0.4894,0.4744,0.5043,-3.9,-7.4,-1.0,,False,False,False
+401869929-ml-home,401869929,ULM @ APP,2026-11-21T19:30:00Z,Moneyline,moneyline,home,APP,,App State to win,-625,0.8287,0.8333,0.8271,-3.3,-3.9,,,False,True,True
+401869929-ml-away,401869929,ULM @ APP,2026-11-21T19:30:00Z,Moneyline,moneyline,away,ULM,,UL Monroe to win,455,0.1713,0.1667,0.1729,-0.9,-4.9,,,False,False,False
+401869929-to-Over,401869929,ULM @ APP,2026-11-21T19:30:00Z,Total,total,Over,,50.5,Over 50.5 (ULM @ APP),-105,0.4892,0.4848,0.4892,-2.3,-4.5,,,False,False,False
+401869929-to-Under,401869929,ULM @ APP,2026-11-21T19:30:00Z,Total,total,Under,,50.5,Under 50.5 (ULM @ APP),-115,0.5108,0.5152,0.5108,-2.4,-4.5,,,False,False,True
+401869946-sp-home,401869946,CCU @ UL,2026-11-21T20:00:00Z,Spread,spread,home,UL,-10.5,Louisiana -10.5,-105,0.4676,0.446,0.4892,-4.5,-8.7,-2.1,,False,False,False
+401869946-sp-away,401869946,CCU @ UL,2026-11-21T20:00:00Z,Spread,spread,away,CCU,10.5,Coastal +10.5,-115,0.5324,0.554,0.5108,-0.2,-0.5,2.1,,False,False,True
+401869946-ml-home,401869946,CCU @ UL,2026-11-21T20:00:00Z,Moneyline,moneyline,home,UL,,Louisiana to win,-395,0.7509,0.706,0.7659,-4.7,-5.9,,,False,True,True
+401869946-ml-away,401869946,CCU @ UL,2026-11-21T20:00:00Z,Moneyline,moneyline,away,CCU,,Coastal to win,310,0.2491,0.294,0.2341,0.5,2.1,,,False,False,False
+401869946-to-Over,401869946,CCU @ UL,2026-11-21T20:00:00Z,Total,total,Over,,49.5,Over 49.5 (CCU @ UL),-112,0.5043,0.5063,0.5043,-2.4,-4.5,,,False,False,True
+401869946-to-Under,401869946,CCU @ UL,2026-11-21T20:00:00Z,Total,total,Under,,49.5,Under 49.5 (CCU @ UL),-108,0.4957,0.4937,0.4957,-2.4,-4.5,,,False,False,False
+401871077-sp-home,401871077,DEL @ NMSU,2026-11-21T20:00:00Z,Spread,spread,home,NMSU,3.0,New Mexico St +3,-112,0.5025,0.5006,0.5043,-2.6,-4.9,0.0,,False,False,True
+401871077-sp-away,401871077,DEL @ NMSU,2026-11-21T20:00:00Z,Spread,spread,away,DEL,-3.0,Delaware -3,-108,0.4975,0.4994,0.4957,-2.2,-4.2,-0.0,,False,False,False
+401871077-ml-home,401871077,DEL @ NMSU,2026-11-21T20:00:00Z,Moneyline,moneyline,home,NMSU,,New Mexico St to win,130,0.4187,0.4239,0.417,-1.6,-3.7,,,False,False,False
+401871077-ml-away,401871077,DEL @ NMSU,2026-11-21T20:00:00Z,Moneyline,moneyline,away,DEL,,Delaware to win,-155,0.5813,0.5761,0.583,-2.7,-4.4,,,False,True,True
+401871077-to-Over,401871077,DEL @ NMSU,2026-11-21T20:00:00Z,Total,total,Over,,53.5,Over 53.5 (DEL @ NMSU),-115,0.5108,0.5062,0.5108,-2.4,-4.5,,,False,False,True
+401871077-to-Under,401871077,DEL @ NMSU,2026-11-21T20:00:00Z,Total,total,Under,,53.5,Under 53.5 (DEL @ NMSU),-105,0.4892,0.4938,0.4892,-2.3,-4.5,,,False,False,False
+401871078-sp-home,401871078,FIU @ KENN,2026-11-21T20:00:00Z,Spread,spread,home,KENN,-2.5,Kennesaw St -2.5,-115,0.5199,0.5289,0.5108,-1.5,-2.8,1.1,,False,False,True
+401871078-sp-away,401871078,FIU @ KENN,2026-11-21T20:00:00Z,Spread,spread,away,FIU,2.5,FIU +2.5,-105,0.4801,0.4711,0.4892,-3.2,-6.3,-1.1,,False,False,False
+401871078-ml-home,401871078,FIU @ KENN,2026-11-21T20:00:00Z,Moneyline,moneyline,home,KENN,,Kennesaw St to win,-125,0.5475,0.5924,0.5325,-0.8,-1.5,,,False,True,True
+401871078-ml-away,401871078,FIU @ KENN,2026-11-21T20:00:00Z,Moneyline,moneyline,away,FIU,,FIU to win,105,0.4525,0.4076,0.4675,-3.5,-7.2,,,False,False,False
+401871078-to-Over,401871078,FIU @ KENN,2026-11-21T20:00:00Z,Total,total,Over,,44.5,Over 44.5 (FIU @ KENN),-110,0.5,0.494,0.5,-2.4,-4.5,,,False,False,False
+401871078-to-Under,401871078,FIU @ KENN,2026-11-21T20:00:00Z,Total,total,Under,,44.5,Under 44.5 (FIU @ KENN),-110,0.5,0.506,0.5,-2.4,-4.5,,,False,False,True
+401861968-sp-home,401861968,ODU @ CONN,2026-11-21T20:30:00Z,Spread,spread,home,CONN,-13.5,UConn -13.5,-118,0.4675,0.4176,0.5174,-7.4,-13.6,-3.2,,False,False,False
+401861968-sp-away,401861968,ODU @ CONN,2026-11-21T20:30:00Z,Spread,spread,away,ODU,13.5,Old Dominion +13.5,-102,0.5325,0.5824,0.4826,2.8,5.5,3.2,Value,False,False,True
+401861968-ml-home,401861968,ODU @ CONN,2026-11-21T20:30:00Z,Moneyline,moneyline,home,CONN,,UConn to win,-575,0.7995,0.7463,0.8173,-5.2,-6.1,,,False,True,True
+401861968-ml-away,401861968,ODU @ CONN,2026-11-21T20:30:00Z,Moneyline,moneyline,away,ODU,,Old Dominion to win,425,0.2005,0.2537,0.1827,1.0,5.3,,,False,False,False
+401861968-to-Over,401861968,ODU @ CONN,2026-11-21T20:30:00Z,Total,total,Over,,47.5,Over 47.5 (ODU @ CONN),-110,0.5,0.5243,0.5,-2.4,-4.5,,,False,False,True
+401861968-to-Under,401861968,ODU @ CONN,2026-11-21T20:30:00Z,Total,total,Under,,47.5,Under 47.5 (ODU @ CONN),-110,0.5,0.4757,0.5,-2.4,-4.5,,,False,False,False
+401858532-sp-home,401858532,RUTG @ PSU,2026-11-21T20:30:00Z,Spread,spread,home,PSU,-26.5,Penn State -26.5,-110,0.4329,0.3657,0.5,-9.1,-17.4,-5.3,,False,False,False
+401858532-sp-away,401858532,RUTG @ PSU,2026-11-21T20:30:00Z,Spread,spread,away,RUTG,26.5,Rutgers +26.5,-110,0.5671,0.6343,0.5,4.3,8.3,5.3,Value,False,False,True
+401858532-ml-home,401858532,RUTG @ PSU,2026-11-21T20:30:00Z,Moneyline,moneyline,home,PSU,,Penn State to win,-3200,0.9303,0.9141,0.9357,-3.9,-4.1,,,False,True,True
+401858532-ml-away,401858532,RUTG @ PSU,2026-11-21T20:30:00Z,Moneyline,moneyline,away,RUTG,,Rutgers to win,1400,0.0697,0.0859,0.0643,0.3,4.6,,,False,False,False
+401858532-to-Over,401858532,RUTG @ PSU,2026-11-21T20:30:00Z,Total,total,Over,,49.5,Over 49.5 (RUTG @ PSU),-112,0.5043,0.6549,0.5043,-2.4,-4.5,,,False,False,True
+401858532-to-Under,401858532,RUTG @ PSU,2026-11-21T20:30:00Z,Total,total,Under,,49.5,Under 49.5 (RUTG @ PSU),-108,0.4957,0.3451,0.4957,-2.4,-4.5,,,False,False,False
+401858304-sp-home,401858304,NCSU @ FSU,2026-11-21T20:30:00Z,Spread,spread,home,FSU,-10.5,Florida St -10.5,-108,0.4952,0.4947,0.4957,-2.4,-4.6,-0.2,,False,False,False
+401858304-sp-away,401858304,NCSU @ FSU,2026-11-21T20:30:00Z,Spread,spread,away,NCSU,10.5,NC State +10.5,-112,0.5048,0.5053,0.5043,-2.3,-4.4,0.2,,False,False,True
+401858304-ml-home,401858304,NCSU @ FSU,2026-11-21T20:30:00Z,Moneyline,moneyline,home,FSU,,Florida St to win,-395,0.7611,0.7467,0.7659,-3.7,-4.6,,,False,True,True
+401858304-ml-away,401858304,NCSU @ FSU,2026-11-21T20:30:00Z,Moneyline,moneyline,away,NCSU,,NC State to win,310,0.2389,0.2533,0.2341,-0.5,-2.0,,,False,False,False
+401858304-to-Over,401858304,NCSU @ FSU,2026-11-21T20:30:00Z,Total,total,Over,,56.5,Over 56.5 (NCSU @ FSU),-108,0.4957,0.5522,0.4957,-2.4,-4.5,,,False,False,True
+401858304-to-Under,401858304,NCSU @ FSU,2026-11-21T20:30:00Z,Total,total,Under,,56.5,Under 56.5 (NCSU @ FSU),-112,0.5043,0.4478,0.5043,-2.4,-4.5,,,False,False,False
+401856747-sp-home,401856747,SAM @ AUB,2026-11-21T20:30:00Z,Spread,spread,home,AUB,-48.5,Auburn -48.5,-110,0.4553,0.4105,0.5,-6.9,-13.1,-3.5,,True,False,False
+401856747-sp-away,401856747,SAM @ AUB,2026-11-21T20:30:00Z,Spread,spread,away,SAM,48.5,Samford +48.5,-110,0.5447,0.5895,0.5,2.1,4.0,3.5,,True,False,True
+401856747-to-Over,401856747,SAM @ AUB,2026-11-21T20:30:00Z,Total,total,Over,,59.5,Over 59.5 (SAM @ AUB),-110,0.5,0.3311,0.5,-2.4,-4.5,,,True,False,False
+401856747-to-Under,401856747,SAM @ AUB,2026-11-21T20:30:00Z,Total,total,Under,,59.5,Under 59.5 (SAM @ AUB),-110,0.5,0.6689,0.5,-2.4,-4.5,,,True,False,True
+401858535-sp-home,401858535,IU @ WASH,2026-11-21T20:30:00Z,Spread,spread,home,WASH,7.5,Washington +7.5,-110,0.4644,0.4287,0.5,-5.9,-11.3,-2.8,,False,False,False
+401858535-sp-away,401858535,IU @ WASH,2026-11-21T20:30:00Z,Spread,spread,away,IU,-7.5,Indiana -7.5,-110,0.5356,0.5713,0.5,1.2,2.3,2.8,,False,False,True
+401858535-ml-home,401858535,IU @ WASH,2026-11-21T20:30:00Z,Moneyline,moneyline,home,WASH,,Washington to win,250,0.2691,0.2535,0.2742,-1.7,-5.8,,,False,False,False
+401858535-ml-away,401858535,IU @ WASH,2026-11-21T20:30:00Z,Moneyline,moneyline,away,IU,,Indiana to win,-310,0.7309,0.7465,0.7258,-2.5,-3.3,,,False,True,True
+401858535-to-Over,401858535,IU @ WASH,2026-11-21T20:30:00Z,Total,total,Over,,44.5,Over 44.5 (IU @ WASH),-105,0.4892,0.5193,0.4892,-2.3,-4.5,,,False,False,True
+401858535-to-Under,401858535,IU @ WASH,2026-11-21T20:30:00Z,Total,total,Under,,44.5,Under 44.5 (IU @ WASH),-115,0.5108,0.4807,0.5108,-2.4,-4.5,,,False,False,False
+401856754-sp-home,401856754,LSU @ TENN,2026-11-21T20:30:00Z,Spread,spread,home,TENN,1.5,Tennessee +1.5,-115,0.5259,0.5409,0.5108,-0.9,-1.7,1.6,,False,False,True
+401856754-sp-away,401856754,LSU @ TENN,2026-11-21T20:30:00Z,Spread,spread,away,LSU,-1.5,LSU -1.5,-105,0.4741,0.4591,0.4892,-3.8,-7.4,-1.6,,False,False,False
+401856754-ml-home,401856754,LSU @ TENN,2026-11-21T20:30:00Z,Moneyline,moneyline,home,TENN,,Tennessee to win,-105,0.4925,0.5024,0.4892,-2.0,-3.9,,,False,False,False
+401856754-ml-away,401856754,LSU @ TENN,2026-11-21T20:30:00Z,Moneyline,moneyline,away,LSU,,LSU to win,-115,0.5075,0.4976,0.5108,-2.7,-5.1,,,False,True,True
+401856754-to-Over,401856754,LSU @ TENN,2026-11-21T20:30:00Z,Total,total,Over,,45.5,Over 45.5 (LSU @ TENN),-112,0.5043,0.6326,0.5043,-2.4,-4.5,,,False,False,True
+401856754-to-Under,401856754,LSU @ TENN,2026-11-21T20:30:00Z,Total,total,Under,,45.5,Under 45.5 (LSU @ TENN),-108,0.4957,0.3674,0.4957,-2.4,-4.5,,,False,False,False
+401856755-sp-home,401856755,ARK @ TEX,2026-11-21T20:30:00Z,Spread,spread,home,TEX,-20.5,Texas -20.5,-108,0.4967,0.4978,0.4957,-2.3,-4.3,-0.1,,False,False,False
+401856755-sp-away,401856755,ARK @ TEX,2026-11-21T20:30:00Z,Spread,spread,away,ARK,20.5,Arkansas +20.5,-112,0.5033,0.5022,0.5043,-2.5,-4.7,0.1,,False,False,True
+401856755-ml-home,401856755,ARK @ TEX,2026-11-21T20:30:00Z,Moneyline,moneyline,home,TEX,,Texas to win,-1600,0.9045,0.9061,0.904,-3.7,-3.9,,,False,True,True
+401856755-ml-away,401856755,ARK @ TEX,2026-11-21T20:30:00Z,Moneyline,moneyline,away,ARK,,Arkansas to win,900,0.0955,0.0939,0.096,-0.4,-4.5,,,False,False,False
+401856755-to-Over,401856755,ARK @ TEX,2026-11-21T20:30:00Z,Total,total,Over,,47.5,Over 47.5 (ARK @ TEX),-118,0.5174,0.4957,0.5174,-2.4,-4.4,,,False,False,False
+401856755-to-Under,401856755,ARK @ TEX,2026-11-21T20:30:00Z,Total,total,Under,,47.5,Under 47.5 (ARK @ TEX),-102,0.4826,0.5043,0.4826,-2.2,-4.4,,,False,False,True
+401858528-sp-home,401858528,UCLA @ MICH,2026-11-21T20:30:00Z,Spread,spread,home,MICH,3.5,Michigan +3.5,-110,0.5392,0.5784,0.5,1.5,2.9,3.1,Value,False,False,True
+401858528-sp-away,401858528,UCLA @ MICH,2026-11-21T20:30:00Z,Spread,spread,away,UCLA,-3.5,UCLA -3.5,-110,0.4608,0.4216,0.5,-6.3,-12.0,-3.1,,False,False,False
+401858528-ml-home,401858528,UCLA @ MICH,2026-11-21T20:30:00Z,Moneyline,moneyline,home,MICH,,Michigan to win,150,0.4099,0.4889,0.3836,1.0,2.5,,,False,False,False
+401858528-ml-away,401858528,UCLA @ MICH,2026-11-21T20:30:00Z,Moneyline,moneyline,away,UCLA,,UCLA to win,-180,0.5901,0.5111,0.6164,-5.3,-8.2,,,False,True,True
+401858528-to-Over,401858528,UCLA @ MICH,2026-11-21T20:30:00Z,Total,total,Over,,36.5,Over 36.5 (UCLA @ MICH),-118,0.5174,0.6181,0.5174,-2.4,-4.4,,,False,False,True
+401858528-to-Under,401858528,UCLA @ MICH,2026-11-21T20:30:00Z,Total,total,Under,,36.5,Under 36.5 (UCLA @ MICH),-102,0.4826,0.3819,0.4826,-2.2,-4.4,,,False,False,False
+401856871-sp-home,401856871,TTU @ BAY,2026-11-21T20:30:00Z,Spread,spread,home,BAY,4.5,Baylor +4.5,-105,0.511,0.5327,0.4892,-0.1,-0.2,1.3,,False,False,True
+401856871-sp-away,401856871,TTU @ BAY,2026-11-21T20:30:00Z,Spread,spread,away,TTU,-4.5,Texas Tech -4.5,-115,0.489,0.4673,0.5108,-4.6,-8.6,-1.3,,False,False,False
+401856871-ml-home,401856871,TTU @ BAY,2026-11-21T20:30:00Z,Moneyline,moneyline,home,BAY,,Baylor to win,170,0.3708,0.4176,0.3553,0.0,0.1,,,False,False,False
+401856871-ml-away,401856871,TTU @ BAY,2026-11-21T20:30:00Z,Moneyline,moneyline,away,TTU,,Texas Tech to win,-205,0.6292,0.5824,0.6447,-4.3,-6.4,,,False,True,True
+401856871-to-Over,401856871,TTU @ BAY,2026-11-21T20:30:00Z,Total,total,Over,,57.5,Over 57.5 (TTU @ BAY),-105,0.4892,0.5116,0.4892,-2.3,-4.5,,,False,False,True
+401856871-to-Under,401856871,TTU @ BAY,2026-11-21T20:30:00Z,Total,total,Under,,57.5,Under 57.5 (TTU @ BAY),-115,0.5108,0.4884,0.5108,-2.4,-4.5,,,False,False,False
+401856752-sp-home,401856752,TA&M @ OU,2026-11-21T20:45:00Z,Spread,spread,home,OU,-7.0,Oklahoma -7,-112,0.4677,0.4311,0.5043,-6.1,-11.5,-2.7,,False,False,False
+401856752-sp-away,401856752,TA&M @ OU,2026-11-21T20:45:00Z,Spread,spread,away,TA&M,7.0,Texas A&M +7,-108,0.5323,0.5689,0.4957,1.3,2.5,2.7,,False,False,True
+401856752-ml-home,401856752,TA&M @ OU,2026-11-21T20:45:00Z,Moneyline,moneyline,home,OU,,Oklahoma to win,-290,0.6875,0.6095,0.7136,-5.6,-7.5,,,False,True,True
+401856752-ml-away,401856752,TA&M @ OU,2026-11-21T20:45:00Z,Moneyline,moneyline,away,TA&M,,Texas A&M to win,235,0.3125,0.3905,0.2864,1.4,4.7,,,False,False,False
+401856752-to-Over,401856752,TA&M @ OU,2026-11-21T20:45:00Z,Total,total,Over,,37.5,Over 37.5 (TA&M @ OU),-112,0.5043,0.5166,0.5043,-2.4,-4.5,,,False,False,True
+401856752-to-Under,401856752,TA&M @ OU,2026-11-21T20:45:00Z,Total,total,Under,,37.5,Under 37.5 (TA&M @ OU),-108,0.4957,0.4834,0.4957,-2.4,-4.5,,,False,False,False
+401864543-sp-home,401864543,NIU @ NDSU,2026-11-21T21:00:00Z,Spread,spread,home,NDSU,-25.5,N Dakota St -25.5,-105,0.4923,0.4955,0.4892,-2.0,-3.9,-0.2,,False,False,False
+401864543-sp-away,401864543,NIU @ NDSU,2026-11-21T21:00:00Z,Spread,spread,away,NIU,25.5,N Illinois +25.5,-115,0.5077,0.5045,0.5108,-2.7,-5.1,0.2,,False,False,True
+401864543-ml-home,401864543,NIU @ NDSU,2026-11-21T21:00:00Z,Moneyline,moneyline,home,NDSU,,N Dakota St to win,-3200,0.939,0.9488,0.9357,-3.1,-3.2,,,False,True,True
+401864543-ml-away,401864543,NIU @ NDSU,2026-11-21T21:00:00Z,Moneyline,moneyline,away,NIU,,N Illinois to win,1400,0.061,0.0512,0.0643,-0.6,-8.4,,,False,False,False
+401864543-to-Over,401864543,NIU @ NDSU,2026-11-21T21:00:00Z,Total,total,Over,,44.5,Over 44.5 (NIU @ NDSU),-115,0.5108,0.5161,0.5108,-2.4,-4.5,,,False,False,True
+401864543-to-Under,401864543,NIU @ NDSU,2026-11-21T21:00:00Z,Total,total,Under,,44.5,Under 44.5 (NIU @ NDSU),-105,0.4892,0.4839,0.4892,-2.3,-4.5,,,False,False,False
+401869953-sp-home,401869953,GASO @ TROY,2026-11-21T21:00:00Z,Spread,spread,home,TROY,9.5,Troy +9.5,-112,0.5559,0.6076,0.5043,2.8,5.2,4.2,Value,False,False,True
+401869953-sp-away,401869953,GASO @ TROY,2026-11-21T21:00:00Z,Spread,spread,away,GASO,-9.5,GA Southern -9.5,-108,0.4441,0.3924,0.4957,-7.5,-14.5,-4.2,,False,False,False
+401869953-ml-home,401869953,GASO @ TROY,2026-11-21T21:00:00Z,Moneyline,moneyline,home,TROY,,Troy to win,280,0.2809,0.3669,0.2522,1.8,6.7,,,False,False,False
+401869953-ml-away,401869953,GASO @ TROY,2026-11-21T21:00:00Z,Moneyline,moneyline,away,GASO,,GA Southern to win,-355,0.7191,0.6331,0.7478,-6.1,-7.8,,,False,True,True
+401869953-to-Over,401869953,GASO @ TROY,2026-11-21T21:00:00Z,Total,total,Over,,47.5,Over 47.5 (GASO @ TROY),-110,0.5,0.4974,0.5,-2.4,-4.5,,,False,False,False
+401869953-to-Under,401869953,GASO @ TROY,2026-11-21T21:00:00Z,Total,total,Under,,47.5,Under 47.5 (GASO @ TROY),-110,0.5,0.5026,0.5,-2.4,-4.5,,,False,False,True
+401869958-sp-home,401869958,GAST @ MRSH,2026-11-21T21:00:00Z,Spread,spread,home,MRSH,-2.5,Marshall -2.5,-118,0.4893,0.4613,0.5174,-5.2,-9.6,-1.5,,False,False,False
+401869958-sp-away,401869958,GAST @ MRSH,2026-11-21T21:00:00Z,Spread,spread,away,GAST,2.5,Georgia St +2.5,-102,0.5107,0.5387,0.4826,0.6,1.1,1.5,,False,False,True
+401869958-ml-home,401869958,GAST @ MRSH,2026-11-21T21:00:00Z,Moneyline,moneyline,home,MRSH,,Marshall to win,-142,0.554,0.5255,0.5635,-3.3,-5.6,,,False,True,True
+401869958-ml-away,401869958,GAST @ MRSH,2026-11-21T21:00:00Z,Moneyline,moneyline,away,GAST,,Georgia St to win,120,0.446,0.4745,0.4365,-0.9,-1.9,,,False,False,False
+401869958-to-Over,401869958,GAST @ MRSH,2026-11-21T21:00:00Z,Total,total,Over,,55.5,Over 55.5 (GAST @ MRSH),-105,0.4892,0.5885,0.4892,-2.3,-4.5,,,False,False,True
+401869958-to-Under,401869958,GAST @ MRSH,2026-11-21T21:00:00Z,Total,total,Under,,55.5,Under 55.5 (GAST @ MRSH),-115,0.5108,0.4115,0.5108,-2.4,-4.5,,,False,False,False
+401871101-sp-home,401871101,USA @ USM,2026-11-21T21:00:00Z,Spread,spread,home,USM,4.5,Southern Miss +4.5,-105,0.4883,0.4874,0.4892,-2.4,-4.7,-0.5,,False,False,False
+401871101-sp-away,401871101,USA @ USM,2026-11-21T21:00:00Z,Spread,spread,away,USA,-4.5,South Alabama -4.5,-115,0.5117,0.5126,0.5108,-2.3,-4.3,0.5,,False,False,True
+401871101-ml-home,401871101,USA @ USM,2026-11-21T21:00:00Z,Moneyline,moneyline,home,USM,,Southern Miss to win,164,0.3658,0.3738,0.3631,-1.3,-3.4,,,False,False,False
+401871101-ml-away,401871101,USA @ USM,2026-11-21T21:00:00Z,Moneyline,moneyline,away,USA,,South Alabama to win,-198,0.6342,0.6262,0.6369,-3.0,-4.5,,,False,True,True
+401871101-to-Over,401871101,USA @ USM,2026-11-21T21:00:00Z,Total,total,Over,,66.5,Over 66.5 (USA @ USM),-108,0.4957,0.4908,0.4957,-2.4,-4.5,,,False,False,False
+401871101-to-Under,401871101,USA @ USM,2026-11-21T21:00:00Z,Total,total,Under,,66.5,Under 66.5 (USA @ USM),-112,0.5043,0.5092,0.5043,-2.4,-4.5,,,False,False,True
+401860920-sp-home,401860920,WSU @ TXST,2026-11-21T23:00:00Z,Spread,spread,home,TXST,-13.5,Texas St -13.5,-112,0.4546,0.4049,0.5043,-7.4,-13.9,-3.7,,False,False,False
+401860920-sp-away,401860920,WSU @ TXST,2026-11-21T23:00:00Z,Spread,spread,away,WSU,13.5,Washington St +13.5,-108,0.5454,0.5951,0.4957,2.6,5.0,3.7,Value,False,False,True
+401860920-ml-home,401860920,WSU @ TXST,2026-11-21T23:00:00Z,Moneyline,moneyline,home,TXST,,Texas St to win,-535,0.7901,0.7358,0.8082,-5.2,-6.2,,,False,True,True
+401860920-ml-away,401860920,WSU @ TXST,2026-11-21T23:00:00Z,Moneyline,moneyline,away,WSU,,Washington St to win,400,0.2099,0.2642,0.1918,1.0,5.0,,,False,False,False
+401860920-to-Over,401860920,WSU @ TXST,2026-11-21T23:00:00Z,Total,total,Over,,62.5,Over 62.5 (WSU @ TXST),-108,0.4957,0.3868,0.4957,-2.4,-4.5,,,False,False,False
+401860920-to-Under,401860920,WSU @ TXST,2026-11-21T23:00:00Z,Total,total,Under,,62.5,Under 62.5 (WSU @ TXST),-112,0.5043,0.6132,0.5043,-2.4,-4.5,,,False,False,True
+401858534-sp-home,401858534,MD @ USC,2026-11-21T23:15:00Z,Spread,spread,home,USC,-17.5,USC -17.5,-110,0.5182,0.5365,0.5,-0.6,-1.1,1.4,,False,False,True
+401858534-sp-away,401858534,MD @ USC,2026-11-21T23:15:00Z,Spread,spread,away,MD,17.5,Maryland +17.5,-110,0.4818,0.4635,0.5,-4.2,-8.0,-1.4,,False,False,False
+401858534-ml-home,401858534,MD @ USC,2026-11-21T23:15:00Z,Moneyline,moneyline,home,USC,,USC to win,-950,0.873,0.8889,0.8677,-3.2,-3.5,,,False,True,True
+401858534-ml-away,401858534,MD @ USC,2026-11-21T23:15:00Z,Moneyline,moneyline,away,MD,,Maryland to win,625,0.127,0.1111,0.1323,-1.1,-7.9,,,False,False,False
+401858534-to-Over,401858534,MD @ USC,2026-11-21T23:15:00Z,Total,total,Over,,56.5,Over 56.5 (MD @ USC),-115,0.5108,0.5875,0.5108,-2.4,-4.5,,,False,False,True
+401858534-to-Under,401858534,MD @ USC,2026-11-21T23:15:00Z,Total,total,Under,,56.5,Under 56.5 (MD @ USC),-105,0.4892,0.4125,0.4892,-2.3,-4.5,,,False,False,False
+401869938-sp-home,401869938,ARST @ LT,2026-11-22T00:00:00Z,Spread,spread,home,LT,-14.5,Louisiana Tech -14.5,-110,0.4819,0.4638,0.5,-4.2,-8.0,-1.4,,False,False,False
+401869938-sp-away,401869938,ARST @ LT,2026-11-22T00:00:00Z,Spread,spread,away,ARST,14.5,Arkansas St +14.5,-110,0.5181,0.5362,0.5,-0.6,-1.1,1.4,,False,False,True
+401869938-ml-home,401869938,ARST @ LT,2026-11-22T00:00:00Z,Moneyline,moneyline,home,LT,,Louisiana Tech to win,-600,0.817,0.8008,0.8223,-4.0,-4.7,,,False,True,True
+401869938-ml-away,401869938,ARST @ LT,2026-11-22T00:00:00Z,Moneyline,moneyline,away,ARST,,Arkansas St to win,440,0.183,0.1992,0.1777,-0.2,-1.2,,,False,False,False
+401869938-to-Over,401869938,ARST @ LT,2026-11-22T00:00:00Z,Total,total,Over,,54.5,Over 54.5 (ARST @ LT),-115,0.5108,0.4749,0.5108,-2.4,-4.5,,,False,False,False
+401869938-to-Under,401869938,ARST @ LT,2026-11-22T00:00:00Z,Total,total,Under,,54.5,Under 54.5 (ARST @ LT),-105,0.4892,0.5251,0.4892,-2.3,-4.5,,,False,False,True
+401864544-sp-home,401864544,UNLV @ SJSU,2026-11-22T00:00:00Z,Spread,spread,home,SJSU,6.5,San José St +6.5,-105,0.5068,0.5245,0.4892,-0.5,-1.0,1.0,,False,False,True
+401864544-sp-away,401864544,UNLV @ SJSU,2026-11-22T00:00:00Z,Spread,spread,away,UNLV,-6.5,UNLV -6.5,-115,0.4932,0.4755,0.5108,-4.2,-7.8,-1.0,,False,False,False
+401864544-ml-home,401864544,UNLV @ SJSU,2026-11-22T00:00:00Z,Moneyline,moneyline,home,SJSU,,San José St to win,200,0.3296,0.3602,0.3194,-0.4,-1.1,,,False,False,False
+401864544-ml-away,401864544,UNLV @ SJSU,2026-11-22T00:00:00Z,Moneyline,moneyline,away,UNLV,,UNLV to win,-245,0.6704,0.6398,0.6806,-4.0,-5.6,,,False,True,True
+401864544-to-Over,401864544,UNLV @ SJSU,2026-11-22T00:00:00Z,Total,total,Over,,47.5,Over 47.5 (UNLV @ SJSU),-112,0.5043,0.5241,0.5043,-2.4,-4.5,,,False,False,True
+401864544-to-Under,401864544,UNLV @ SJSU,2026-11-22T00:00:00Z,Total,total,Under,,47.5,Under 47.5 (UNLV @ SJSU),-108,0.4957,0.4759,0.4957,-2.4,-4.5,,,False,False,False
+401858302-sp-home,401858302,VT @ MIA,2026-11-22T00:00:00Z,Spread,spread,home,MIA,-20.5,Miami -20.5,-115,0.5599,0.609,0.5108,2.5,4.7,4.3,Value,False,False,True
+401858302-sp-away,401858302,VT @ MIA,2026-11-22T00:00:00Z,Spread,spread,away,VT,20.5,Virginia Tech +20.5,-105,0.4401,0.391,0.4892,-7.2,-14.1,-4.3,,False,False,False
+401858302-ml-home,401858302,VT @ MIA,2026-11-22T00:00:00Z,Moneyline,moneyline,home,MIA,,Miami to win,-1650,0.9175,0.9451,0.9083,-2.5,-2.7,,,False,True,True
+401858302-ml-away,401858302,VT @ MIA,2026-11-22T00:00:00Z,Moneyline,moneyline,away,VT,,Virginia Tech to win,950,0.0825,0.0549,0.0917,-1.3,-13.3,,,False,False,False
+401858302-to-Over,401858302,VT @ MIA,2026-11-22T00:00:00Z,Total,total,Over,,60.5,Over 60.5 (VT @ MIA),-115,0.5108,0.5105,0.5108,-2.4,-4.5,,,False,False,True
+401858302-to-Under,401858302,VT @ MIA,2026-11-22T00:00:00Z,Total,total,Under,,60.5,Under 60.5 (VT @ MIA),-105,0.4892,0.4895,0.4892,-2.3,-4.5,,,False,False,False
+401856865-sp-home,401856865,ARIZ @ KSU,2026-11-22T00:00:00Z,Spread,spread,home,KSU,7.5,Kansas St +7.5,-115,0.5099,0.5089,0.5108,-2.5,-4.7,0.3,,False,False,True
+401856865-sp-away,401856865,ARIZ @ KSU,2026-11-22T00:00:00Z,Spread,spread,away,ARIZ,-7.5,Arizona -7.5,-105,0.4901,0.4911,0.4892,-2.2,-4.3,-0.3,,False,False,False
+401856865-ml-home,401856865,ARIZ @ KSU,2026-11-22T00:00:00Z,Moneyline,moneyline,home,KSU,,Kansas St to win,235,0.2954,0.3222,0.2864,-0.3,-1.0,,,False,False,False
+401856865-ml-away,401856865,ARIZ @ KSU,2026-11-22T00:00:00Z,Moneyline,moneyline,away,ARIZ,,Arizona to win,-290,0.7046,0.6778,0.7136,-3.9,-5.2,,,False,True,True
+401856865-to-Over,401856865,ARIZ @ KSU,2026-11-22T00:00:00Z,Total,total,Over,,52.5,Over 52.5 (ARIZ @ KSU),-108,0.4957,0.5924,0.4957,-2.4,-4.5,,,False,False,True
+401856865-to-Under,401856865,ARIZ @ KSU,2026-11-22T00:00:00Z,Total,total,Under,,52.5,Under 52.5 (ARIZ @ KSU),-112,0.5043,0.4076,0.5043,-2.4,-4.5,,,False,False,False
+401856753-sp-home,401856753,UGA @ SC,2026-11-22T00:30:00Z,Spread,spread,home,SC,14.5,South Carolina +14.5,-105,0.5117,0.5343,0.4892,-0.0,-0.1,1.3,,False,False,True
+401856753-sp-away,401856753,UGA @ SC,2026-11-22T00:30:00Z,Spread,spread,away,UGA,-14.5,Georgia -14.5,-115,0.4883,0.4657,0.5108,-4.7,-8.7,-1.3,,False,False,False
+401856753-ml-home,401856753,UGA @ SC,2026-11-22T00:30:00Z,Moneyline,moneyline,home,SC,,South Carolina to win,525,0.1646,0.1978,0.1535,0.5,2.9,,,False,False,False
+401856753-ml-away,401856753,UGA @ SC,2026-11-22T00:30:00Z,Moneyline,moneyline,away,UGA,,Georgia to win,-750,0.8354,0.8022,0.8465,-4.7,-5.3,,,False,True,True
+401856753-to-Over,401856753,UGA @ SC,2026-11-22T00:30:00Z,Total,total,Over,,51.5,Over 51.5 (UGA @ SC),-102,0.4826,0.6265,0.4826,-2.2,-4.4,,,False,False,True
+401856753-to-Under,401856753,UGA @ SC,2026-11-22T00:30:00Z,Total,total,Under,,51.5,Under 51.5 (UGA @ SC),-118,0.5174,0.3735,0.5174,-2.4,-4.4,,,False,False,False
+401858307-sp-home,401858307,SMU @ ND,2026-11-22T00:30:00Z,Spread,spread,home,ND,-20.5,Notre Dame -20.5,-112,0.5189,0.5335,0.5043,-0.9,-1.8,1.3,,False,False,True
+401858307-sp-away,401858307,SMU @ ND,2026-11-22T00:30:00Z,Spread,spread,away,SMU,20.5,SMU +20.5,-108,0.4811,0.4665,0.4957,-3.8,-7.3,-1.3,,False,False,False
+401858307-ml-home,401858307,SMU @ ND,2026-11-22T00:30:00Z,Moneyline,moneyline,home,ND,,Notre Dame to win,-1650,0.9112,0.9202,0.9083,-3.2,-3.4,,,False,True,True
+401858307-ml-away,401858307,SMU @ ND,2026-11-22T00:30:00Z,Moneyline,moneyline,away,SMU,,SMU to win,950,0.0888,0.0798,0.0917,-0.6,-6.8,,,False,False,False
+401858307-to-Over,401858307,SMU @ ND,2026-11-22T00:30:00Z,Total,total,Over,,56.5,Over 56.5 (SMU @ ND),-108,0.4957,0.5529,0.4957,-2.4,-4.5,,,False,False,True
+401858307-to-Under,401858307,SMU @ ND,2026-11-22T00:30:00Z,Total,total,Under,,56.5,Under 56.5 (SMU @ ND),-112,0.5043,0.4471,0.5043,-2.4,-4.5,,,False,False,False
+401856751-sp-home,401856751,UK @ MIZ,2026-11-22T00:30:00Z,Spread,spread,home,MIZ,-4.5,Missouri -4.5,-115,0.5315,0.5523,0.5108,-0.3,-0.6,2.0,,False,False,True
+401856751-sp-away,401856751,UK @ MIZ,2026-11-22T00:30:00Z,Spread,spread,away,UK,4.5,Kentucky +4.5,-105,0.4685,0.4477,0.4892,-4.4,-8.5,-2.0,,False,False,False
+401856751-ml-home,401856751,UK @ MIZ,2026-11-22T00:30:00Z,Moneyline,moneyline,home,MIZ,,Missouri to win,-205,0.6494,0.6634,0.6447,-2.3,-3.4,,,False,True,True
+401856751-ml-away,401856751,UK @ MIZ,2026-11-22T00:30:00Z,Moneyline,moneyline,away,UK,,Kentucky to win,170,0.3506,0.3366,0.3553,-2.0,-5.3,,,False,False,False
+401856751-to-Over,401856751,UK @ MIZ,2026-11-22T00:30:00Z,Total,total,Over,,48.5,Over 48.5 (UK @ MIZ),-110,0.5,0.57,0.5,-2.4,-4.5,,,False,False,True
+401856751-to-Under,401856751,UK @ MIZ,2026-11-22T00:30:00Z,Total,total,Under,,48.5,Under 48.5 (UK @ MIZ),-110,0.5,0.43,0.5,-2.4,-4.5,,,False,False,False
+401858306-sp-home,401858306,PITT @ LOU,2026-11-22T00:30:00Z,Spread,spread,home,LOU,-13.5,Louisville -13.5,-112,0.4531,0.4019,0.5043,-7.5,-14.2,-3.8,,False,False,False
+401858306-sp-away,401858306,PITT @ LOU,2026-11-22T00:30:00Z,Spread,spread,away,PITT,13.5,Pitt +13.5,-108,0.5469,0.5981,0.4957,2.8,5.3,3.8,Value,False,False,True
+401858306-ml-home,401858306,PITT @ LOU,2026-11-22T00:30:00Z,Moneyline,moneyline,home,LOU,,Louisville to win,-550,0.7922,0.7332,0.8119,-5.4,-6.4,,,False,True,True
+401858306-ml-away,401858306,PITT @ LOU,2026-11-22T00:30:00Z,Moneyline,moneyline,away,PITT,,Pitt to win,410,0.2078,0.2668,0.1881,1.2,6.0,,,False,False,False
+401858306-to-Over,401858306,PITT @ LOU,2026-11-22T00:30:00Z,Total,total,Over,,50.5,Over 50.5 (PITT @ LOU),-110,0.5,0.5954,0.5,-2.4,-4.5,,,False,False,True
+401858306-to-Under,401858306,PITT @ LOU,2026-11-22T00:30:00Z,Total,total,Under,,50.5,Under 50.5 (PITT @ LOU),-110,0.5,0.4046,0.5,-2.4,-4.5,,,False,False,False
+401858308-sp-home,401858308,STAN @ CAL,2026-11-22T00:30:00Z,Spread,spread,home,CAL,2.5,California +2.5,-105,0.5564,0.6237,0.4892,4.4,8.6,4.9,Value,False,False,True
+401858308-sp-away,401858308,STAN @ CAL,2026-11-22T00:30:00Z,Spread,spread,away,STAN,-2.5,Stanford -2.5,-115,0.4436,0.3763,0.5108,-9.1,-17.1,-4.9,,False,False,False
+401858308-ml-home,401858308,STAN @ CAL,2026-11-22T00:30:00Z,Moneyline,moneyline,home,CAL,,California to win,114,0.4767,0.5612,0.4486,0.9,2.0,,,False,False,False
+401858308-ml-away,401858308,STAN @ CAL,2026-11-22T00:30:00Z,Moneyline,moneyline,away,STAN,,Stanford to win,-135,0.5233,0.4388,0.5514,-5.1,-8.9,,,False,True,True
+401858308-to-Over,401858308,STAN @ CAL,2026-11-22T00:30:00Z,Total,total,Over,,55.5,Over 55.5 (STAN @ CAL),-110,0.5,0.4696,0.5,-2.4,-4.5,,,False,False,False
+401858308-to-Under,401858308,STAN @ CAL,2026-11-22T00:30:00Z,Total,total,Under,,55.5,Under 55.5 (STAN @ CAL),-110,0.5,0.5304,0.5,-2.4,-4.5,,,False,False,True
+401860918-sp-home,401860918,CSU @ FRES,2026-11-22T00:30:00Z,Spread,spread,home,FRES,-20.5,Fresno St -20.5,-105,0.4525,0.4159,0.4892,-6.0,-11.6,-3.3,,False,False,False
+401860918-sp-away,401860918,CSU @ FRES,2026-11-22T00:30:00Z,Spread,spread,away,CSU,20.5,Colorado St +20.5,-115,0.5475,0.5841,0.5108,1.3,2.4,3.3,Value,False,False,True
+401860918-ml-home,401860918,CSU @ FRES,2026-11-22T00:30:00Z,Moneyline,moneyline,home,FRES,,Fresno St to win,-1450,0.8908,0.8665,0.8989,-4.5,-4.8,,,False,True,True
+401860918-ml-away,401860918,CSU @ FRES,2026-11-22T00:30:00Z,Moneyline,moneyline,away,CSU,,Colorado St to win,850,0.1092,0.1335,0.1011,0.4,3.8,,,False,False,False
+401860918-to-Over,401860918,CSU @ FRES,2026-11-22T00:30:00Z,Total,total,Over,,66.5,Over 66.5 (CSU @ FRES),-108,0.4957,0.4508,0.4957,-2.4,-4.5,,,False,False,False
+401860918-to-Under,401860918,CSU @ FRES,2026-11-22T00:30:00Z,Total,total,Under,,66.5,Under 66.5 (CSU @ FRES),-112,0.5043,0.5492,0.5043,-2.4,-4.5,,,False,False,True
+401862836-sp-home,401862836,UTSA @ UAB,2026-11-22T01:00:00Z,Spread,spread,home,UAB,6.0,UAB +6,-112,0.504,0.5038,0.5043,-2.4,-4.6,0.1,,False,False,True
+401862836-sp-away,401862836,UTSA @ UAB,2026-11-22T01:00:00Z,Spread,spread,away,UTSA,-6.0,UTSA -6,-108,0.496,0.4962,0.4957,-2.3,-4.5,-0.1,,False,False,False
+401862836-ml-home,401862836,UTSA @ UAB,2026-11-22T01:00:00Z,Moneyline,moneyline,home,UAB,,UAB to win,185,0.3405,0.3528,0.3364,-1.0,-3.0,,,False,False,False
+401862836-ml-away,401862836,UTSA @ UAB,2026-11-22T01:00:00Z,Moneyline,moneyline,away,UTSA,,UTSA to win,-225,0.6595,0.6472,0.6636,-3.3,-4.7,,,False,True,True
+401862836-to-Over,401862836,UTSA @ UAB,2026-11-22T01:00:00Z,Total,total,Over,,49.5,Over 49.5 (UTSA @ UAB),-112,0.5043,0.6094,0.5043,-2.4,-4.5,,,False,False,True
+401862836-to-Under,401862836,UTSA @ UAB,2026-11-22T01:00:00Z,Total,total,Under,,49.5,Under 49.5 (UTSA @ UAB),-108,0.4957,0.3906,0.4957,-2.4,-4.5,,,False,False,False
+401856872-sp-home,401856872,UTAH @ TCU,2026-11-22T02:00:00Z,Spread,spread,home,TCU,8.5,TCU +8.5,-112,0.5315,0.5587,0.5043,0.3,0.6,2.3,,False,False,True
+401856872-sp-away,401856872,UTAH @ TCU,2026-11-22T02:00:00Z,Spread,spread,away,UTAH,-8.5,Utah -8.5,-108,0.4685,0.4413,0.4957,-5.1,-9.8,-2.3,,False,False,False
+401856872-ml-home,401856872,UTAH @ TCU,2026-11-22T02:00:00Z,Moneyline,moneyline,home,TCU,,TCU to win,260,0.2859,0.3443,0.2665,0.8,2.9,,,False,False,False
+401856872-ml-away,401856872,UTAH @ TCU,2026-11-22T02:00:00Z,Moneyline,moneyline,away,UTAH,,Utah to win,-325,0.7141,0.6557,0.7335,-5.1,-6.6,,,False,True,True
+401856872-to-Over,401856872,UTAH @ TCU,2026-11-22T02:00:00Z,Total,total,Over,,46.5,Over 46.5 (UTAH @ TCU),-108,0.4957,0.5108,0.4957,-2.4,-4.5,,,False,False,True
+401856872-to-Under,401856872,UTAH @ TCU,2026-11-22T02:00:00Z,Total,total,Under,,46.5,Under 46.5 (UTAH @ TCU),-112,0.5043,0.4892,0.5043,-2.4,-4.5,,,False,False,False
+401860925-sp-home,401860925,SDSU @ BOIS,2026-11-22T02:30:00Z,Spread,spread,home,BOIS,-17.5,Boise St -17.5,-108,0.522,0.5484,0.4957,0.3,0.5,1.9,,False,False,True
+401860925-sp-away,401860925,SDSU @ BOIS,2026-11-22T02:30:00Z,Spread,spread,away,SDSU,17.5,San Diego St +17.5,-112,0.478,0.4516,0.5043,-5.0,-9.5,-1.9,,False,False,False
+401860925-ml-home,401860925,SDSU @ BOIS,2026-11-22T02:30:00Z,Moneyline,moneyline,home,BOIS,,Boise St to win,-950,0.8744,0.8945,0.8677,-3.0,-3.4,,,False,True,True
+401860925-ml-away,401860925,SDSU @ BOIS,2026-11-22T02:30:00Z,Moneyline,moneyline,away,SDSU,,San Diego St to win,625,0.1256,0.1055,0.1323,-1.2,-8.9,,,False,False,False
+401860925-to-Over,401860925,SDSU @ BOIS,2026-11-22T02:30:00Z,Total,total,Over,,60.5,Over 60.5 (SDSU @ BOIS),-115,0.5108,0.4477,0.5108,-2.4,-4.5,,,False,False,False
+401860925-to-Under,401860925,SDSU @ BOIS,2026-11-22T02:30:00Z,Total,total,Under,,60.5,Under 60.5 (SDSU @ BOIS),-105,0.4892,0.5523,0.4892,-2.3,-4.5,,,False,False,True
+401856870-sp-home,401856870,OKST @ ASU,2026-11-22T03:15:00Z,Spread,spread,home,ASU,2.5,Arizona St +2.5,-105,0.4729,0.4567,0.4892,-3.9,-7.7,-1.7,,False,False,False
+401856870-sp-away,401856870,OKST @ ASU,2026-11-22T03:15:00Z,Spread,spread,away,OKST,-2.5,Oklahoma St -2.5,-115,0.5271,0.5433,0.5108,-0.8,-1.5,1.7,,False,False,True
+401856870-ml-home,401856870,OKST @ ASU,2026-11-22T03:15:00Z,Moneyline,moneyline,home,ASU,,Arizona St to win,114,0.4348,0.3936,0.4486,-3.2,-7.0,,,False,False,False
+401856870-ml-away,401856870,OKST @ ASU,2026-11-22T03:15:00Z,Moneyline,moneyline,away,OKST,,Oklahoma St to win,-135,0.5652,0.6064,0.5514,-0.9,-1.6,,,False,True,True
+401856870-to-Over,401856870,OKST @ ASU,2026-11-22T03:15:00Z,Total,total,Over,,59.5,Over 59.5 (OKST @ ASU),-112,0.5043,0.6067,0.5043,-2.4,-4.5,,,False,False,True
+401856870-to-Under,401856870,OKST @ ASU,2026-11-22T03:15:00Z,Total,total,Under,,59.5,Under 59.5 (OKST @ ASU),-108,0.4957,0.3933,0.4957,-2.4,-4.5,,,False,False,False
+401860919-sp-home,401860919,USU @ ORST,2026-11-22T03:30:00Z,Spread,spread,home,ORST,-8.5,Oregon St -8.5,-105,0.506,0.5228,0.4892,-0.6,-1.2,0.9,,False,False,True
+401860919-sp-away,401860919,USU @ ORST,2026-11-22T03:30:00Z,Spread,spread,away,USU,8.5,Utah State +8.5,-115,0.494,0.4772,0.5108,-4.1,-7.6,-0.9,,False,False,False
+401860919-ml-home,401860919,USU @ ORST,2026-11-22T03:30:00Z,Moneyline,moneyline,home,ORST,,Oregon St to win,-325,0.7321,0.7276,0.7335,-3.3,-4.3,,,False,True,True
+401860919-ml-away,401860919,USU @ ORST,2026-11-22T03:30:00Z,Moneyline,moneyline,away,USU,,Utah State to win,260,0.2679,0.2724,0.2665,-1.0,-3.5,,,False,False,False
+401860919-to-Over,401860919,USU @ ORST,2026-11-22T03:30:00Z,Total,total,Over,,50.5,Over 50.5 (USU @ ORST),-108,0.4957,0.4729,0.4957,-2.4,-4.5,,,False,False,False
+401860919-to-Under,401860919,USU @ ORST,2026-11-22T03:30:00Z,Total,total,Under,,50.5,Under 50.5 (USU @ ORST),-112,0.5043,0.5271,0.5043,-2.4,-4.5,,,False,False,True
+401864541-sp-home,401864541,HAW @ NEV,2026-11-22T03:30:00Z,Spread,spread,home,NEV,-6.0,Nevada -6,-112,0.4757,0.447,0.5043,-5.3,-10.0,-2.1,,False,False,False
+401864541-sp-away,401864541,HAW @ NEV,2026-11-22T03:30:00Z,Spread,spread,away,HAW,6.0,Hawai'i +6,-108,0.5243,0.553,0.4957,0.5,1.0,2.1,,False,False,True
+401864541-ml-home,401864541,HAW @ NEV,2026-11-22T03:30:00Z,Moneyline,moneyline,home,NEV,,Nevada to win,-238,0.6563,0.6002,0.675,-4.8,-6.8,,,False,True,True
+401864541-ml-away,401864541,HAW @ NEV,2026-11-22T03:30:00Z,Moneyline,moneyline,away,HAW,,Hawai'i to win,195,0.3437,0.3998,0.325,0.5,1.4,,,False,False,False
+401864541-to-Over,401864541,HAW @ NEV,2026-11-22T03:30:00Z,Total,total,Over,,40.5,Over 40.5 (HAW @ NEV),-110,0.5,0.5747,0.5,-2.4,-4.5,,,False,False,True
+401864541-to-Under,401864541,HAW @ NEV,2026-11-22T03:30:00Z,Total,total,Under,,40.5,Under 40.5 (HAW @ NEV),-110,0.5,0.4253,0.5,-2.4,-4.5,,,False,False,False
