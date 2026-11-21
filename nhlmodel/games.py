@@ -53,15 +53,15 @@ def en_table(tg, mask):
     """P(final margin | regulation margin before empty-net goals), margins from the home side, -4..4."""
     t = tg[mask]
     h = t[t.is_home == 1].merge(t[t.is_home == 0][['game_id', 'gf_reg']], on='game_id', suffixes=('', '_a'))
-    h = h[h.ot == 0]
-    h['m0'] = h.gf_reg - h.gf_reg_a
-    h['mf'] = h.gf - h.ga
+    h = h[(h.ot == 0) & h[['gf', 'ga', 'gf_reg', 'gf_reg_a']].notna().all(axis=1)]   # unplayed games (the slate) have no score
+    h['m0'] = (h.gf_reg - h.gf_reg_a).astype(int)
+    h['mf'] = (h.gf - h.ga).astype(int)   # whole numbers: total_pmf keys index the page's total-goals list
     T = {}
     for m in range(-4, 5):
         if m == 0:
             continue
         s = h[h.m0 == m].mf
-        T[m] = (s.value_counts() / len(s)).to_dict() if len(s) >= 30 else {m: 1.0}
+        T[m] = {int(k): float(v) for k, v in (s.value_counts() / len(s)).items()} if len(s) >= 30 else {m: 1.0}
     return T
 
 

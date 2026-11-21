@@ -100,7 +100,7 @@ for r in slate.itertuples():
                p_home=round(pr['home_win'], 3), gk_home=nh.get('goalie'), gk_away=na.get('goalie'),
                gk_home_ok=nh.get('confirmed', False), gk_away_ok=na.get('confirmed', False),
                out_home=nh.get('outs', []), out_away=na.get('outs', []), legs=[],
-               tpmf=[round(float(tp.get(k, 0.0)), 5) for k in range(max(tp) + 1)])   # total-goals chances, for the page's line editor
+               tpmf=[round(float(tp.get(k, 0.0)), 5) for k in range(int(max(tp)) + 1)])   # total-goals chances, for the page's line editor
     ex = lambda market, side, line: dict(gid=g, market=market, side=side, line=line)
     if r.ml_home == r.ml_home and r.ml_away == r.ml_away and r.ml_home and r.ml_away:
         b = nv(r.ml_home, r.ml_away)
