@@ -37,7 +37,7 @@ patchNhl();
 const STATS = [['sog', 'Shots on goal'], ['saves', 'Goalie saves']];
 const SRC = (k) => (k === 'saves' ? D.goalies : D.players);
 const SL = Object.fromEntries(STATS);
-const TABS = [['games', 'Games']].concat(STATS).concat([['parlay', 'Parlay builder'], ['record', 'Model record']]);
+const TABS = [['games', 'Games']].concat(STATS).concat([['parlay', 'Parlay builder'], ['sim', 'Simulation'], ['record', 'Model record']]);
 const state = { tab: 'games', game: 'all', pos: 'all', q: '', sort: 'edge', pmin: 0.25, pq: '' };
 const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
 const fmt = (o) => o == null ? '—' : (o > 0 ? '+' : '') + o;
@@ -241,7 +241,7 @@ function header() {
 
 function strip() {
   const s = $('games'); s.innerHTML = '';
-  s.style.display = state.tab === 'record' || state.tab === 'parlay' ? 'none' : '';
+  s.style.display = state.tab === 'record' || state.tab === 'parlay' || state.tab === 'sim' ? 'none' : '';
   const mk = (id, m, sub) => { const b = el('button', 'game'); b.setAttribute('aria-pressed', state.game === id); b.append(el('span', 'm', m), el('span', 't', sub)); b.onclick = () => { state.game = id; render(); }; s.append(b); };
   mk('all', 'All games', `${D.games.length} tonight`);
   D.games.forEach((g) => mk(g.game, g.game, g.tip));
@@ -600,11 +600,27 @@ function openLog(p, k, leg) {
   const esc = (e) => { if (e.key === 'Escape') { ov.remove(); document.removeEventListener('keydown', esc); } }; document.addEventListener('keydown', esc);
 }
 
+// ---- Simulation tab (Thomas, 2026-11-21): each game's simulation (board/site/sim.js renderTab), from the board's chances ----
+function boardSim() {
+  const B = $('board'); B.innerHTML = '';
+  if (!(window.GameSim && GameSim.ready('nhl') && GameSim.renderTab)) { B.append(el('div', 'empty', 'The simulation tables did not load. Refresh the page.')); return; }
+  B.append(el('p', 'note', 'Each game simulated 20,000 times with correlations measured on past NHL games: the game lines\' chances, how each player\'s chance moves if each team wins or the game goes over or under, the likeliest same-game parlays, and the legs that rise and fall together. Hockey legs are mostly independent, except goalie saves. Tap Build to open a parlay in the builder.'));
+  const box = el('div'); B.append(box);
+  GameSim.renderTab(box, {
+    sport: 'nhl', all: D.legs, posOf: (l) => SIM_POS[String(l.pid)], starts: STARTS, legs: D.legs.filter((l) => l.price != null),
+    name: (l) => l.label, price: (l) => l.price, side: (l) => String(l.side || ''), team: (l) => l.side,
+    role: (l) => (l.kind === 'Moneyline' ? 'win' : l.kind === 'Total' ? 'total' : l.kind === 'Puck line' ? 'line' : 'player'),
+    main: (l) => !l.alt, slot: sideKey, who: (l) => (l.pid && !['Moneyline', 'Puck line', 'Total'].includes(l.kind) ? String(l.pid) : ''),
+    ok: (l) => !l.flags.length && l.p >= 0.5 && l.price >= ALT_MIN_PRICE && !NO_SGP.has(l.kind),
+    onBuild: (ids) => { slip = ids.slice(); sugIdx = -1; saveSlip(); state.tab = 'parlay'; render(); window.scrollTo(0, 0); },
+  });
+}
 function render() {
   header(); strip(); bar();
   if (state.tab === 'games') boardGames();
   else if (state.tab === 'parlay') boardParlay();
   else if (state.tab === 'record') boardRecord();
+  else if (state.tab === 'sim') boardSim();
   else boardProps(state.tab);
 }
 render();
